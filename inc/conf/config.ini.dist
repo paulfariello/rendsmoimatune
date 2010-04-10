@@ -1,0 +1,37 @@
+[logger]
+level = "DEBUG" 
+;level = "INFO" 
+;level = "WARN" 
+;level = "ERROR" 
+;level = "FATAL" 
+
+[sgbd]
+;driver = "pdo_mysql"
+;driver = "pdo_sqlite"
+driver = "pdo_pgsql"
+;driver = "pdo_oci"
+;driver = "pdo_mssql"
+;driver = "oci8"
+host = "localhost"
+user_name = "botteDeFoin"
+password = "botteDeFoin"
+database_name = "botteDeFoin"
+prefix = "Bdf"
+hash = SHA256
+;hash = Blowfish
+;hash = MD5
+
+[doctrine]
+version = "2.0.0-ALPHA3"
+proxy_dir = "proxy/"
+proxy_namespace = "\Bdf\Model\Proxy"
+mapping_dir = "mapping/"
+; Comment this line if you don't want to use apc for caching sql queries and doctrine entities
+cache = "apc"
+
+[site]
+url = "http://localhost/botteDeFoin/"
+image_dir = "px/"
+style_dir = "style/"
+templates_dir = "templates/"
+default_templates = "default/"
