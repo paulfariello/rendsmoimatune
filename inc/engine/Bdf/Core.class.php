@@ -41,7 +41,7 @@ class Core {
 	private $dbConnection = null;
 	private $doctrineEntityManager = null;
 
-  private $templatesEngine = null;
+	private $templatesEngine = null;
 
 
 
@@ -73,11 +73,11 @@ class Core {
 	}
 
 	private function loadConfiguration() {
-    if(file_exists(CONF."config.ini")) {
-      $this->config = parse_ini_file(CONF."config.ini",true);
-    } else {
+		if(file_exists(CONF."config.ini")) {
+			$this->config = parse_ini_file(CONF."config.ini",true);
+		} else {
 			trigger_error('Le fichier de configuration n\'est pas présent. Utiliser le script install/index.php pour en créer un nouveau.',E_USER_ERROR);
-    }
+		}
 	}
 
 	public function initialization() {
@@ -89,7 +89,7 @@ class Core {
 			$this->loggerInitialization();
 			$this->utilsInitialization();
 			$this->doctrineInitialization();
-      $this->sessionInitialization();
+			$this->sessionInitialization();
 			$this->smartyInitialization();
 			$this->initialized = true;
 		}
@@ -100,25 +100,25 @@ class Core {
 		$this->logger->setLevel($this->getConfig("logger","level"));
 	}
 
-  private function utilsInitialization() {
-    $this->utils = \Bdf\Utils::getInstance();
-  }
+	private function utilsInitialization() {
+		$this->utils = \Bdf\Utils::getInstance();
+	}
 
 	private function classLoaderInitialization() {
 		require_once(COTS.'doctrine/'.$this->getConfig('doctrine','version').'/Doctrine/Common/IsolatedClassLoader.php');
 
-    // Register Bdf Class Loader
+		// Register Bdf Class Loader
 		$classLoader = new \Doctrine\Common\IsolatedClassLoader('Bdf');
 		$classLoader->setBasePath(ENGINE);
 		$classLoader->setFileExtension('.class.php');
 		$classLoader->register();
 
-    // Register Doctrine Class Loader
+		// Register Doctrine Class Loader
 		$classLoader = new \Doctrine\Common\IsolatedClassLoader('Doctrine');
 		$classLoader->setBasePath(COTS.'doctrine/'.$this->getConfig('doctrine','version'));
 		$classLoader->register();
-    
-    // Register Bdf Class Loader
+
+		// Register Bdf Class Loader
 		$classLoader = new \Doctrine\Common\IsolatedClassLoader($this->getConfig('site','namespace'));
 		$classLoader->setBasePath(INC."class/");
 		$classLoader->setFileExtension('.class.php');
@@ -129,8 +129,8 @@ class Core {
 		$this->doctrineConfig = new \Doctrine\ORM\Configuration();
 		$this->doctrineConfig->setProxyDir(INC.$this->getConfig('doctrine','proxy_dir'));
 		$this->doctrineConfig->setProxyNamespace($this->getConfig('doctrine','proxy_namespace'));
-    // Deprecated for production environment
-    $this->doctrineConfig->setAutoGenerateProxyClasses(true);
+		// Deprecated for production environment
+		$this->doctrineConfig->setAutoGenerateProxyClasses(true);
 		$driver = new \Doctrine\ORM\Mapping\Driver\XmlDriver(array(INC.$this->getConfig('doctrine','mapping_dir')));
 		$this->doctrineConfig->setMetadataDriverImpl($driver);
 		$this->doctrineConfig->setSqlLogger($this->logger);
@@ -142,44 +142,45 @@ class Core {
 		}
 
 		$connectionParams = array(
-      'dbname' => $this->getConfig('sgbd','database_name'),
-      'user' => $this->getConfig('sgbd','user_name'),
-      'password' => $this->getConfig('sgbd','password'),
-      'host' => $this->getConfig('sgbd','host'),
-      'driver' => $this->getConfig('sgbd','driver')
-		);
+				'dbname' => $this->getConfig('sgbd','database_name'),
+				'user' => $this->getConfig('sgbd','user_name'),
+				'password' => $this->getConfig('sgbd','password'),
+				'host' => $this->getConfig('sgbd','host'),
+				'driver' => $this->getConfig('sgbd','driver')
+				);
 		$this->dbConnection = \Doctrine\DBAL\DriverManager::getConnection($connectionParams);
 		$this->doctrineEntityManager = \Doctrine\ORM\EntityManager::create($this->dbConnection, $this->doctrineConfig);
 	}
 
 	private function smartyInitialization() {
-    require_once(COTS."smarty/2.6.26-STABLE/Smarty.class.php");
-    $this->templatesEngine = new \Smarty();
-    $this->templatesEngine->template_dir = ROOT."templates/".$this->session->getUser()->getSkin().'/';
-    $this->templatesEngine->compile_dir  = ROOT."templates_c/";
-    if($this->getConfig('logger','level') == 'Bdf::DEBUG') {
-      $this->templatesEngine->debugging = true;
-    } else {
-      $this->templatesEngine->debugging = false;
-    }
+		if($this->getConfig('smarty','version') !== null) {
+			require_once(COTS."smarty/".$this->getConfig('smarty','version')."/Smarty.class.php");
+			$this->templatesEngine = new \Smarty();
+			$this->templatesEngine->template_dir = ROOT."templates/".$this->session->getUser()->getSkin().'/';
+			$this->templatesEngine->compile_dir  = ROOT."templates_c/";
+			if($this->getConfig('logger','level') == 'Bdf::DEBUG') {
+				$this->templatesEngine->debugging = true;
+			} else {
+				$this->templatesEngine->debugging = false;
+			}
 
-    $this->templatesEngine->assign("bdfUtils",$this->utils);
-
+			$this->templatesEngine->assign("bdfUtils",$this->utils);
+		}
 	}
 
-  private function sessionInitialization() {
-    $this->session = \Bdf\Session::getInstance();
-  }
+	private function sessionInitialization() {
+		$this->session = \Bdf\Session::getInstance();
+	}
 
 
-  public function getTemplatesEngine() {
-    return $this->templatesEngine;
-  }
+	public function getTemplatesEngine() {
+		return $this->templatesEngine;
+	}
 
 
-  public function getClientClass($className) {
-    return $this->getConfig('site','namespace')."\\".$className;
-  }
+	public function getClientClass($className) {
+		return $this->getConfig('site','namespace')."\\".$className;
+	}
 
 	/**
 	 * Nom de la fonction
@@ -193,9 +194,9 @@ class Core {
 
 
 	public function getConfig($section,$var) {
-    if(isset($this->config[$section][$var])) {
-      return $this->config[$section][$var];
-    }
+		if(isset($this->config[$section][$var])) {
+			return $this->config[$section][$var];
+		}
 		return null;
 	}
 
