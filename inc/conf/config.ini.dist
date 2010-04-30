@@ -35,5 +35,5 @@ style_dir = "style/"
 templates_dir = "templates/"
 default_templates = "default/"
 ; do not start with \
-namespace = "SteakHache" 
+namespace = "" 
 
