@@ -16,7 +16,6 @@ host = "localhost"
 user_name = ""
 password = ""
 database_name = ""
-prefix = "Bdf"
 hash = SHA256
 ;hash = Blowfish
 ;hash = MD5
