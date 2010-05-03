@@ -19,6 +19,9 @@ namespace Bdf;
 class Utils {
 
     private static $instance = null;
+    const RESSOURCE_IMAGE = 1;
+    const RESSOURCE_TEMPLATE = 2;
+    const RESSOURCE_CSS = 3;
 
 
     /**

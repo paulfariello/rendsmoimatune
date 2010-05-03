@@ -90,7 +90,7 @@ class Core {
 			$this->utilsInitialization();
 			$this->doctrineInitialization();
 			$this->sessionInitialization();
-			$this->smartyInitialization();
+			$this->templatesEngineInitialization();
 			$this->initialized = true;
 		}
 	}
@@ -152,20 +152,29 @@ class Core {
 		$this->doctrineEntityManager = \Doctrine\ORM\EntityManager::create($this->dbConnection, $this->doctrineConfig);
 	}
 
-	private function smartyInitialization() {
-		if($this->getConfig('smarty','version') !== null) {
-			require_once(COTS."smarty/".$this->getConfig('smarty','version')."/Smarty.class.php");
-			$this->templatesEngine = new \Smarty();
-			$this->templatesEngine->template_dir = ROOT."templates/".$this->session->getUser()->getSkin().'/';
-			$this->templatesEngine->compile_dir  = ROOT."templates_c/";
-			if($this->getConfig('logger','level') == 'Bdf::DEBUG') {
-				$this->templatesEngine->debugging = true;
-			} else {
-				$this->templatesEngine->debugging = false;
-			}
+  private function templatesEngineInitialization() {
+		switch($this->getConfig('templates','engine')) {
+      case "smarty":
+        $this->smartyInitialization();
+        break;
+      case "simpleTemplatesEngine":
+        $this->simpleTemplatesEngineInitialization();
+        break;
+      default:
+        trigger_error('Mauvaise configuration du moteur de templates');
+    }
+  }
 
-			$this->templatesEngine->assign("bdfUtils",$this->utils);
-		}
+	private function simpleTemplatesEngineInitialization() {
+      $this->templatesEngine = new \Bdf\SimpleTemplatesEngine();
+      $this->templatesEngine->initialization();
+      $this->templatesEngine->setSkin($this->session->getUser()->getSkin());
+  }
+
+	private function smartyInitialization() {
+      $this->templatesEngine = new \Bdf\SmartyAdapter();
+      $this->templatesEngine->initialization();
+      $this->templatesEngine->setSkin($this->session->getUser()->getSkin());
 	}
 
 	private function sessionInitialization() {

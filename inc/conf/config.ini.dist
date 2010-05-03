@@ -28,8 +28,10 @@ mapping_dir = "mapping/"
 ; Comment this line if you don't want to use apc for caching sql queries and doctrine entities
 ;cache = "apc"
 
-[smarty]
-version = "2.6.26-STABLE"
+[templates]
+;engine = "smarty"
+;version = "2.6.26-STABLE"
+engine = "simpleTemplatesEngine"
 
 [site]
 url = ""
