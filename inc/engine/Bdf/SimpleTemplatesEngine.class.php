@@ -46,7 +46,13 @@ class SimpleTemplatesEngine implements \Bdf\ITemplatesEngine {
     $this->vars[$name] = $value;
   }
 
-  public function insert($fileName) {
+  public function insert($fileName,array $vars = array()) {
+    foreach($this->vars as $name => $value) {
+      ${$name} = $value;
+    }
+    foreach($vars as $name=>$value) {
+      ${$name} = $value;
+    }
     include(ROOT.self::TEMPLATES_DIR.$this->skin."/".$fileName);
   }
 }
