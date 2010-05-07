@@ -23,7 +23,6 @@ class SmartyAdapter implements \Bdf\ITemplatesEngine {
   }
 
   public function initialization() {
-echo "init";
     require_once(COTS."smarty/".\Bdf\Core::getInstance()->getConfig('templates','version')."/Smarty.class.php");
     $this->smartyInstance = new \Smarty();
     $this->smartyInstance->template_dir = ROOT.\Bdf\Core::getInstance()->getConfig("site","templates_dir").$this->skin.'/';
