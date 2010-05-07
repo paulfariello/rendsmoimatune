@@ -28,10 +28,12 @@ class Session {
    */
 
   private static $instance;
-  private $securityLevel;
   private $values;
-  private $user;
-  private $validChallenges;
+  private $userId;
+  private $validChallenges = array();
+  const FIELD_USER_ID = "bdf-user-id";
+  const FIELD_CHALLENGE = "bdf-challenge-id";
+
 
   /*~*~*~*~*~*~*~*~*~*~*/
   /*  2. méthodes      */
@@ -48,16 +50,16 @@ class Session {
 
   private function __construct() {
 
-    $this->securityLevel = 'all';
-    $this->validChallenges = array();
-    $this->user = null;
     $this->values = array();
 
     session_start();
     // On récupère toutes les variables de session
     $this->values = $_SESSION;
     $_SESSION = array();
-    $this->getValidChallenges(); 
+
+    // Récupération des variables particulières
+    $this->getValidChallenges();
+    $this->userId = isset($this->values[self::FIELD_USER_ID])?$this->values[self::FIELD_USER_ID]:null;
   }
 
   public static function getInstance() {
@@ -92,117 +94,30 @@ class Session {
    * @return void
    */
 
-  public function add($nom,$value) {
+  public function add($name,$value) {
 
-    if($nom != 'bdfUser') {
-      $this->values[$nom] = $value;
+    if($name != self::FIELD_USER_ID) {
+      $this->values[$name] = $value;
       return true;
     } else {
-      BdfCore::getInstance()->logger->warn('Vous ne pouvez pas ecraser la variable de session : bdfUser','Session add');
+      \Bdf\Core::getInstance()->logger->warn('Vous ne pouvez pas ecraser la variable de session : '.$name,'Session add');
       return false;
     }
 
   }
 
+  public function remove($name) {
+    if(isset($this->value[$name])) {
+      unset($this->value[$name]);
+    }
+  }
 
-  public function get($nom) {
-    if(isset($this->values[$nom])) {
-      return $this->values[$nom];
+  public function get($name) {
+    if(isset($this->values[$name])) {
+      return $this->values[$name];
     } else {
-      BdfCore::getInstance()->logger->warn('Valeur inexistante : '.$nom,'Session');
-      return false;
+      return null;
     }
-  }
-
-  public function setSecurityLevel($level) {
-    $core = BdfCore::getInstance();
-    // Est-ce que le niveau de sécurité requis existe en base de donnée
-    $res = $core->db->query("SELECT id FROM ".$core->getConfig('sgbd','prefix')."_Security WHERE nom = '".$core->utils->escapeStr($level)."' LIMIT 1");
-    if($core->db->numRows($res) > 0) {
-      $this->securityLevel = $level;  
-    } else {
-      $core->logger->warn('Le niveau de securité n\'existe pas','Security Level');
-    }
-  }
-
-  public function checkUserHasRight() {
-    $userRight = $this->getUserRight();
-    if(!in_array($this->securityLevel,$userRight)) {
-      if($this->getUserId() !== 0) {
-        header('location: '.BdfCore::getInstance()->utils->makeUrl('acces-interdit'));
-      } else {
-        header('location: '.BdfCore::getInstance()->utils->makeUrl('identification'));
-      }
-      die();
-    }
-    BdfCore::getInstance()->logger->info($this->getUserId(),'User Id');
-  }
-
-
-  private function getUserRight() {
-
-    $listeDroits = $this->getListeDroit();
-    $droits = array('all');
-    $userId = $this->getUserId();
-    $core = BdfCore::getInstance();
-
-    if($userId === 0) // Si l'utilisateur n'est pas connecté
-      return $droits;
-
-
-    // On récupère l'id du droit de l'utilisateur
-    $res = $core->db->query("SELECT ".$core->getConfig('sgbd','prefix')."_User_Right.id_right FROM ".$core->getConfig('sgbd','prefix')."_User_Right WHERE ".$core->getConfig('sgbd','prefix')."_User_Right.id_user = '".$this->getUserId()."'");
-    while($idDroitUser = $core->db->fetchArray($res)) {
-      $idDroitUser = $idDroitUser['id_right'];
-
-      $temp = $listeDroits[$idDroitUser];
-
-      while($temp['parent'] != 0) {
-        $droits[] = $temp['nom'];
-        $temp = $listeDroits[$temp['parent']];
-      }
-    }
-
-    $core->logger->info($droits,"Droits de l'utilisateur");
-
-    return $droits;
-
-  }
-
-  private function getListeDroit() {
-    $core = BdfCore::getInstance();
-
-    $listeDroit = array();
-    $res = $core->db->query("SELECT ".$core->getConfig('sgbd','prefix')."_Security.* FROM ".$core->getConfig('sgbd','prefix')."_Security");
-    while($result = $core->db->fetchArray($res)) {
-      $listeDroit[$result['id']] = $result;
-    }
-
-    return $listeDroit;
-  }
-  
-  private function getUserId() {
-    $userId = 0;
-    if(isset($this->values['BdfUser']) AND is_numeric($this->values['BdfUser'])) {
-      $userId = $this->values['BdfUser'];
-    }
-    return $userId;
-  }
-
-  private function setUserId($id) {
-    $id = (int)$id;
-
-    $this->values['BdfUser'] = $id;
-  }
-
-  public function userHasRight() {
-    return (bool)in_array($right,$this->getUserRight());
-  }
-
-  public function getUser() {
-    if($this->user === NULL)
-      $this->user = call_user_func_array(array(\Bdf\Core::getInstance()->getClientClass("User"),"getUser"),array($this->getUserId()));
-    return $this->user;
   }
 
   public function getChallenge() {
@@ -215,75 +130,10 @@ class Session {
     return substr(hash('sha256',uniqid(mt_rand(),true)),0,$length);
   }
 
-  public function authentication($email,$password,$challenge = null) {
-    $core = BdfCore::getInstance();
-    $auth = false;
-    $id = 0;
-
-    // On récupète le mot de passe
-    $res = $core->db->query("
-      SELECT 
-        ".$core->getConfig('sgbd','prefix')."_User.id,
-        ".$core->getConfig('sgbd','prefix')."_User.password
-      FROM
-        ".$core->getConfig('sgbd','prefix')."_User
-      WHERE
-        ".$core->getConfig('sgbd','prefix')."_User.email = '".$core->utils->escapeStr($email)."'
-      LIMIT 1");
-
-    if($core->db->numRows($res) > 0) {
-      list($id,$goodPassword) = $core->db->fetchRow($res);
-
-      // On récupère le type de hash du bon password
-      preg_match('#^{([a-z0-9]+)}([a-z0-9]+)([a-z0-9]{10})$#i',$goodPassword,$matches);
-      $dbHashType = $matches[1];
-      $goodHash = $matches[2];
-      $salt = $matches[3];
-
-      if($challenge !== null AND preg_match('#^{([a-z0-9]+)}([a-z0-9]+)$#i',$password,$matches) > 0 AND array_key_exists($challenge,$this->validChallenges)) {
-        // Authentification avec challenge response
-        // On récupère le type de hash
-        unset($this->validChallenges[$challenge]);
-        $hashType = $matches[1];
-        $hash = $matches[2];
-        if($hash == hash_hmac($hashType,$goodHash,$challenge)) {
-          // L'utilisateur est authentifié
-          $auth = true;
-        }
-      } else {
-        // Authentification classique
-        if(hash_hmac($dbHashType,$password,$salt) == $goodHash) {
-          // L'utilisateur est authentifié
-          $auth = true;
-        }
-      }
-    }
-
-    if($auth === true) {
-      $this->setUserId($id);
-      $this->user = new User($id);
-      $core->logger->info($id,'Utilisateur authentifié');
-      $core->logger->info($this->user,'Utilisateur authentifié');
-    }
-  }
-
-  public function getUserSalt($email) {
-    $core = BdfCore::getInstance();
-    $salt = NULL;
-    $res = $core->db->query("SELECT ".$core->getConfig('sgbd','prefix')."_User.password FROM ".$core->getConfig('sgbd','prefix')."_User WHERE ".$core->getConfig('sgbd','prefix')."_User.email = '".$core->utils->escapeStr($email)."' LIMIT 1");
-    if($core->db->numRows($res) > 0) {
-      $password = $core->db->result($res,0);
-      if(preg_match('#^{([a-z0-9]+)}([a-z0-9]+)([a-z0-9]{10})$#i',$password,$matches) > 0)
-        $salt = $matches[3];
-    }
-
-    return $salt;
-  }
-
   private function getValidChallenges() {
-    if(isset($this->values['bdfChallenge'])) {
-      $this->validChallenges = $this->values['bdfChallenge'];
-      unset($this->values['bdfChallenge']);
+    if(isset($this->values[self::FIELD_CHALLENGE])) {
+      $this->validChallenges = $this->values[self::FIELD_CHALLENGE];
+      unset($this->values[self::FIELD_CHALLENGE]);
     }
     $time = time();
     foreach($this->validChallenges as $challenge=>$timeout) {
@@ -294,6 +144,22 @@ class Session {
 
   public function destroy() {
     $this->values = array();
+  }
+
+  public function getCurrentUserId() {
+      return $this->userId;
+  }
+
+  public function setCurrentUserId($userId){
+      $this->userId = $userId;
+  }
+  
+  public function setCurrentUser(Bdf\IUser $user){
+      $this->userId = $user->getId();
+  }
+
+  public function removeCurrentUser(){
+      $this->setCurrentUserId(NULL);
   }
 
   /**
@@ -311,8 +177,8 @@ class Session {
       $_SESSION = array();
     }
     if(!empty($this->validChallenges))
-      $this->values['bdfChallenge'] = $this->validChallenges;
-
+      $this->values[self::FIELD_CHALLENGE] = $this->validChallenges;
+      $this->values[self::FIELD_USER_ID] = $this->userId;
     $_SESSION = $this->values;
 
   }

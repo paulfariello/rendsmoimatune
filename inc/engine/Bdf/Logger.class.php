@@ -39,7 +39,7 @@ class Logger implements \Doctrine\DBAL\Logging\SqlLogger {
   
   private $store = array();
   private $noDebug = false;
-  private $console = true;
+  private $console = false;
   private $phpTrigger = true;
 
   /**

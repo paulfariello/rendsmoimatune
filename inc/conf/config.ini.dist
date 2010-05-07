@@ -23,7 +23,8 @@ hash = SHA256
 [doctrine]
 version = "2.0.0-ALPHA4"
 proxy_dir = "proxy/"
-proxy_namespace = "\Bdf\Model\Proxy"
+; do not start with \
+proxy_namespace = "Bdf\Model\Proxy"
 mapping_dir = "mapping/"
 ; Comment this line if you don't want to use apc for caching sql queries and doctrine entities
 ;cache = "apc"
@@ -37,8 +38,9 @@ engine = "simpleTemplatesEngine"
 url = ""
 image_dir = "px/"
 style_dir = "style/"
+javascript_dir = "js/"
 templates_dir = "templates/"
-default_templates = "default/"
+skin = "default"
 ; do not start with \
 namespace = "" 
 

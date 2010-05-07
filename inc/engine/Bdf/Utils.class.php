@@ -38,26 +38,52 @@ class Utils {
 
     }
 
-    public static function getInstance() {
-      if (self::$instance === null) {
-        $c = __CLASS__;
-        self::$instance = new $c;
+    public static function makeUrl($url,$type = NULL) {
+      if(isset($url[0]) AND $url[0] == '/') {
+        $url = substr($url, 1);
       }
+      $core = \Bdf\Core::getInstance();
+      switch($type) {
+        case "js":
+          return $core->getConfig('site','url').$core->getConfig('site','javascript_dir').$core->getConfig('site','skin').'/'.$url;
+          break;
+        case "css":
+          return $core->getConfig('site','url').$core->getConfig('site','style_dir').$core->getConfig('site','skin').'/'.$url;
+          break;
+        case "img":
+          return $core->getConfig('site','url').$core->getConfig('site','image_dir').$core->getConfig('site','skin').'/'.$url;
+          break;
+        default:
+          return \Bdf\Core::getInstance()->getConfig('site','url').$url;
 
-      return self::$instance;
-    }
-
-    public function __clone() {
-      trigger_error('Le clônage n\'est pas autorisé.', E_USER_ERROR);
-    }
-
-
-    public function makeUrl($url,$type = NULL) {
+      }
       if($type != NULL) {
-        return \Bdf\Core::getInstance()->getConfig('site','url').$type.'/'.\Bdf\Session::getInstance()->getUser()->getSkin().'/'.$url;
       } else {
-        return \Bdf\Core::getInstance()->getConfig('site','url').$url;
       }
+    }
+
+    public static function hashPassword($password) {
+      $algo = \Bdf\Core::getInstance()->getConfig("sgbd","hash");
+      $salt = uniqid(mt_rand(), false);
+      $hash = hash_hmac($algo,$password, $salt);
+      return '{'.$algo.'}'.$hash.$salt;
+    }
+
+    public static function comparePassword($password, $hash){
+      $hashLen = array('SHA256' => 64);
+      $algo = substr($hash, 1, strpos($hash, '}')-1);
+
+      if(!isset($hashLen[$algo])) {
+        throw new \Exception("L'algorithme de hashage n'est pas supporté");
+      }
+
+      $oldHash = substr($hash, strpos($hash, '}')+1, $hashLen[$algo]);
+      $salt = substr($hash, strpos($hash, '}')+$hashLen[$algo]+1,strlen($hash));
+      return $oldHash == hash_hmac($algo, $password, $salt);
+    }
+
+    public static function isCurrentPage($url) {
+      return strstr($url, $_SERVER['REQUEST_URI']) !== false;
     }
 }
 

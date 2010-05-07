@@ -16,8 +16,9 @@
 namespace Bdf;
 
 interface IUser {
-  public static function getUser($id);
-  public function getSkin();
+    public function getSkin();
+    public function getId();
+    public static function getCurrentUser();
 }
 
 ?>

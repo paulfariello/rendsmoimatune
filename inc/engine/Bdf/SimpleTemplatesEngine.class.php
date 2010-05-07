@@ -31,7 +31,7 @@ class SimpleTemplatesEngine implements \Bdf\ITemplatesEngine {
 
   public function display($fileName) {
     foreach($this->vars as $name => $value) {
-      ${$name} = &$value;
+      ${$name} = $value;
     } 
     include(ROOT.self::TEMPLATES_DIR.$this->skin."/".$fileName.self::EXTENSION);
   }
@@ -44,6 +44,10 @@ class SimpleTemplatesEngine implements \Bdf\ITemplatesEngine {
 
   public function assign($name,$value) {
     $this->vars[$name] = $value;
+  }
+
+  public function insert($fileName) {
+    include(ROOT.self::TEMPLATES_DIR.$this->skin."/".$fileName);
   }
 }
 

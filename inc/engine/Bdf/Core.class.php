@@ -34,7 +34,6 @@ class Core {
 
 	private $config = array();
 	private $initialized = false;
-	private $utils = null;
 	private $session = null;
 
 	private $doctrineConfig = null;
@@ -87,7 +86,6 @@ class Core {
 			$this->loadConfiguration();
 			$this->classLoaderInitialization();
 			$this->loggerInitialization();
-			$this->utilsInitialization();
 			$this->doctrineInitialization();
 			$this->sessionInitialization();
 			$this->templatesEngineInitialization();
@@ -98,10 +96,6 @@ class Core {
 	private function loggerInitialization() {
 		$this->logger = \Bdf\Logger::getInstance();
 		$this->logger->setLevel($this->getConfig("logger","level"));
-	}
-
-	private function utilsInitialization() {
-		$this->utils = \Bdf\Utils::getInstance();
 	}
 
 	private function classLoaderInitialization() {
@@ -168,13 +162,13 @@ class Core {
 	private function simpleTemplatesEngineInitialization() {
       $this->templatesEngine = new \Bdf\SimpleTemplatesEngine();
       $this->templatesEngine->initialization();
-      $this->templatesEngine->setSkin($this->session->getUser()->getSkin());
+      $this->templatesEngine->setSkin($this->getConfig("site", "skin"));
   }
 
 	private function smartyInitialization() {
       $this->templatesEngine = new \Bdf\SmartyAdapter();
       $this->templatesEngine->initialization();
-      $this->templatesEngine->setSkin($this->session->getUser()->getSkin());
+      $this->templatesEngine->setSkin($this->getConfig("site", "skin"));
 	}
 
 	private function sessionInitialization() {
@@ -186,10 +180,6 @@ class Core {
 		return $this->templatesEngine;
 	}
 
-
-	public function getClientClass($className) {
-		return $this->getConfig('site','namespace')."\\".$className;
-	}
 
 	/**
 	 * Nom de la fonction
