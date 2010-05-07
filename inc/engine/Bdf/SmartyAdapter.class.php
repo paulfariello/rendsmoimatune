@@ -1,22 +1,8 @@
 <?php
 
-/**
- * Session
- *
- *
- * <p>Singleton de gestion des session, identification etc</p>
- *
- * @name nom
- * @author Needle <paul.fariello@gmail.com>
- * @link
- * @copyright Paul Fariello 2007
- * @version 1.0.0
- * @package Nom du package
- */
-
 namespace Bdf;
 
-class SimpleTemplatesEngine implements \Bdf\ITemplatesEngine {
+class SmartyAdapter implements \Bdf\ITemplatesEngine {
 
   private $skin = null;
   const EXTENSION = ".tpl";
