@@ -37,22 +37,22 @@ class SmartyAdapter implements \Bdf\ITemplatesEngine {
 
   public function utilsMakeUrl($params, &$smarty) {
     if(isset($params['type'])) {
-      \Bdf\Utils::makeUrl($params['url'],$params['type']);
+      return \Bdf\Utils::makeUrl($params['url'],$params['type']);
     } else {
-      \Bdf\Utils::makeUrl($params['url']);
+      return \Bdf\Utils::makeUrl($params['url']);
     }
   }
 
   public function utilsHashPassword($params, &$smarty) {
-      \Bdf\Utils::hashPassword($params['password']);
+      return \Bdf\Utils::hashPassword($params['password']);
   }
   
   public function utilsComparePassword($params, &$smarty) {
-      \Bdf\Utils::comparePassword($params['password'],$params['hash']);
+      return \Bdf\Utils::comparePassword($params['password'],$params['hash']);
   }
 
   public function utilsIsCurrentPage($params, &$smarty) {
-      \Bdf\Utils::isCurrentPage($params['page']);
+      return \Bdf\Utils::isCurrentPage($params['page']);
   }
 
   private function registerUtilsFunctions() {
