@@ -35,12 +35,38 @@ class SmartyAdapter implements \Bdf\ITemplatesEngine {
     $this->registerUtilsFunctions();
   }
 
+  public function utilsMakeUrl($params, &$smarty) {
+    if(isset($params['type'])) {
+      \Bdf\Utils::makeUrl($params['url'],$params['type']);
+    } else {
+      \Bdf\Utils::makeUrl($params['url']);
+    }
+  }
+
+  public function utilsHashPassword($params, &$smarty) {
+      \Bdf\Utils::hashPassword($params['password']);
+  }
+  
+  public function utilsComparePassword($params, &$smarty) {
+      \Bdf\Utils::comparePassword($params['password'],$params['hash']);
+  }
+
+  public function utilsIsCurrentPage($params, &$smarty) {
+      \Bdf\Utils::isCurrentPage($params['page']);
+  }
+
   private function registerUtilsFunctions() {
    $utils = new \ReflectionClass('Bdf\Utils');
+   $smartyAdapter = new \ReflectionClass(__class__);
    $methods = $utils->getMethods();
    foreach($methods as $method) {
      if(!$method->isConstructor() AND !$method->isDestructor() AND substr($method->name,0,2) != "__") {
-       $this->smartyInstance->register_function($method->name,array($method->class, $method->name));
+       $methodName = "utils".ucfirst($method->name);
+       if(method_exists($this, $methodName)) {
+         $this->smartyInstance->register_function($method->name,array($this, $methodName));
+       } else {
+         \Bdf\Logger::getInstance()->error("La méthode ".$method->name." n'est pas definie dans SmartyAdapter->".$methodName); 
+       }
      }
    }
   }
