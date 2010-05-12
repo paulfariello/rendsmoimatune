@@ -21,7 +21,7 @@ hash = SHA256
 ;hash = MD5
 
 [doctrine]
-version = "2.0.0-ALPHA4"
+version = "2.0.0-BETA1"
 proxy_dir = "proxy/"
 ; do not start with \
 proxy_namespace = "Bdf\Model\Proxy"
@@ -31,7 +31,7 @@ mapping_dir = "mapping/"
 
 [templates]
 ;engine = "smarty"
-;version = "2.6.26-STABLE"
+;version = "3.0-RC1"
 engine = "simpleTemplatesEngine"
 
 [site]

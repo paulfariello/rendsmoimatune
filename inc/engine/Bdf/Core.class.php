@@ -99,22 +99,22 @@ class Core {
 	}
 
 	private function classLoaderInitialization() {
-		require_once(COTS.'doctrine/'.$this->getConfig('doctrine','version').'/Doctrine/Common/IsolatedClassLoader.php');
+		require_once(COTS.'doctrine/'.$this->getConfig('doctrine','version').'/Doctrine/Common/ClassLoader.php');
 
 		// Register Bdf Class Loader
-		$classLoader = new \Doctrine\Common\IsolatedClassLoader('Bdf');
-		$classLoader->setBasePath(ENGINE);
+		$classLoader = new \Doctrine\Common\ClassLoader('Bdf');
+		$classLoader->setIncludePath(ENGINE);
 		$classLoader->setFileExtension('.class.php');
 		$classLoader->register();
 
 		// Register Doctrine Class Loader
-		$classLoader = new \Doctrine\Common\IsolatedClassLoader('Doctrine');
-		$classLoader->setBasePath(COTS.'doctrine/'.$this->getConfig('doctrine','version'));
+		$classLoader = new \Doctrine\Common\ClassLoader('Doctrine');
+		$classLoader->setIncludePath(COTS.'doctrine/'.$this->getConfig('doctrine','version'));
 		$classLoader->register();
 
 		// Register Bdf Class Loader
-		$classLoader = new \Doctrine\Common\IsolatedClassLoader($this->getConfig('site','namespace'));
-		$classLoader->setBasePath(INC."class/");
+		$classLoader = new \Doctrine\Common\ClassLoader($this->getConfig('site','namespace'));
+		$classLoader->setIncludePath(INC."class/");
 		$classLoader->setFileExtension('.class.php');
 		$classLoader->register();
 	}

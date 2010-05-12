@@ -17,7 +17,7 @@
 namespace Bdf;
 
 
-class Logger implements \Doctrine\DBAL\Logging\SqlLogger {
+class Logger implements \Doctrine\DBAL\Logging\SQLLogger {
 
   /*~*~*~*~*~*~*~*~*~*~*/
   /*  1. propriétés    */
