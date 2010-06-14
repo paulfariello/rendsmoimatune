@@ -1,87 +1,215 @@
 <?php
+/**
+ * Fichier de classe
+ *
+ * PHP version 5.3
+ *
+ * This file is part of BotteDeFoin.
+ *
+ * BotteDeFoin is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * BotteDeFoin is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with BotteDeFoin.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @category ClassFile
+ * @package  BotteDeFoin
+ * @author   Paul Fariello <paul.fariello@gmail.com>
+ * @license  http://www.gnu.org/copyleft/gpl.html  GPL License 3.0
+ * @version  SVN: 145
+ * @link     http://www.bottedefoin.net
+ */
 
 namespace Bdf;
 
-class SmartyAdapter implements \Bdf\ITemplatesEngine {
+/**
+ * SmartyAdapter
+ *
+ * Classe d'adaptation de Smarty à BotteDeFoin
+ *
+ * @category Class
+ * @package  Bdf
+ * @author   Paul Fariello <paul.fariello@gmail.com>
+ * @license  http://www.gnu.org/copyleft/gpl.html  GPL License 3.0
+ * @link     http://www.bottedefoin.net
+ */
+class SmartyAdapter implements \Bdf\ITemplatesEngine
+{
+    const EXTENSION = ".tpl";
 
-  private $skin = null;
-  const EXTENSION = ".tpl";
-  private $smartyInstance = null;
 
-  public function setSkin($skin) {
-      $skinDir = ROOT.\Bdf\Core::getInstance()->getConfig("site","templates_dir").$skin.'/';
-      if(file_exists($skinDir) AND is_dir($skinDir)) {
-        $this->skin = $skin;
-      }
-      if($this->smartyInstance !== null) {
-        $this->smartyInstance->template_dir = ROOT.\Bdf\Core::getInstance()->getConfig("site","templates_dir").$this->skin.'/';
-      }
-  }
+    private $_skin = null;
+    private $_smartyInstance = null;
 
-  public function display($fileName) {
-    $this->smartyInstance->display($fileName.self::EXTENSION);
-  }
-
-  public function initialization() {
-    require_once(COTS."smarty/".\Bdf\Core::getInstance()->getConfig('templates','version')."/Smarty.class.php");
-    $this->smartyInstance = new \Smarty();
-    $this->smartyInstance->template_dir = ROOT.\Bdf\Core::getInstance()->getConfig("site","templates_dir").$this->skin.'/';
-    $this->smartyInstance->compile_dir  = ROOT."templates_c/";
-    if(\Bdf\Core::getInstance()->getConfig('logger','level') == 'Bdf::DEBUG') {
-      $this->smartyInstance->debugging = true;
-    } else {
-      $this->smartyInstance->debugging = false;
+    /**
+     * Inherited from {@link \Bdf\ITemplatesEngine::setSkin()}
+     *
+     * @param string $skin @see \Bdf\ITemplatesEngine::setSkin()
+     *
+     * @return void
+     */
+    public function setSkin($skin)
+    {
+        $skinDir = ROOT.\Bdf\Core::getInstance()->getConfig("site", "templates_dir").$skin.'/';
+        if (file_exists($skinDir) AND is_dir($skinDir)) {
+            $this->_skin = $skin;
+        }
+        if ($this->_smartyInstance !== null) {
+            $this->_smartyInstance->template_dir = ROOT.\Bdf\Core::getInstance()->getConfig("site", "templates_dir").$this->_skin.'/';
+        }
     }
-    $this->registerUtilsFunctions();
-  }
 
-  public function utilsMakeUrl($params, $smarty) {
-    if(isset($params['type'])) {
-      return \Bdf\Utils::makeUrl($params['url'],$params['type']);
-    } else {
-      return \Bdf\Utils::makeUrl($params['url']);
+    /**
+     * Inherited from {@link \Bdf\ITemplatesEngine::display()}
+     *
+     * @param string $fileName @see \Bdf\ITemplatesEngine::display()
+     *
+     * @return void
+     */
+    public function display($fileName)
+    {
+        $this->_smartyInstance->display($fileName.self::EXTENSION);
     }
-  }
 
-  public function utilsHashPassword($params, $smarty) {
-      return \Bdf\Utils::hashPassword($params['password']);
-  }
-  
-  public function utilsComparePassword($params, $smarty) {
-      return \Bdf\Utils::comparePassword($params['password'],$params['hash']);
-  }
+    /**
+     * Inherited from {@link \Bdf\ITemplatesEngine::initialization()}
+     *
+     * @return void
+     */
+    public function initialization()
+    {
+        include_once COTS."smarty/".\Bdf\Core::getInstance()->getConfig('templates', 'version')."/Smarty.class.php";
+        $this->_smartyInstance = new \Smarty();
+        $this->_smartyInstance->template_dir = ROOT.\Bdf\Core::getInstance()->getConfig("site", "templates_dir").$this->_skin.'/';
+        $this->_smartyInstance->compile_dir  = ROOT."templates_c/";
+        if (\Bdf\Core::getInstance()->getConfig('logger', 'level') == 'Bdf::DEBUG') {
+            $this->_smartyInstance->debugging = true;
+        } else {
+            $this->_smartyInstance->debugging = false;
+        }
+        $this->_registerUtilsFunctions();
+    }
 
-  public function utilsIsCurrentPage($params, $smarty) {
-      return \Bdf\Utils::isCurrentPage($params['page']);
-  }
+    /**
+     * Encapsulation de {@link \Bdf\Utils::makeUrl()}
+     *
+     * @param array  $params @see \Bdf\Utils::makeUrl()
+     * @param Smarty $smarty instance de Smarty
+     * 
+     * @return @see \Bdf\Utils::makeUrl()
+     */
+    public function utilsMakeUrl($params, $smarty)
+    {
+        if (isset($params['type'])) {
+            return \Bdf\Utils::makeUrl($params['url'], $params['type']);
+        } else {
+            return \Bdf\Utils::makeUrl($params['url']);
+        }
+    }
 
-  private function registerUtilsFunctions() {
-   $utils = new \ReflectionClass('Bdf\Utils');
-   $smartyAdapter = new \ReflectionClass(__class__);
-   $methods = $utils->getMethods();
-   foreach($methods as $method) {
-     if(!$method->isConstructor() AND !$method->isDestructor() AND substr($method->name,0,2) != "__") {
-       $methodName = "utils".ucfirst($method->name);
-       if(method_exists($this, $methodName)) {
-         $this->smartyInstance->register->templateFunction($method->name,array($this, $methodName));
-       } else {
-         \Bdf\Logger::getInstance()->error("La méthode ".$method->name." n'est pas definie dans SmartyAdapter->".$methodName); 
-       }
-     }
-   }
-  }
+    /**
+     * Encapsulation de {@link \Bdf\Utils::hashPassword()}
+     *
+     * @param array  $params @see \Bdf\Utils::hashPassword()
+     * @param Smarty $smarty instance de Smarty
+     *
+     * @return @see \Bdf\Utils::hashPassword()
+     */
+    public function utilsHashPassword($params, $smarty)
+    {
+        return \Bdf\Utils::hashPassword($params['password']);
+    }
 
-  public function assign($name, $value) {
-    $this->smartyInstance->assign($name,$value);
-  }
+    /**
+     * Encapsulation de {@link \Bdf\Utils::comparePassword()}
+     *
+     * @param array  $params @see \Bdf\Utils::comparePassword()
+     * @param Smarty $smarty instance de Smarty
+     *
+     * @return @see \Bdf\Utils::comparePassword()
+     */
+    public function utilsComparePassword($params, $smarty)
+    {
+        return \Bdf\Utils::comparePassword($params['password'], $params['hash']);
+    }
 
-  public function assignByRef($name, &$value) {
-    $this->smartyInstance->assign_by_ref($name,$value);
-  }
+    /**
+     * Encapsulation de {@link \Bdf\Utils::isCurrentPage()}
+     *
+     * @param array  $params @see \Bdf\Utils::isCurrentPage()
+     * @param Smarty $smarty instance de Smarty
+     *
+     * @return @see \Bdf\Utils::isCurrentPage()
+     */
+    public function utilsIsCurrentPage($params, $smarty)
+    {
+        return \Bdf\Utils::isCurrentPage($params['page']);
+    }
 
-  public function getSmartyInstance() {
-    return $this->smartyInstance();
-  }
+    /**
+     * Enregistrement des méthodes de {@link \Bdf\Utils} dans smarty
+     *
+     * @return void
+     */
+    private function _registerUtilsFunctions()
+    {
+        $utils = new \ReflectionClass('Bdf\Utils');
+        $smartyAdapter = new \ReflectionClass(__class__);
+        $methods = $utils->getMethods();
+        foreach ($methods as $method) {
+            if (!$method->isConstructor() AND !$method->isDestructor() AND substr($method->name, 0, 2) != "__") {
+                $methodName = "utils".ucfirst($method->name);
+                if (method_exists($this, $methodName)) {
+                    $this->_smartyInstance->register->templateFunction($method->name, array($this, $methodName));
+                } else {
+                    \Bdf\Logger::getInstance()->error("La méthode ".$method->name." n'est pas definie dans SmartyAdapter->".$methodName);
+                }
+            }
+        }
+    }
+
+    /**
+     * Inherited from {@link \Bdf\ITemplatesEngine::assign()}
+     *
+     * @param string $name  @see \Bdf\ITemplatesEngine::assign()
+     * @param string $value @see \Bdf\ITemplatesEngine::assign()
+     *
+     * @return void
+     */
+    public function assign($name, $value)
+    {
+        $this->_smartyInstance->assign($name, $value);
+    }
+
+    /**
+     * Inherited from {@link \Bdf\ITemplatesEngine::assignByRef()}
+     *
+     * @param string $name   @see \Bdf\ITemplatesEngine::assignByRef()
+     * @param string &$value @see \Bdf\ITemplatesEngine::assignByRef()
+     *
+     * @return void
+     */
+    public function assignByRef($name, &$value)
+    {
+        $this->_smartyInstance->assign_by_ref($name, $value);
+    }
+
+    /**
+     * Accesseur à l'instance de smarty
+     *
+     * @return Smarty
+     */
+    public function getSmartyInstance()
+    {
+        return $this->smartyInstance();
+    }
 }
 
 ?>
