@@ -30,7 +30,7 @@
 require_once 'inc/init.php';
 
 $em = \Bdf\Core::getInstance()->getEntityManager();
-$page = \Bdf\Core::getInstance()->getTemplatesEngine();
+$te = \Bdf\Core::getInstance()->getTemplatesEngine();
 
-$page->display('index.tpl');
+$te->display('index');
 ?>
