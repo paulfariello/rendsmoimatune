@@ -73,12 +73,12 @@ class Logger implements \Doctrine\DBAL\Logging\SQLLogger
      */
     public static function getInstance()
     {
-        if (!isset(self::$instance)) {
+        if (!isset(self::$_instance)) {
             $c = __CLASS__;
-            self::$instance = new $c;
+            self::$_instance = new $c;
         }
 
-        return self::$instance;
+        return self::$_instance;
     }
 
     /**
@@ -414,5 +414,3 @@ class Logger implements \Doctrine\DBAL\Logging\SQLLogger
         $this->_noDebug = true;
     }
 }
-
-?>

@@ -75,17 +75,17 @@ class Utils
         }
         $core = \Bdf\Core::getInstance();
         switch($type) {
-        case "js":
-            return $core->getConfig('site', 'url').$core->getConfig('site', 'javascript_dir').$core->getConfig('site', 'skin').'/'.$url;
-            break;
-        case "css":
-            return $core->getConfig('site', 'url').$core->getConfig('site', 'style_dir').$core->getConfig('site', 'skin').'/'.$url;
-            break;
-        case "img":
-            return $core->getConfig('site', 'url').$core->getConfig('site', 'image_dir').$core->getConfig('site', 'skin').'/'.$url;
-            break;
-        default:
-            return \Bdf\Core::getInstance()->getConfig('site', 'url').$url;
+            case "js":
+                return $core->getConfig('site', 'url').$core->getConfig('site', 'javascript_dir').$core->getConfig('site', 'skin').'/'.$url;
+                break;
+            case "css":
+                return $core->getConfig('site', 'url').$core->getConfig('site', 'style_dir').$core->getConfig('site', 'skin').'/'.$url;
+                break;
+            case "img":
+                return $core->getConfig('site', 'url').$core->getConfig('site', 'image_dir').$core->getConfig('site', 'skin').'/'.$url;
+                break;
+            default:
+                return \Bdf\Core::getInstance()->getConfig('site', 'url').$url;
         }
     }
 
@@ -93,7 +93,7 @@ class Utils
      * Hash un mot de passe
      *
      * @param string $password Le mot de passe
-     * 
+     *
      * @return string
      */
     public static function hashPassword($password)
@@ -109,7 +109,7 @@ class Utils
      *
      * @param string $password Le password
      * @param string $hash     Le hash
-     * 
+     *
      * @return boolean
      */
     public static function comparePassword($password, $hash)
@@ -137,6 +137,18 @@ class Utils
     {
         return strstr($url, $_SERVER['REQUEST_URI']) !== false;
     }
-}
 
-?>
+    /**
+     * Transforme un entier en taille d'octet
+     */
+    public static function intToByteQuantity($int)
+    {
+        $suffix = array("Octet","Kio","Mio","Gio","Tio","Pio","Eio","Zio","Yio");
+        $i = 0;
+        while($int >= 1024) {
+            $int = $int/1024;
+            $i++;
+        }
+        return round($int,2)." ".$suffix[$i];
+    }
+}

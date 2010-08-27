@@ -29,36 +29,37 @@
  */
 
 namespace Bdf;
+use ReflectionClass;
 
 /**
- * IUser
+ * Enum
  *
  * @category Class
  * @package  Bdf
  * @author   Paul Fariello <paul.fariello@gmail.com>
  * @license  http://www.gnu.org/copyleft/gpl.html  GPL License 3.0
- * @link     http://www.bottedefoin.net
+ * @link     http://dev.paulfariello.fr/utt/lo07/
  */
-interface IUser
+
+abstract class Enum
 {
-    /**
-     * Accesseur au skin à utiliser pour l'utilisateur
-     *
-     * @return string
-     */
-    public function getSkin();
+    final public function __construct($value)
+    {
+        $c = new ReflectionClass($this);
+        if(!in_array($value, $c->getConstants())) {
+            throw IllegalArgumentException();
+        }
+        $this->value = $value;
+    }
 
-    /**
-     * Accesseur à l'identifiant de l'utilisateur
-     *
-     * @return mixed
-     */
-    public function getId();
+    final public function __toString()
+    {
+        return $this->value;
+    }
 
-    /**
-     * Accesseur à l'utilisateur courant
-     *
-     * @return \Bdf\IUser
-     */
-    public static function getCurrentUser();
+    final public static function getValues()
+    {
+        $c = new ReflectionClass(get_called_class());
+        return $c->getConstants();
+    }
 }

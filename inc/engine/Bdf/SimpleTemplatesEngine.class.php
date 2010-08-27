@@ -128,5 +128,3 @@ class SimpleTemplatesEngine implements \Bdf\ITemplatesEngine
         include ROOT.self::TEMPLATES_DIR.$this->_skin."/".$fileName;
     }
 }
-
-?>

@@ -90,5 +90,3 @@ interface ITemplatesEngine
      */
     public function assignByRef($name,&$value);
 }
-
-?>

@@ -87,12 +87,12 @@ class Core
      */
     public static function getInstance()
     {
-        if (self::$instance === null) {
+        if (self::$_instance === null) {
             $c = __CLASS__;
-            self::$instance = new $c;
+            self::$_instance = new $c;
         }
 
-        return self::$instance;
+        return self::$_instance;
     }
 
     /**
@@ -314,5 +314,3 @@ class Core
     }
 
 }
-
-?>

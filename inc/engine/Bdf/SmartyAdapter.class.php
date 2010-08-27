@@ -45,8 +45,15 @@ class SmartyAdapter implements \Bdf\ITemplatesEngine
     const EXTENSION = ".tpl";
 
 
-    private $_skin = null;
+    private $_skin           = null;
     private $_smartyInstance = null;
+    private $_functions      = array(
+        'makeUrl',
+        'isCurrentPage'
+    );
+    private $_modifiers      = array(
+        'intToByteQuantity'
+    );
 
     /**
      * Inherited from {@link \Bdf\ITemplatesEngine::setSkin()}
@@ -95,6 +102,7 @@ class SmartyAdapter implements \Bdf\ITemplatesEngine
             $this->_smartyInstance->debugging = false;
         }
         $this->_registerUtilsFunctions();
+        $this->_registerVariableModifier();
     }
 
     /**
@@ -102,7 +110,7 @@ class SmartyAdapter implements \Bdf\ITemplatesEngine
      *
      * @param array  $params @see \Bdf\Utils::makeUrl()
      * @param Smarty $smarty instance de Smarty
-     * 
+     *
      * @return @see \Bdf\Utils::makeUrl()
      */
     public function utilsMakeUrl($params, $smarty)
@@ -112,32 +120,6 @@ class SmartyAdapter implements \Bdf\ITemplatesEngine
         } else {
             return \Bdf\Utils::makeUrl($params['url']);
         }
-    }
-
-    /**
-     * Encapsulation de {@link \Bdf\Utils::hashPassword()}
-     *
-     * @param array  $params @see \Bdf\Utils::hashPassword()
-     * @param Smarty $smarty instance de Smarty
-     *
-     * @return @see \Bdf\Utils::hashPassword()
-     */
-    public function utilsHashPassword($params, $smarty)
-    {
-        return \Bdf\Utils::hashPassword($params['password']);
-    }
-
-    /**
-     * Encapsulation de {@link \Bdf\Utils::comparePassword()}
-     *
-     * @param array  $params @see \Bdf\Utils::comparePassword()
-     * @param Smarty $smarty instance de Smarty
-     *
-     * @return @see \Bdf\Utils::comparePassword()
-     */
-    public function utilsComparePassword($params, $smarty)
-    {
-        return \Bdf\Utils::comparePassword($params['password'], $params['hash']);
     }
 
     /**
@@ -154,6 +136,19 @@ class SmartyAdapter implements \Bdf\ITemplatesEngine
     }
 
     /**
+     * Encapsulation de {@link \Bdf\Utils::intToByteQuantity()}
+     *
+     * @param array  $params @see \Bdf\Utils::intToByteQuantity()
+     * @param Smarty $smarty instance de Smarty
+     *
+     * @return @see \Bdf\Utils::intToByteQuantity()
+     */
+    public function utilsIntToByteQuantity($param)
+    {
+        return \Bdf\Utils::intToByteQuantity($param);
+    }
+
+    /**
      * Enregistrement des méthodes de {@link \Bdf\Utils} dans smarty
      *
      * @return void
@@ -164,10 +159,32 @@ class SmartyAdapter implements \Bdf\ITemplatesEngine
         $smartyAdapter = new \ReflectionClass(__class__);
         $methods = $utils->getMethods();
         foreach ($methods as $method) {
-            if (!$method->isConstructor() AND !$method->isDestructor() AND substr($method->name, 0, 2) != "__") {
+            if (!$method->isConstructor() AND !$method->isDestructor() AND in_array($method->name, $this->_functions) AND substr($method->name, 0, 2) != "__") {
                 $methodName = "utils".ucfirst($method->name);
                 if (method_exists($this, $methodName)) {
                     $this->_smartyInstance->register->templateFunction($method->name, array($this, $methodName));
+                } else {
+                    \Bdf\Logger::getInstance()->error("La méthode ".$method->name." n'est pas definie dans SmartyAdapter->".$methodName);
+                }
+            }
+        }
+    }
+
+    /**
+     * Enregistrement des méthodes de {@link \Bdf\Utils} dans smarty
+     *
+     * @return void
+     */
+    private function _registerVariableModifier()
+    {
+        $utils = new \ReflectionClass('Bdf\Utils');
+        $smartyAdapter = new \ReflectionClass(__class__);
+        $methods = $utils->getMethods();
+        foreach ($methods as $method) {
+            if (!$method->isConstructor() AND !$method->isDestructor() AND in_array($method->name, $this->_modifiers) AND substr($method->name, 0, 2) != "__") {
+                $methodName = "utils".ucfirst($method->name);
+                if (method_exists($this, $methodName)) {
+                    $this->_smartyInstance->register->modifier($method->name, array($this, $methodName));
                 } else {
                     \Bdf\Logger::getInstance()->error("La méthode ".$method->name." n'est pas definie dans SmartyAdapter->".$methodName);
                 }
@@ -211,5 +228,3 @@ class SmartyAdapter implements \Bdf\ITemplatesEngine
         return $this->smartyInstance();
     }
 }
-
-?>

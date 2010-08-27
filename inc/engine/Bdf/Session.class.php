@@ -47,6 +47,7 @@ class Session
     private $_userId;
     private $_validChallenges = array();
     const FIELD_USER_ID = "bdf-user-id";
+    const FIELD_CRASH = "bdf-crash";
     const FIELD_CHALLENGE = "bdf-challenge-id";
 
     /**
@@ -61,11 +62,18 @@ class Session
 
         session_start();
         // On récupère toutes les variables de session
-        $this->_values = $_SESSION;
+        if (isset($_SESSION[self::FIELD_CRASH])) {
+            $this->_values = $_SESSION[self::FIELD_CRASH];
+        } else {
+            $this->_values = $_SESSION;
+        }
+
         $_SESSION = array();
+        $_SESSION[self::FIELD_CRASH] = $this->_values;
 
         // Récupération des variables particulières
         $this->_getValidChallenges();
+
         $this->_userId = isset($this->_values[self::FIELD_USER_ID])?$this->_values[self::FIELD_USER_ID]:null;
     }
 
@@ -76,12 +84,12 @@ class Session
      */
     public static function getInstance()
     {
-        if (!isset(self::$instance)) {
+        if (!isset(self::$_instance)) {
             $c = __CLASS__;
-            self::$instance = new $c;
+            self::$_instance = new $c;
         }
 
-        return self::$instance;
+        return self::$_instance;
     }
 
     /**
@@ -100,14 +108,15 @@ class Session
      *
      * @param string $name  Le nom de la variable
      * @param mixed  $value La variable
-     * 
+     *
      * @return void
      */
     public function add($name,$value)
     {
 
-        if ($name != self::FIELD_USER_ID) {
+        if ($name != self::FIELD_USER_ID AND $name != self::FIELD_CRASH) {
             $this->_values[$name] = $value;
+            $_SESSION[self::FIELD_CRASH][$name] = $value;
         } else {
             // TODO throw exception
             \Bdf\Core::getInstance()->logger->warn('Vous ne pouvez pas ecraser la variable de session : '.$name, 'Session add');
@@ -124,8 +133,8 @@ class Session
      */
     public function remove($name)
     {
-        if (isset($this->value[$name])) {
-            unset($this->value[$name]);
+        if (isset($this->_values[$name])) {
+            unset($this->_values[$name]);
         }
     }
 
@@ -217,6 +226,7 @@ class Session
      */
     public function setCurrentUserId($userId)
     {
+        $_SESSION[self::FIELD_CRASH][self::FIELD_USER_ID] = $userId;
         $this->_userId = $userId;
     }
 
@@ -229,7 +239,7 @@ class Session
      */
     public function setCurrentUser(Bdf\IUser $user)
     {
-        $this->_userId = $user->getId();
+        $this->setCurrentUserId($user->getId());
     }
 
     /**
@@ -246,7 +256,7 @@ class Session
 
     /**
      * Destructeur
-     * 
+     *
      * @return void
      */
     public function __destruct()
@@ -258,12 +268,10 @@ class Session
         if (!empty($this->_validChallenges)) {
             $this->_values[self::FIELD_CHALLENGE] = $this->_validChallenges;
         }
-        
+
         $this->_values[self::FIELD_USER_ID] = $this->_userId;
         $_SESSION = $this->_values;
 
     }
 
 }
-
-?>
