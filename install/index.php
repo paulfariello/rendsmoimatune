@@ -27,9 +27,118 @@
  * @link     http://www.bottedefoin.net
  */
 
-//TODO copier config.ini.dist
-//TODO configurer config.ini
-//TODO installer la base de donnée
-//TODO mettre les bons droits sur templates_c
-//TODO download des cots
+define('HTML_OK', '<span style="color:green">OK</span><br />');
+define('HTML_NOK', '<span style="color:red">Erreur</span><br />');
+define('CONFIG_FILE', dirname(__FILE__).'/../inc/conf/config.ini');
+define('TEMPLATES_COMPILED_DIR', dirname(__FILE__).'/../templates_c/');
+define('TEMPLATES_COMPILED_DIR_MOD', 0770);
+
+$config = array();
+
+function checkConfigFile()
+{
+    global $config;
+
+    echo 'Vérification du fichier de configuration : ';
+    $config = parse_ini_file(CONFIG_FILE, true);
+    if ($config === false) {
+        echo HTML_NOK;
+        return false;
+    } else {
+        echo HTML_OK;
+        return true;
+    }
+}
+
+function createConfigFile()
+{
+    global $config;
+
+    echo 'Creation du fichier de configuration : ';
+    //TODO copier config.ini.dist
+
+    //TODO configurer config.ini
+    
+    echo HTML_NOK;
+    return false;
+}
+
+function checkTemplatesDir()
+{
+    global $config;
+
+    echo 'Dossier temporaire des templates : ';
+    switch($config['templates']['engine']) {
+    case 'smarty':
+        echo HTML_OK;
+        checkSmarty();
+        return true;
+        break;
+    case 'simpleTemplatesEngine':
+        echo HTML_OK;
+        checkSimpleTemplatesEngine();
+        return true;
+        break;
+    default:
+        echo HTML_NOK;
+        return false;
+    }
+}
+
+function checkSmarty()
+{
+    global $config;
+
+    echo 'Vérification de la configuration de smarty : ';
+    if (is_writable(TEMPLATES_COMPILED_DIR)) {
+        echo HTML_OK;
+        return true;
+    } else {
+        // Tente de mettre les bons droits sur templates_c
+        if (chmod(TEMPLATES_COMPILED_DIR,TEMPLATES_COMPILED_DIR_MOD) AND is_writable(TEMPLATES_DIR)) {
+            echo HTML_OK;
+            return true;
+        } else {
+            echo HTML_NOK;
+            return false;
+        }
+    }
+}
+
+function checkSimpleTemplatesEngine()
+{
+    global $config;
+
+    echo 'Vérification de la configuration de SimpleTemplatesEngine : ';
+    echo HTML_OK;
+    return true;
+}
+
+function checkCots()
+{
+    global $config;
+
+    echo 'Vérification de la présence des COTS : ';
+    //TODO check cots and their version
+    
+    echo HTML_NOK;
+    return false;
+}
+
+function downloadCots()
+{
+    global $config;
+
+    //TODO dowload cots
+}
+
+if (checkConfigFile()) {
+    checkTemplatesDir();
+    if (!checkCots()) {
+        downloadCots();
+    }
+} else {
+    createConfigFile();
+}
+
 ?>
