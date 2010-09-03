@@ -92,11 +92,11 @@ class SmartyAdapter implements \Bdf\ITemplatesEngine
      */
     public function initialization()
     {
-        include_once COTS."smarty/".\Bdf\Core::getInstance()->getConfig('templates', 'version')."/Smarty.class.php";
+        include_once COTS."smarty/".\Bdf\Core::getInstance()->getConfig('templates', 'release')."/Smarty.class.php";
         $this->_smartyInstance = new \Smarty();
-        $this->_smartyInstance->template_dir = ROOT.\Bdf\Core::getInstance()->getConfig("site", "templates_dir").$this->_skin.'/';
-        $this->_smartyInstance->compile_dir  = ROOT."templates_c/";
-        if (\Bdf\Core::getInstance()->getConfig('logger', 'level') == 'Bdf::DEBUG') {
+        $this->_smartyInstance->template_dir = ROOT.\Bdf\Core::getInstance()->getConfig("templates", "templates_dir").$this->_skin.'/';
+        $this->_smartyInstance->compile_dir  = ROOT.\Bdf\Core::getInstance()->getConfig("templates", "templates_compiled_dir");
+        if (\Bdf\Core::getInstance()->getConfig('logger', 'level') == 'DEBUG') {
             $this->_smartyInstance->debugging = true;
         } else {
             $this->_smartyInstance->debugging = false;

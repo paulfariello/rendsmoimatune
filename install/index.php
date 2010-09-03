@@ -29,8 +29,14 @@
 
 define('HTML_OK', '<span style="color:green">OK</span><br />');
 define('HTML_NOK', '<span style="color:red">Erreur</span><br />');
-define('CONFIG_FILE', dirname(__FILE__).'/../inc/conf/config.ini');
-define('TEMPLATES_COMPILED_DIR', dirname(__FILE__).'/../templates_c/');
+define('HTML_UNSUPPORTED_VERSION', '<span style="color:orange">Version non supportée</span><br />');
+define('HTML_COTS_NOT_FOUND', '<span style="color:orange">Fichiers introuvables</span><br />');
+
+define('ROOT', dirname(__FILE__).'/../');
+define('CONFIG_FILE', ROOT.'/inc/conf/config.ini');
+define('COTS_FILE', ROOT.'install/cots.xml');
+define('COTS_DIR', ROOT.'/inc/cots/');
+define('TEMPLATES_COMPILED_DIR', ROOT.'templates_c/');
 define('TEMPLATES_COMPILED_DIR_MOD', 0770);
 
 $config = array();
@@ -40,7 +46,7 @@ function checkConfigFile()
     global $config;
 
     echo 'Vérification du fichier de configuration : ';
-    $config = parse_ini_file(CONFIG_FILE, true);
+    $config = @parse_ini_file(CONFIG_FILE, true);
     if ($config === false) {
         echo HTML_NOK;
         return false;
@@ -54,91 +60,148 @@ function createConfigFile()
 {
     global $config;
 
-    echo 'Creation du fichier de configuration : ';
-    //TODO copier config.ini.dist
-
-    //TODO configurer config.ini
-    
-    echo HTML_NOK;
+    echo '<a href="config.php">Créer le fichier de configuration</a>';
     return false;
 }
 
-function checkTemplatesDir()
+function checkDirectories()
 {
     global $config;
 
-    echo 'Dossier temporaire des templates : ';
-    switch($config['templates']['engine']) {
-    case 'smarty':
-        echo HTML_OK;
-        checkSmarty();
-        return true;
-        break;
-    case 'simpleTemplatesEngine':
-        echo HTML_OK;
-        checkSimpleTemplatesEngine();
-        return true;
-        break;
-    default:
-        echo HTML_NOK;
-        return false;
-    }
-}
+    $return = true;
 
-function checkSmarty()
-{
-    global $config;
-
-    echo 'Vérification de la configuration de smarty : ';
-    if (is_writable(TEMPLATES_COMPILED_DIR)) {
+    /***** Dossier de proxy doctrine *****/
+    echo 'Dossier pour les proxy doctine : ';
+    if(file_exists(ROOT.$config['doctrine']['proxy_dir']) AND is_dir(ROOT.$config['doctrine']['proxy_dir'])) {
         echo HTML_OK;
-        return true;
     } else {
-        // Tente de mettre les bons droits sur templates_c
-        if (chmod(TEMPLATES_COMPILED_DIR,TEMPLATES_COMPILED_DIR_MOD) AND is_writable(TEMPLATES_DIR)) {
+        echo HTML_NOK;
+        $return = false;
+    }
+
+    /***** Dossier de mapping doctrine *****/
+    echo 'Dossier pour les mapping doctrine : ';
+    if(file_exists(ROOT.$config['doctrine']['mapping_dir']) AND is_dir(ROOT.$config['doctrine']['mapping_dir'])) {
+        echo HTML_OK;
+    } else {
+        echo HTML_NOK;
+        $return = false;
+    }
+
+    /***** Dossier de templates *****/
+    echo 'Dossier pour les templates : ';
+    if(file_exists(ROOT.$config['templates']['dir'].$config['site']['skin']) AND is_dir(ROOT.$config['templates']['dir'].$config['site']['skin'])) {
+        echo HTML_OK;
+    } else {
+        echo HTML_NOK;
+        $return = false;
+    }
+
+    /***** Dossier de templates compiles *****/
+    if (isset($config['templates']['compiled_dir'])) {
+        echo 'Dossier pour les templates compilés : ';
+        if(file_exists(ROOT.$config['templates']['compiled_dir']) AND is_dir(ROOT.$config['templates']['compiled_dir']) AND is_writable(ROOT.$config['templates']['compiled_dir'])) {
             echo HTML_OK;
-            return true;
         } else {
             echo HTML_NOK;
-            return false;
+            $return = false;
         }
     }
-}
 
-function checkSimpleTemplatesEngine()
-{
-    global $config;
+    /***** Dossier de javascript *****/
+    echo 'Dossier pour les fichiers javascript : ';
+    if(file_exists(ROOT.$config['site']['javascript_dir']) AND is_dir(ROOT.$config['site']['javascript_dir'])) {
+        echo HTML_OK;
+    } else {
+        echo HTML_NOK;
+        $return = false;
+    }
 
-    echo 'Vérification de la configuration de SimpleTemplatesEngine : ';
-    echo HTML_OK;
-    return true;
+    /***** Dossier de css *****/
+    echo 'Dossier pour les fichiers css : ';
+    if(file_exists(ROOT.$config['site']['style_dir'].$config['site']['skin']) AND is_dir(ROOT.$config['site']['style_dir'].$config['site']['skin'])) {
+        echo HTML_OK;
+    } else {
+        echo HTML_NOK;
+        $return = false;
+    }
+
+    /***** Dossier d'images *****/
+    echo 'Dossier pour les images : ';
+    if(file_exists(ROOT.$config['site']['image_dir'].$config['site']['skin']) AND is_dir(ROOT.$config['site']['image_dir'].$config['site']['skin'])) {
+        echo HTML_OK;
+    } else {
+        echo HTML_NOK;
+        $return = false;
+    }
 }
 
 function checkCots()
 {
     global $config;
 
-    echo 'Vérification de la présence des COTS : ';
-    //TODO check cots and their version
-    
-    echo HTML_NOK;
-    return false;
-}
+    $return = true;
 
-function downloadCots()
-{
-    global $config;
+    $cots = new SimpleXMLElement(COTS_FILE, null, true);
 
-    //TODO dowload cots
-}
-
-if (checkConfigFile()) {
-    checkTemplatesDir();
-    if (!checkCots()) {
-        downloadCots();
+    echo 'Vérification de la compatibilité et de la présence de '.$config['templates']['engine'].' : ';
+    $supported = false;
+    if($cots->xpath("/xml/templates/engine[@name='".$config['templates']['engine']."']/release[@name='".$config['templates']['release']."']")) {
+        $supported = true;        
     }
+
+    if ($supported) {
+        if ($config['templates']['engine'] != 'simpleTemplatesEngine') {
+            $templatesDir = COTS_DIR.$config['templates']['engine'].'/'.$config['templates']['release'];
+            if(file_exists($templatesDir) AND is_dir($templatesDir)) {
+                echo HTML_OK;
+            } else {
+                echo HTML_COTS_NOT_FOUND;
+                $return = false;
+            }
+        } else {
+            echo HTML_OK;
+        }
+    } else {
+        echo HTML_UNSUPPORTED_VERSION;
+        $return = false;
+    }
+
+    echo 'Vérification de la compatibilité et de la présence de Doctrine : ';
+    $supported = false;
+    if($cots->xpath("/xml/doctrine/release[@name='".$config['doctrine']['release']."']")) {
+        $supported = true;        
+    }
+
+    if ($supported) {
+        if(file_exists(COTS_DIR.'doctrine/'.$config['doctrine']['release'])) {
+            echo HTML_OK;
+        } else {
+            echo HTML_COTS_NOT_FOUND;
+        }
+    } else {
+        echo HTML_UNSUPPORTED_VERSION;
+        $return = false;
+    }
+
+    return $return;
+}
+?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>BotteDeFoin - Installation</title>
+</head>
+<body>
+<?php
+if (checkConfigFile()) {
+    checkCots();
+    checkDirectories();
 } else {
     createConfigFile();
 }
 
 ?>
+</body>
+</html>

@@ -1,46 +1,42 @@
+;Configuration file automaticaly created by BotteDeFoin on Tue, 31 Aug 2010 13:11:29 +0200
 [logger]
-level = "DEBUG" 
-;level = "INFO" 
-;level = "WARN" 
-;level = "ERROR" 
-;level = "FATAL" 
+;See possible values in Bdf\Logger class
+level = "DEBUG"
 
 [sgbd]
-;driver = "pdo_mysql"
-;driver = "pdo_sqlite"
-driver = "pdo_pgsql"
-;driver = "pdo_oci"
-;driver = "pdo_mssql"
-;driver = "oci8"
+;See supported drivers by DBAL from Doctrine project
+driver = "pdo_mysql"
 host = "localhost"
-user_name = ""
+user = ""
 password = ""
-database_name = ""
-hash = SHA256
-;hash = Blowfish
-;hash = MD5
+database_name= ""
+;Hash method is used for encrypted password stored in database
+;See possible values with hash_algos() php function
+hash = "sha512"
 
 [doctrine]
-version = "2.0.0-BETA1"
-proxy_dir = "proxy/"
-; do not start with \
+release = "2.0.0-BETA3"
+proxy_dir = "inc/proxy/"
+;Namespace should not start with \
 proxy_namespace = "Bdf\Model\Proxy"
-mapping_dir = "mapping/"
-; Comment this line if you don't want to use apc for caching sql queries and doctrine entities
-;cache = "apc"
-
+mapping_dir = "inc/mapping/"
+;See cache engine supported by your version of Doctrine
+;cache = ""
 [templates]
-;engine = "smarty"
-;version = "3.0-RC1"
-engine = "simpleTemplatesEngine"
+engine = "smarty"
+release = "3.0-RC1"
+dir = "templates/"
+;Line can be commented if your templates engine doesn't need special directory for compiled templates files
+compiled_dir = "templates_c/"
 
 [site]
+;Root url of your site. Used when you create link
 url = ""
+;You should store images that are used with css here.
+;That means not user uploaded images, and more generaly not images that represents site contents. My 2 cents...
 image_dir = "px/"
 style_dir = "style/"
 javascript_dir = "js/"
-templates_dir = "templates/"
 skin = "default"
-; do not start with \
-namespace = "" 
-
+;Namespace should not start with \
+namespace = ""

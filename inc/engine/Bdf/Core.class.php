@@ -157,7 +157,7 @@ class Core
      */
     private function _classLoaderInitialization()
     {
-        include_once COTS.'doctrine/'.$this->getConfig('doctrine', 'version').'/Doctrine/Common/ClassLoader.php';
+        include_once COTS.'doctrine/'.$this->getConfig('doctrine', 'release').'/Doctrine/Common/ClassLoader.php';
 
         // Register Bdf Class Loader
         $classLoader = new \Doctrine\Common\ClassLoader('Bdf');
@@ -167,7 +167,7 @@ class Core
 
         // Register Doctrine Class Loader
         $classLoader = new \Doctrine\Common\ClassLoader('Doctrine');
-        $classLoader->setIncludePath(COTS.'doctrine/'.$this->getConfig('doctrine', 'version'));
+        $classLoader->setIncludePath(COTS.'doctrine/'.$this->getConfig('doctrine', 'release'));
         $classLoader->register();
 
         // Register Bdf Class Loader
@@ -185,11 +185,11 @@ class Core
     private function _doctrineInitialization()
     {
         $this->_doctrineConfig = new \Doctrine\ORM\Configuration();
-        $this->_doctrineConfig->setProxyDir(INC.$this->getConfig('doctrine', 'proxy_dir'));
+        $this->_doctrineConfig->setProxyDir(ROOT.$this->getConfig('doctrine', 'proxy_dir'));
         $this->_doctrineConfig->setProxyNamespace($this->getConfig('doctrine', 'proxy_namespace'));
         // Deprecated for production environment
         $this->_doctrineConfig->setAutoGenerateProxyClasses(true);
-        $driver = new \Doctrine\ORM\Mapping\Driver\XmlDriver(array(INC.$this->getConfig('doctrine', 'mapping_dir')));
+        $driver = new \Doctrine\ORM\Mapping\Driver\XmlDriver(array(ROOT.$this->getConfig('doctrine', 'mapping_dir')));
         $this->_doctrineConfig->setMetadataDriverImpl($driver);
         $this->_doctrineConfig->setSqlLogger($this->logger);
 
@@ -201,7 +201,7 @@ class Core
 
         $connectionParams = array(
                 'dbname' => $this->getConfig('sgbd', 'database_name'),
-                'user' => $this->getConfig('sgbd', 'user_name'),
+                'user' => $this->getConfig('sgbd', 'user'),
                 'password' => $this->getConfig('sgbd', 'password'),
                 'host' => $this->getConfig('sgbd', 'host'),
                 'driver' => $this->getConfig('sgbd', 'driver')
