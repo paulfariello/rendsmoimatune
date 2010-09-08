@@ -64,12 +64,12 @@ class SmartyAdapter implements \Bdf\ITemplatesEngine
      */
     public function setSkin($skin)
     {
-        $skinDir = ROOT.\Bdf\Core::getInstance()->getConfig("site", "templates_dir").$skin.'/';
+        $skinDir = ROOT.\Bdf\Core::getInstance()->getConfig("templates", "dir").$skin.'/';
         if (file_exists($skinDir) AND is_dir($skinDir)) {
             $this->_skin = $skin;
         }
         if ($this->_smartyInstance !== null) {
-            $this->_smartyInstance->template_dir = ROOT.\Bdf\Core::getInstance()->getConfig("site", "templates_dir").$this->_skin.'/';
+            $this->_smartyInstance->template_dir = ROOT.\Bdf\Core::getInstance()->getConfig("templates", "dir").$this->_skin.'/';
         }
     }
 
@@ -94,8 +94,8 @@ class SmartyAdapter implements \Bdf\ITemplatesEngine
     {
         include_once COTS."smarty/".\Bdf\Core::getInstance()->getConfig('templates', 'release')."/Smarty.class.php";
         $this->_smartyInstance = new \Smarty();
-        $this->_smartyInstance->template_dir = ROOT.\Bdf\Core::getInstance()->getConfig("templates", "templates_dir").$this->_skin.'/';
-        $this->_smartyInstance->compile_dir  = ROOT.\Bdf\Core::getInstance()->getConfig("templates", "templates_compiled_dir");
+        $this->_smartyInstance->template_dir = ROOT.\Bdf\Core::getInstance()->getConfig("templates", "dir").$this->_skin.'/';
+        $this->_smartyInstance->compile_dir  = ROOT.\Bdf\Core::getInstance()->getConfig("templates", "compiled_dir");
         if (\Bdf\Core::getInstance()->getConfig('logger', 'level') == 'DEBUG') {
             $this->_smartyInstance->debugging = true;
         } else {
