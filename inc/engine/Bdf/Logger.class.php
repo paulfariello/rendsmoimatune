@@ -413,4 +413,20 @@ class Logger implements \Doctrine\DBAL\Logging\SQLLogger
     {
         $this->_noDebug = true;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+     public function startQuery($sql, array $params = null, array $types = null)
+     {
+         // TODO
+     }
+
+    /**
+     * {@inheritdoc}
+     */
+     public function stopQuery()
+     {
+         // TODO
+     }
 }
