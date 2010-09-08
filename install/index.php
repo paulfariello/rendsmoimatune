@@ -19,7 +19,7 @@
  * You should have received a copy of the GNU General Public License
  * along with BotteDeFoin.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @category ClassFile
+ * @category ScriptFile
  * @package  BotteDeFoin
  * @author   Paul Fariello <paul.fariello@gmail.com>
  * @license  http://www.gnu.org/copyleft/gpl.html  GPL License 3.0
@@ -30,12 +30,12 @@
 define('HTML_OK', '<span style="color:green">OK</span><br />');
 define('HTML_NOK', '<span style="color:red">Erreur</span><br />');
 define('HTML_UNSUPPORTED_VERSION', '<span style="color:orange">Version non supportée</span><br />');
-define('HTML_COTS_NOT_FOUND', '<span style="color:orange">Fichiers introuvables</span><br />');
+define('HTML_COTS_NOT_FOUND', '<span style="color:orange">Fichiers introuvables</span>');
 
-define('ROOT', dirname(__FILE__).'/../');
-define('CONFIG_FILE', ROOT.'/inc/conf/config.ini');
+define('ROOT', realpath(dirname(__FILE__).'/../').'/');
+define('CONFIG_FILE', ROOT.'inc/conf/config.ini');
 define('COTS_FILE', ROOT.'install/cots.xml');
-define('COTS_DIR', ROOT.'/inc/cots/');
+define('COTS_DIR', ROOT.'inc/cots/');
 
 $config = array();
 
@@ -154,7 +154,7 @@ function checkCots()
             if(file_exists($templatesDir) AND is_dir($templatesDir)) {
                 echo HTML_OK;
             } else {
-                echo HTML_COTS_NOT_FOUND;
+                echo HTML_COTS_NOT_FOUND.' <a href="downloadCots.php?cots=templates">Télécharger</a><br />';
                 $return = false;
             }
         } else {
@@ -175,7 +175,7 @@ function checkCots()
         if(file_exists(COTS_DIR.'doctrine/'.$config['doctrine']['release'])) {
             echo HTML_OK;
         } else {
-            echo HTML_COTS_NOT_FOUND;
+            echo HTML_COTS_NOT_FOUND.' <a href="downloadCots.php?cots=doctrine">Télécharger</a><br />';
         }
     } else {
         echo HTML_UNSUPPORTED_VERSION;

@@ -170,7 +170,7 @@ class Core
         $classLoader->setIncludePath(COTS.'doctrine/'.$this->getConfig('doctrine', 'release'));
         $classLoader->register();
 
-        // Register Bdf Class Loader
+        // Register Project Class Loader
         $classLoader = new \Doctrine\Common\ClassLoader($this->getConfig('site', 'namespace'));
         $classLoader->setIncludePath(INC."class/");
         $classLoader->setFileExtension('.class.php');

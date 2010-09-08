@@ -1,6 +1,6 @@
 <?php
 /**
- * Fichier d'installation de botteDeFoin
+ * Fichier de creation de la configuration de botteDeFoin
  *
  * PHP version 5.3
  *
@@ -19,7 +19,7 @@
  * You should have received a copy of the GNU General Public License
  * along with BotteDeFoin.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @category ClassFile
+ * @category ScriptFile
  * @package  BotteDeFoin
  * @author   Paul Fariello <paul.fariello@gmail.com>
  * @license  http://www.gnu.org/copyleft/gpl.html  GPL License 3.0
@@ -32,7 +32,7 @@ define('HTML_NOK', '<span style="color:red">Erreur</span><br />');
 define('HTML_UNSUPPORTED_VERSION', '<span style="color:orange">Version non supportée</span><br />');
 define('HTML_COTS_NOT_FOUND', '<span style="color:orange">Fichiers introuvables</span><br />');
 
-define('ROOT', dirname(__FILE__).'/../');
+define('ROOT', realpath(dirname(__FILE__).'/../').'/');
 define('CONFIG_FILE', ROOT.'inc/conf/config.ini');
 define('COTS_FILE', ROOT.'install/cots.xml');
 define('COTS_DIR', ROOT.'inc/cots/');
@@ -114,8 +114,8 @@ if (isset($_POST['create-config-file'])) {
         if (!file_exists('../'.$_POST['doctrine-mapping-dir'])) {
             mkdir('../'.$_POST['doctrine-mapping-dir'],0770,true);
         }
-        if (!file_exists('../'.$_POST['templates-dir'])) {
-            mkdir('../'.$_POST['templates-dir'],0770,true);
+        if (!file_exists('../'.$_POST['templates-dir'].$_POST['site-skin'].'/')) {
+            mkdir('../'.$_POST['templates-dir'].$_POST['site-skin'].'/',0770,true);
         }
         if (!file_exists('../'.$_POST['templates-compiled-dir'])) {
             mkdir('../'.$_POST['templates-compiled-dir'],0770,true);

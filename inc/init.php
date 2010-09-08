@@ -29,7 +29,7 @@
 
 error_reporting(E_ALL | E_STRICT);
 
-define('ROOT', dirname(__FILE__).'/../');
+define('ROOT', realpath(dirname(__FILE__).'/../').'/');
 define('INC', ROOT.'inc/');
 define('ENGINE', INC.'engine/');
 define('COTS', INC.'cots/');
