@@ -106,6 +106,31 @@ if (isset($_POST['create-config-file'])) {
     fwrite($f,'namespace = "'.$_POST['site-namespace'].'"'.EOL);
 
     fclose($f);
+
+    if (isset($_POST['create-directories']) AND $_POST['create-directories'] == 'create-directories') {
+        if (!file_exists('../'.$_POST['doctrine-proxy-dir'])) {
+            mkdir('../'.$_POST['doctrine-proxy-dir'],0770,true);
+        }
+        if (!file_exists('../'.$_POST['doctrine-mapping-dir'])) {
+            mkdir('../'.$_POST['doctrine-mapping-dir'],0770,true);
+        }
+        if (!file_exists('../'.$_POST['templates-dir'])) {
+            mkdir('../'.$_POST['templates-dir'],0770,true);
+        }
+        if (!file_exists('../'.$_POST['templates-compiled-dir'])) {
+            mkdir('../'.$_POST['templates-compiled-dir'],0770,true);
+        }
+        if (!file_exists('../'.$_POST['site-image-dir'].$_POST['site-skin'].'/')) {
+            mkdir('../'.$_POST['site-image-dir'].$_POST['site-skin'].'/',0770,true);
+        }
+        if (!file_exists('../'.$_POST['site-style-dir'].$_POST['site-skin'].'/')) {
+            mkdir('../'.$_POST['site-style-dir'].$_POST['site-skin'].'/',0770,true);
+        }
+        if (!file_exists('../'.$_POST['site-javascript-dir'])) {
+            mkdir('../'.$_POST['site-javascript-dir'],0770,true);
+        }
+    }
+
     header('location: index.php');
 }
 

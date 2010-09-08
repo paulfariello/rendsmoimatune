@@ -1,2 +1,0 @@
-<!-- fermeture du page -->
-</div>

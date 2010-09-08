@@ -36,8 +36,6 @@ define('ROOT', dirname(__FILE__).'/../');
 define('CONFIG_FILE', ROOT.'/inc/conf/config.ini');
 define('COTS_FILE', ROOT.'install/cots.xml');
 define('COTS_DIR', ROOT.'/inc/cots/');
-define('TEMPLATES_COMPILED_DIR', ROOT.'templates_c/');
-define('TEMPLATES_COMPILED_DIR_MOD', 0770);
 
 $config = array();
 
