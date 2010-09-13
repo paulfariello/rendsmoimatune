@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping http://doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+
+    <entity name="Eu\Rmmt\Repayment" table="repayment">
+        <id name="_id" type="integer" column="repayment_pk">
+            <generator strategy="SEQUENCE" />
+            <sequence-generator sequence-name="repayment_repayment_pk_seq" initial-value="1" allocation-size="1" />
+        </id>
+
+        <field name="_date"   column="date"   type="date"   />
+        <field name="_amount" column="amount" type="float"  />
+
+        <many-to-one target-entity="User" field="_fromUser" mapped-by="_repaymentsFromMe" >
+            <join-column name="from_user_fk" referenced-column-name="user_fk" />
+        </many-to-one>
+        <many-to-one target-entity="User" field="_toUser"   mapped-by="_repaymentsToMe" >
+            <join-column name="to_user_fk" referenced-column-name="user_fk" />
+        </many-to-one>
+
+        <many-to-one target-entity="Event" field="_event" inversed-by="_repayments" >
+            <join-column name="event_fk" referenced-column-name="event_pk" />
+        </many-to-one>
+    </entity>
+</doctrine-mapping>

@@ -1,0 +1,8 @@
+Options +FollowSymLinks
+RewriteEngine On
+RewriteBase /Rendsmoimatune/
+RewriteRule    ^sign-in.html$                   sign-in.php [L]
+RewriteRule    ^new-account.html$               new-account.php [L]
+RewriteRule    ^dashboard/$                     index.php  [L]
+RewriteRule    ^events/$                        events/index.php  [L]
+RewriteRule    ^my-account/$                    my-account/index.php  [L]

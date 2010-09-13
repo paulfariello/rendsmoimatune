@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping http://doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+
+    <entity name="Eu\Rmmt\Expenditure" table="expenditure">
+        <id name="_id" type="integer" column="expenditure_pk">
+            <generator strategy="SEQUENCE" />
+            <sequence-generator sequence-name="expenditure_expenditure_pk_seq" initial-value="1" allocation-size="1" />        </id>
+
+        <field name="_name"   column="name"   type="string" />
+        <field name="_date"   column="date"   type="date"   />
+        <field name="_amount" column="amount" type="float"  />
+
+        <many-to-many target-entity="Tag"  field="_tags" inversed-by="_expenditures" >
+            <join-table name="expenditure_tag">
+                <join-columns>
+                    <join-column name="expenditure_pcfk" referenced-column-name="expenditure_pk" />
+                </join-columns>
+                <inverse-join-columns>
+                    <join-column name="tag_pcfk" referenced-column-name="tag_pk"         />
+                </inverse-join-columns>
+            </join-table>
+        </many-to-many>
+
+        <many-to-one target-entity="Payed"    mapped-by="_expenditure" field="_payed"    />
+        <many-to-one target-entity="Involved" mapped-by="_expenditure" field="_involved" />
+
+        <many-to-one target-entity="Event" field="_event" inversed-by="_expenditures" >
+            <join-column name="event_fk" referenced-column-name="event_pk" />
+        </many-to-one>
+
+    </entity>
+</doctrine-mapping>

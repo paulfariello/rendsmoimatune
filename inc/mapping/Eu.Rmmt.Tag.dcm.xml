@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping http://doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+
+    <entity name="Eu\Rmmt\Tag" table="tag">
+        <id name="_id" type="integer" column="tag_pk">
+            <generator strategy="SEQUENCE" />
+            <sequence-generator sequence-name="payed_payed_pk_seq" initial-value="1" allocation-size="1" />
+        </id>
+
+        <field name="_name" column="name" type="string" />
+
+        <many-to-many target-entity="Expenditure" field="_expenditures" mapped-by="_tags" />
+    </entity>
+</doctrine-mapping>
