@@ -1,0 +1,21 @@
+<xml>
+    <doctrine>
+        <release name="2.0.0-BETA4" url="http://www.doctrine-project.org/downloads/DoctrineORM-2.0.0BETA4-full.tar.gz" md5sum="30f1bab35480e54161f56e03196bdfab" extractPath="doctrine-orm" />
+    </doctrine>
+    <templates>
+        <engine name="smarty">
+            <release name="3.0-RC1" url="http://www.smarty.net/do_download.php?download_file=Smarty-3.0rc1.tar.gz" md5sum="bc1c8d4e91acd2242a40225bccf11994" extractPath="Smarty-3.0rc1/libs" />
+        </engine>
+        <engine name="simpleTemplatesEngine">
+            <release name="1.0-ALPHA1" />
+        </engine>
+    </templates>
+    <javascript>
+        <framework name="mootools">
+            <release name="2.0" url="http://mootools.com" md5sum=""/>
+        </framework>
+        <framework name="jquery">
+            <release name="3.6" url="http://jquery.com" md5sum=""/>
+        </framework>
+    </javascript>
+</xml>

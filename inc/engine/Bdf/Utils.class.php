@@ -114,8 +114,8 @@ class Utils
      */
     public static function comparePassword($password, $hash)
     {
-        $hashLen = array('SHA256' => 64);
-        $algo = substr($hash, 1, strpos($hash, '}')-1);
+        $hashLen = array('SHA256' => 64,'SHA512' => 128);
+        $algo = strtoupper(substr($hash, 1, strpos($hash, '}')-1));
 
         if (!isset($hashLen[$algo])) {
             throw new \Exception("L'algorithme de hashage n'est pas supporté");

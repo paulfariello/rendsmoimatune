@@ -10,7 +10,7 @@
         	<li><a href="{makeUrl url='dashboard/'}" class="active">{getText id='DASHBOARD'}</a></li> <!-- Use the "active" class for the active menu item  -->
         	<li><a href="{makeUrl url='events/'}">{getText id='EVENTS'}</a></li>
         	<li><a href="{makeUrl url='my-account/'}">{getText id='MY ACCOUNT'}</a></li>
-        	<li class="logout"><a href="{makeUrl url='logout.html'}">{getText id='LOGOUT'}</a></li>
+        	<li class="logout">{if $currentUser == null}<a href="{makeUrl url='sign-in.html'}">{getText id='SIGN IN'}</a>{else}<a href="{makeUrl url='sign-out.html'}">{getText id='SIGN OUT'}</a>{/if}</li>
         </ul>
         <!-- // #end mainNav -->
         

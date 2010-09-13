@@ -1,8 +1,8 @@
-{include file='inc/header-html.tpl'}
+{include file='inc/header-html.tpl' title='Dashboard'}
 <!-- Additionnal javascript script -->
 {include file='inc/header.tpl'}
 {include file='inc/side-nav-dashboard.tpl'}
-{include file='inc/breadcrumbs.tpl'}
+<h2><a href="{makeUrl url='dashboard.html'}">{getText id='Dashboard'}</a></h2>
 {include file='inc/main.tpl'}
 
 					<h3>{getText id='My debts'}</h3>

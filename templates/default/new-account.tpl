@@ -2,15 +2,18 @@
 <!-- Additionnal javascript script -->
 {include file='inc/header.tpl'}
 {include file='inc/side-nav-sign-in.tpl'}
-{include file='inc/breadcrumbs.tpl'}
+<h2><a href="{makeUrl url='new-account.html'}">{getText id='New account'}</a></h2>
 {include file='inc/main.tpl'}
-
+          {include file='inc/message.tpl'}
 					<h3>{getText id='New account'}</h3>
-                	<form action="{makeUrl url='new-account.html'}" class="jNice">
+                	<form action="{makeUrl url='new-account.html'}" class="jNice" method="post" >
                     	<fieldset>
-                        	<p><label>{getText id='Email'}</label><input type="text" class="text-long" /></p>
-                        	<p><label>{getText id='Password'}</label><input type="password" class="text-long" /></p>
-                            <input type="submit" value="{getText id='Create new account'}" />
+                        	<p><label>{getText id='Email'}</label><input type="text" class="text-long" name="email" /></p>
+                        	<p><label>{getText id='Password'}</label><input type="password" class="text-long" name="password" /></p>
+                        	<p><label>{getText id='Password Confirm'}</label><input type="password" class="text-long" name="password-confirm" /></p>
+                        	<p><label>{getText id='First Name'}</label><input type="text" class="text-long" name="first-name" /></p>
+                        	<p><label>{getText id='Last Name'}</label><input type="text" class="text-long" name="last-name" /></p>
+                            <input type="submit" name="create-new-account" value="{getText id='Create new account'}" />
                         </fieldset>
                     </form>
 {include file='inc/footer.tpl'}

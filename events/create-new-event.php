@@ -33,5 +33,5 @@ require_once '../inc/assignDefaultVar.php';
 $em = \Bdf\Core::getInstance()->getEntityManager();
 $te = \Bdf\Core::getInstance()->getTemplatesEngine();
 
-$te->display('events/index');
+$te->display('events/create-new-event');
 ?>

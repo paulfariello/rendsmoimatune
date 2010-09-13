@@ -24,13 +24,41 @@
  * @author   Paul Fariello <paul.fariello@gmail.com>
  * @license  http://www.gnu.org/copyleft/gpl.html  GPL License 3.0
  * @version  SVN: 145
- * @link     http://www.bottedefoin.net
+ * @link     http://www.rendsmoimatune.net
  */
 
 require_once 'inc/init.php';
+require_once 'inc/assignDefaultVar.php';
 
 $em = \Bdf\Core::getInstance()->getEntityManager();
 $te = \Bdf\Core::getInstance()->getTemplatesEngine();
 
-$te->display('new-account');
+if (!isset($_POST['create-new-account'])) {
+    $te->display('new-account');
+} else {
+    $doSave = true;
+    if ($_POST['password'] !== $_POST['password-confirm']) {
+        $doSave = false;
+        $te->assign('message', array('type'=>'error','content'=>\Bdf\Utils::getText('Password are not identical')));
+        $te->display('new-account');
+    }
+
+    if (!isset($_POST['email']) OR empty($_POST['email'])) {
+        $doSave = false;
+        $te->assign('message', array('type'=>'error','content'=>\Bdf\Utils::getText('Email is required')));
+        $te->display('new-account');
+    }
+
+    if ($doSave) {
+        $user = new Eu\Rmmt\User($_POST['email']);
+        $user->setPassword($_POST['password']);
+        $user->setFirstName($_POST['first-name']);
+        $user->setLastName($_POST['last-name']);
+        $em = \Bdf\Core::getInstance()->getEntityManager();
+        $em->persist($user);
+        $em->flush();
+        \Bdf\Session::getInstance()->setCurrentUserId($user->getId());
+        header('location: '.\Bdf\Utils::makeUrl(''));
+    }
+}
 ?>

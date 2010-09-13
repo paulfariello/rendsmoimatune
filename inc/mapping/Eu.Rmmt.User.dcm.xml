@@ -1,20 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping http://doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
 
-  <entity name="Eu\Rmmt\User" table="user">
-    <id name="id" type="integer" column="user_pk">
-        <generator strategy="AUTO"/>
-    </id>
+    <entity name="Eu\Rmmt\User" table='"user"'>
+        <id name="_id" type="integer" column="user_pk">
+            <generator strategy="SEQUENCE" />
+            <sequence-generator sequence-name="user_user_pk_seq" initial-value="1" allocation-size="1" />
+        </id>
 
-    <field name="nom" column="nom" type="string" />
-    <field name="prenom" column="prenom" type="string" />
-    <field name="email" column="email" type="string" />
-    <field name="password" column="password" type="string" />
-    <field name="isAdmin" column="admin" type="boolean" />
-    <one-to-many target-entity="Vehicule" mapped-by="proprietaire" field="vehicules" />
-    <one-to-many target-entity="Voyageur" mapped-by="user" field="voyageurs" />
-    <many-to-one target-entity="Ville" field="ville">
-        <join-column name="ville_fk" referenced-column-name="ville_pk" />
-    </many-to-one>
-  </entity>
+        <field name="_firstName" column="first_name" type="string"  />
+        <field name="_lastName"  column="last_name"  type="string"  />
+        <field name="_email"     column="email"      type="string"  />
+        <field name="_password"  column="password"   type="string"  />
+        <field name="_isAdmin"   column="is_admin"   type="boolean" />
+
+        <one-to-many target-entity="Repayment" mapped-by="_fromUser" field="_repaymentsFromMe" />
+        <one-to-many target-entity="Repayment" mapped-by="_toUser"   field="_repaymentsToMe" />
+        <one-to-many target-entity="Payed"     mapped-by="_user"     field="_payed"     />
+        <one-to-many target-entity="Involved"  mapped-by="_user"     field="_involved"  />
+
+        <many-to-many target-entity="Event" field="_events" mapped-by="_users"/>
+    </entity>
 </doctrine-mapping>

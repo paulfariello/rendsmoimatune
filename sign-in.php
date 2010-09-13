@@ -24,7 +24,7 @@
  * @author   Paul Fariello <paul.fariello@gmail.com>
  * @license  http://www.gnu.org/copyleft/gpl.html  GPL License 3.0
  * @version  SVN: 145
- * @link     http://www.bottedefoin.net
+ * @link     http://www.rendsmoimatune.net
  */
 
 require_once 'inc/init.php';
@@ -32,5 +32,35 @@ require_once 'inc/init.php';
 $em = \Bdf\Core::getInstance()->getEntityManager();
 $te = \Bdf\Core::getInstance()->getTemplatesEngine();
 
-$te->display('sign-in');
+if(isset ($_POST['sign-in'])) {
+    try {
+        \Eu\Rmmt\User::authenticateUser($_POST['email'], $_POST['password']);
+    } catch (Exception $e) {
+        $te = \Bdf\Core::getInstance()->getTemplatesEngine();
+        $te->assign("message", $e->getMessage());
+        $te->assign("_POST", $_POST);
+        $te->display("sign-in");
+        die();
+    }
+    if (null === \Bdf\Session::getInstance()->getCurrentUserId()) {
+        $te = \Bdf\Core::getInstance()->getTemplatesEngine();
+        $te->assign("message", array('type'=>'error','content'=>\Bdf\Utils::getText('The e-mail address and password you entered do not match any accounts')));
+        $te->assign("_POST", $_POST);
+        $te->display("sign-in");
+    } else {
+      $redirect = \Bdf\Session::getInstance()->get('redirect');
+      if (null != $redirect) {
+        \Bdf\Session::getInstance()->remove('redirect');
+        header("location: ".$redirect);
+      } else {
+        header("location: ".\Bdf\Utils::makeUrl(""));
+      }
+    }
+}else {
+    $te = \Bdf\Core::getInstance()->getTemplatesEngine();
+    if (null !== \Bdf\Session::getInstance()->get('redirect')) {
+        $te->assign('message',array('type'=>'warning','content'=>'Authentification requise'));
+    }
+    $te->display("sign-in");
+}
 ?>
