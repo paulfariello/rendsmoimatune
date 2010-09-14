@@ -48,11 +48,11 @@ class SmartyAdapter implements \Bdf\ITemplatesEngine
     private $_skin           = null;
     private $_smartyInstance = null;
     private $_functions      = array(
-        'makeUrl',
-        'isCurrentPage'
+        'makeUrl'
     );
     private $_modifiers      = array(
-        'intToByteQuantity'
+        'intToByteQuantity',
+        'isCurrentPage'
     );
 
     /**
@@ -130,9 +130,9 @@ class SmartyAdapter implements \Bdf\ITemplatesEngine
      *
      * @return @see \Bdf\Utils::isCurrentPage()
      */
-    public function utilsIsCurrentPage($params, $smarty)
+    public function utilsIsCurrentPage($param)
     {
-        return \Bdf\Utils::isCurrentPage($params['page']);
+        return \Bdf\Utils::isCurrentPage($param);
     }
 
     /**
