@@ -135,7 +135,7 @@ class Utils
      */
     public static function isCurrentPage($url)
     {
-        return strstr($url, $_SERVER['REQUEST_URI']) !== false;
+        return strstr($_SERVER['REQUEST_URI'], $url) !== false;
     }
 
     /**
