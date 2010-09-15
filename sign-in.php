@@ -36,14 +36,12 @@ if(isset ($_POST['sign-in'])) {
     try {
         \Eu\Rmmt\User::authenticateUser($_POST['email'], $_POST['password']);
     } catch (Exception $e) {
-        $te = \Bdf\Core::getInstance()->getTemplatesEngine();
         $te->assign("message", $e->getMessage());
         $te->assign("_POST", $_POST);
         $te->display("sign-in");
         die();
     }
     if (null === \Bdf\Session::getInstance()->getCurrentUserId()) {
-        $te = \Bdf\Core::getInstance()->getTemplatesEngine();
         $te->assign("message", array('type'=>'error','content'=>\Bdf\Utils::getText('The e-mail address and password you entered do not match any accounts')));
         $te->assign("_POST", $_POST);
         $te->display("sign-in");
@@ -57,7 +55,6 @@ if(isset ($_POST['sign-in'])) {
       }
     }
 }else {
-    $te = \Bdf\Core::getInstance()->getTemplatesEngine();
     if (null !== \Bdf\Session::getInstance()->get('redirect')) {
         $te->assign('message',array('type'=>'warning','content'=>'Authentification requise'));
     }

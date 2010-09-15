@@ -54,7 +54,6 @@ if (!isset($_POST['create-new-account'])) {
         $user->setPassword($_POST['password']);
         $user->setFirstName($_POST['first-name']);
         $user->setLastName($_POST['last-name']);
-        $em = \Bdf\Core::getInstance()->getEntityManager();
         $em->persist($user);
         $em->flush();
         \Bdf\Session::getInstance()->setCurrentUserId($user->getId());

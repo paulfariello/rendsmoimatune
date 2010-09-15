@@ -32,6 +32,51 @@ require_once '../inc/assignDefaultVar.php';
 
 $em = \Bdf\Core::getInstance()->getEntityManager();
 $te = \Bdf\Core::getInstance()->getTemplatesEngine();
+$currentUser = \Eu\Rmmt\User::getCurrentUser();
+if ($currentUser == null) {
+    \Bdf\Session::getInstance()->add('redirect',$_SERVER['REQUEST_URI']);
+    header('location: '.\Bdf\Utils::makeUrl('sign-in.html'));
+    die();
+}
 
-$te->display('events/create-new-event');
+if (!isset($_POST['create-new-event'])) {
+    $te->display('events/create-new-event');
+} else {
+    $doSave = true;
+
+    // Initialisation des dates
+    $startDate = null;
+    $endDate   = null;
+    if (isset($_POST['start-date']) AND !empty($_POST['start-date']) AND isset($_POST['end-date']) AND !empty($_POST['end-date'])) {
+        $startDate = new DateTime($_POST['start-date']);
+        $endDate   = new DateTime($_POST['end-date']);
+        // Est-ce que la date de début est inférieur à la date de fin
+        if (date_diff($startDate,$endDate)->format('%R') == '-') {
+            $doSave = false;
+            $te->assign('message', array('type'=>'error','content'=>\Bdf\Utils::getText('Time period must be positive')));
+            $te->assign('_POST', $_POST);
+
+            $te->display('events/create-new-event');
+        }
+    }
+
+    if (!isset($_POST['name']) OR empty($_POST['name'])) {
+        $doSave = false;
+        $te->assign('message', array('type'=>'error','content'=>\Bdf\Utils::getText('Name is required')));
+        $te->assign('_POST', $_POST);
+
+        $te->display('events/create-new-event');
+    }
+
+    if ($doSave) {
+        $event = new Eu\Rmmt\Event($_POST['name']);
+        $event->setStartDate($startDate);
+        $event->setEndDate($endDate);
+        $event->addUser(\Eu\Rmmt\User::getCurrentUser());
+        $em->persist($event);
+        $em->flush();
+        header('location: '.$event->getUrlDetail());
+    }
+}
+
 ?>

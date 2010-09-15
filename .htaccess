@@ -11,6 +11,7 @@ RewriteRule    ^dashboard/$                     index.php  [L]
 # Events
 RewriteRule    ^events/$                        events/index.php  [L]
 RewriteRule    ^events/create-new-event.html    events/create-new-event.php [L]
+RewriteRule    ^events/[a-z-]*-([0-9]?)/        events/event.php?id=$1 [L]
 
 # My Account
 RewriteRule    ^my-account/$                    my-account/index.php  [L]

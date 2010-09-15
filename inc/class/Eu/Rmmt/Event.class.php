@@ -28,6 +28,9 @@
  */
 
 namespace Eu\Rmmt;
+use DateTime;
+use Bdf\Utils;
+use Doctrine\Common\Collections\ArrayCollection;
 
 /**
  * Event
@@ -47,6 +50,11 @@ class Event
     private $_expenditures;
     private $_users;
     private $_repayments;
+
+    public function  __construct($name) {
+        $this->_name = $name;
+        $this->_users = new ArrayCollection();
+    }
 
     public function getId()
     {
@@ -119,4 +127,8 @@ class Event
         $this->_repayments->removeElement($repayment);
     }
 
+    public function getUrlDetail()
+    {
+        return Utils::makeUrl('events/'.Utils::urlize($this->_name).'-'.$this->_id.'/');
+    }
 }

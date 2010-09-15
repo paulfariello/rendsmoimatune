@@ -32,6 +32,12 @@ require_once '../inc/assignDefaultVar.php';
 
 $em = \Bdf\Core::getInstance()->getEntityManager();
 $te = \Bdf\Core::getInstance()->getTemplatesEngine();
+$currentUser = \Eu\Rmmt\User::getCurrentUser();
+if ($currentUser == null) {
+    \Bdf\Session::getInstance()->add('redirect',$_SERVER['REQUEST_URI']);
+    header('location: '.\Bdf\Utils::makeUrl('sign-in.html'));
+    die();
+}
 
 $te->display('events/index');
 ?>
