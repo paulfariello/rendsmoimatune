@@ -21,8 +21,8 @@
             </join-table>
         </many-to-many>
 
-        <many-to-one target-entity="Payed"    mapped-by="_expenditure" field="_payed"    />
-        <many-to-one target-entity="Involved" mapped-by="_expenditure" field="_involved" />
+        <one-to-many target-entity="Payed"    mapped-by="_expenditure" field="_payed"    />
+        <one-to-many target-entity="Involved" mapped-by="_expenditure" field="_involved" />
 
         <many-to-one target-entity="Event" field="_event" inversed-by="_expenditures" >
             <join-column name="event_fk" referenced-column-name="event_pk" />

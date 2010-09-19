@@ -39,5 +39,6 @@ if ($currentUser == null) {
     die();
 }
 
+$te->assign('events',$em->getRepository('Eu\Rmmt\Event')->findAll());
 $te->display('events/index');
 ?>

@@ -27,7 +27,7 @@
  * @link
  */
 
-namespace Eu\Rmmt\Expenditure;
+namespace Eu\Rmmt;
 use DateTime;
 
 /**

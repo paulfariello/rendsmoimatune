@@ -38,6 +38,15 @@ if ($currentUser == null) {
     header('location: '.\Bdf\Utils::makeUrl('sign-in.html'));
     die();
 }
+$_GET['id'] = 5;
+if (!isset($_GET['id'])) {
+    header('location: '.\Bdf\Utils::makeUrl('events/'));
+    die();
+}
 
+$event = $em->getRepository('Eu\Rmmt\Event')->find($_GET['id']);
+$te->assign('currentEvent',$event);
+$te->assign('events',$em->getRepository('Eu\Rmmt\Event')->findAll());
 $te->display('events/event');
+
 ?>
