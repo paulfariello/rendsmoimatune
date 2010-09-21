@@ -38,7 +38,7 @@ if ($currentUser == null) {
     header('location: '.\Bdf\Utils::makeUrl('sign-in.html'));
     die();
 }
-$_GET['id'] = 5;
+
 if (!isset($_GET['id'])) {
     header('location: '.\Bdf\Utils::makeUrl('events/'));
     die();

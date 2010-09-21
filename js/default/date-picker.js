@@ -16,5 +16,5 @@ along with Rendsmoimatune.  If not, see <http://www.gnu.org/licenses/>.
  */
 window.addEvent("domready", function()
 {
-    new DatePicker($$('.date'));
+    new DatePicker($$('input.date'));
 });
