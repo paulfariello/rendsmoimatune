@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<todo version="0.1.20">
+    <note priority="veryhigh" time="1285080182" done="1285081158">
+        toto
+        <comment>
+            test
+        </comment>
+    </note>
+    <note priority="veryhigh" time="1285081939">
+        gestion des exceptions dans les formulaires
+    </note>
+    <note priority="high" time="1285082143">
+        creer le css pour les messages
+    </note>
+</todo>
