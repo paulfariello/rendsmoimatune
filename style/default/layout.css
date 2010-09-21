@@ -67,11 +67,47 @@ h1 span { display: none; }
 	border-right: none;
 }
 
-#mainNav li a:hover { background: #fdfcf6; }
+#mainNav li:hover { background: #fdfcf6; }
 
-#mainNav li a.active, #mainNav li a.active {
+#mainNav li.active, #mainNav li.active {
 	background: #f0f0f0 url(../../px/default/top-menu-item-bg.gif) repeat-x left top;
 	color: #454545;
+}
+
+#mainNav li a.home {
+    background-image: url("../../px/default/snowish/24x24/actions/stock_home.png");
+    background-position: left center;
+    background-repeat: no-repeat;
+    background-color: transparent;
+    padding: 0 20px 0 30px;
+    margin-left:5px;
+}
+
+#mainNav li a.events {
+    background-image: url("../../px/default/snowish/24x24/apps/kedit.png");
+    background-position: left center;
+    background-repeat: no-repeat;
+    background-color: transparent;
+    padding: 0 20px 0 30px;
+    margin-left:5px;
+}
+
+#mainNav li a.my-account {
+    background-image: url("../../px/default/snowish/24x24/apps/gnome-control-center.png");
+    background-position: left center;
+    background-repeat: no-repeat;
+    background-color: transparent;
+    padding: 0 20px 0 30px;
+    margin-left:5px;
+}
+
+#mainNav li a.sign-out {
+    background-image: url("../../px/default/snowish/24x24/actions/exit.png");
+    background-position: left center;
+    background-repeat: no-repeat;
+    background-color: transparent;
+    padding: 0 20px 0 30px;
+    margin-left:5px;
 }
 
 /* Container ---------------------------------------- */
@@ -112,9 +148,18 @@ h1 span { display: none; }
 
 #sidebar .sideNav li a:hover { background: #fdfcf6; }
 
-#sidebar .sideNav li a.active, #sidebar .sideNav li a.active:hover {
+#sidebar .sideNav li.active, #sidebar .sideNav li.active:hover {
 	background: #f0f7fa;
 	color: #c66653;
+}
+
+#sidebar .sideNav li a.new {
+    background-image: url("../../px/default/snowish/24x24/actions/gtk-add.png");
+    background-repeat: no-repeat;
+    background-position: center left;
+    background-color: transparent;
+	padding: 0 19px 0 29px;
+	width: 131px;
 }
 
 /* Breadcrumb ---------------------------------------- */
