@@ -133,12 +133,16 @@ h1 span { display: none; }
 
 #sidebar .sideNav { width: 179px; }
 
-#sidebar .sideNav li { border-bottom: 1px solid #ddd; width: 179px; }
+#sidebar .sideNav li { 
+    border-bottom: 1px solid #ddd;
+    width: 179px;
+    background-color: #F6F6F6;
+}
 
 #sidebar .sideNav li a {
 	display: block;
 	color: #646464;
-	background: #f6f6f6;
+	background-color: transparent;
 	text-decoration: none;
 	height: 29px;
 	line-height: 29px;
