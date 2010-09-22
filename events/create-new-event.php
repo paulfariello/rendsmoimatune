@@ -39,44 +39,47 @@ if ($currentUser == null) {
     die();
 }
 
-if (!isset($_POST['create-new-event'])) {
-    $te->display('events/create-new-event');
-} else {
-    $doSave = true;
+if (isset($_POST['create-new-event'])) {
 
-    // Initialisation des dates
-    $startDate = null;
-    $endDate   = null;
-    if (isset($_POST['start-date']) AND !empty($_POST['start-date']) AND isset($_POST['end-date']) AND !empty($_POST['end-date'])) {
-        $startDate = new DateTime($_POST['start-date']);
-        $endDate   = new DateTime($_POST['end-date']);
-        // Est-ce que la date de début est inférieur à la date de fin
-        if (date_diff($startDate,$endDate)->format('%R') == '-') {
-            $doSave = false;
-            $te->assign('message', array('type'=>'error','content'=>\Bdf\Utils::getText('Time period must be positive')));
-            $te->assign('_POST', $_POST);
-
-            $te->display('events/create-new-event');
+    try {
+        if (!isset($_POST['name']) OR empty($_POST['name'])) {
+            throw new Eu\Rmmt\UserInputException(\Bdf\Utils::getText('Name is required'), $_POST['name']);
         }
-    }
 
-    if (!isset($_POST['name']) OR empty($_POST['name'])) {
-        $doSave = false;
-        $te->assign('message', array('type'=>'error','content'=>\Bdf\Utils::getText('Name is required')));
-        $te->assign('_POST', $_POST);
-
-        $te->display('events/create-new-event');
-    }
-
-    if ($doSave) {
         $event = new Eu\Rmmt\Event($_POST['name']);
-        $event->setStartDate($startDate);
-        $event->setEndDate($endDate);
+
+
+        // Initialisation des dates
+        $startDate = null;
+        $endDate   = null;
+        if (isset($_POST['start-date']) AND !empty($_POST['start-date']) AND isset($_POST['end-date']) AND !empty($_POST['end-date'])) {
+            $startDate = DateTime::createFromFormat('m-d-Y', $_POST['start-date']);
+            $endDate   = DateTime::createFromFormat('m-d-Y', $_POST['end-date']);
+
+            // Est-ce que la date de début est inférieur à la date de fin
+            if (date_diff($startDate,$endDate)->format('%R') == '-') {
+                throw new Eu\Rmmt\UserInputException(\Bdf\Utils::getText('Time period must be positive'), $_POST['end-date']);
+            }
+
+            $event->setStartDate($startDate);
+            $event->setEndDate($endDate);
+        }
+
         $event->addUser(\Eu\Rmmt\User::getCurrentUser());
         $em->persist($event);
         $em->flush();
         header('location: '.$event->getUrlDetail());
+    } catch(Eu\Rmmt\UserInputException $e) {
+        $te->assign('_POST',$_POST);
+        $te->assign('message', array('type'=>'error','content'=>$e->getMessage()));
+        $te->display('events/create-new-event');
+    } catch(Exception $e) {
+        $te->assign('_POST',$_POST);
+        $te->assign('message', array('type'=>'error','content'=>$e->getMessage()));
+        $te->display('events/create-new-event');
     }
+} else {
+    $te->display('events/create-new-event');
 }
 
 ?>
