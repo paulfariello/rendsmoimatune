@@ -16,9 +16,14 @@ along with Rendsmoimatune.  If not, see <http://www.gnu.org/licenses/>.
  */
 window.addEvent("domready", function()
 {
+    script = $('textboxlist-src');
+    uri = script.get('src');
+    uri = new URI(uri.substring(0,uri.lastIndexOf("/")+1)+'../../../../');
+    root = uri.toAbsolute();
+    
     $$('input.textboxuserlist').each(function(input)
     {
-        new TextboxList(input, {
+        var tbl = new TextboxList(input, {
             unique: true,
             bitsOptions: {
                 editable: {
@@ -29,9 +34,11 @@ window.addEvent("domready", function()
                 autocomplete: {
                     minLength: 3,
                     queryRemote: true,
-                    remote: {url: 'ajax/user.php'}
+                    remote: {url: root+'ajax/autocomplete-user.php'}
                 }
             }
         });
+
+        input.store('textboxlist', tbl);
     });
 });
