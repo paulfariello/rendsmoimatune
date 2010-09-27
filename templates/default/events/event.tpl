@@ -17,17 +17,7 @@
                             </tr>
                             {/foreach}                      
                         </table>
-          <h3>{getText id='New expenditure'}</h3>
-            <form action="" class="jNice">
-                <fieldset>
-                  <p><label>{getText id='Name'} :</label><input type="text" class="text-long" name="name" /></p>
-                  <p><label>{getText id='Date'} :</label><input type="text" class="text-medium date" name="date" /></p>
-                  <p><label>{getText id='Amount'} :</label><input type="text" class="text-medium" name="amount" /></p>
-                  <p><label>{getText id='Payers'} :</label><input type="text" class="text-long textboxuserlist" name="payed" /></p>
-                  <p><label>{getText id='Involved users'} :</label><input type="text" class="text-long textboxuserlist" name="involved" /></p>
-                  <input type="submit" value="Add expenditure" />
-                </fieldset>
-            </form>
+          {include file='events/create-new-expenditure-form.tpl'}
 					<h3>{getText id='Repayments'}</h3>
                         <table cellpadding="0" cellspacing="0">
                             {foreach from=$currentEvent->getRepayments() item='repayment'}

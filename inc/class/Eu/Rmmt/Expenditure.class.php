@@ -29,6 +29,7 @@
 
 namespace Eu\Rmmt;
 use DateTime;
+use Doctrine\Common\Collections\ArrayCollection;
 
 /**
  * Expenditure
@@ -50,10 +51,14 @@ class Expenditure
     private $_tags;
     private $_event;
 
-    public function __construct(Event $event, $amount)
+    public function __construct(Event $event, $name, $amount)
     {
-        $this->_event  = $event;
-        $this->_amount = $amount;
+        $this->_event     = $event;
+        $this->_name      = $name;
+        $this->_amount    = $amount;
+        $this->_payed     = new ArrayCollection();
+        $this->_involved  = new ArrayCollection();
+        $this->_tags      = new ArrayCollection();
     }
 
     public function getId()
@@ -93,54 +98,56 @@ class Expenditure
 
     public function getPayingUsers()
     {
-        // TODO get paying users
+        //TODO get paying users
         return null;
     }
 
     public function addPayingUser(User $user, $amount)
     {
-        // TODO add paying user
+        $payed = new Payed($this, $user, $amount);
+        $this->_payed->add($payed);
     }
 
     public function removePayingUser(User $user)
     {
-        // TODO remove paying user
+        //TODO remove paying user
     }
 
     public function getPayedAmount(User $user)
     {
-        // TODO get payed amount for given $user
+        //TODO get payed amount for given $user
     }
 
     public function setPayedAmount(User $user, $amount)
     {
-        // TODO set payed amount for given $user
+        //TODO set payed amount for given $user
     }
 
     public function getInvolvedUsers()
     {
-        // TODO get involved users
+        //TODO get involved users
         return null;
     }
 
     public function addInvolvedUser(User $user, $amount)
     {
-        // TODO add involved user
+        $involved = new Involved($this, $user, $amount);
+        $this->_involved->add($involved);
     }
 
     public function removeInvolvedUser(User $user)
     {
-        // TODO remove involved user
+        //TODO remove involved user
     }
 
     public function getInvolvedAmount(User $user)
     {
-        // TODO get involved amount for given $user
+        //TODO get involved amount for given $user
     }
 
     public function setInvolvedAmount(User $user, $amount)
     {
-        // TODO set involved amount for given $user
+        //TODO set involved amount for given $user
     }
 
     public function getTags()

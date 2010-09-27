@@ -131,4 +131,9 @@ class Event
     {
         return Utils::makeUrl('events/'.Utils::urlize($this->_name).'-'.$this->_id.'/');
     }
+
+    public function getUrlNewExpenditure()
+    {
+        return Utils::makeUrl('events/'.Utils::urlize($this->_name).'-'.$this->_id.'/create-new-expenditure.html');
+    }
 }

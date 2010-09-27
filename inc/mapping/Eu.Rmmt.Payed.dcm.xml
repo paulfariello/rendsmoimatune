@@ -7,13 +7,19 @@
             <sequence-generator sequence-name="payed_payed_pk_seq" initial-value="1" allocation-size="1" />
         </id>
 
-        <field name="_amount" column="amount" type="float" />
+        <field name="_amount" column="amount" type="decimal" />
 
         <many-to-one target-entity="Expenditure" field="_expenditure" inversed-by="_payed">
             <join-column name="expenditure_pcfk" referenced-column-name="expenditure_pk" />
+            <cascade>
+                <cascade-persist />
+            </cascade>
         </many-to-one>
         <many-to-one target-entity="User" field="_user" inversed-by="_payed">
             <join-column name="user_pcfk" referenced-column-name="user_pk" />
+            <cascade>
+                <cascade-persist />
+            </cascade>
         </many-to-one>
 
     </entity>

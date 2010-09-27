@@ -29,6 +29,7 @@
 
 namespace Eu\Rmmt;
 use Doctrine\Common\Collections\ArrayCollection;
+use Bdf\Core;
 
 /**
  * User
@@ -46,7 +47,8 @@ class User implements \Bdf\IUser
     private $_password;
     private $_firstName;
     private $_lastName;
-    private $_isAdmin;
+    private $_isAdmin    = false;
+    private $_registered = true;
     private $_events;
     private $_payed;
     private $_involved;
@@ -193,44 +195,44 @@ class User implements \Bdf\IUser
 
     public function getPayedExpenditures()
     {
-        // TODO get paying users
+        //TODO get paying users
         return null;
     }
 
     public function addPayedExpenditure(Expenditure $expenditure, $amount)
     {
-        // TODO add paying user
+        //TODO add paying user
     }
 
     public function removePayedExpenditure(Expenditure $expenditure)
     {
-        // TODO remove paying user
+        //TODO remove paying user
     }
 
     public function setPayedAmount(Expenditure $expenditure, $amount)
     {
-        // TODO set payed amount for given $user
+        //TODO set payed amount for given $user
     }
 
     public function getInvolvedExpenditures()
     {
-        // TODO get involved users
+        //TODO get involved users
         return null;
     }
 
     public function addInvolvedExpenditure(Expenditure $expenditure, $amount)
     {
-        // TODO add involved user
+        //TODO add involved user
     }
 
     public function removeInvolvedExpenditure(Expenditure $expenditure)
     {
-        // TODO remove involved user
+        //TODO remove involved user
     }
 
     public function setInvolvedAmount(Expenditure $expenditure, $amount)
     {
-        // TODO set involved amount for given $user
+        //TODO set involved amount for given $user
     }
 
     public function getRepaymentsFromMe()
@@ -253,5 +255,17 @@ class User implements \Bdf\IUser
         $this->_repaymentsToMe->add($repaymentsToMe);
     }
 
+    public function getRegistered() {
+        return $this->_registered;
+    }
+
+    public function setRegistered($registered) {
+        $this->_registered = (boolean)$registered;
+    }
+
+    public static function getRepository()
+    {
+        return Core::getInstance()->getEntityManager()->getRepository(__CLASS__);
+    }
 
 }
