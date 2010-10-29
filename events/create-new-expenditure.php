@@ -58,11 +58,11 @@ if (!isset($_POST['create-new-expenditure'])) {
 
     try {
         if (!isset($_POST['name']) OR empty($_POST['name'])) {
-            throw new Eu\Rmmt\UserInputException(\Bdf\Utils::getText('Name is required'), $_POST['name']);
+            throw new Eu\Rmmt\Exception\UserInputException(\Bdf\Utils::getText('Name is required'), $_POST['name']);
         }
 
         if (!isset($_POST['amount']) OR empty($_POST['amount'])) {
-            throw new Eu\Rmmt\UserInputException(\Bdf\Utils::getText('Amount is required'), $_POST['amount']);
+            throw new Eu\Rmmt\Exception\UserInputException(\Bdf\Utils::getText('Amount is required'), $_POST['amount']);
         }
 
         $expenditure = new Eu\Rmmt\Expenditure($event, $_POST['name'], $_POST['amount']);
@@ -74,70 +74,127 @@ if (!isset($_POST['create-new-expenditure'])) {
             $expenditure->setDate($date);
         }
 
+        // Store new users here in order to propose invitations
+        $newUsers       = array();
+
         // Payers
-        $payers = array();
-        $payersNameOrId = explode(',', $_POST['payers']);
+        $amountPayed    = 0;
 
-        $unknown = false;
-        foreach($payersNameOrId as $payer) {
-            if (ctype_digit($payer)) {
-                $user = Eu\Rmmt\User::getRepository()->find((int)$payer);
-                if (null !== $user) {
-                    $payers[] = $user;
-                }
-            } else {
+        foreach( array_keys ($_POST['payersId']) as $index ) {
+            $id     = $_POST['payersId'][$index];
+            $name   = trim ($_POST['payersName'][$index]);
+            $amount = (float) $_POST['payersAmount'][$index];
+            $metric = $_POST['payersMetric'][$index];
+
+            if (!empty($name)) {
                 $unknown = true;
-                $user = new User(uniqid().'@rendsmoimatune.eu');
-                list($firstName, $lastName) = explode(' ', $payer, 2);
-                $user->setFirstName($firstName);
-                $user->setLastName($lastName);
-                $user->setUnknown(true);
-                $em->persist($user);
-                $payers[] = $user;
+                $payer   = null;
+
+                // Get user
+                if (!empty($id) and ctype_digit ($id)) {
+                    $user = Eu\Rmmt\User::getRepository()->find((int)$id);
+
+                    // Check inconsistency between id and name
+                    if (null !== $user and $user->getName() == $name) {
+                        $unknown     = false;
+                        $payer       = $user;
+                    }
+                }
+
+                if ($unknown) {
+                    // Create new user
+                    $user = new Eu\Rmmt\User(uniqid().'@rendsmoimatune.eu');
+                    if (substr_count($name, ' ') > 0) {
+                        list($firstName, $lastName) = explode(' ', $name, 2);
+                        $user->setFirstName($firstName);
+                        $user->setLastName($lastName);
+                    } else {
+                        $user->setFirstName($name);
+                    }
+                    $user->setRegistered(false);
+                    $payer       = $user;
+                    $newUsers[]  = $payer;
+                }
+
+                // Create payer
+                switch ($metric) {
+                    case '%':
+                        $amount = round($expenditure->getAmount() * $amount / 100, 2);
+                        break;
+                    case '€':
+                        $amount = $amount;
+                        break;
+                }
+
+                $expenditure->addPayer($payer, $amount);
+
+                $amountPayed += $amount;
             }
         }
 
-        // Involved users
-        $involvedNameOrId = explode(',', $_POST['involved']);
-        foreach($involvedNameOrId as $involved) {
-            if (ctype_digit($involved)) {
-                $user = Eu\Rmmt\User::getRepository()->find((int)$involved);
-                if (null !== $user) {
-                    $involvedUsers[] = $user;
+        if ($amountPayed != $expenditure->getAmount()) {
+            throw new Eu\Rmmt\Exception\InvalidAmountPayedException($expenditure);
+        }
+
+        // Beneficiaries
+        $beneficiaries = array();
+
+        foreach( array_keys ($_POST['beneficiariesId']) as $index ) {
+            $id   = $_POST['beneficiariesId'][$index];
+            $name = trim ($_POST['beneficiariesName'][$index]);
+
+            if (!empty ($name)) {
+                $unknown     = true;
+                $beneficiary = null;
+
+                if (!empty ($id) and ctype_digit ($id)) {
+                    $user = Eu\Rmmt\User::getRepository()->find((int)$id);
+
+                    // Check inconsistency between id and name
+                    if (null !== $user and $user->getName() == $name) {
+                        $unknown     = false;
+                        $beneficiary = $user;
+                    }
                 }
-            } else {
-                $unknown = true;
-                $user = new Eu\Rmmt\User(uniqid().'@rendsmoimatune.eu');
-                list($firstName, $lastName) = explode(' ', $involved, 2);
-                $user->setFirstName($firstName);
-                $user->setLastName($lastName);
-                $user->setRegistered(false);
-                $involvedUsers[] = $user;
+
+                if ($unknown) {
+                    // Create new user
+                    $user = new Eu\Rmmt\User(uniqid().'@rendsmoimatune.eu');
+                    if (substr_count($name, ' ') > 0) {
+                        list($firstName, $lastName) = explode(' ', $name, 2);
+                        $user->setFirstName($firstName);
+                        $user->setLastName($lastName);
+                    } else {
+                        $user->setFirstName($name);
+                    }
+                    $user->setRegistered(false);
+                    $beneficiary = $user;
+                    $newUsers[]  = $payer;
+                }
+
+                $beneficiaries[] = $beneficiary;
             }
         }
 
-        //TODO calculate amount payed per user, amount due per user
-        $amountPerPayers        = $expenditure->getAmount()/count($payers);
-        $amountPerInvolvedUsers = $expenditure->getAmount()/count($involvedUsers);
+        // Calculate amount due per user
+        $amountPerBeneficiary = $expenditure->getAmount() / count($beneficiaries);
 
-        foreach($payers as $user) {
-            $expenditure->addPayingUser($user, $amountPerPayers);
-        }
-
-        foreach($involvedUsers as $user) {
-            $expenditure->addInvolvedUser($user, $amountPerInvolvedUsers);
+        foreach($beneficiaries as $user) {
+            $expenditure->addBeneficiary($user, $amountPerBeneficiary);
         }
 
         $em->persist($expenditure);
         $em->flush();
         header('location: '.$event->getUrlDetail());
-    } catch(Eu\Rmmt\UserInputException $e) {
+    } catch(Eu\Rmmt\Exception\UserInputException $e) {
         $te->assign('currentEvent',$event);
+        $te->assign('events',$em->getRepository('Eu\Rmmt\Event')->findAll());
         $te->assign('_POST',$_POST);
         $te->assign('message', array('type'=>'error','content'=>$e->getMessage()));
         $te->display('events/create-new-expenditure');
     } catch(Exception $e) {
         $te->assign('currentEvent',$event);
+        $te->assign('events',$em->getRepository('Eu\Rmmt\Event')->findAll());
         $te->assign('_POST',$_POST);
         $te->assign('message', array('type'=>'error','content'=>$e->getMessage()));
         $te->display('events/create-new-expenditure');

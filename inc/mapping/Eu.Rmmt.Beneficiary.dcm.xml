@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping http://doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+
+    <entity name="Eu\Rmmt\Beneficiary" table="beneficiary">
+        <id name="_id" type="integer" column="beneficiary_pk">
+            <generator strategy="SEQUENCE" />
+            <sequence-generator sequence-name="beneficiary_beneficiary_pk_seq" initial-value="1" allocation-size="1" />        </id>
+
+        <field name="_amount" column="amount" type="decimal" />
+
+        <many-to-one target-entity="Expenditure" field="_expenditure" inversed-by="_beneficiaries">
+            <join-column name="expenditure_pcfk" referenced-column-name="expenditure_pk" />
+        </many-to-one>
+
+        <many-to-one target-entity="User" field="_user" inversed-by="_beneficiaries">
+            <join-column name="user_pcfk" referenced-column-name="user_pk" />
+            <cascade>
+                <cascade-persist/>
+            </cascade>
+        </many-to-one>
+    </entity>
+</doctrine-mapping>

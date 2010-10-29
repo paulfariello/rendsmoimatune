@@ -314,6 +314,10 @@ h3 {
 	background: url(../../px/default/button-submit.gif) no-repeat left top;
 }
 
+.select {
+    float: left;
+}
+
 /* Footer ---------------------------------------- */
 
 #footer {

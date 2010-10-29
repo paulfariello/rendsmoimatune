@@ -46,19 +46,19 @@ class Expenditure
     private $_name;
     private $_date;
     private $_amount;
-    private $_payed;
-    private $_involved;
+    private $_payers;
+    private $_beneficiaries;
     private $_tags;
     private $_event;
 
     public function __construct(Event $event, $name, $amount)
     {
-        $this->_event     = $event;
-        $this->_name      = $name;
-        $this->_amount    = $amount;
-        $this->_payed     = new ArrayCollection();
-        $this->_involved  = new ArrayCollection();
-        $this->_tags      = new ArrayCollection();
+        $this->_event          = $event;
+        $this->_name           = $name;
+        $this->_amount         = $amount;
+        $this->_payers         = new ArrayCollection();
+        $this->_beneficiaries  = new ArrayCollection();
+        $this->_tags           = new ArrayCollection();
     }
 
     public function getId()
@@ -96,58 +96,36 @@ class Expenditure
         $this->_amount = $amount;
     }
 
-    public function getPayingUsers()
+    public function getPayers()
     {
-        //TODO get paying users
-        return null;
+        return $this->_payers;
     }
 
-    public function addPayingUser(User $user, $amount)
+    public function addPayer(User $user, $amount)
     {
-        $payed = new Payed($this, $user, $amount);
-        $this->_payed->add($payed);
+        $payer = new Payer($this, $user, $amount);
+        $this->_payers->add($payer);
     }
 
-    public function removePayingUser(User $user)
+    public function removePayer(User $user)
     {
         //TODO remove paying user
     }
 
-    public function getPayedAmount(User $user)
+    public function getBeneficiaries()
     {
-        //TODO get payed amount for given $user
+        return $this->_beneficiaries;
     }
 
-    public function setPayedAmount(User $user, $amount)
+    public function addBeneficiary(User $user, $amount)
     {
-        //TODO set payed amount for given $user
+        $beneficiary = new Beneficiary($this, $user, $amount);
+        $this->_beneficiaries->add($beneficiary);
     }
 
-    public function getInvolvedUsers()
-    {
-        //TODO get involved users
-        return null;
-    }
-
-    public function addInvolvedUser(User $user, $amount)
-    {
-        $involved = new Involved($this, $user, $amount);
-        $this->_involved->add($involved);
-    }
-
-    public function removeInvolvedUser(User $user)
+    public function removeBeneficiary(User $user)
     {
         //TODO remove involved user
-    }
-
-    public function getInvolvedAmount(User $user)
-    {
-        //TODO get involved amount for given $user
-    }
-
-    public function setInvolvedAmount(User $user, $amount)
-    {
-        //TODO set involved amount for given $user
     }
 
     public function getTags()

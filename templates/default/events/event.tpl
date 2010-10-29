@@ -1,7 +1,7 @@
 {include file='inc/header-html.tpl'}
 <!-- Additionnal javascript script -->
 {include file='inc/js-includes/date-picker.tpl'}
-{include file='inc/js-includes/textboxlist.tpl'}
+{include file='inc/js-includes/manage-expenditure-users.tpl'}
 {include file='inc/header.tpl'}
 {include file='inc/side-nav-events.tpl'}
 <h2><a href="{makeUrl url='events/'}">{getText id='Events'}</a> &raquo; <a href="{$currentEvent->getUrlDetail()}">{$currentEvent->getName()}</a></h2>
@@ -12,8 +12,26 @@
                     	<table cellpadding="0" cellspacing="0">
                             {foreach from=$currentEvent->getExpenditures() item='expenditure'}
                             <tr>
-                                <td>{$expenditure->getName()}</td>
-                                <td class="action"><a href="#" class="view">View</a><a href="#" class="edit">Edit</a><a href="#" class="delete">Delete</a></td>
+                                <td>
+                                    {$expenditure->getName()}
+                                    {if $expenditure->getPayers()->count() > 0}
+                                    <span class="payers">
+                                        {getText id='Payers'} :
+                                        {foreach from=$expenditure->getPayers() item="payer" name="payers"}
+                                            {$payer->getUser()->getName()}{if !$smarty.foreach.payers.last},{/if}
+                                        {/foreach}
+                                    </span>
+                                    {/if}
+                                    {if $expenditure->getBeneficiaries()->count() > 0}
+                                    <span class="beneficiaries">
+                                        {getText id='Beneficiaries'} :
+                                        {foreach from=$expenditure->getBeneficiaries() item="beneficiary" name="beneficiaries"}
+                                            {$beneficiary->getUser()->getName()}{if !$smarty.foreach.beneficiaries.last},{/if}
+                                        {/foreach}
+                                    </span>
+                                    {/if}
+                                </td>
+                                <td class="action"><a href="#" class="view">{getText id='View'}</a><a href="#" class="edit">{getText id='Edit'}</a><a href="#" class="delete">{getText id='Delete'}</a></td>
                             </tr>
                             {/foreach}                      
                         </table>

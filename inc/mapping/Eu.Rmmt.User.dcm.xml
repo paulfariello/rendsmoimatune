@@ -15,10 +15,10 @@
         <field name="_registered" column="registered" type="boolean" />
 
 
-        <one-to-many target-entity="Repayment" mapped-by="_fromUser" field="_repaymentsFromMe" />
-        <one-to-many target-entity="Repayment" mapped-by="_toUser"   field="_repaymentsToMe" />
-        <one-to-many target-entity="Payed"     mapped-by="_user"     field="_payed"     />
-        <one-to-many target-entity="Involved"  mapped-by="_user"     field="_involved"  />
+        <one-to-many target-entity="Repayment"    mapped-by="_payer"       field="_repaymentsFromMe" />
+        <one-to-many target-entity="Repayment"    mapped-by="_beneficiary" field="_repaymentsToMe" />
+        <one-to-many target-entity="Payer"        mapped-by="_user"        field="_payers"     />
+        <one-to-many target-entity="Beneficiary"  mapped-by="_user"        field="_beneficiaries"  />
 
         <many-to-many target-entity="Event" field="_events" mapped-by="_users"/>
     </entity>

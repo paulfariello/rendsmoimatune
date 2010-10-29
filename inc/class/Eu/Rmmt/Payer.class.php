@@ -30,7 +30,7 @@
 namespace Eu\Rmmt;
 
 /**
- * Repayment
+ * Payer
  *
  * @category Class
  * @package
@@ -38,21 +38,18 @@ namespace Eu\Rmmt;
  * @license  http://www.gnu.org/copyleft/gpl.html  GPL License 3.0
  * @link
  */
-class Repayment
+class Payer
 {
     private $_id;
-    private $_date;
     private $_amount;
-    private $_payer;
-    private $_beneficiary;
-    private $_event;
+    private $_expenditure;
+    private $_user;
 
-    public function  __construct(Event $event, User $payer, User $beneficiary, $amount)
+    public function __construct(Expenditure $expenditure, User $user, $amount)
     {
-        $this->_event    = $event;
-        $this->_payer = $payer;
-        $this->_beneficiary   = $beneficiary;
-        $this->_amount   = $amount;
+        $this->_expenditure = $expenditure;
+        $this->_user        = $user;
+        $this->_amount      = $amount;
     }
 
     public function getId()
@@ -65,16 +62,6 @@ class Repayment
         $this->_id = $id;
     }
 
-    public function getDate()
-    {
-        return $this->_date;
-    }
-
-    public function setDate(DateTime $date)
-    {
-        $this->_date = $date;
-    }
-
     public function getAmount()
     {
         return $this->_amount;
@@ -85,36 +72,24 @@ class Repayment
         $this->_amount = $amount;
     }
 
-    public function getPayer()
+    public function getExpenditure()
     {
-        return $this->_payer;
+        return $this->_expenditure;
     }
 
-    public function setPayer(User $fromUser)
+    public function setExpenditure(Expenditure $expenditure)
     {
-        $this->_payer = $fromUser;
+        $this->_expenditure = $expenditure;
     }
 
-    public function getBeneficiary()
+    public function getUser()
     {
-        return $this->_beneficiary;
+        return $this->_user;
     }
 
-    public function setBeneficiary(User $toUser)
+    public function setUser(User $user)
     {
-        $this->_beneficiary = $toUser;
+        $this->_user = $user;
     }
-
-    public function getEvent()
-    {
-        return $this->_event;
-    }
-
-    public function setEvent(Event $event)
-    {
-        $this->_event = $event;
-    }
-
-
 
 }

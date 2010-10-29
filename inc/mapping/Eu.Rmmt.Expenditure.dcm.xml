@@ -21,12 +21,12 @@
             </join-table>
         </many-to-many>
 
-        <one-to-many target-entity="Payed"    mapped-by="_expenditure" field="_payed">
+        <one-to-many target-entity="Payer"    mapped-by="_expenditure" field="_payers">
             <cascade>
                 <cascade-persist />
             </cascade>
         </one-to-many>
-        <one-to-many target-entity="Involved" mapped-by="_expenditure" field="_involved">
+        <one-to-many target-entity="Beneficiary" mapped-by="_expenditure" field="_beneficiaries">
             <cascade>
                 <cascade-persist />
             </cascade>

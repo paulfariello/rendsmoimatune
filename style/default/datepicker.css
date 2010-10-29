@@ -2,12 +2,13 @@
 	position: absolute;
 	font-size: 10px;
 	font-family: Tahoma, sans-serif;
-	color: #000;
 	line-height: normal;
 	width: 172px;
 	height: 135px;
-	padding: 14px;
-	background: url(../../px/default/datepicker/frame.png) no-repeat;
+	margin: 2px 0 0 1px;
+  padding: 5px;
+  background: none repeat scroll 0 0 #FBFBFB;
+  border: 1px solid #DDDDDD;
 }
 
 /* header

@@ -71,14 +71,17 @@ if (isset($_POST['create-new-event'])) {
         header('location: '.$event->getUrlDetail());
     } catch(Eu\Rmmt\UserInputException $e) {
         $te->assign('_POST',$_POST);
+        $te->assign('events',$em->getRepository('Eu\Rmmt\Event')->findAll());
         $te->assign('message', array('type'=>'error','content'=>$e->getMessage()));
         $te->display('events/create-new-event');
     } catch(Exception $e) {
         $te->assign('_POST',$_POST);
+        $te->assign('events',$em->getRepository('Eu\Rmmt\Event')->findAll());
         $te->assign('message', array('type'=>'error','content'=>$e->getMessage()));
         $te->display('events/create-new-event');
     }
 } else {
+    $te->assign('events',$em->getRepository('Eu\Rmmt\Event')->findAll());
     $te->display('events/create-new-event');
 }
 

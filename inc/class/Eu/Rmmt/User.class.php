@@ -50,8 +50,8 @@ class User implements \Bdf\IUser
     private $_isAdmin    = false;
     private $_registered = true;
     private $_events;
-    private $_payed;
-    private $_involved;
+    private $_payers;
+    private $_beneficiaries;
     private $_repaymentsFromMe;
     private $_repaymentsToMe;
 
@@ -166,6 +166,11 @@ class User implements \Bdf\IUser
     public function setLastName($lastName)
     {
         $this->_lastName = $lastName;
+    }
+
+    public function getName()
+    {
+        return $this->getFirstName()." ".$this->getLastName();
     }
 
     public function isAdmin()
