@@ -143,13 +143,29 @@ class Expenditure
         $this->_tags->removeElement($tag);
     }
 
-    public function getEvent() {
+    public function getEvent()
+    {
         return $this->_event;
     }
 
-    public function setEvent($event) {
+    public function setEvent($event)
+    {
         $this->_event = $event;
     }
 
+    public static function getRepository()
+    {
+        return \Bdf\Core::getInstance()->getEntityManager()->getRepository(__CLASS__);
+    }
+
+    public function getUrlDelete()
+    {
+        return $this->_event->getUrlDeleteExpenditure($this);
+    }
+
+    public function getUrlEdit()
+    {
+        return $this->_event->getUrlEditExpenditure($this);
+    }
 
 }

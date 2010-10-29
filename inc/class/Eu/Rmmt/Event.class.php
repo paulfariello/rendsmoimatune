@@ -136,4 +136,19 @@ class Event
     {
         return Utils::makeUrl('events/'.Utils::urlize($this->_name).'-'.$this->_id.'/create-new-expenditure.html');
     }
+
+    public function getUrlNewRepayment()
+    {
+        return Utils::makeUrl('events/'.Utils::urlize($this->_name).'-'.$this->_id.'/create-new-repayment.html');
+    }
+
+    public function getUrlDeleteExpenditure(Expenditure $expenditure)
+    {
+        return Utils::makeUrl('events/'.Utils::urlize($this->_name).'-'.$this->_id.'/delete-'.Utils::urlize($expenditure->getName()).'-'.$expenditure->getId().'.html');
+    }
+
+    public function getUrlEditExpenditure(Expenditure $expenditure)
+    {
+        return Utils::makeUrl('events/'.Utils::urlize($this->_name).'-'.$this->_id.'/edit-'.Utils::urlize($expenditure->getName()).'-'.$expenditure->getId().'.html');
+    }
 }

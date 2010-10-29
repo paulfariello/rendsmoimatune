@@ -1,19 +1,20 @@
 Options +FollowSymLinks
 RewriteEngine On
 RewriteBase /Rendsmoimatune/
-RewriteRule    ^sign-in.html$                                             sign-in.php [L]
-RewriteRule    ^sign-out.html$                                            sign-out.php [L]
-RewriteRule    ^new-account.html$                                         new-account.php [L]
+RewriteRule    ^sign-in.html$                                                        sign-in.php [L]
+RewriteRule    ^sign-out.html$                                                       sign-out.php [L]
+RewriteRule    ^new-account.html$                                                    new-account.php [L]
 
 # Dashboard
-RewriteRule    ^dashboard/$                                               index.php  [L]
+RewriteRule    ^dashboard/$                                                          index.php  [L]
 
 # Events
-RewriteRule    ^events/$                                                  events/index.php  [L]
-RewriteRule    ^events/create-new-event.html$                             events/create-new-event.php [L]
-RewriteRule    ^events/[a-z-]*-([0-9]+)/$                                 events/event.php?id=$1 [L]
-RewriteRule    ^events/[a-z-]*-([0-9]+)/create-new-expenditure.html$      events/create-new-expenditure.php?event-id=$1 [L]
+RewriteRule    ^events/$                                                             events/index.php  [L]
+RewriteRule    ^events/create-new-event.html$                                        events/create-new-event.php [L]
+RewriteRule    ^events/[a-z0-9-]*-([0-9]+)/$                                         events/event.php?id=$1 [L]
+RewriteRule    ^events/[a-z0-9-]*-([0-9]+)/create-new-expenditure.html$              events/create-new-expenditure.php?event-id=$1 [L]
+RewriteRule    ^events/[a-z0-9-]*-[0-9]+/delete-[a-z0-9-]*-([0-9]+).html$            events/delete-expenditure.php?expenditure-id=$1 [L]
 
 
 # My Account
-RewriteRule    ^my-account/$                                              my-account/index.php  [L]
+RewriteRule    ^my-account/$                                                         my-account/index.php  [L]
