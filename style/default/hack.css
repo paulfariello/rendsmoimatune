@@ -43,3 +43,23 @@
     background: url("../../px/default/snowish/24x24/status/error.png") transparent no-repeat center center;
     float: left;
 }
+
+#main .button {
+    display: block;
+    float: right;
+    color: #5494AF;
+    font-size: 14px;
+    font-weight: bold;
+    line-height: 24px;
+    height: 24px;
+    text-decoration: none;
+}
+
+#main .button:hover {
+    text-decoration: underline;
+}
+
+#main .button.add {
+    padding-left: 24px;
+    background: url("../../px/default/snowish/24x24/actions/gtk-add.png") transparent no-repeat center left;
+}
