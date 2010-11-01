@@ -43,7 +43,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 class Expenditure
 {
     private $_id;
-    private $_name;
+    private $_title;
     private $_date;
     private $_amount;
     private $_payers;
@@ -51,10 +51,10 @@ class Expenditure
     private $_tags;
     private $_event;
 
-    public function __construct(Event $event, $name, $amount)
+    public function __construct(Event $event, $title, $amount)
     {
         $this->_event          = $event;
-        $this->_name           = $name;
+        $this->_title          = $title;
         $this->_amount         = $amount;
         $this->_payers         = new ArrayCollection();
         $this->_beneficiaries  = new ArrayCollection();
@@ -66,14 +66,14 @@ class Expenditure
         return $this->_id;
     }
 
-    public function getName()
+    public function getTitle()
     {
-        return $this->_name;
+        return $this->_title;
     }
 
-    public function setName($name)
+    public function setTitle($title)
     {
-        $this->_name = $name;
+        $this->_title = $title;
     }
 
     public function getDate()

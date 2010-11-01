@@ -28,21 +28,86 @@ function deleteBeneficiary(event)
 
 function addPayer(event)
 {
-    event.stop();
+    var euro = '\u20ac';
     var payer = $('clonable-payer').clone();
-    payer.getElements('.remove-payer').each(function(button)
-    {
-       button.addEvent("click", deletePayer)
-    });
+
+    event.stop();
+
+    payer.getElement('.remove-payer').addEvent("click", deletePayer);
     payer.getElements('input[type!=button]').each(function(input)
     {
         input.set('value','');
     });
-    payer.getElements('input.payer-name').each(function(input)
-    {
-        autocomplete(input);
+    autocomplete(payer.getElement('input.payer-name'));
+
+
+    // Autocomplete amount and metric
+    var expenditureAmount = parseFloat($('expenditure-amount').get('value'));
+    var payedAmount       = 0;
+    var newMetric         = '%';
+    var newAmount;
+    var total;
+
+
+    $$('select[name^=payersMetric]').each(function(select) {
+        var metric = select.get('value');
+        switch(metric) {
+            case '%':
+                break;
+            case euro:
+                // If an input is in € then the new one will be in €
+                newMetric = euro;
+                break;
+        }
     });
+
+
+    switch(newMetric) {
+        case '%':
+            total = 100;
+            break;
+        case euro:
+            // If an input is in € then the new one will be in €
+            newMetric = euro;
+            total      = expenditureAmount;
+            break;
+        default:
+            total = null;
+    }
+
+    $$('input[name^=payersAmount]').each(function(input)
+    {
+        var amount = parseFloat(input.get('value'));
+        var metric = input.getNext('select[name^=payersMetric]').get('value');
+        if (! isNaN(amount)) {
+            amount       = convertAmount(amount, metric, newMetric, expenditureAmount);
+            payedAmount += amount;
+        }
+    });
+
+    if (! isNaN(total)) {
+        newAmount = total - payedAmount;
+        payer.getElement('input[name^=payersAmount]').set('value', newAmount);
+        payer.getElement('select[name^=payersMetric]').set('value', newMetric);
+    }
+    
     payer.inject(this.getParent(), 'before');
+}
+
+function convertAmount(amount, from, to, expenditureAmount)
+{
+    var euro = '\u20ac';
+    if (from == to) {
+        return amount;
+    } else {
+        if (from == '%' && to == euro) {
+            return amount / 100 * expenditureAmount;
+        } else if (from == euro && to == '%') {
+            return amount / expenditureAmount * 100;
+        }
+    }
+
+    return null;
 }
 
 function addBeneficiary(event)
@@ -66,17 +131,19 @@ function addBeneficiary(event)
 
 function autocomplete(input)
 {
-    new Meio.Autocomplete.Select(input, input.get('rel'),
-    {
-        valueField: input.getPrevious('input[name^=payersId]'),
-        valueFilter: function(data){
-            return data.identifier;
-        },
-        filter: {
-            type: 'contains',
-            path: 'value'
-        }
-    });
+    if ($chk(input)) {
+        new Meio.Autocomplete.Select(input, input.get('rel'),
+        {
+            valueField: input.getPrevious('input[name^=payersId]'),
+            valueFilter: function(data){
+                return data.identifier;
+            },
+            filter: {
+                type: 'contains',
+                path: 'value'
+            }
+        });
+    }
 }
 
 window.addEvent("domready", function()

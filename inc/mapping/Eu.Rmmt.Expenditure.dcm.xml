@@ -6,7 +6,7 @@
             <generator strategy="SEQUENCE" />
             <sequence-generator sequence-name="expenditure_expenditure_pk_seq" initial-value="1" allocation-size="1" />        </id>
 
-        <field name="_name"   column="name"   type="string" />
+        <field name="_title"  column="title"  type="string" />
         <field name="_date"   column="date"   type="date"   />
         <field name="_amount" column="amount" type="decimal"  />
 

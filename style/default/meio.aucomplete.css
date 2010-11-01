@@ -11,40 +11,46 @@ license: MIT-style license
 ...
 */
 
-.ma-container{
-	color: #000;
-	border: 1px solid #333;
+.ma-container {
+	color: #646464;
+	border: 1px solid #DDDDDD;
 	background-color: #fff;
 	position: absolute;
 	visibility: hidden;
 	overflow-y: auto;
 	overflow-x: hidden;
+  text-align: left;
 }
-.ma-container ul{
+
+.ma-container ul {
 	list-style: none;
 	overflow: hidden;
 	width: 100%;
 }
-.ma-container li{
-	padding: 2px 5px;
+
+.ma-container li {
+	padding: 2px 7px;
 	line-height: 16px;
 	cursor: pointer;
 	float: left;
 	width: 100%;
 	overflow: hidden;
 }
-.ma-container .ma-hover{
-	color: #fff;
-	background-color: #921506 !important;
+
+.ma-container .ma-hover {
+	color: #646464;
+	background-color: #FDFCF6 !important;
 }
-.ma-container .ma-odd{
+
+.ma-container .ma-odd {
 }
-.ma-container .ma-even{
-	background-color: #efefef;
+
+.ma-container .ma-even {
+	background-color: #FBFBFB;
 }
-.ma-loading{
-	background-color: #fafba4;
+
+.ma-loading {
 }
-.ma-selected{
-	background-color: #ccfda8;
+
+.ma-selected {
 }

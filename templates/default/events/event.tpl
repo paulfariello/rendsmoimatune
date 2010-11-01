@@ -13,7 +13,7 @@
     {foreach from=$currentEvent->getExpenditures() item='expenditure'}
         <tr>
             <td>
-                {$expenditure->getName()}
+                {$expenditure->getTitle()}
                 {if $expenditure->getPayers()->count() > 0}
                     <span class="payers">
                         {getText id='Payers'} :

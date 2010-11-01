@@ -57,15 +57,15 @@ if (!isset($_POST['create-new-expenditure'])) {
 } else {
 
     try {
-        if (!isset($_POST['name']) OR empty($_POST['name'])) {
-            throw new Eu\Rmmt\Exception\UserInputException(\Bdf\Utils::getText('Name is required'), $_POST['name']);
+        if (!isset($_POST['title']) OR empty($_POST['title'])) {
+            throw new Eu\Rmmt\Exception\UserInputException(\Bdf\Utils::getText('Title is required'), $_POST['title']);
         }
 
         if (!isset($_POST['amount']) OR empty($_POST['amount'])) {
             throw new Eu\Rmmt\Exception\UserInputException(\Bdf\Utils::getText('Amount is required'), $_POST['amount']);
         }
 
-        $expenditure = new Eu\Rmmt\Expenditure($event, $_POST['name'], $_POST['amount']);
+        $expenditure = new Eu\Rmmt\Expenditure($event, $_POST['title'], $_POST['amount']);
 
         $date = null;
         if (isset($_POST['date']) AND !empty($_POST['date'])) {
