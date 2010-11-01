@@ -144,11 +144,11 @@ class Event
 
     public function getUrlDeleteExpenditure(Expenditure $expenditure)
     {
-        return Utils::makeUrl('events/'.Utils::urlize($this->_name).'-'.$this->_id.'/delete-'.Utils::urlize($expenditure->getName()).'-'.$expenditure->getId().'.html');
+        return Utils::makeUrl('events/'.Utils::urlize($this->_name).'-'.$this->_id.'/delete-'.Utils::urlize($expenditure->getTitle()).'-'.$expenditure->getId().'.html');
     }
 
     public function getUrlEditExpenditure(Expenditure $expenditure)
     {
-        return Utils::makeUrl('events/'.Utils::urlize($this->_name).'-'.$this->_id.'/edit-'.Utils::urlize($expenditure->getName()).'-'.$expenditure->getId().'.html');
+        return Utils::makeUrl('events/'.Utils::urlize($this->_name).'-'.$this->_id.'/edit-'.Utils::urlize($expenditure->getTitle()).'-'.$expenditure->getId().'.html');
     }
 }
