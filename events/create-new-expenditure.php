@@ -55,7 +55,6 @@ if (!isset($_POST['create-new-expenditure'])) {
     $te->assign('events',$em->getRepository('Eu\Rmmt\Event')->findAll());
     $te->display('events/create-new-expenditure');
 } else {
-
     try {
         if (!isset($_POST['title']) OR empty($_POST['title'])) {
             throw new Eu\Rmmt\Exception\UserInputException(\Bdf\Utils::getText('Title is required'), $_POST['title']);
@@ -169,7 +168,7 @@ if (!isset($_POST['create-new-expenditure'])) {
                     }
                     $user->setRegistered(false);
                     $beneficiary = $user;
-                    $newUsers[]  = $payer;
+                    $newUsers[]  = $beneficiary;
                 }
 
                 $beneficiaries[] = $beneficiary;
@@ -185,7 +184,12 @@ if (!isset($_POST['create-new-expenditure'])) {
 
         $em->persist($expenditure);
         $em->flush();
-        \Bdf\Session::getInstance()->add('message',array('type'=>'done','content'=>Bdf\Utils::getText('Expenditure created')));
+        $messages = array();
+        $messages[] = array('type'=>'done','content'=>Bdf\Utils::getText('Expenditure created'));
+        foreach($newUsers as $user) {
+            $messages[] = array('type'=>'info','content'=>sprintf(Bdf\Utils::getText('User %s has been created. <a href="%s">Invite her/him ?</a>'), $user->getName(), $user->getUrlInvite()));
+        }
+        \Bdf\Session::getInstance()->add('messages',$messages);
         header('location: '.$event->getUrlDetail());
     } catch(Eu\Rmmt\Exception\UserInputException $e) {
         $te->assign('currentEvent',$event);

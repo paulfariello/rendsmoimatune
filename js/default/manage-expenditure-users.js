@@ -38,7 +38,7 @@ function addPayer(event)
     {
         input.set('value','');
     });
-    autocomplete(payer.getElement('input.payer-name'));
+    autocompletePayer(payer.getElement('input.payer-name'));
 
 
     // Autocomplete amount and metric
@@ -124,12 +124,29 @@ function addBeneficiary(event)
     });
     beneficiary.getElements('input.beneficiary-name').each(function(input)
     {
-        autocomplete(input);
+        autocompleteBeneficiary(input);
     });
     beneficiary.inject(this.getParent(), 'before');
 }
 
-function autocomplete(input)
+function autocompleteBeneficiary(input)
+{
+    if ($chk(input)) {
+        new Meio.Autocomplete.Select(input, input.get('rel'),
+        {
+            valueField: input.getPrevious('input[name^=beneficiariesId]'),
+            valueFilter: function(data){
+                return data.identifier;
+            },
+            filter: {
+                type: 'contains',
+                path: 'value'
+            }
+        });
+    }
+}
+
+function autocompletePayer(input)
 {
     if ($chk(input)) {
         new Meio.Autocomplete.Select(input, input.get('rel'),
@@ -169,13 +186,13 @@ window.addEvent("domready", function()
     // AUTO-COMPLETE PAYER
     $$('input.payer-name').each(function(input)
     {
-        autocomplete(input);
+        autocompletePayer(input);
     });
 
     // AUTO-COMPLETE BENEFICIARY
     $$('input.beneficiary-name').each(function(input)
     {
-        autocomplete(input);
+        autocompleteBeneficiary(input);
     });
 
 });

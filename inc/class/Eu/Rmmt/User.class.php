@@ -273,4 +273,9 @@ class User implements \Bdf\IUser
         return Core::getInstance()->getEntityManager()->getRepository(__CLASS__);
     }
 
+    public function getUrlInvite()
+    {
+        return \Bdf\Utils::makeUrl('user-'.$this->getId().'/invite.html');
+    }
+
 }
