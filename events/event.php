@@ -47,10 +47,10 @@ if (!isset($_GET['id'])) {
 $event = $em->getRepository('Eu\Rmmt\Event')->find($_GET['id']);
 $te->assign('currentEvent',$event);
 $te->assign('events',$em->getRepository('Eu\Rmmt\Event')->findAll());
-$message = \Bdf\Session::getInstance()->get('message');
-if (null !== $message) {
-    $te->assign('message',$message);
-    \Bdf\Session::getInstance()->remove('message');
+$messages = \Bdf\Session::getInstance()->get('messages');
+if (null !== $messages) {
+    $te->assign('messages',$messages);
+    \Bdf\Session::getInstance()->remove('messages');
 }
 $te->display('events/event');
 

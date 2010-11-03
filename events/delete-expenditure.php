@@ -50,6 +50,9 @@ if (!isset($_GET['expenditure-id'])) {
         $em->remove($expenditure);
         $em->flush();
 
+        $messages = array();
+        $messages[] = array('type'=>'done','content'=>Bdf\Utils::getText('Expenditure deleted'));
+        \Bdf\Session::getInstance()->add('messages',$messages);
         header('location: '.$url);
     }
 }
