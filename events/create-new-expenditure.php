@@ -185,6 +185,7 @@ if (!isset($_POST['create-new-expenditure'])) {
 
         $em->persist($expenditure);
         $em->flush();
+        \Bdf\Session::getInstance()->add('message',array('type'=>'done','content'=>Bdf\Utils::getText('Expenditure created')));
         header('location: '.$event->getUrlDetail());
     } catch(Eu\Rmmt\Exception\UserInputException $e) {
         $te->assign('currentEvent',$event);
