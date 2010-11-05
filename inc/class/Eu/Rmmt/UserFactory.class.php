@@ -30,6 +30,7 @@
 namespace Eu\Rmmt;
 use Doctrine\Common\Collections\ArrayCollection;
 use Bdf\Core;
+use Eu\Rmmt\User;
 
 /**
  * UserFactory
@@ -48,7 +49,7 @@ class UserFactory
      */
     public static function createUnregisteredUser(User $creator, $firstName, $lastName)
     {
-        $user = new Eu\Rmmt\User(uniqid().'@rendsmoimatune.eu');
+        $user = new User(uniqid().'@rendsmoimatune.eu');
         $user->setRegistered(false);
         $user->setFirstName($firstName);
         $user->setLastName($lastName);
