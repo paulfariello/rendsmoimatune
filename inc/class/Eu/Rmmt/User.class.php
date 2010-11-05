@@ -98,7 +98,7 @@ class User implements \Bdf\IUser
         $em = \Bdf\Core::getInstance()->getEntityManager();
         $user = $em->getRepository(__CLASS__)->findOneBy(array('_email' => $email));
         if($user !== NULL) {
-            if(\Bdf\Utils::comparePassword($password, $user->getPassword()) === TRUE) {
+            if($user->isRegistered() and \Bdf\Utils::comparePassword($password, $user->getPassword()) === TRUE) {
                 \Bdf\Session::getInstance()->setCurrentUserId($user->getId());
             }
         }
@@ -260,8 +260,8 @@ class User implements \Bdf\IUser
         $this->_repaymentsToMe->add($repaymentsToMe);
     }
 
-    public function getRegistered() {
-        return $this->_registered;
+    public function isRegistered() {
+        return $this->_registered === true;
     }
 
     public function setRegistered($registered) {
@@ -276,6 +276,11 @@ class User implements \Bdf\IUser
     public function getUrlInvite()
     {
         return \Bdf\Utils::makeUrl('user-'.$this->getId().'/invite.html');
+    }
+
+    public function mergeWith(User $user)
+    {
+        
     }
 
 }
