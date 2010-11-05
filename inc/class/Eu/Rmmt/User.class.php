@@ -30,6 +30,8 @@
 namespace Eu\Rmmt;
 use Doctrine\Common\Collections\ArrayCollection;
 use Bdf\Core;
+use Bdf\Utils;
+use Eu\Rmmt\Exception\MergeException;
 
 /**
  * User
@@ -54,6 +56,7 @@ class User implements \Bdf\IUser
     private $_beneficiaries;
     private $_repaymentsFromMe;
     private $_repaymentsToMe;
+    private $_creator;
 
     /**
      * Constructeur
@@ -98,7 +101,7 @@ class User implements \Bdf\IUser
         $em = \Bdf\Core::getInstance()->getEntityManager();
         $user = $em->getRepository(__CLASS__)->findOneBy(array('_email' => $email));
         if($user !== NULL) {
-            if($user->isRegistered() and \Bdf\Utils::comparePassword($password, $user->getPassword()) === TRUE) {
+            if($user->isRegistered() and Utils::comparePassword($password, $user->getPassword()) === TRUE) {
                 \Bdf\Session::getInstance()->setCurrentUserId($user->getId());
             }
         }
@@ -145,7 +148,7 @@ class User implements \Bdf\IUser
      */
     public function setPassword($password)
     {
-        $this->_password = \Bdf\Utils::hashPassword($password);
+        $this->_password = Utils::hashPassword($password);
     }
 
     public function getFirstName()
@@ -198,46 +201,14 @@ class User implements \Bdf\IUser
         $this->_events->removeElement($event);
     }
 
-    public function getPayedExpenditures()
+    public function getPayers()
     {
-        //TODO get paying users
-        return null;
+        return $this->_payers;
     }
 
-    public function addPayedExpenditure(Expenditure $expenditure, $amount)
+    public function getBeneficiaries()
     {
-        //TODO add paying user
-    }
-
-    public function removePayedExpenditure(Expenditure $expenditure)
-    {
-        //TODO remove paying user
-    }
-
-    public function setPayedAmount(Expenditure $expenditure, $amount)
-    {
-        //TODO set payed amount for given $user
-    }
-
-    public function getInvolvedExpenditures()
-    {
-        //TODO get involved users
-        return null;
-    }
-
-    public function addInvolvedExpenditure(Expenditure $expenditure, $amount)
-    {
-        //TODO add involved user
-    }
-
-    public function removeInvolvedExpenditure(Expenditure $expenditure)
-    {
-        //TODO remove involved user
-    }
-
-    public function setInvolvedAmount(Expenditure $expenditure, $amount)
-    {
-        //TODO set involved amount for given $user
+        return $this->_beneficiaries;
     }
 
     public function getRepaymentsFromMe()
@@ -268,19 +239,59 @@ class User implements \Bdf\IUser
         $this->_registered = (boolean)$registered;
     }
 
+    public function getCreator() {
+        return $this->_creator;
+    }
+
+    public function setCreator(User $creator) {
+        $this->_creator = $creator;
+    }
+
     public static function getRepository()
     {
         return Core::getInstance()->getEntityManager()->getRepository(__CLASS__);
     }
 
+    public function equals(User $user)
+    {
+        return $this->getId() === $user->getId();
+    }
+
     public function getUrlInvite()
     {
-        return \Bdf\Utils::makeUrl('user-'.$this->getId().'/invite.html');
+        return Utils::makeUrl('user-'.$this->getId().'/invite.html');
     }
 
     public function mergeWith(User $user)
     {
-        
+        $em = Core::getInstance()->getEntityManager();
+        $currentUser = User::getCurrentUser(); 
+        if ( ! $currentUser->equals($user->getCreator()) ) {
+            throw new MergeException(Utils::getText('You must be creator of user in order to merge it'));
+        }
+
+        foreach($user->getRepaymentsToMe() as $repayment) {
+            $repayment->setBeneficiary($this);
+        }
+
+        foreach($user->getRepaymentsFromMe() as $repayment) {
+            $repayment->setPayer($this);
+        }
+
+        foreach($user->getPayers() as $payer) {
+            $payer->setUser($this);
+        }
+
+        foreach($user->getBeneficiaries() as $beneficiary) {
+            $beneficiary->setUser($this);
+        }
+
+        foreach($user->getEvents() as $event) {
+            $event->removeUser($user);
+            $event->addUser($this);
+        }
+
+        $em->remove($user); 
     }
 
 }

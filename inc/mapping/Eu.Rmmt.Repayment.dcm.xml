@@ -11,10 +11,10 @@
         <field name="_amount" column="amount" type="decimal"  />
 
         <many-to-one target-entity="User" field="_payer" mapped-by="_repaymentsFromMe" >
-            <join-column name="payer_fk" referenced-column-name="user_fk" />
+            <join-column name="payer_fk" referenced-column-name="user_pk" />
         </many-to-one>
         <many-to-one target-entity="User" field="_beneficiary"   mapped-by="_repaymentsToMe" >
-            <join-column name="beneficiary_fk" referenced-column-name="user_fk" />
+            <join-column name="beneficiary_fk" referenced-column-name="user_pk" />
         </many-to-one>
 
         <many-to-one target-entity="Event" field="_event" inversed-by="_repayments" >

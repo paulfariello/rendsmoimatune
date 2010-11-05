@@ -102,15 +102,12 @@ if (!isset($_POST['create-new-expenditure'])) {
 
                 if ($unknown) {
                     // Create new user
-                    $user = new Eu\Rmmt\User(uniqid().'@rendsmoimatune.eu');
                     if (substr_count($name, ' ') > 0) {
                         list($firstName, $lastName) = explode(' ', $name, 2);
-                        $user->setFirstName($firstName);
-                        $user->setLastName($lastName);
+                        $user = Eu\Rmmt\UserFactory::createUnregisteredUser($currentUser, $firstName, $lastName);
                     } else {
-                        $user->setFirstName($name);
+                        $user = Eu\Rmmt\UserFactory::createUnregisteredUser($currentUser, $name, "");
                     }
-                    $user->setRegistered(false);
                     $payer       = $user;
                     $newUsers[]  = $payer;
                 }
@@ -158,15 +155,12 @@ if (!isset($_POST['create-new-expenditure'])) {
 
                 if ($unknown) {
                     // Create new user
-                    $user = new Eu\Rmmt\User(uniqid().'@rendsmoimatune.eu');
                     if (substr_count($name, ' ') > 0) {
                         list($firstName, $lastName) = explode(' ', $name, 2);
-                        $user->setFirstName($firstName);
-                        $user->setLastName($lastName);
+                        $user = Eu\Rmmt\UserFactory::createUnregisteredUser($currentUser, $firstName, $lastName);
                     } else {
-                        $user->setFirstName($name);
+                        $user = Eu\Rmmt\UserFactory::createUnregisteredUser($currentUser, $name, "");
                     }
-                    $user->setRegistered(false);
                     $beneficiary = $user;
                     $newUsers[]  = $beneficiary;
                 }
@@ -195,13 +189,13 @@ if (!isset($_POST['create-new-expenditure'])) {
         $te->assign('currentEvent',$event);
         $te->assign('events',$em->getRepository('Eu\Rmmt\Event')->findAll());
         $te->assign('_POST',$_POST);
-        $te->assign('message', array('type'=>'error','content'=>$e->getMessage()));
+        $te->assign('messages', array(array('type'=>'error','content'=>$e->getMessage())));
         $te->display('events/create-new-expenditure');
     } catch(Exception $e) {
         $te->assign('currentEvent',$event);
         $te->assign('events',$em->getRepository('Eu\Rmmt\Event')->findAll());
         $te->assign('_POST',$_POST);
-        $te->assign('message', array('type'=>'error','content'=>$e->getMessage()));
+        $te->assign('messages', array(array('type'=>'error','content'=>$e->getMessage())));
         $te->display('events/create-new-expenditure');
     }
 }
