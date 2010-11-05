@@ -108,7 +108,9 @@ class Event
     }
 
     public function addUser(User $user) {
-        $this->_users->add($user);
+        if ( ! $this->_users->contains($user)) {
+            $this->_users->add($user);
+        }
     }
 
     public function removeUser(User $user) {

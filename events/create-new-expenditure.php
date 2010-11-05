@@ -123,6 +123,7 @@ if (!isset($_POST['create-new-expenditure'])) {
                 }
 
                 $expenditure->addPayer($payer, $amount);
+                $event->addUser($payer);
 
                 $amountPayed += $amount;
             }
@@ -172,8 +173,9 @@ if (!isset($_POST['create-new-expenditure'])) {
         // Calculate amount due per user
         $amountPerBeneficiary = $expenditure->getAmount() / count($beneficiaries);
 
-        foreach($beneficiaries as $user) {
-            $expenditure->addBeneficiary($user, $amountPerBeneficiary);
+        foreach($beneficiaries as $beneficiary) {
+            $expenditure->addBeneficiary($beneficiary, $amountPerBeneficiary);
+            $event->addUser($beneficiary);
         }
 
         $em->persist($expenditure);
