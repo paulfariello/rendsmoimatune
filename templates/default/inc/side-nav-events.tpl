@@ -5,9 +5,9 @@
                 <li class="active">
                     <a href="{$event->getUrlDetail()}">{$event->getName()}</a>
                     <ul class="subNav">
-                        <li><a href="" class="new">{getText id="New expenditure"}</a></li>
-                        <li><a href="" class="new">{getText id="New repayment"}</a></li>
-                        <li><a href="" class="cash-up">{getText id="Cash up"}</a></li>
+                        <li><a href="{$currentEvent->getUrlNewExpenditure()}" class="new">{getText id="New expenditure"}</a></li>
+                        <li><a href="{$currentEvent->getUrlNewRepayment()}" class="new">{getText id="New repayment"}</a></li>
+                        <li><a href="{$currentEvent->getUrlCashUp()}" class="cash-up">{getText id="Cash up"}</a></li>
                     </ul>
                 </li>
             {else}

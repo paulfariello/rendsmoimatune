@@ -153,4 +153,10 @@ class Event
     {
         return Utils::makeUrl('events/'.Utils::urlize($this->_name).'-'.$this->_id.'/edit-'.Utils::urlize($expenditure->getTitle()).'-'.$expenditure->getId().'.html');
     }
+
+    public function getUrlCashUp()
+    {
+        return Utils::makeUrl('events/'.Utils::urlize($this->_name).'-'.$this->_id.'/cash-up.html');
+    }
+
 }
