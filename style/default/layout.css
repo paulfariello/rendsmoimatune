@@ -148,6 +148,7 @@ h1 span { display: none; }
 	line-height: 29px;
 	padding: 0 19px;
 	width: 141px;
+    overflow: hidden;
 }
 
 #sidebar .sideNav li a:hover { background: #fdfcf6; }
