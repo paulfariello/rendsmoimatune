@@ -51,7 +51,8 @@ class Event
     private $_users;
     private $_repayments;
 
-    public function  __construct($name) {
+    public function  __construct($name)
+    {
         $this->_name = $name;
         $this->_users = new ArrayCollection();
     }
@@ -71,7 +72,8 @@ class Event
         $this->_name = $name;
     }
 
-    public function getStartDate() {
+    public function getStartDate()
+    {
         return $this->_startDate;
     }
 
@@ -80,7 +82,8 @@ class Event
         $this->_startDate = $startDate;
     }
 
-    public function getEndDate() {
+    public function getEndDate()
+    {
         return $this->_endDate;
     }
 
@@ -89,7 +92,8 @@ class Event
         $this->_endDate = $endDate;
     }
 
-    public function getExpenditures() {
+    public function getExpenditures()
+    {
         return $this->_expenditures;
     }
 
@@ -103,30 +107,64 @@ class Event
         $this->_expenditures->removeElement($expenditure);
     }
 
-    public function getUsers() {
+    public function getUsers()
+    {
         return $this->_users;
     }
 
-    public function addUser(User $user) {
+    public function addUser(User $user)
+    {
         if ( ! $this->_users->contains($user)) {
             $this->_users->add($user);
         }
     }
 
-    public function removeUser(User $user) {
+    public function removeUser(User $user)
+    {
         $this->_users->removeElement($user);
     }
 
-    public function getRepayments() {
+    public function getRepayments()
+    {
         return $this->_repayments;
     }
 
-    public function addRepayments(Repayment $repayment) {
+    public function addRepayments(Repayment $repayment)
+    {
         $this->_repayments->add($repayment);
     }
 
-    public function removeRepayments(Repayment $repayment) {
+    public function removeRepayments(Repayment $repayment)
+    {
         $this->_repayments->removeElement($repayment);
+    }
+
+    public function grantAccess(User $user)
+    {
+        if ($this->_users->contains($user)) {
+            return true;
+        }
+
+        // If user has payed for an expenditure
+        $em = \Bdf\Core::getInstance()->getEntityManager();
+        $query = $em->createQuery("SELECT count(p._id) FROM \Eu\Rmmt\Payer p INNER JOIN p._expenditure ex INNER JOIN p._user u INNER JOIN ex._event ev WHERE u._id = ?1 AND ev._id = ?2");
+        $query->setParameter(1, $user->getId());
+        $query->setParameter(2, $this->getId());
+        $count = $query->getSingleScalarResult();
+        if ($count > 0) {
+            return true;
+        }
+
+        // If user is concerned by an expenditure
+        $em = \Bdf\Core::getInstance()->getEntityManager();
+        $query = $em->createQuery("SELECT count(b._id) FROM \Eu\Rmmt\Beneficiary b INNER JOIN b._expenditure ex INNER JOIN b._user u INNER JOIN ex._event ev WHERE u._id = ?1 AND ev._id = ?2");
+        $query->setParameter(1, $user->getId());
+        $query->setParameter(2, $this->getId());
+        $count = $query->getSingleScalarResult();
+        if ($count > 0) {
+            return true;
+        }
+
     }
 
     public static function getRepository()
