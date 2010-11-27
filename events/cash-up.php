@@ -58,7 +58,13 @@ if (null !== $messages) {
     \Bdf\Session::getInstance()->remove('messages');
 }
 
+$debtFactory = new \Eu\Rmmt\Debt\DebtFactory($event);
+$debts = $debtFactory->createDebts();
+$balances = $event->getBalances();
+$te->assign("balances", $balances);
+$te->assign("totalExpenditure", $event->getTotalExpenditure());
 
+$te->assign("debts", $debts);
 
 $te->display('events/cash-up');
 

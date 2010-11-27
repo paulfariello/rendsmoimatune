@@ -79,3 +79,89 @@
     padding-left: 10px;
     width: 100%;
 }
+
+/** Balance */
+#main div.balance-due, #main div.balance-name, #main div.balance-payed, #main div.balance-bar {
+    height: 2em;
+}
+
+#main div.balance-due, #main div.balance-payed {
+    width: 40%;
+}
+
+#main div.balance-amount, #main div.balance-name {
+    line-height: 2em;
+}
+
+#main div.balance-bar {
+  -moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	-moz-box-shadow: 0 1px 3px rgba(0,0,0,0.5);
+	-webkit-box-shadow: 0 1px 3px rgba(0,0,0,0.5);
+	text-shadow: 0 -1px 1px rgba(0,0,0,0.25);
+	border-bottom: 1px solid rgba(0,0,0,0.25);
+  color: #fff;
+  text-decoration: none;
+  font-weight: bold;
+  line-height: 2em;
+  text-shadow: 0 -1px 1px rgba(0,0,0,0.25);
+  text-align: center;
+  overflow: visible;
+}
+
+#main div.balance-due {
+    float: left;
+}
+
+#main div.balance-due div.balance-bar {
+    background-color: #FF1B00;
+    background: -webkit-gradient(
+        linear,
+        left top,
+        left bottom,
+        color-stop(0, rgb(255,98,65)),
+        color-stop(1, rgb(255,28,0))
+    );
+    background: -moz-linear-gradient(
+        center top,
+        rgb(255,98,65) 0%,
+        rgb(255,28,0) 100%
+    );
+    float: right;
+}
+
+#main div.balance-due div.balance-amount {
+    float: right;
+}
+
+#main div.balance-name {
+    width: 20%;
+    margin: auto;
+    margin-bottom: 0.5em;
+    text-align: center;
+}
+
+#main div.balance-payed {
+    float: right;
+}
+
+#main div.balance-payed div.balance-bar {
+    background-color: #00A400;
+    background: -webkit-gradient(
+        linear,
+        left top,
+        left bottom,
+        color-stop(0, rgb(0,208,0)),
+        color-stop(1, rgb(0,165,0))
+    );
+    background: -moz-linear-gradient(
+        center top,
+        rgb(0,208,0) 0%,
+        rgb(0,165,0) 100%
+    );
+    float: left;
+}
+
+#main div.balance-payed div.balance-amount {
+    float: left;
+}

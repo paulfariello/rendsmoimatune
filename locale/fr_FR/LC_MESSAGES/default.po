@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Rendsmoimatune\n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2010-11-01 13:14+0100\n"
+"PO-Revision-Date: 2010-11-27 11:11+0100\n"
 "Last-Translator: Paul Fariello <paul.fariello@gmail.com>\n"
 "Language-Team: needle <dev@rendsmoimatune.eu>\n"
 "MIME-Version: 1.0\n"
@@ -123,6 +123,21 @@ msgid "Title"
 msgstr "Intitulé"
 
 msgid "Cash up"
+msgstr "Faire les comptes"
+
+msgid "New repayment"
+msgstr "Nouveau remboursement"
+
+msgid "Balance of payments"
+msgstr "Balance des comptes"
+
+msgid "Balancing"
+msgstr "Équilibrage"
+
+msgid "Expenditure title"
+msgstr "Intitulé de la dépense"
+
+msgid "Cash-up"
 msgstr "Faire les comptes"
 
 #~ msgid "Involved users"

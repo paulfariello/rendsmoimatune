@@ -167,6 +167,47 @@ class Event
 
     }
 
+    public function getBalances()
+    {
+        // Array[userId]["amount"] = $amount;
+        // Array[userId]["user"]   = $user;
+        $balance  = array();
+
+        foreach($this->getExpenditures() as $expenditure) {
+            foreach($expenditure->getPayers() as $payer) {
+                $id = $payer->getUser()->getId();
+                if (!isset($balance[$id])) {
+                    $balance[$id]["amount"] = 0;
+                    $balance[$id]["user"]   = $payer->getUser();
+                }
+                $balance[$id]["amount"] += $payer->getAmount();
+            }
+
+            foreach($expenditure->getBeneficiaries() as $beneficiary) {
+                $id = $beneficiary->getUser()->getId();
+                if (!isset($balance[$id])) {
+                    $balance[$id]["amount"] = 0;
+                    $balance[$id]["user"]   = $beneficiary->getUser();
+                }
+                $balance[$id]["amount"] -= $beneficiary->getAmount();
+            }
+        }
+
+        if (array_sum($balance) != 0) {
+            throw new \Exception("Unexpected difference between total paid and total received");
+        }
+
+        return $balance;
+    }
+
+    public function getTotalExpenditure() {
+        $total = 0;
+        foreach($this->getExpenditures() as $expenditure) {
+            $total += $expenditure->getAmount();
+        }
+        return $total;
+    }
+
     public static function getRepository()
     {
         return \Bdf\Core::getInstance()->getEntityManager()->getRepository(__CLASS__);
