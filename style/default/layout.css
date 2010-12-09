@@ -240,6 +240,11 @@ h2 a:hover { text-decoration: underline; }
 
 /* Content ---------------------------------------- */
 
+#full-main {
+	float: right;
+	padding: 1em;
+}
+
 #main {
 	width: 700px;
 	float: right;
