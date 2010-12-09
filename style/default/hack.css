@@ -184,30 +184,30 @@ div.clear {
     clear: both;
 }
 
-#full-main div.site-presentation {
+#main div.site-presentation {
 	/* border: 1px solid #ddd; */
     margin: 1em;
     font-size: 120%;
     min-height: 200px;
 }
 
-#full-main div.site-presentation.img-right p {
+#main div.site-presentation.img-right p {
     border-right: 3px solid #ddd;
     margin-right: 200px;
     padding: 0.5em;
 }
 
-#full-main div.site-presentation.img-left p {
+#main div.site-presentation.img-left p {
     border-left: 3px solid #ddd;
     margin-left: 200px;
     padding: 0.5em;
 }
 
-#full-main div.site-presentation.img-right img {
+#main div.site-presentation.img-right img {
     float: right;
 }
 
-#full-main div.site-presentation.img-left img {
+#main div.site-presentation.img-left img {
     float: left;
 }
 

@@ -140,5 +140,8 @@ msgstr "Intitulé de la dépense"
 msgid "Cash-up"
 msgstr "Faire les comptes"
 
+msgid "P_Balancing"
+msgstr "Voyez d'un coup d'œil qui a le plus payé."
+
 #~ msgid "Involved users"
 #~ msgstr "Bénéficiaires"
