@@ -57,6 +57,7 @@ class User implements \Bdf\IUser
     private $_repaymentsFromMe;
     private $_repaymentsToMe;
     private $_creator;
+    private $_facebookId;
 
     /**
      * Constructeur
@@ -87,24 +88,6 @@ class User implements \Bdf\IUser
         $idUser = \Bdf\Session::getInstance()->getCurrentUserId();
         $user = $em->getRepository(__CLASS__)->find($idUser);
         return $user;
-    }
-
-    /**
-     * Authentifie un utilisateur
-     *
-     * @param string $email    Email
-     * @param string $password Clear password
-     *
-     * @return User
-     */
-    public static function authenticateUser($email, $password) {
-        $em = \Bdf\Core::getInstance()->getEntityManager();
-        $user = $em->getRepository(__CLASS__)->findOneBy(array('_email' => $email));
-        if($user !== NULL) {
-            if($user->isRegistered() and Utils::comparePassword($password, $user->getPassword()) === TRUE) {
-                \Bdf\Session::getInstance()->setCurrentUserId($user->getId());
-            }
-        }
     }
 
     /**
@@ -231,20 +214,34 @@ class User implements \Bdf\IUser
         $this->_repaymentsToMe->add($repaymentsToMe);
     }
 
-    public function isRegistered() {
+    public function isRegistered() 
+    {
         return $this->_registered === true;
     }
 
-    public function setRegistered($registered) {
+    public function setRegistered($registered) 
+    {
         $this->_registered = (boolean)$registered;
     }
 
-    public function getCreator() {
+    public function getCreator() 
+    {
         return $this->_creator;
     }
 
-    public function setCreator(User $creator) {
+    public function setCreator(User $creator) 
+    {
         $this->_creator = $creator;
+    }
+
+    public function getFacebookId()
+    {
+        return $this->_facebookId;
+    }
+
+    public function setFacebookId($facebookId)
+    {
+        return $this->_facebookId = (int)$facebookId;
     }
 
     public static function getRepository()

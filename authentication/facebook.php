@@ -1,6 +1,6 @@
 <?php
 /**
- * Fichier de connexion au site
+ * Fichier de connexion au site via facebook
  *
  * PHP version 5.3
  *
@@ -27,41 +27,38 @@
  * @link     http://www.rendsmoimatune.net
  */
 
-require_once 'inc/init.php';
+require_once '../inc/init.php';
 
 $em = \Bdf\Core::getInstance()->getEntityManager();
 $te = \Bdf\Core::getInstance()->getTemplatesEngine();
 
-if(isset ($_POST['sign-in'])) {
-    try {
-        $authentication = new \Eu\Rmmt\Authentication\BasicAuthentication();
-        $authentication->setState(\Eu\Rmmt\Authentication\BasicAuthentication::CHECK_CREDENTIALS_STATE);
-        $authentication->setEmail($_POST['email']);
-        $authentication->setPassword($_POST['password']);
-        $user = $authentication->authenticate();
-    } catch (Exception $e) {
-        $te->assign("message", $e->getMessage());
-        $te->assign("_POST", $_POST);
-        $te->display("sign-in");
-        die();
+try {
+    $authentication = \Bdf\Session::getInstance()->get('authentication');
+    if ( null == $authentication) {
+        $authentication = new \Eu\Rmmt\Authentication\FacebookAuthentication();
     }
-    if (null === \Bdf\Session::getInstance()->getCurrentUserId()) {
-        $te->assign("message", array('type'=>'error','content'=>\Bdf\Utils::getText('The e-mail address and password you entered do not match any accounts')));
-        $te->assign("_POST", $_POST);
-        $te->display("sign-in");
-    } else {
-      $redirect = \Bdf\Session::getInstance()->get('redirect');
-      if (null != $redirect) {
+    $authentication->authenticate();
+    \Bdf\Session::getInstance()->add('authentication', $authentication);
+} catch (Exception $e) {
+    \Bdf\Session::getInstance()->remove('authentication');
+    $te->assign("messages", array(array('type'=>'error', 'content'=>$e->getMessage())));
+    $te->assign("_POST", $_POST);
+    $te->display("authentication/facebook");
+    die();
+}
+
+if (null === \Bdf\Session::getInstance()->getCurrentUserId()) {
+    \Bdf\Session::getInstance()->remove('authentication');
+    $te->assign("messages", array(array('type'=>'error','content'=>\Bdf\Utils::getText('Authantication failed'))));
+    $te->assign("_POST", $_POST);
+    $te->display("authentication/facebook");
+} else {
+    $redirect = \Bdf\Session::getInstance()->get('redirect');
+    if (null != $redirect) {
         \Bdf\Session::getInstance()->remove('redirect');
         header("location: ".$redirect);
-      } else {
+    } else {
         header("location: ".\Bdf\Utils::makeUrl(""));
-      }
     }
-}else {
-    if (null !== \Bdf\Session::getInstance()->get('redirect')) {
-        $te->assign('message',array('type'=>'warning','content'=>'Authentification requise'));
-    }
-    $te->display("sign-in");
 }
 ?>

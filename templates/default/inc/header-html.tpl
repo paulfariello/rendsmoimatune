@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>Rends-moi ma tune | {$title}</title>
+<title>Rends-moi ma tune{if isset($title) AND !empty($title)} | {$title}{/if}</title>
 
 <!-- CSS -->
 <link href="{makeUrl url='transdmin.css' type='css'}" rel="stylesheet" type="text/css" media="screen" />

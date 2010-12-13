@@ -5,6 +5,9 @@ RewriteRule    ^sign-in.html$                                                   
 RewriteRule    ^sign-out.html$                                                                  sign-out.php [L]
 RewriteRule    ^new-account.html$                                                               new-account.php [L]
 
+# Authentication
+RewriteRule    ^authentication/facebook.html$                                                   authentication/facebook.php [L]
+
 # Dashboard
 RewriteRule    ^dashboard/$                                                                     index.php  [L]
 

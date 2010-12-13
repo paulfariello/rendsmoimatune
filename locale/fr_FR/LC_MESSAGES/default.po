@@ -72,7 +72,7 @@ msgid "Last Name"
 msgstr "Nom"
 
 msgid "Create new account"
-msgstr "Créer un nouveau compte"
+msgstr "S'inscrire"
 
 msgid "Sign in"
 msgstr "S'identifier"

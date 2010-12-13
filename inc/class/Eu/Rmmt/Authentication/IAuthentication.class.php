@@ -1,6 +1,6 @@
 <?php
 /**
- * Fichier de classe
+ * Fichier d'interface
  *
  * PHP version 5.3
  *
@@ -27,43 +27,23 @@
  * @link     http://www.Rendsmoimatune.fr
  */
 
-namespace Eu\Rmmt;
-use Doctrine\Common\Collections\ArrayCollection;
-use Bdf\Core;
-use Eu\Rmmt\User;
+namespace Eu\Rmmt\Authentication;
 
 /**
- * UserFactory
+ * IAuthentication
  *
- * @category Class
+ * @category Interface
  * @package  Fr\Rendsmoimatune\User
  * @author   Paul Fariello <paul.fariello@gmail.com>
  * @license  http://www.gnu.org/copyleft/gpl.html  GPL License 3.0
  * @link     http://www.Rendsmoimatune.fr
  */
-class UserFactory
+Interface IAuthentication
 {
     /**
-     * Create
+     * Start authentication
      *
+     * @return void
      */
-    public static function createUnregisteredUser(User $creator, $firstName, $lastName)
-    {
-        $user = new User(uniqid().'@rendsmoimatune.eu');
-        $user->setRegistered(false);
-        $user->setFirstName($firstName);
-        $user->setLastName($lastName);
-        $user->setCreator($creator);
-        return $user;
-    }
-
-    public static function createFacebookUser($facebookId, $firstName, $lastName)
-    {
-        $user = new User(uniqid().'@rendsmoimatune.eu');
-        $user->setRegistered(true);
-        $user->setFirstName($firstName);
-        $user->setLastName($lastName);
-        $user->setFacebookId($facebookId);
-        return $user;
-    }
+    public function authenticate();
 }
