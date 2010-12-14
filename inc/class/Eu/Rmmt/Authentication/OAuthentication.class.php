@@ -52,7 +52,6 @@ abstract class OAuthentication implements IAuthentication
     private $_state;
     const REQUEST_REQUEST_TOKEN_STATE       = 0;
     const REQUEST_ACCESS_TOKEN_STATE        = 1;
-    const ACCESS_PROTECTED_RESSOURCES_STATE = 2;
 
     protected $_requestToken;
     protected $_accessToken;
@@ -76,15 +75,19 @@ abstract class OAuthentication implements IAuthentication
 
     public function authenticate()
     {
+        // If there is a problem authentication won't be persisted
+        $this->_close();
         switch($this->_state) {
             case self::REQUEST_REQUEST_TOKEN_STATE:
                 $this->_requestRequestToken();
+                $this->_persist();
                 $this->_redirectUserToServiceProvider();
                 break;
             case self::REQUEST_ACCESS_TOKEN_STATE:
                 $this->_requestAccessToken();
                 $this->_accessProtectedRessources();
                 $this->_setCurrentUser();
+                $this->_close();
                 break;
         }
     }
@@ -151,6 +154,25 @@ abstract class OAuthentication implements IAuthentication
             throw new \Exception("Error while authenticating");
         }
             
+    }
+
+    private function _persist()
+    {
+        \Bdf\Session::getInstance()->add('authentication', $this);
+    }
+
+    private function _close()
+    {
+        \Bdf\Session::getInstance()->remove('authentication');
+    }
+
+    public static function getAuthentication()
+    {
+        $authentication = \Bdf\Session::getInstance()->get('authentication');
+        if ( null == $authentication OR get_class($authentication) != get_called_class()) {
+            $authentication = new \Eu\Rmmt\Authentication\FacebookAuthentication();
+        }
+        return $authentication;
     }
 
     abstract protected function _constructServiceProviderUrl();

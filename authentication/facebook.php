@@ -33,14 +33,9 @@ $em = \Bdf\Core::getInstance()->getEntityManager();
 $te = \Bdf\Core::getInstance()->getTemplatesEngine();
 
 try {
-    $authentication = \Bdf\Session::getInstance()->get('authentication');
-    if ( null == $authentication) {
-        $authentication = new \Eu\Rmmt\Authentication\FacebookAuthentication();
-    }
+    $authentication = \Eu\Rmmt\Authentication\FacebookAuthentication::getAuthentication();
     $authentication->authenticate();
-    \Bdf\Session::getInstance()->add('authentication', $authentication);
 } catch (Exception $e) {
-    \Bdf\Session::getInstance()->remove('authentication');
     $te->assign("messages", array(array('type'=>'error', 'content'=>$e->getMessage())));
     $te->assign("_POST", $_POST);
     $te->display("authentication/facebook");
@@ -48,7 +43,6 @@ try {
 }
 
 if (null === \Bdf\Session::getInstance()->getCurrentUserId()) {
-    \Bdf\Session::getInstance()->remove('authentication');
     $te->assign("messages", array(array('type'=>'error','content'=>\Bdf\Utils::getText('Authantication failed'))));
     $te->assign("_POST", $_POST);
     $te->display("authentication/facebook");
