@@ -46,7 +46,6 @@ if (!isset($_GET['id'])) {
 
 $event = $em->getRepository('Eu\Rmmt\Event')->find($_GET['id']);
 $te->assign('currentEvent',$event);
-$te->assign('events',$em->getRepository('Eu\Rmmt\Event')->findAll());
 $messages = \Bdf\Session::getInstance()->get('messages');
 if (null !== $messages) {
     $te->assign('messages',$messages);

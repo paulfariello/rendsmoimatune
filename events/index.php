@@ -38,7 +38,5 @@ if ($currentUser == null) {
     header('location: '.\Bdf\Utils::makeUrl('sign-in.html'));
     die();
 }
-
-$te->assign('events',$em->getRepository('Eu\Rmmt\Event')->findAll());
 $te->display('events/index');
 ?>

@@ -52,7 +52,6 @@ if (!isset($_GET['event-id'])) {
 
 if (!isset($_POST['create-new-expenditure'])) {
     $te->assign("currentEvent",$event);
-    $te->assign('events',$em->getRepository('Eu\Rmmt\Event')->findAll());
     $te->display('events/create-new-expenditure');
 } else {
     try {
@@ -189,13 +188,11 @@ if (!isset($_POST['create-new-expenditure'])) {
         header('location: '.$event->getUrlDetail());
     } catch(Eu\Rmmt\Exception\UserInputException $e) {
         $te->assign('currentEvent',$event);
-        $te->assign('events',$em->getRepository('Eu\Rmmt\Event')->findAll());
         $te->assign('_POST',$_POST);
         $te->assign('messages', array(array('type'=>'error','content'=>$e->getMessage())));
         $te->display('events/create-new-expenditure');
     } catch(Exception $e) {
         $te->assign('currentEvent',$event);
-        $te->assign('events',$em->getRepository('Eu\Rmmt\Event')->findAll());
         $te->assign('_POST',$_POST);
         $te->assign('messages', array(array('type'=>'error','content'=>$e->getMessage())));
         $te->display('events/create-new-expenditure');

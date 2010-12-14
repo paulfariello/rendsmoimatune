@@ -50,7 +50,6 @@ if (null === $event OR !$event->grantAccess($currentUser)) {
     die();
 }
 $te->assign('currentEvent',$event);
-$te->assign('events',$currentUser->getEvents());
 
 $messages = \Bdf\Session::getInstance()->get('messages');
 if (null !== $messages) {
