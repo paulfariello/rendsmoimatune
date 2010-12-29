@@ -138,6 +138,8 @@ class SmartyAdapter implements \Bdf\ITemplatesEngine
 
     /**
      * Encapsulation de {@link \Bdf\Utils::isCurrentPage()}
+     * Must have a param named id wich corresponds to the text id
+     * and may have params named argN wich will be replaced in the text
      *
      * @param array  $params @see \Bdf\Utils::isCurrentPage()
      * @param Smarty $smarty instance de Smarty
@@ -146,7 +148,16 @@ class SmartyAdapter implements \Bdf\ITemplatesEngine
      */
     public function utilsGetText($params, $smarty)
     {
-        return \Bdf\Utils::getText($params['id']);
+        $id = $params['id'];
+        $args = array();
+        foreach($params as $index => $value) {
+            $matches = array();
+            if (preg_match_all("#^arg([0-9]+)$#", $index, $matches, PREG_PATTERN_ORDER)) {
+                $args[(int)$matches[1][0]] = $value;
+            }
+        }
+        ksort($args);
+        return \Bdf\Utils::getText($id, $args);
     }
 
     /**

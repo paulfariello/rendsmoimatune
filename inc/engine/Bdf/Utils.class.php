@@ -157,7 +157,17 @@ class Utils
      */
     public static function getText($str)
     {
-        return getText($str);
+        $str = addslashes($str);
+        if (func_num_args() > 1) {
+            if (is_array(func_get_arg(1))) {
+                return vsprintf(getText($str), func_get_arg(1));
+            } else {
+                return vsprintf(getText($str), array_slice(func_get_args(), 1));
+            }
+        } else {
+            return getText($str);
+        }
+        
     }
 
     /**

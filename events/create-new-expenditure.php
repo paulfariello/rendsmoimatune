@@ -183,7 +183,7 @@ if (!isset($_POST['create-new-expenditure'])) {
         $messages = array();
         $messages[] = array('type'=>'done','content'=>Bdf\Utils::getText('Expenditure created'));
         foreach($newUsers as $user) {
-            $messages[] = array('type'=>'info','content'=>sprintf(Bdf\Utils::getText('User %s has been created. <a href="%s">Invite her/him ?</a>'), $user->getName(), $user->getUrlInvite()));
+            $messages[] = array('type'=>'info','content'=>Bdf\Utils::getText('User %1$s has been created. <a href="%2$s">Invite her/him ?</a>', $user->getName(), $user->getUrlInvite()));
         }
         \Bdf\Session::getInstance()->add('messages',$messages);
         header('location: '.$event->getUrlDetail());

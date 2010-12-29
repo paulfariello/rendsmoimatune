@@ -69,54 +69,21 @@ class DebtFactory
      */
     public function createDebts()
     {
-        // Array[userId] = $amount;
-        $payed    = array();
-        $due      = array();
-        $creditor = array();
         $debitor  = array();
-        $debts    = new ArrayCollection();
+        $creditor = array();
 
-        foreach($this->_event->getExpenditures() as $expenditure) {
-            foreach($expenditure->getPayers() as $payer) {
-                $id = $payer->getUser()->getId();
-                if (!isset($payed[$id])) {
-                    $payed[$id] = 0;
-                }
-                $payed[$id] += $payer->getAmount();
-            }
-
-            foreach($expenditure->getBeneficiaries() as $beneficiary) {
-                $id = $beneficiary->getUser()->getId();
-                if (!isset($due[$id])) {
-                    $due[$id] = 0;
-                }
-                $due[$id] += $beneficiary->getAmount();
-            }
-        }
-
-        if (array_sum($payed) != array_sum($due)) {
-            throw new \Exception("Unexpected difference between total paid and total received");
-        }
-
-        $usersId = array_keys($payed) + array_keys($due);
-        foreach($usersId as $id) {
-            if (!isset($due[$id])) {
-                $due[$id] = 0;
-            }
-            if (!isset($payed[$id])) {
-                $payed[$id] = 0;
-            }
-
-            $balance = $due[$id] - $payed[$id];
+        $users = $this->_event->getUsers();
+        foreach($users as $user) {
+            $balance = $this->_event->getBalance($user);
             if ($balance > 0) {
-                $debitor[$id] = $balance;
+                $creditor[] = $user;
             } elseif($balance < 0) {
-                $creditor[$id] = -$balance;
+                $debitor[] = $user;
             }
         }
 
-        asort($debitor);
-        asort($creditor);
+        /** uasort($debitor);
+        uasort($creditor);
 
         foreach($debitor as $debitorId => $due) {
             foreach($creditor as $creditorId => $amount) {
@@ -127,9 +94,9 @@ class DebtFactory
                     break;
                 }
             }
-        }
+        } **/
 
-        return $debts;
+        return array();
     }
 
 }

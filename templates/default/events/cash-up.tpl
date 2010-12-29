@@ -7,34 +7,38 @@
 <h2><a href="{makeUrl url='events/'}">{getText id='Events'}</a> &raquo; <a href="{$currentEvent->getUrlDetail()}">{$currentEvent->getName()}</a> &raquo; <a href="{$currentEvent->getUrlCashUp()}">{getText id='Cash-up'}</a></h2>
 {include file='inc/main.tpl'}
 <h3>{getText id='Balance of payments'}</h3>
-{foreach from=$balances item="balance"}
+<h4 class="balance-due">
+    {getText id="Not paid enough"}
+</h4>
+<h4 class="balance-payed">
+    {getText id="Overpaid"}
+</h4>
+<div class="clear"></div>
+{assign var="totalExpenditure" value=$currentEvent->getTotalExpenditure()}
+{foreach from=$users item="user"}
+    {assign var="balance" value=$currentEvent->getBalance($user)}
     <div class="balance-due">
-        {if $balance.amount < 0}
-        <div class="balance-bar" style="width: {round(- $balance.amount / $totalExpenditure * 100)}%;">
-            {$balance.amount} €
+        {if $balance < 0}
+        <div class="balance-bar" style="width: {round(- $balance / $totalExpenditure * 100)}%;">
+            {$balance} €
         </div>
-        <!-- <div class="balance-amount">
-            {$balance.amount}
-        </div> -->
+
         {/if}
     </div>
     <div class="balance-payed">
-        {if $balance.amount > 0}
-            <div class="balance-bar" style="width: {round($balance.amount / $totalExpenditure * 100)}%;">
-                {$balance.amount} €
+        {if $balance > 0}
+            <div class="balance-bar" style="width: {round($balance / $totalExpenditure * 100)}%;">
+                {$balance} €
             </div>
-            <!-- <div class="balance-amount">
-                {$balance.amount}
-            </div> -->
         {/if}
     </div>
-    <div class="balance-name">{$balance.user->getName()}</div>
+    <div class="balance-name">{$user->getName()}</div>
 {/foreach}
 
 <h3>{getText id='Balancing'}</h3>
 <ul>
     {foreach from=$debts item="debt"}
-        <li>{$debt->getFrom()->getName()} doit {$debt->getAmount()} à {$debt->getTo()->getName()}</li>
+        <li>{getText id="%1\$s gives %2\$d€ to %3\$s" arg1=$debt->getFrom()->getName() arg2=$debt->getAmount() arg3=$debt->getTo()->getName()}</li>
     {/foreach}
 </ul>
 {include file='inc/footer.tpl'}

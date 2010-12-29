@@ -167,37 +167,20 @@ class Event
 
     }
 
-    public function getBalances()
+    public function getBalance(User $user)
     {
-        // Array[userId]["amount"] = $amount;
-        // Array[userId]["user"]   = $user;
-        $balance  = array();
+        $em = \Bdf\Core::getInstance()->getEntityManager();
+        $query = $em->createQuery("SELECT sum(p._amount) FROM \Eu\Rmmt\Payer p INNER JOIN p._expenditure ex INNER JOIN ex._event e INNER JOIN p._user u WHERE u._id = :user AND e._id = :event");
+        $query->setParameter("user", $user->getId());
+        $query->setParameter("event", $this->getId());
+        $payed = $query->getSingleScalarResult();
 
-        foreach($this->getExpenditures() as $expenditure) {
-            foreach($expenditure->getPayers() as $payer) {
-                $id = $payer->getUser()->getId();
-                if (!isset($balance[$id])) {
-                    $balance[$id]["amount"] = 0;
-                    $balance[$id]["user"]   = $payer->getUser();
-                }
-                $balance[$id]["amount"] += $payer->getAmount();
-            }
+        $query = $em->createQuery("SELECT sum(b._amount) FROM \Eu\Rmmt\Beneficiary b INNER JOIN b._expenditure ex INNER JOIN ex._event e INNER JOIN b._user u WHERE u._id = :user AND e._id = :event");
+        $query->setParameter("user", $user->getId());
+        $query->setParameter("event", $this->getId());
+        $owes = $query->getSingleScalarResult();
 
-            foreach($expenditure->getBeneficiaries() as $beneficiary) {
-                $id = $beneficiary->getUser()->getId();
-                if (!isset($balance[$id])) {
-                    $balance[$id]["amount"] = 0;
-                    $balance[$id]["user"]   = $beneficiary->getUser();
-                }
-                $balance[$id]["amount"] -= $beneficiary->getAmount();
-            }
-        }
-
-        if (array_sum($balance) != 0) {
-            throw new \Exception("Unexpected difference between total paid and total received");
-        }
-
-        return $balance;
+        return $payed - $owes;
     }
 
     public function getTotalExpenditure() {
