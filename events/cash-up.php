@@ -53,8 +53,6 @@ $te->assign('currentEvent',$event);
 
 $messages = \Bdf\Session::getInstance()->get('messages');
 
-$messages[] = array('type'=>'info','content'=>Bdf\Utils::getText('User %1$s has been created. <a href="%2$s">Invite her/him ?</a>', "Test", "http://test"));
-
 if (null !== $messages) {
     $te->assign('messages',$messages);
     \Bdf\Session::getInstance()->remove('messages');
