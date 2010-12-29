@@ -143,8 +143,8 @@ msgstr "Faire les comptes"
 msgid "P_Balancing"
 msgstr "Voyez d'un coup d'œil qui a le plus payé."
 
-msgid "User %s has been created. <a href=\"%s\">Invite her/him ?</a>"
-msgstr "L'utilisateur %s a été créé. <a href=\"%s\">L'inviter ?</a>"
+msgid "User %1$s has been created. <a href=\"%2$s\">Invite her/him ?</a>"
+msgstr "L'utilisateur %1$s a été créé. <a href=\"%2$s\">L'inviter ?</a>"
 
 msgid "%s gives %.2f€ to %s"
 msgstr "%s doit %.2f€ à %s"
@@ -154,6 +154,9 @@ msgstr "A trop payé"
 
 msgid "Not paid enough"
 msgstr "N'a pas assez payé"
+
+msgid "%1$s repaid %2$.2f€ to %3$s"
+msgstr "%1$s a remboursé %2$.2f€ à %3$s"
 
 #~ msgid "Involved users"
 #~ msgstr "Bénéficiaires"

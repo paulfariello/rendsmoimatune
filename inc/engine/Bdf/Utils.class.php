@@ -157,7 +157,6 @@ class Utils
      */
     public static function getText($str)
     {
-        $str = addslashes($str);
         if (func_num_args() > 1) {
             if (is_array(func_get_arg(1))) {
                 return vsprintf(getText($str), func_get_arg(1));

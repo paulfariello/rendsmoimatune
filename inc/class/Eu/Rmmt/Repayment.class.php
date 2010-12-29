@@ -119,7 +119,7 @@ class Repayment
 
     public function getDescription()
     {
-        return sprintf(Utils::getText('%s repaid %.2f€ to %s'), $this->_payer->getName(), $this->_amount, $this->_beneficiary->getName());
+        return Utils::getText('%1$s repaid %2$.2f€ to %3$s', $this->_payer->getName(), $this->_amount, $this->_beneficiary->getName());
     }
 
 }
