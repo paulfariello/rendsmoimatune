@@ -28,6 +28,8 @@
  */
 
 namespace Eu\Rmmt;
+use \DateTime;
+use \Bdf\Utils;
 
 /**
  * Repayment
@@ -49,10 +51,10 @@ class Repayment
 
     public function  __construct(Event $event, User $payer, User $beneficiary, $amount)
     {
-        $this->_event    = $event;
-        $this->_payer = $payer;
-        $this->_beneficiary   = $beneficiary;
-        $this->_amount   = $amount;
+        $this->_event       = $event;
+        $this->_payer       = $payer;
+        $this->_beneficiary = $beneficiary;
+        $this->_amount      = $amount;
     }
 
     public function getId()
@@ -115,6 +117,9 @@ class Repayment
         $this->_event = $event;
     }
 
-
+    public function getDescription()
+    {
+        return sprintf(Utils::getText('%s repaid %.2f€ to %s'), $this->_payer->getName(), $this->_amount, $this->_beneficiary->getName());
+    }
 
 }

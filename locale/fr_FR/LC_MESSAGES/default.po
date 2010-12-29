@@ -143,5 +143,8 @@ msgstr "Faire les comptes"
 msgid "P_Balancing"
 msgstr "Voyez d'un coup d'œil qui a le plus payé."
 
+msgid "User %s has been created. <a href=\"%s\">Invite her/him ?</a>"
+msgstr "L'utilisateur %s a été créé. <a href=\"%s\">L'inviter ?</a>"
+
 #~ msgid "Involved users"
 #~ msgstr "Bénéficiaires"

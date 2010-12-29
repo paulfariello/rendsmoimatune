@@ -210,3 +210,9 @@ div.clear {
 #main div.site-presentation.img-left img {
     float: left;
 }
+
+#main span.inter-input {
+    float: left;
+    line-height: 2em;
+    margin: 0 10px 0 0;
+}

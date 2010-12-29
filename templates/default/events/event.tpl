@@ -40,7 +40,7 @@
 <table cellpadding="0" cellspacing="0">
     {foreach from=$currentEvent->getRepayments() item='repayment'}
         <tr>
-            <td>{$repayment->getName()}</td>
+            <td>{$repayment->getDescription()}</td>
             <td class="action"><a href="#" class="view">View</a><a href="#" class="edit">Edit</a><a href="#" class="delete">Delete</a></td>
         </tr>
     {/foreach}

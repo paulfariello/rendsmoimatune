@@ -3,7 +3,7 @@
     <fieldset>
         <p><label>{getText id='Title'} :</label><input type="text" class="text-long" name="title" value="{if isset($_POST.title)}{$_POST.title|htmlentities}{/if}" /></p>
         <p><label>{getText id='Date'} :</label><input type="text" class="text-medium date" name="date" value="{if isset($_POST.date)}{$_POST.date|htmlentities}{else}{date('m-d-Y')}{/if}" /></p>
-        <p><label>{getText id='Amount'} :</label><input type="text" id="expenditure-amount" class="text-medium" name="amount" value="{if isset($_POST.amount)}{$_POST.amount|htmlentities}{/if}" /></p>
+        <p><label>{getText id='Amount'} :</label><input type="text" id="expenditure-amount" class="text-medium" name="amount" value="{if isset($_POST.amount)}{$_POST.amount|htmlentities}{/if}" /><span class="inter-input">€</span></p>
         <!-- Beneficiaries -->
         <p><label>{getText id='Beneficiaries'} :</label></p>
         <div class="subfieldset">
