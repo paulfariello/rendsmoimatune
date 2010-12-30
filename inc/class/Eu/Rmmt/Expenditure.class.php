@@ -28,6 +28,7 @@
  */
 
 namespace Eu\Rmmt;
+use Bdf\Core;
 use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
 
@@ -103,7 +104,18 @@ class Expenditure
 
     public function addPayer(User $user, $amount)
     {
-        $payer = new Payer($this, $user, $amount);
+        $em = Core::getInstance()->getEntityManager();
+        $query = $em->createQuery('SELECT p FROM \Eu\Rmmt\Payer p INNER JOIN p._user u INNER JOIN p._expenditure e WHERE u._id = :user AND e._id = :expenditure');
+        $query->setParameter('user', $user->getId());
+        $query->setParameter('expenditure', $this->_id);
+        $payer = $query->getSingleResult();
+
+        if (null == $payer) {
+            $payer = new Payer($this, $user, $amount);
+        } else {
+            $payer->setAmount($amount);
+        }
+
         $this->_payers->add($payer);
     }
 
@@ -119,7 +131,18 @@ class Expenditure
 
     public function addBeneficiary(User $user, $amount)
     {
-        $beneficiary = new Beneficiary($this, $user, $amount);
+        $em = Core::getInstance()->getEntityManager();
+        $query = $em->createQuery('SELECT b FROM \Eu\Rmmt\Beneficiary b INNER JOIN b._user u INNER JOIN b._expenditure e WHERE u._id = :user AND e._id = :expenditure');
+        $query->setParameter('user', $user->getId());
+        $query->setParameter('expenditure', $this->_id);
+        $beneficiary = $query->getSingleResult();
+
+        if (null == $beneficiary) {
+            $beneficiary = new Beneficiary($this, $user, $amount);
+        } else {
+            $beneficiary->setAmount($amount);
+        }
+
         $this->_beneficiaries->add($beneficiary);
     }
 
@@ -167,5 +190,4 @@ class Expenditure
     {
         return $this->_event->getUrlEditExpenditure($this);
     }
-
 }

@@ -76,7 +76,8 @@ if (!isset($_POST['edit-expenditure'])) {
             throw new Eu\Rmmt\Exception\UserInputException(\Bdf\Utils::getText('Amount is required'), $_POST['amount']);
         }
 
-        $expenditure = new Eu\Rmmt\Expenditure($event, $_POST['title'], $_POST['amount']);
+        $expenditure->setTitle($_POST['title']);
+        $expenditure->setAmount($_POST['amount']);
 
         $date = null;
         if (isset($_POST['date']) AND !empty($_POST['date'])) {
@@ -192,7 +193,7 @@ if (!isset($_POST['edit-expenditure'])) {
 
         $em->flush();
         $messages = array();
-        $messages[] = array('type'=>'done','content'=>Bdf\Utils::getText('Expenditure created'));
+        $messages[] = array('type'=>'done','content'=>Bdf\Utils::getText('Expenditure saved'));
         foreach($newUsers as $user) {
             $messages[] = array('type'=>'info','content'=>sprintf(Bdf\Utils::getText('User %s has been created. <a href="%s">Invite her/him ?</a>'), $user->getName(), $user->getUrlInvite()));
         }

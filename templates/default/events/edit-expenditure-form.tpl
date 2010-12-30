@@ -1,5 +1,5 @@
 <h3>{getText id='Edit expenditure'}</h3>
-<form action="{$currentEvent->getUrlNewExpenditure()}" method="post" class="jNice">
+<form action="{$currentEvent->getUrlEditExpenditure($expenditure)}" method="post" class="jNice">
     <fieldset>
         <p><label>{getText id='Title'} :</label><input type="text" class="text-long" name="title" value="{if isset($_POST.title)}{$_POST.title|htmlentities}{else}{$expenditure->getTitle()|htmlentities}{/if}" /></p>
         <p><label>{getText id='Date'} :</label><input type="text" class="text-medium date" name="date" value="{if isset($_POST.date)}{$_POST.date|htmlentities}{else}{$expenditure->getDate()->format('m-d-Y')}{/if}" /></p>
