@@ -104,11 +104,13 @@ class Expenditure
 
     public function addPayer(User $user, $amount)
     {
-        $em = Core::getInstance()->getEntityManager();
-        $query = $em->createQuery('SELECT p FROM \Eu\Rmmt\Payer p INNER JOIN p._user u INNER JOIN p._expenditure e WHERE u._id = :user AND e._id = :expenditure');
-        $query->setParameter('user', $user->getId());
-        $query->setParameter('expenditure', $this->_id);
-        $payer = $query->getSingleResult();
+        // On vérifie que le payeur n'existe pas deja
+        $payer = null;
+        foreach ($this->_payers as $tempPayer) {
+            if ($tempPayer->getUser()->getId() == $user->getId()) {
+                $payer = $tempPayer;        
+            }
+        }
 
         if (null == $payer) {
             $payer = new Payer($this, $user, $amount);
@@ -124,6 +126,14 @@ class Expenditure
         //TODO remove paying user
     }
 
+    public function removePayers()
+    {
+        $em = Core::getInstance()->getEntityManager();
+        foreach($this->_payers as $payer) {
+            $em->remove($payer);
+        }
+    }
+
     public function getBeneficiaries()
     {
         return $this->_beneficiaries;
@@ -131,11 +141,13 @@ class Expenditure
 
     public function addBeneficiary(User $user, $amount)
     {
-        $em = Core::getInstance()->getEntityManager();
-        $query = $em->createQuery('SELECT b FROM \Eu\Rmmt\Beneficiary b INNER JOIN b._user u INNER JOIN b._expenditure e WHERE u._id = :user AND e._id = :expenditure');
-        $query->setParameter('user', $user->getId());
-        $query->setParameter('expenditure', $this->_id);
-        $beneficiary = $query->getSingleResult();
+        // On vérifie que le beneficiare n'existe pas deja
+        $beneficiary = null;
+        foreach ($this->_beneficiaries as $tempBeneficiary) {
+            if ($tempBeneficiary->getUser()->getId() == $user->getId()) {
+                $beneficiary = $tempBeneficiary;        
+            }
+        }
 
         if (null == $beneficiary) {
             $beneficiary = new Beneficiary($this, $user, $amount);
@@ -149,6 +161,16 @@ class Expenditure
     public function removeBeneficiary(User $user)
     {
         //TODO remove involved user
+    }
+
+    public function removeBeneficiaries()
+    {
+        $em = Core::getInstance()->getEntityManager();
+        foreach($this->_beneficiaries as $beneficiary) {
+            $em->remove($beneficiary);
+        }
+
+        $this->_beneficiaries->clear();
     }
 
     public function getTags()

@@ -89,7 +89,12 @@ if (!isset($_POST['edit-expenditure'])) {
         // Store new users here in order to propose invitations
         $newUsers       = array();
 
+        $expenditure->removePayers();
+        $expenditure->removeBeneficiaries();
+        $em->flush();
+
         // Payers
+
         $amountPayed    = 0;
 
         foreach( array_keys ($_POST['payersId']) as $index ) {
@@ -147,6 +152,7 @@ if (!isset($_POST['edit-expenditure'])) {
         }
 
         // Beneficiaries
+
         $beneficiaries = array();
 
         foreach( array_keys ($_POST['beneficiariesId']) as $index ) {
@@ -201,14 +207,16 @@ if (!isset($_POST['edit-expenditure'])) {
         header('location: '.$event->getUrlDetail());
     } catch(Eu\Rmmt\Exception\UserInputException $e) {
         $te->assign('currentEvent',$event);
+        $te->assign('expenditure',$expenditure);
         $te->assign('_POST',$_POST);
         $te->assign('messages', array(array('type'=>'error','content'=>$e->getMessage())));
-        $te->display('events/create-new-expenditure');
+        $te->display('events/edit-expenditure');
     } catch(Exception $e) {
         $te->assign('currentEvent',$event);
+        $te->assign('expenditure',$expenditure);
         $te->assign('_POST',$_POST);
         $te->assign('messages', array(array('type'=>'error','content'=>$e->getMessage())));
-        $te->display('events/create-new-expenditure');
+        $te->display('events/edit-expenditure');
     }
 }
 
