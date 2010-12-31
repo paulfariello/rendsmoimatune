@@ -22,6 +22,9 @@
                     <join-column name="user_pcfk" referenced-column-name="user_pk"  />
                 </inverse-join-columns>
             </join-table>
+            <cascade>
+                <cascade-persist />
+            </cascade>
         </many-to-many>
 
     </entity>

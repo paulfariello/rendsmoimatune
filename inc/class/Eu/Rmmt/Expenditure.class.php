@@ -160,6 +160,7 @@ class Expenditure
 
         foreach($payers as $newPayer) {
             $this->_payers->add($newPayer);
+            $this->_event->addUser($newPayer->getUser());
         }
     }
 
@@ -185,6 +186,7 @@ class Expenditure
         }
 
         $this->_beneficiaries->add($beneficiary);
+        $this->_event->addUser($beneficiary->getUser());
     }
 
     public function removeBeneficiary(User $user)
@@ -228,6 +230,7 @@ class Expenditure
         foreach($beneficiaries as $newBeneficiary) {
             $beneficiary = new Beneficiary($this, $newBeneficiary->getUser(), $newBeneficiary->getAmount());
             $this->_beneficiaries->add($beneficiary);
+            $this->_event->addUser($beneficiary->getUser());
         }
     }
 
