@@ -38,7 +38,7 @@
 <h3>{getText id='Balancing'}</h3>
 <ul>
     {foreach from=$debts item="debt"}
-        <li>{getText id="%1\$s gives %2\$d€ to %3\$s" arg1=$debt->getFrom()->getName() arg2=$debt->getAmount() arg3=$debt->getTo()->getName()}</li>
+        <li>{getText id="%1\$s gives %2\$.2f€ to %3\$s" arg1=$debt->getFrom()->getName() arg2=$debt->getAmount() arg3=$debt->getTo()->getName()}</li>
     {/foreach}
 </ul>
 {include file='inc/footer.tpl'}

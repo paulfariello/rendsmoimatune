@@ -61,6 +61,31 @@ class DebtFactory
         $this->_event = $event;
     }
 
+    private function _sortUsers($a, $b)
+    {
+        if ($a['balance'] == $b['balance']) {
+            return 0;
+        }
+        return ($a['balance'] > $b['balance']) ? -1 : 1;
+    }
+
+    private function _resortFirstUser(array $users)
+    {
+        $first = $users[0];
+        array_shift($users);
+
+        if (sizeof($users) < 1) {
+            return array($first);
+        }
+
+        $i = 0;
+        while($i < sizeof($users) AND $first['balance'] < $users[$i]['balance']) {
+            $i++;
+        }
+        
+        return array_merge(array_slice($users, 0, $i), array($first), array_slice($users, $i));
+    }
+
     /**
      * Create debts
      *
@@ -69,34 +94,46 @@ class DebtFactory
      */
     public function createDebts()
     {
-        $debitor  = array();
-        $creditor = array();
+        $debts = new ArrayCollection();
+        $debitors  = array();
+        $creditors = array();
 
         $users = $this->_event->getUsers();
         foreach($users as $user) {
             $balance = $this->_event->getBalance($user);
             if ($balance > 0) {
-                $creditor[] = $user;
+                $creditors[] = array('user'=>$user, 'balance'=>$balance);
             } elseif($balance < 0) {
-                $debitor[] = $user;
+                $debitors[] = array('user'=>$user, 'balance'=>-$balance);
             }
         }
 
-        /** uasort($debitor);
-        uasort($creditor);
+        usort($debitors, array($this, "_sortUsers"));
+        usort($creditors, array($this, "_sortUsers"));
 
-        foreach($debitor as $debitorId => $due) {
-            foreach($creditor as $creditorId => $amount) {
-                if ($amount >= $due) {
-                    $debt = new Debt(User::getRepository()->find($debitorId), User::getRepository()->find($creditorId), $due);
-                    $debts->add($debt);
-                    $creditor[$creditorId] -= $due;
-                    break;
-                }
+        while (!empty($debitors) AND !empty($creditors)) {
+            $amount = min($creditors[0]['balance'], $debitors[0]['balance']);
+            $debt = new Debt($debitors[0]['user'], $creditors[0]['user'], $amount);
+            $debts->add($debt);
+
+            $creditors[0]['balance'] -= $amount;
+            $debitors[0]['balance'] -= $amount;
+
+            // On met a jour les tableaux
+            if ($creditors[0]['balance'] == 0) {
+                array_shift($creditors);                    
+            } else {
+                $creditors = $this->_resortFirstUser($creditors);
             }
-        } **/
 
-        return array();
+            if ($debitors[0]['balance'] == 0) {
+                array_shift($debitors);                    
+            } else {
+                $debitors = $this->_resortFirstUser($debitors);
+            }
+        }
+
+        return $debts;
     }
 
 }
