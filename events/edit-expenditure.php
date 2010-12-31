@@ -89,13 +89,10 @@ if (!isset($_POST['edit-expenditure'])) {
         // Store new users here in order to propose invitations
         $newUsers       = array();
 
-        $expenditure->removePayers();
-        $expenditure->removeBeneficiaries();
-        $em->flush();
-
         // Payers
 
         $amountPayed    = 0;
+        $payers = array();
 
         foreach( array_keys ($_POST['payersId']) as $index ) {
             $id     = $_POST['payersId'][$index];
@@ -140,8 +137,7 @@ if (!isset($_POST['edit-expenditure'])) {
                         break;
                 }
 
-                $expenditure->addPayer($payer, $amount);
-                $event->addUser($payer);
+                $payers[] = new Eu\Rmmt\Payer($expenditure, $payer, $amount);
 
                 $amountPayed += $amount;
             }
@@ -150,6 +146,8 @@ if (!isset($_POST['edit-expenditure'])) {
         if ($amountPayed != $expenditure->getAmount()) {
             throw new Eu\Rmmt\Exception\InvalidAmountPayedException($expenditure);
         }
+
+        $expenditure->updatePayers($payers);
 
         // Beneficiaries
 
@@ -185,17 +183,17 @@ if (!isset($_POST['edit-expenditure'])) {
                     $newUsers[]  = $beneficiary;
                 }
 
-                $beneficiaries[] = $beneficiary;
+                $beneficiaries[] = new Eu\Rmmt\Beneficiary($expenditure, $beneficiary, 0);
             }
         }
 
         // Calculate amount due per user
         $amountPerBeneficiary = $expenditure->getAmount() / count($beneficiaries);
 
-        foreach($beneficiaries as $beneficiary) {
-            $expenditure->addBeneficiary($beneficiary, $amountPerBeneficiary);
-            $event->addUser($beneficiary);
+        foreach($beneficiaries as $index=>$beneficiary) {
+            $beneficiary->setAmount($amountPerBeneficiary);
         }
+        $expenditure->updateBeneficiaries($beneficiaries);
 
         $em->flush();
         $messages = array();

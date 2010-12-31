@@ -134,6 +134,35 @@ class Expenditure
         }
     }
 
+
+    public function updatePayers(array $payers)
+    {
+        $em = Core::getInstance()->getEntityManager();
+        // On met à jour les ancien payeurs
+        foreach($this->_payers as $oldPayer) {
+            $amount = null;
+            // On cherche si l'ancien payeur existe toujours
+            foreach($payers as $index => $newPayer) {
+                if ($newPayer->getUser()->getId() == $oldPayer->getUser()->getId()) {
+                    $amount = $newPayer->getAmount();
+                    unset($payers[$index]);
+                    break;
+                }
+            }
+
+            // On met a jour le montant ou on supprime le payeur
+            if (null == $amount) {
+                $em->remove($oldPayer);
+            } else {
+                $oldPayer->setAmount($amount);
+            }
+        }
+
+        foreach($payers as $newPayer) {
+            $this->_payers->add($newPayer);
+        }
+    }
+
     public function getBeneficiaries()
     {
         return $this->_beneficiaries;
@@ -171,6 +200,35 @@ class Expenditure
         }
 
         $this->_beneficiaries->clear();
+    }
+
+    public function updateBeneficiaries(array $beneficiaries)
+    {
+        $em = Core::getInstance()->getEntityManager();
+        // On met à jour les ancien beneficiaires
+        foreach($this->_beneficiaries as $oldBeneficiary) {
+            $amount = null;
+            // On cherche si l'ancien beneficiaire existe toujours
+            foreach($beneficiaries as $index => $newBeneficiary) {
+                if ($newBeneficiary->getUser()->getId() == $oldBeneficiary->getUser()->getId()) {
+                    $amount = $newBeneficiary->getAmount();
+                    unset($beneficiaries[$index]);
+                    break;
+                }
+            }
+
+            // On met a jour le montant ou on supprime le payeur
+            if (null == $amount) {
+                $em->remove($oldBeneficiary);
+            } else {
+                $oldBeneficiary->setAmount($amount);
+            }
+        }
+
+        foreach($beneficiaries as $newBeneficiary) {
+            $beneficiary = new Beneficiary($this, $newBeneficiary->getUser(), $newBeneficiary->getAmount());
+            $this->_beneficiaries->add($beneficiary);
+        }
     }
 
     public function getTags()
