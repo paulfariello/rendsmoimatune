@@ -198,9 +198,14 @@ if (!isset($_POST['edit-expenditure'])) {
         $em->flush();
         $messages = array();
         $messages[] = array('type'=>'done','content'=>Bdf\Utils::getText('Expenditure saved'));
-        foreach($newUsers as $user) {
-            $messages[] = array('type'=>'info','content'=>sprintf(Bdf\Utils::getText('User %s has been created. <a href="%s">Invite her/him ?</a>'), $user->getName(), $user->getUrlInvite()));
+        $usersString = "";
+        foreach($newUsers as $index => $user) {
+            $usersString .= $user->getName();
+            if ($index < sizeof($newUsers)-1) {
+               $usersString .= ', '; 
+            }
         }
+        $messages[] = array('type'=>'info','content'=>Bdf\Utils::getText('User %1$s has been created. <a href="%2$s">Invite them ?</a>', $usersString, Bdf\Utils::makeUrl('my-account/send-invitation.html')));
         \Bdf\Session::getInstance()->add('messages',$messages);
         header('location: '.$event->getUrlDetail());
     } catch(Eu\Rmmt\Exception\UserInputException $e) {

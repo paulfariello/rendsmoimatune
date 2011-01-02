@@ -216,3 +216,11 @@ div.clear {
     line-height: 2em;
     margin: 0 10px 0 0;
 }
+
+#main span.invited-user {
+    float: left;
+    display: block;
+    width: 24px;
+    height: 24px;
+    background: url("../../px/default/snowish/24x24/actions/mail_new.png") transparent no-repeat center center;
+}

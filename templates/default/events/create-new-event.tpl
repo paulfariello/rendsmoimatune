@@ -5,7 +5,6 @@
 {include file='inc/side-nav-events.tpl'}
 <h2><a href="{makeUrl url='events/'}">{getText id='Events'}</a> &raquo; <a href="{makeUrl url='events/create-new-event.html'}">{getText id='New event'}</a></h2>
 {include file='inc/main.tpl'}
-{include file='inc/message.tpl'}
                 	<form action="{makeUrl url='events/create-new-event.html'}" class="jNice" method="post">
                       <fieldset>
                           <p><label for="name">{getText id='Name'}</label><input type="text" class="text-long" name="name" value="{if isset($_POST)}{$_POST.name|htmlspecialchars}{/if}" /></p>

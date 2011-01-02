@@ -368,9 +368,10 @@ h3 {
 	background: url(../../px/default/button-submit.gif) no-repeat left top;
 }
 
-.select {
+.select, #main fieldset .checkbox {
     float: left;
 }
+
 
 /* Footer ---------------------------------------- */
 

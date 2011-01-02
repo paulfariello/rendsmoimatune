@@ -29,3 +29,4 @@ RewriteRule    ^events/[a-z0-9-]*-([0-9]+)/create-new-repayment.html$           
 # My Account
 RewriteRule    ^my-account/$                                                                    my-account/index.php  [L]
 RewriteRule    ^my-account/merge-user-([0-9]+)-with-([0-9]+).html$                              my-account/mergeUsers.php?id1=$1&id2=$2 [L]
+RewriteRule    ^my-account/send-invitation.html$                                                my-account/send-invitation.php [L]

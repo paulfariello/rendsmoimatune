@@ -49,8 +49,8 @@ class User implements \Bdf\IUser
     private $_password;
     private $_firstName;
     private $_lastName;
-    private $_isAdmin    = false;
-    private $_registered = true;
+    private $_isAdmin           = false;
+    private $_registered        = true;
     private $_events;
     private $_payers;
     private $_beneficiaries;
@@ -58,6 +58,8 @@ class User implements \Bdf\IUser
     private $_repaymentsToMe;
     private $_creator;
     private $_facebookId;
+    private $_invited           = false;
+    private $_invitationToken   = null;
 
     /**
      * Constructeur
@@ -289,6 +291,29 @@ class User implements \Bdf\IUser
         }
 
         $em->remove($user); 
+    }
+
+    public function setInvited($invited)
+    {
+        $this->_invited = (boolean)$invited;
+    }
+
+    public function hasBeenInvited()
+    {
+        return $this->_invited;
+    }
+
+    public function generateInvitationToken()
+    {
+        $this->_invitationToken = uniqid();
+    }
+
+    public function getInvitationToken()
+    {
+        if (null == $this->_invitationToken) {
+            throw new \Exception('Invitation token must have been generated first');
+        }
+        return hash_hmac('sha256', $this->_invitationToken, $this->_id);
     }
 
 }
