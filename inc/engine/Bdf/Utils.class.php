@@ -139,6 +139,18 @@ class Utils
     }
 
     /**
+     * Protect a string from XSS
+     *
+     * @param string $str string to protect
+     *
+     * @return string the protected string
+     */
+    public static function htmlProtect($str)
+    {
+        return htmlspecialchars($str);
+    }
+
+    /**
      * Transforme un entier en taille d'octet
      */
     public static function intToByteQuantity($int)

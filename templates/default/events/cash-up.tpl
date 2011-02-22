@@ -4,7 +4,7 @@
 {include file='inc/js-includes/manage-expenditure-users.tpl'}
 {include file='inc/header.tpl'}
 {include file='inc/side-nav-events.tpl'}
-<h2><a href="{makeUrl url='events/'}">{getText id='Events'}</a> &raquo; <a href="{$currentEvent->getUrlDetail()}">{$currentEvent->getName()}</a> &raquo; <a href="{$currentEvent->getUrlCashUp()}">{getText id='Cash-up'}</a></h2>
+<h2><a href="{makeUrl url='events/'}">{getText id='Events'}</a> &raquo; <a href="{$currentEvent->getUrlDetail()}">{$currentEvent->getName()|htmlProtect}</a> &raquo; <a href="{$currentEvent->getUrlCashUp()}">{getText id='Cash-up'}</a></h2>
 {include file='inc/main.tpl'}
 <h3>{getText id='Balance of payments'}</h3>
 <h4 class="balance-due">
@@ -32,7 +32,7 @@
             </div>
         {/if}
     </div>
-    <div class="balance-name">{$user->getName()}</div>
+    <div class="balance-name">{$user->getName()|htmlProtect}</div>
 {/foreach}
 
 <h3>{getText id='Balancing'}</h3>

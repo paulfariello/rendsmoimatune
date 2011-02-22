@@ -4,7 +4,7 @@
 {include file='inc/js-includes/manage-repayment-users.tpl'}
 {include file='inc/header.tpl'}
 {include file='inc/side-nav-events.tpl'}
-<h2><a href="{makeUrl url='events/'}">{getText id='Events'}</a> &raquo; <a href="{$currentEvent->getUrlDetail()}">{$currentEvent->getName()}</a></h2>
+<h2><a href="{makeUrl url='events/'}">{getText id='Events'}</a> &raquo; <a href="{$currentEvent->getUrlDetail()}">{$currentEvent->getName()|htmlProtect}</a></h2>
 {include file='inc/main.tpl'}
 <h3>{getText id='New repayment'}</h3>
 <form action="{$currentEvent->getUrlNewRepayment()}" method="post" class="jNice">
@@ -17,8 +17,8 @@
             <input type="hidden" name="beneficiaryId" />
             <input type="text" class="text-medium beneficiary-name" rel="{makeUrl url='ajax/autocomplete-user.php'}" name="beneficiariesName[]" value="" />
         </p>
-        <p><label>{getText id='Amount'} :</label><input type="text" id="expenditure-amount" class="text-medium" name="amount" value="{if isset($_POST.amount)}{$_POST.amount|htmlentities}{/if}" /><span class="inter-input">€</span></p>
-        <p><label>{getText id='Date'} :</label><input type="text" class="text-medium date" name="date" value="{if isset($_POST.date)}{$_POST.date|htmlentities}{else}{date('m-d-Y')}{/if}" /></p>
+        <p><label>{getText id='Amount'} :</label><input type="text" id="expenditure-amount" class="text-medium" name="amount" value="{if isset($_POST.amount)}{$_POST.amount|htmlProtect}{/if}" /><span class="inter-input">€</span></p>
+        <p><label>{getText id='Date'} :</label><input type="text" class="text-medium date" name="date" value="{if isset($_POST.date)}{$_POST.date|htmlProtect}{else}{date('m-d-Y')}{/if}" /></p>
         <input type="submit" name="create-new-repayment" value="{getText id='Create'}" />
     </fieldset>
 </form>

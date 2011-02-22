@@ -53,7 +53,8 @@ class SmartyAdapter implements \Bdf\ITemplatesEngine
     );
     private $_modifiers      = array(
         'intToByteQuantity',
-        'isCurrentPage'
+        'isCurrentPage',
+        'htmlProtect'
     );
 
     /**
@@ -134,6 +135,19 @@ class SmartyAdapter implements \Bdf\ITemplatesEngine
     public function utilsIsCurrentPage($param)
     {
         return \Bdf\Utils::isCurrentPage($param);
+    }
+
+    /**
+     * Encapsulation de {@link \Bdf\Utils::htmlProtect()}
+     *
+     * @param array  $params @see \Bdf\Utils::htmlProtect()
+     * @param Smarty $smarty instance de Smarty
+     *
+     * @return @see \Bdf\Utils::htmlProtect()
+     */
+    public function utilsHtmlProtect($param)
+    {
+        return \Bdf\Utils::htmlProtect($param);
     }
 
     /**

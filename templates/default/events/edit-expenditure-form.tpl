@@ -1,9 +1,9 @@
 <h3>{getText id='Edit expenditure'}</h3>
 <form action="{$currentEvent->getUrlEditExpenditure($expenditure)}" method="post" class="jNice">
     <fieldset>
-        <p><label>{getText id='Title'} :</label><input type="text" class="text-long" name="title" value="{if isset($_POST.title)}{$_POST.title|htmlentities}{else}{$expenditure->getTitle()|htmlentities}{/if}" /></p>
-        <p><label>{getText id='Date'} :</label><input type="text" class="text-medium date" name="date" value="{if isset($_POST.date)}{$_POST.date|htmlentities}{else}{$expenditure->getDate()->format('m-d-Y')}{/if}" /></p>
-        <p><label>{getText id='Amount'} :</label><input type="text" id="expenditure-amount" class="text-medium" name="amount" value="{if isset($_POST.amount)}{$_POST.amount|htmlentities}{else}{$expenditure->getAmount()|htmlentities}{/if}" /></p>
+        <p><label>{getText id='Title'} :</label><input type="text" class="text-long" name="title" value="{if isset($_POST.title)}{$_POST.title|htmlProtect}{else}{$expenditure->getTitle()|htmlProtect}{/if}" /></p>
+        <p><label>{getText id='Date'} :</label><input type="text" class="text-medium date" name="date" value="{if isset($_POST.date)}{$_POST.date|htmlProtect}{else}{$expenditure->getDate()->format('m-d-Y')}{/if}" /></p>
+        <p><label>{getText id='Amount'} :</label><input type="text" id="expenditure-amount" class="text-medium" name="amount" value="{if isset($_POST.amount)}{$_POST.amount|htmlProtect}{else}{$expenditure->getAmount()|htmlProtect}{/if}" /></p>
         <!-- Beneficiaries -->
         <p><label>{getText id='Beneficiaries'} :</label></p>
         <div class="subfieldset">
@@ -21,8 +21,8 @@
                         <div>
                             <p class="inline-label"><label class="medium-inline">{getText id='Name'} :</label></p>
                             <p>
-                                <input type="hidden" name="beneficiariesId[]" value="{$_POST.beneficiariesId.{$index}|htmlentities}" />
-                                <input type="text" class="text-medium beneficiary-name" rel="{makeUrl url='ajax/autocomplete-user.php'}" name="beneficiariesName[]" value="{$beneficiaryName|htmlentities}" />
+                                <input type="hidden" name="beneficiariesId[]" value="{$_POST.beneficiariesId.{$index}|htmlProtect}" />
+                                <input type="text" class="text-medium beneficiary-name" rel="{makeUrl url='ajax/autocomplete-user.php'}" name="beneficiariesName[]" value="{$beneficiaryName|htmlProtect}" />
                                 <a href="#" class="remove-beneficiary"></a>
                             </p>
                         </div>
@@ -33,8 +33,8 @@
                     <div>
                         <p class="inline-label"><label class="medium-inline">{getText id='Name'} :</label></p>
                         <p>
-                            <input type="hidden" name="beneficiariesId[]" value="{$beneficiary->getUser()->getId()|htmlentities}" />
-                            <input type="text" class="text-medium beneficiary-name" rel="{makeUrl url='ajax/autocomplete-user.php'}" name="beneficiariesName[]" value="{$beneficiary->getUser()->getName()|htmlentities}" />
+                            <input type="hidden" name="beneficiariesId[]" value="{$beneficiary->getUser()->getId()}" />
+                            <input type="text" class="text-medium beneficiary-name" rel="{makeUrl url='ajax/autocomplete-user.php'}" name="beneficiariesName[]" value="{$beneficiary->getUser()->getName()|htmlProtect}" />
                             <a href="#" class="remove-beneficiary"></a>
                         </p>
                     </div>
@@ -64,9 +64,9 @@
                         <div>
                             <p class="inline-label"><label class="medium-inline">{getText id='Name'} :</label><label class="medium-inline">{getText id='Amount'} :</label></p>
                             <p>
-                                <input type="hidden" name="payersId[]" value="{$_POST.payersId.{$index}|htmlentities}" />
-                                <input type="text" class="text-medium payer-name" rel="{makeUrl url='ajax/autocomplete-user.php'}" name="payersName[]" value="{$payerName|htmlentities}" />
-                                <input type="text" class="text-medium" name="payersAmount[]" value="{$_POST.payersAmount.{$index}|htmlentities}" />
+                                <input type="hidden" name="payersId[]" value="{$_POST.payersId.{$index}|htmlProtect}" />
+                                <input type="text" class="text-medium payer-name" rel="{makeUrl url='ajax/autocomplete-user.php'}" name="payersName[]" value="{$payerName|htmlProtect}" />
+                                <input type="text" class="text-medium" name="payersAmount[]" value="{$_POST.payersAmount.{$index}|htmlProtect}" />
                                 <select name="payersMetric[]" class="select">
                                     <option value="%" {if $_POST.payersMetric.{$index} == '%'}selected="selected"{/if}>%</option>
                                     <option value="€" {if $_POST.payersMetric.{$index} == '€'}selected="selected"{/if}>€</option>
@@ -81,9 +81,9 @@
                     <div>
                         <p class="inline-label"><label class="medium-inline">{getText id='Name'} :</label><label class="medium-inline">{getText id='Amount'} :</label></p>
                         <p>
-                            <input type="hidden" name="payersId[]" value="{$payer->getUser()->getId()|htmlentities}" />
-                            <input type="text" class="text-medium payer-name" rel="{makeUrl url='ajax/autocomplete-user.php'}" name="payersName[]" value="{$payer->getUser()->getName()|htmlentities}" />
-                            <input type="text" class="text-medium" name="payersAmount[]" value="{$payer->getAmount()|htmlentities}" />
+                            <input type="hidden" name="payersId[]" value="{$payer->getUser()->getId()}" />
+                            <input type="text" class="text-medium payer-name" rel="{makeUrl url='ajax/autocomplete-user.php'}" name="payersName[]" value="{$payer->getUser()->getName()|htmlProtect}" />
+                            <input type="text" class="text-medium" name="payersAmount[]" value="{$payer->getAmount()|htmlProtect}" />
                             <select name="payersMetric[]" class="select">
                                 <option value="%">%</option>
                                 <option value="€" selected="selected">€</option>

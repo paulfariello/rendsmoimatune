@@ -12,7 +12,7 @@
                         </ul>
                     </li>
                 {else}
-                    <li><a href="{$event->getUrlDetail()}">{$event->getName()}</a></li>
+                    <li><a href="{$event->getUrlDetail()}">{$event->getName()|htmlProtect}</a></li>
                 {/if}
             {/foreach}
         {/if}
