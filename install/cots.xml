@@ -1,6 +1,7 @@
 <xml>
     <doctrine>
         <release name="2.0.0-BETA4" url="http://www.doctrine-project.org/downloads/DoctrineORM-2.0.0BETA4-full.tar.gz" md5sum="30f1bab35480e54161f56e03196bdfab" extractPath="doctrine-orm" />
+        <release name="2.0.1" url="http://www.doctrine-project.org/downloads/DoctrineORM-2.0.1-full.tar.gz" md5sum="078ab54e6a4d04910a2f3850ffa7208a" extractPath="doctrine-orm" />
     </doctrine>
     <templates>
         <engine name="smarty">
