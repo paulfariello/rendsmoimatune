@@ -74,14 +74,14 @@ if ($cots[0] instanceof SimpleXMLElement) {
     file_put_contents($fileName, file_get_contents($url));
 
     // Extract
-    if (md5_file($fileName) == $cots[0]->attributes()->md5sum) {
-        echo 'Extracting '.$fileName.' to '.$extractPath.'<br />';
-        PclTarExtract($fileName, $extractPath, $cots[0]->attributes()->extractPath);
-        echo 'Deleting '.$fileName.'<br />';
-        unlink($fileName);
-    } else {
-      echo "Error while downloading file<br />";
+    if (md5_file($fileName) != $cots[0]->attributes()->md5sum) {
+        echo "Error while downloading file<br />";
+        echo "Expecting md5 sum ".$cots[0]->attributes()->md5sum." but getting ".md5_file($fileName)."<br />";
     }
+    echo 'Extracting '.$fileName.' to '.$extractPath.'<br />';
+    PclTarExtract($fileName, $extractPath, $cots[0]->attributes()->extractPath);
+    echo 'Deleting '.$fileName.'<br />';
+    unlink($fileName);
 
 }
 ?>
