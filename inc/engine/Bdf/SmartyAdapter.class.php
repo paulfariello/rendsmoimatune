@@ -162,7 +162,7 @@ class SmartyAdapter implements \Bdf\ITemplatesEngine
             if (!$method->isConstructor() AND !$method->isDestructor() AND in_array($method->name, $this->_functions) AND substr($method->name, 0, 2) != "__") {
                 $methodName = "utils".ucfirst($method->name);
                 if (method_exists($this, $methodName)) {
-                    $this->_smartyInstance->register->templateFunction($method->name, array($this, $methodName));
+                    $this->_smartyInstance->registerPlugin("function", $method->name, array($this, $methodName));
                 } else {
                     \Bdf\Logger::getInstance()->error("La méthode ".$method->name." n'est pas definie dans SmartyAdapter->".$methodName);
                 }
@@ -184,7 +184,7 @@ class SmartyAdapter implements \Bdf\ITemplatesEngine
             if (!$method->isConstructor() AND !$method->isDestructor() AND in_array($method->name, $this->_modifiers) AND substr($method->name, 0, 2) != "__") {
                 $methodName = "utils".ucfirst($method->name);
                 if (method_exists($this, $methodName)) {
-                    $this->_smartyInstance->register->modifier($method->name, array($this, $methodName));
+                    $this->_smartyInstance->registerPlugin("modifier", $method->name, array($this, $methodName));
                 } else {
                     \Bdf\Logger::getInstance()->error("La méthode ".$method->name." n'est pas definie dans SmartyAdapter->".$methodName);
                 }
