@@ -57,7 +57,7 @@ function sendInvitation($email, $userId)
             $user->setInvited(true);
             $user->generateInvitationToken();
 
-            mail($email, $title, sprintf($message, $user->getName(), Bdf\Utils::makeUrl('join.html?id='.$user->getId().'&token='.$user->getInvitationToken()))); 
+            mail($email, $title, sprintf($message, $user->getName(), Bdf\Utils::makeUrl('new-account-invitation.html?id='.$user->getId().'&token='.$user->getInvitationToken()))); 
         }
     }
 
