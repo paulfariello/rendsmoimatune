@@ -139,6 +139,18 @@ class Utils
     }
 
     /**
+     * Protect a string from XSS
+     *
+     * @param string $str string to protect
+     *
+     * @return string the protected string
+     */
+    public static function htmlProtect($str)
+    {
+        return htmlspecialchars($str);
+    }
+
+    /**
      * Transforme un entier en taille d'octet
      */
     public static function intToByteQuantity($int)
@@ -333,6 +345,11 @@ class Utils
         }
 
         return $string;
+    }
+
+    public static function moneyFormat($amount)
+    {
+        return money_format('%#5.2n €', $amount);
     }
 
     /**

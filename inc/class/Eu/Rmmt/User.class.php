@@ -316,4 +316,21 @@ class User implements \Bdf\IUser
         return hash_hmac('sha256', $this->_invitationToken, $this->_id);
     }
 
+    public function getCreatedUsers()
+    {
+        $em = Core::getInstance()->getEntityManager();
+        return $em->createQuery('SELECT u FROM Eu\Rmmt\User u INNER JOIN u._creator c WHERE c._id = :userId')->setParameter('userId', $this->_id)->getResult();
+    }
+
+    public function delete()
+    {
+        $em = Core::getInstance()->getEntityManager();
+        $currentUser = User::getCurrentUser(); 
+        if ( ! $currentUser->equals($this->getCreator()) ) {
+            throw new MergeException(Utils::getText('You must be creator of user in order to merge it'));
+        }
+
+        $em->remove($this);
+    }
+
 }

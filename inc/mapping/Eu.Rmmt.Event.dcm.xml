@@ -10,8 +10,16 @@
         <field name="_startDate"   column="start_date"   type="date"   />
         <field name="_endDate"    column="end_date"     type="date"   />
 
-        <one-to-many target-entity="Repayment"   field="_repayments"   mapped-by="_event" />
-        <one-to-many target-entity="Expenditure" field="_expenditures" mapped-by="_event" />
+        <one-to-many target-entity="Repayment"   field="_repayments"   mapped-by="_event">
+            <order-by>
+                <order-by-field name="_date" direction="DESC" />
+            </order-by>
+        </one-to-many>
+        <one-to-many target-entity="Expenditure" field="_expenditures" mapped-by="_event">
+            <order-by>
+                <order-by-field name="_date" direction="DESC" />
+            </order-by>
+        </one-to-many>
 
         <many-to-many target-entity="User" field="_users" inversed-by="_events" >
             <join-table name="event_user">

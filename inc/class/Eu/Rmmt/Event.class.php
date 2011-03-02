@@ -92,9 +92,13 @@ class Event
         $this->_endDate = $endDate;
     }
 
-    public function getExpenditures()
+    public function getExpenditures($limit = null)
     {
-        return $this->_expenditures;
+        if (null != $limit) {
+            return $this->_expenditures->slice(0, $limit);
+        } else {
+            return $this->_expenditures;
+        }
     }
 
     public function addExpenditure(Expenditure $expenditure)
@@ -124,9 +128,13 @@ class Event
         $this->_users->removeElement($user);
     }
 
-    public function getRepayments()
+    public function getRepayments($limit = null)
     {
-        return $this->_repayments;
+        if (null != $limit) {
+            return $this->_repayments->slice(0, $limit);
+        } else {
+            return $this->_repayments;
+        }
     }
 
     public function addRepayments(Repayment $repayment)
@@ -167,20 +175,65 @@ class Event
 
     }
 
-    public function getBalance(User $user)
+    public function getPayedAmount(User $user)
     {
         $em = \Bdf\Core::getInstance()->getEntityManager();
         $query = $em->createQuery("SELECT sum(p._amount) FROM \Eu\Rmmt\Payer p INNER JOIN p._expenditure ex INNER JOIN ex._event e INNER JOIN p._user u WHERE u._id = :user AND e._id = :event");
         $query->setParameter("user", $user->getId());
         $query->setParameter("event", $this->getId());
-        $payed = $query->getSingleScalarResult();
+        $payedAmount = $query->getSingleScalarResult();
+        if(null == $payedAmount) {
+            return 0;
+        } else {
+            return $payedAmount;
+        }
+    }
 
+
+    public function getOwesAmount(User $user)
+    {
+        $em = \Bdf\Core::getInstance()->getEntityManager();
         $query = $em->createQuery("SELECT sum(b._amount) FROM \Eu\Rmmt\Beneficiary b INNER JOIN b._expenditure ex INNER JOIN ex._event e INNER JOIN b._user u WHERE u._id = :user AND e._id = :event");
         $query->setParameter("user", $user->getId());
         $query->setParameter("event", $this->getId());
-        $owes = $query->getSingleScalarResult();
+        $owesAmount = $query->getSingleScalarResult();
+        if(null == $owesAmount) {
+            return 0;
+        } else {
+            return $owesAmount;
+        }
+    }
 
-        return $payed - $owes;
+    public function getMaxPayedAmount()
+    {
+        $em = \Bdf\Core::getInstance()->getEntityManager();
+        $query = $em->createQuery("SELECT sum(p._amount) as payed FROM \Eu\Rmmt\Payer p INNER JOIN p._expenditure ex INNER JOIN ex._event e INNER JOIN p._user u WHERE e._id = :event GROUP BY u._id ORDER BY payed DESC")->setMaxResults(1);
+        $query->setParameter("event", $this->getId());
+        $maxPayedAmout = $query->getSingleScalarResult();
+        if(null == $maxPayedAmout) {
+            return 0;
+        } else {
+            return $maxPayedAmout;
+        }
+
+    }
+
+    public function getMaxOwesAmount()
+    {
+        $em = \Bdf\Core::getInstance()->getEntityManager();
+        $query = $em->createQuery("SELECT sum(b._amount) as owes FROM \Eu\Rmmt\Beneficiary b INNER JOIN b._expenditure ex INNER JOIN ex._event e INNER JOIN b._user u WHERE e._id = :event GROUP BY u._id ORDER BY owes DESC")->setMaxResults(1);
+        $query->setParameter("event", $this->getId());
+        $maxOwesAmout = $query->getSingleScalarResult();
+        if(null == $maxOwesAmout) {
+            return 0;
+        } else {
+            return $maxOwesAmout;
+        }
+    }
+
+    public function getBalance(User $user)
+    {
+        return $this->getPayedAmount($user) - $this->getOwesAmount($user);
     }
 
     public function getTotalExpenditure() {
@@ -199,6 +252,16 @@ class Event
     public function getUrlDetail()
     {
         return Utils::makeUrl('events/'.Utils::urlize($this->_name).'-'.$this->_id.'/');
+    }
+
+    public function getUrlExpendituresList()
+    {
+        return Utils::makeUrl('events/'.Utils::urlize($this->_name).'-'.$this->_id.'/expenditures-list.html');
+    }
+
+    public function getUrlRepaymentsList()
+    {
+        return Utils::makeUrl('events/'.Utils::urlize($this->_name).'-'.$this->_id.'/repayments-list.html');
     }
 
     public function getUrlNewExpenditure()
