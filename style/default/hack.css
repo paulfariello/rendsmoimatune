@@ -5,6 +5,12 @@
 .msg.done {background:url("../../px/default/snowish/24x24/actions/gtk-apply.png") 10px 50% no-repeat; border:2px solid #BBDF8D; background-color:#EAF7D9;}
 .msg.error {background:url("../../px/default/snowish/24x24/status/dialog-error.png") 10px 50% no-repeat; border:2px solid #FFAEAE; background-color:#FEEBEB;}
 
+.money {
+    text-align: right;
+    display: block;
+    width: 100%;
+}
+
 #main label.float-left {
     float:left;
     line-height:25px;

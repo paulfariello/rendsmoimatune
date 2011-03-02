@@ -3,6 +3,11 @@
         <tr>
             <td>
                 {$expenditure->getTitle()|htmlProtect}
+            </td> 
+            <td>
+                <span class="money">{$expenditure->getAmount()|moneyFormat}</span>
+            </td> 
+            <td>
                 {if $expenditure->getPayers()->count() > 0}
                     <span class="payers">
                         {getText id='Payers'} :

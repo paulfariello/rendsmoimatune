@@ -54,7 +54,8 @@ class SmartyAdapter implements \Bdf\ITemplatesEngine
     private $_modifiers      = array(
         'intToByteQuantity',
         'isCurrentPage',
-        'htmlProtect'
+        'htmlProtect',
+        'moneyFormat'
     );
 
     /**
@@ -135,6 +136,19 @@ class SmartyAdapter implements \Bdf\ITemplatesEngine
     public function utilsIsCurrentPage($param)
     {
         return \Bdf\Utils::isCurrentPage($param);
+    }
+
+    /**
+     * Encapsulation de {@link \Bdf\Utils::moneyFormat()}
+     *
+     * @param array  $params @see \Bdf\Utils::moneyFormat()
+     * @param Smarty $smarty instance de Smarty
+     *
+     * @return @see \Bdf\Utils::moneyFormat()
+     */
+    public function utilsMoneyFormat($param)
+    {
+        return \Bdf\Utils::moneyFormat($param);
     }
 
     /**

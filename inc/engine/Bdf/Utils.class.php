@@ -347,6 +347,11 @@ class Utils
         return $string;
     }
 
+    public static function moneyFormat($amount)
+    {
+        return money_format('%#5.2n €', $amount);
+    }
+
     /**
      * Transforme une chaine de caractère en une chaine utilisable dans une url
      */
