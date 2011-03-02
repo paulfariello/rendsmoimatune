@@ -17,6 +17,6 @@ along with Rendsmoimatune.  If not, see <http://www.gnu.org/licenses/>.
 window.addEvent("domready", function()
 {
     new DatePicker($$('input.date'), {
-        inputOutputFormat: 'm-d-Y'
+        inputOutputFormat: 'd-m-Y'
     });
 });

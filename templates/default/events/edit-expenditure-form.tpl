@@ -2,7 +2,7 @@
 <form action="{$currentEvent->getUrlEditExpenditure($expenditure)}" method="post" class="jNice">
     <fieldset>
         <p><label>{getText id='Title'} :</label><input type="text" class="text-long" name="title" value="{if isset($_POST.title)}{$_POST.title|htmlProtect}{else}{$expenditure->getTitle()|htmlProtect}{/if}" /></p>
-        <p><label>{getText id='Date'} :</label><input type="text" class="text-medium date" name="date" value="{if isset($_POST.date)}{$_POST.date|htmlProtect}{else}{$expenditure->getDate()->format('m-d-Y')}{/if}" /></p>
+        <p><label>{getText id='Date'} :</label><input type="text" class="text-medium date" name="date" value="{if isset($_POST.date)}{$_POST.date|htmlProtect}{else}{$expenditure->getDate()->format('d-m-Y')}{/if}" /></p>
         <p><label>{getText id='Amount'} :</label><input type="text" id="expenditure-amount" class="text-medium" name="amount" value="{if isset($_POST.amount)}{$_POST.amount|htmlProtect}{else}{$expenditure->getAmount()|htmlProtect}{/if}" /></p>
         <!-- Beneficiaries -->
         <p><label>{getText id='Beneficiaries'} :</label></p>
