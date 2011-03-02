@@ -21,6 +21,7 @@
 #main span.payers, #main span.beneficiaries {
     font-size: 75%;
     color: grey;
+    line-height: normal;
 }
 
 #main span.payers:hover, #main span.beneficiaries:hover {

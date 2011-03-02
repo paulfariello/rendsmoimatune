@@ -271,6 +271,7 @@ h3 {
 	height: 29px;
 	line-height: 29px;
 	border-bottom: 1px solid #ddd;
+    min-width: 5em;
 }
 
 #main table tr.odd td {
