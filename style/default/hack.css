@@ -81,19 +81,231 @@
 }
 
 /** Balance */
-#main div.balance-due, #main div.balance-name, #main div.balance-payed, #main div.balance-bar {
+#main div.balance-due, #main div.balance-name, #main div.balance-payed, #main div.balance-bar, #main div.summary-name, #main div.summary-payed-amount, #main div.summary-owes-amount {
     height: 2em;
 }
 
-#main div.balance-due, #main div.balance-payed {
+#main div.balance-due, #main div.balance-payed, #main div.summary-payed-amount, #main div.summary-owes-amount {
     width: 40%;
 }
 
-#main div.balance-amount, #main div.balance-name {
+#main div.summary-name {
+    width: 20%;
+    margin-bottom: 0.5em;
+    float: left;
+}
+
+#main div.summary-payed-amount {
+    float: right;
+}
+
+#main div.summary-owes-amount {
+    float: left;
+}
+
+#main div.balance-bar.gradient-100 {
+    width: 100%;
+    background-color: rgb(  0,208,  0);
+    background-color: rgb(  0,165,  0);
+    background: -webkit-gradient(
+        linear,
+        left top,
+        left bottom,
+        color-stop(0, rgb(  0,208,  0)),
+        color-stop(1, rgb(  0,165,  0))
+    );
+    background: -moz-linear-gradient(
+        center top,
+        rgb(  0,208,  0) 0%,
+        rgb(  0,165,  0) 100%
+    );
+}
+
+#main div.balance-bar.gradient-90 {
+    width: 90%;
+    background-color: rgb( 26,197,  7);
+    background-color: rgb( 26,151,  0);
+    background: -webkit-gradient(
+        linear,
+        left top,
+        left bottom,
+        color-stop(0, rgb( 26,197,  7)),
+        color-stop(1, rgb( 26,151,  0))
+    );
+    background: -moz-linear-gradient(
+        center top,
+        rgb( 26,197,  7) 0%,
+        rgb( 26,151,  0) 100%
+    );
+}
+
+#main div.balance-bar.gradient-80 {
+    width: 80%;
+    background-color: rgb( 52,186, 13);
+    background-color: rgb( 52,138,  0);
+    background: -webkit-gradient(
+        linear,
+        left top,
+        left bottom,
+        color-stop(0, rgb( 52,186, 13)),
+        color-stop(1, rgb( 52,138,  0))
+    );
+    background: -moz-linear-gradient(
+        center top,
+        rgb( 52,186, 13) 0%,
+        rgb( 52,138,  0) 100%
+    );
+}
+
+#main div.balance-bar.gradient-70 {
+    width: 70%;
+    background-color: rgb( 78,175, 20);
+    background-color: rgb( 78,124,  0);
+    background: -webkit-gradient(
+        linear,
+        left top,
+        left bottom,
+        color-stop(0, rgb( 78,175, 20)),
+        color-stop(1, rgb( 78,124,  0))
+    );
+    background: -moz-linear-gradient(
+        center top,
+        rgb( 78,175, 20) 0%,
+        rgb( 78,124,  0) 100%
+    );
+}
+
+#main div.balance-bar.gradient-60 {
+    width: 60%;
+    background-color: rgb(104,164, 26);
+    background-color: rgb(104,110,  0);
+    background: -webkit-gradient(
+        linear,
+        left top,
+        left bottom,
+        color-stop(0, rgb(104,164, 26)),
+        color-stop(1, rgb(104,110,  0))
+    );
+    background: -moz-linear-gradient(
+        center top,
+        rgb(104,164, 26) 0%,
+        rgb(104,110,  0) 100%
+    );
+}
+
+#main div.balance-bar.gradient-50 {
+    width: 50%;
+    background-color: rgb(130,153, 33);
+    background-color: rgb(130, 97,  0);
+    background: -webkit-gradient(
+        linear,
+        left top,
+        left bottom,
+        color-stop(0, rgb(130,153, 33)),
+        color-stop(1, rgb(130, 97,  0))
+    );
+    background: -moz-linear-gradient(
+        center top,
+        rgb(130,153, 33) 0%,
+        rgb(130, 97,  0) 100%
+    );
+}
+
+#main div.balance-bar.gradient-40 {
+    width: 40%;
+    background-color: rgb(155,142, 39);
+    background-color: rgb(155, 83,  0);
+    background: -webkit-gradient(
+        linear,
+        left top,
+        left bottom,
+        color-stop(0, rgb(155,142, 39)),
+        color-stop(1, rgb(155, 83,  0))
+    );
+    background: -moz-linear-gradient(
+        center top,
+        rgb(155,142, 39) 0%,
+        rgb(155, 83,  0) 100%
+    );
+}
+
+#main div.balance-bar.gradient-30 {
+    width: 30%;
+    background-color: rgb(180,131, 46);
+    background-color: rgb(180, 69,  0);
+    background: -webkit-gradient(
+        linear,
+        left top,
+        left bottom,
+        color-stop(0, rgb(180,131, 46)),
+        color-stop(1, rgb(180, 69,  0))
+    );
+    background: -moz-linear-gradient(
+        center top,
+        rgb(180,131, 46) 0%,
+        rgb(180, 69,  0) 100%
+    );
+}
+
+#main div.balance-bar.gradient-20 {
+    width: 20%;
+    background-color: rgb(205,120, 52);
+    background-color: rgb(205, 55,  0);
+    background: -webkit-gradient(
+        linear,
+        left top,
+        left bottom,
+        color-stop(0, rgb(205,120, 52)),
+        color-stop(1, rgb(205, 55,  0))
+    );
+    background: -moz-linear-gradient(
+        center top,
+        rgb(205,120, 52) 0%,
+        rgb(205, 55,  0) 100%
+    );
+}
+
+#main div.balance-bar.gradient-10 {
+    width: 10%;
+    background-color: rgb(230,109, 59);
+    background-color: rgb(230, 42,  0);
+    background: -webkit-gradient(
+        linear,
+        left top,
+        left bottom,
+        color-stop(0, rgb(230,109, 59)),
+        color-stop(1, rgb(230, 42,  0))
+    );
+    background: -moz-linear-gradient(
+        center top,
+        rgb(230,109, 59) 0%,
+        rgb(230, 42,  0) 100%
+    );
+}
+
+#main div.balance-bar.gradient-0 {
+    width: 2em;
+    background-color: rgb(255, 98, 65);
+    background-color: rgb(255, 28,  0);
+    background: -webkit-gradient(
+        linear,
+        left top,
+        left bottom,
+        color-stop(0, rgb(255, 98, 65)),
+        color-stop(1, rgb(255, 28,  0))
+    );
+    background: -moz-linear-gradient(
+        center top,
+        rgb(255, 98, 65) 0%,
+        rgb(255, 28,  0) 100%
+    );
+}
+
+#main div.balance-amount, #main div.balance-name,#main div.summary-amount, #main div.summary-name {
     line-height: 2em;
 }
 
-#main div.balance-bar, #main h4.balance-payed, #main h4.balance-due {
+#main div.balance-bar, #main h4.balance-payed, #main h4.balance-due, #main h4.summary-owes, #main h4.summary-payed {
   -moz-border-radius: 5px;
 	-webkit-border-radius: 5px;
 	-moz-box-shadow: 0 1px 3px rgba(0,0,0,0.5);
@@ -113,7 +325,7 @@
     float: left;
 }
 
-#main div.balance-due div.balance-bar, #main h4.balance-due {
+#main div.balance-due div.balance-bar, #main h4.balance-due, #main h4.summary-owes {
     background-color: #FF1B00;
     background: -webkit-gradient(
         linear,
@@ -130,11 +342,11 @@
     float: right;
 }
 
-#main div.balance-due div.balance-amount {
+#main div.balance-due div.balance-amount, #main div.summary-owes-amount div.balance-bar {
     float: right;
 }
 
-#main div.balance-name {
+#main div.balance-name, #main div.summary-name {
     width: 20%;
     margin: auto;
     margin-bottom: 0.5em;
@@ -145,7 +357,7 @@
     float: right;
 }
 
-#main div.balance-payed div.balance-bar, #main h4.balance-payed {
+#main div.balance-payed div.balance-bar, #main h4.balance-payed, #main h4.summary-payed {
     background-color: #00A400;
     background: -webkit-gradient(
         linear,
@@ -166,17 +378,17 @@
     float: left;
 }
 
-#main h4.balance-payed, #main h4.balance-due {
+#main h4.balance-payed, #main h4.balance-due, #main h4.summary-payed, #main h4.summary-owes {
     width: 40%;
     display: block;
     margin-bottom: 1em;
 }
 
-#main h4.balance-payed {
+#main h4.balance-payed, #main h4.summary-payed {
     float: right;
 }
 
-#main h4.balance-due {
+#main h4.balance-due, #main h4.summary-owes {
     float: left;
 }
 
