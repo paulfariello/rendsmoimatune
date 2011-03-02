@@ -188,11 +188,18 @@ if (!isset($_POST['edit-expenditure'])) {
         }
 
         // Calculate amount due per user
-        $amountPerBeneficiary = $expenditure->getAmount() / count($beneficiaries);
+        $amountPerBeneficiary = round($expenditure->getAmount() / count($beneficiaries), 2);
 
+        $amountOwed = $expenditure->getAmount();
         foreach($beneficiaries as $index=>$beneficiary) {
+            $amountOwed = round($amountOwed - $amountPerBeneficiary, 2);
             $beneficiary->setAmount($amountPerBeneficiary);
         }
+
+        #We let the last guy take the remaining amount owed it for its own. It happens when total amount isn't divisible by number of beneficiaries.
+        #Note that remaining amount can be negative.
+        $beneficiary->setAmount($amountPerBeneficiary + $amountOwed);
+
         $expenditure->updateBeneficiaries($beneficiaries);
 
         $em->flush();
