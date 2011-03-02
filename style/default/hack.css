@@ -305,7 +305,7 @@
     line-height: 2em;
 }
 
-#main div.balance-bar, #main h4.balance-payed, #main h4.balance-due, #main h4.summary-owes, #main h4.summary-payed {
+#main div.balance-bar, #main h4.balance-payed, #main h4.balance-due {
   -moz-border-radius: 5px;
 	-webkit-border-radius: 5px;
 	-moz-box-shadow: 0 1px 3px rgba(0,0,0,0.5);
@@ -321,11 +321,15 @@
   overflow: visible;
 }
 
+#main h4.summary-owes, #main h4.summary-payed {
+  text-align: center;
+}
+
 #main div.balance-due {
     float: left;
 }
 
-#main div.balance-due div.balance-bar, #main h4.balance-due, #main h4.summary-owes {
+#main div.balance-due div.balance-bar, #main h4.balance-due {
     background-color: #FF1B00;
     background: -webkit-gradient(
         linear,
@@ -357,7 +361,7 @@
     float: right;
 }
 
-#main div.balance-payed div.balance-bar, #main h4.balance-payed, #main h4.summary-payed {
+#main div.balance-payed div.balance-bar, #main h4.balance-payed {
     background-color: #00A400;
     background: -webkit-gradient(
         linear,
