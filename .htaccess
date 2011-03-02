@@ -1,6 +1,6 @@
 Options +FollowSymLinks
 RewriteEngine On
-RewriteBase /beta/
+RewriteBase /dev/
 RewriteRule    ^sign-in.html$                                                                   sign-in.php [L]
 RewriteRule    ^sign-out.html$                                                                  sign-out.php [L]
 RewriteRule    ^new-account.html$                                                               new-account.php [L]
@@ -18,11 +18,13 @@ RewriteRule    ^events/[a-z0-9-]*-([0-9]+)/$                                    
 RewriteRule    ^events/[a-z0-9-]*-([0-9]+)/cash-up.html$                                        events/cash-up.php?event-id=$1 [L]
 
 # Expenditure
+RewriteRule    ^events/[a-z0-9-]*-([0-9]+)/expenditures-list.html$                              events/expenditures-list.php?event-id=$1 [L]
 RewriteRule    ^events/[a-z0-9-]*-([0-9]+)/create-new-expenditure.html$                         events/create-new-expenditure.php?event-id=$1 [L]
 RewriteRule    ^events/[a-z0-9-]*-([0-9]+)/expenditure/edit-[a-z0-9-]*-([0-9]+).html$           events/edit-expenditure.php?event-id=$1&expenditure-id=$2 [L]
 RewriteRule    ^events/[a-z0-9-]*-([0-9]+)/expenditure/delete-[a-z0-9-]*-([0-9]+).html$         events/delete-expenditure.php?event-id=$1&expenditure-id=$2 [L]
 
 # Repayment
+RewriteRule    ^events/[a-z0-9-]*-([0-9]+)/repayments-list.html$                                events/repayments-list.php?event-id=$1 [L]
 RewriteRule    ^events/[a-z0-9-]*-([0-9]+)/create-new-repayment.html$                           events/create-new-repayment.php?event-id=$1 [L]
 
 

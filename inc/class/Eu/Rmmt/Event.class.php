@@ -92,9 +92,13 @@ class Event
         $this->_endDate = $endDate;
     }
 
-    public function getExpenditures()
+    public function getExpenditures($limit = null)
     {
-        return $this->_expenditures;
+        if (null != $limit) {
+            return $this->_expenditures->slice(0, $limit);
+        } else {
+            return $this->_expenditures;
+        }
     }
 
     public function addExpenditure(Expenditure $expenditure)
@@ -124,9 +128,13 @@ class Event
         $this->_users->removeElement($user);
     }
 
-    public function getRepayments()
+    public function getRepayments($limit = null)
     {
-        return $this->_repayments;
+        if (null != $limit) {
+            return $this->_repayments->slice(0, $limit);
+        } else {
+            return $this->_repayments;
+        }
     }
 
     public function addRepayments(Repayment $repayment)
@@ -244,6 +252,16 @@ class Event
     public function getUrlDetail()
     {
         return Utils::makeUrl('events/'.Utils::urlize($this->_name).'-'.$this->_id.'/');
+    }
+
+    public function getUrlExpendituresList()
+    {
+        return Utils::makeUrl('events/'.Utils::urlize($this->_name).'-'.$this->_id.'/expenditures-list.html');
+    }
+
+    public function getUrlRepaymentsList()
+    {
+        return Utils::makeUrl('events/'.Utils::urlize($this->_name).'-'.$this->_id.'/repayments-list.html');
     }
 
     public function getUrlNewExpenditure()
