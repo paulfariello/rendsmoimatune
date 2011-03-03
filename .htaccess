@@ -1,6 +1,6 @@
 Options +FollowSymLinks
 RewriteEngine On
-RewriteBase /dev/
+RewriteBase /rendsmoimatune/
 RewriteRule    ^sign-in.html$                                                                   sign-in.php [L]
 RewriteRule    ^sign-out.html$                                                                  sign-out.php [L]
 RewriteRule    ^new-account.html$                                                               new-account.php [L]
@@ -12,25 +12,25 @@ RewriteRule    ^authentication/facebook.html$                                   
 # Dashboard
 RewriteRule    ^dashboard/$                                                                     index.php  [L]
 
-# Events
-RewriteRule    ^events/$                                                                        events/index.php  [L]
-RewriteRule    ^events/create-new-event.html$                                                   events/create-new-event.php [L]
-RewriteRule    ^events/[a-z0-9-]*-([0-9]+)/$                                                    events/event.php?id=$1 [L]
-RewriteRule    ^events/[a-z0-9-]*-([0-9]+)/cash-up.html$                                        events/cash-up.php?event-id=$1 [L]
+# my-accounts
+RewriteRule    ^my-accounts/$                                                                   my-accounts/index.php  [L]
+RewriteRule    ^my-accounts/create-new-account.html$                                              my-accounts/create-new-account.php [L]
+RewriteRule    ^my-accounts/[a-z0-9-]*-([0-9]+)/$                                               my-accounts/account.php?id=$1 [L]
+RewriteRule    ^my-accounts/[a-z0-9-]*-([0-9]+)/cash-up.html$                                   my-accounts/cash-up.php?account-id=$1 [L]
 
 # Expenditure
-RewriteRule    ^events/[a-z0-9-]*-([0-9]+)/expenditures-list.html$                              events/expenditures-list.php?event-id=$1 [L]
-RewriteRule    ^events/[a-z0-9-]*-([0-9]+)/create-new-expenditure.html$                         events/create-new-expenditure.php?event-id=$1 [L]
-RewriteRule    ^events/[a-z0-9-]*-([0-9]+)/expenditure/edit-[a-z0-9-]*-([0-9]+).html$           events/edit-expenditure.php?event-id=$1&expenditure-id=$2 [L]
-RewriteRule    ^events/[a-z0-9-]*-([0-9]+)/expenditure/delete-[a-z0-9-]*-([0-9]+).html$         events/delete-expenditure.php?event-id=$1&expenditure-id=$2 [L]
+RewriteRule    ^my-accounts/[a-z0-9-]*-([0-9]+)/expenditures-list.html$                         my-accounts/expenditures-list.php?account-id=$1 [L]
+RewriteRule    ^my-accounts/[a-z0-9-]*-([0-9]+)/create-new-expenditure.html$                    my-accounts/create-new-expenditure.php?account-id=$1 [L]
+RewriteRule    ^my-accounts/[a-z0-9-]*-([0-9]+)/expenditure/edit-[a-z0-9-]*-([0-9]+).html$      my-accounts/edit-expenditure.php?account-id=$1&expenditure-id=$2 [L]
+RewriteRule    ^my-accounts/[a-z0-9-]*-([0-9]+)/expenditure/delete-[a-z0-9-]*-([0-9]+).html$    my-accounts/delete-expenditure.php?account-id=$1&expenditure-id=$2 [L]
 
 # Repayment
-RewriteRule    ^events/[a-z0-9-]*-([0-9]+)/repayments-list.html$                                events/repayments-list.php?event-id=$1 [L]
-RewriteRule    ^events/[a-z0-9-]*-([0-9]+)/create-new-repayment.html$                           events/create-new-repayment.php?event-id=$1 [L]
+RewriteRule    ^my-accounts/[a-z0-9-]*-([0-9]+)/repayments-list.html$                           my-accounts/repayments-list.php?account-id=$1 [L]
+RewriteRule    ^my-accounts/[a-z0-9-]*-([0-9]+)/create-new-repayment.html$                      my-accounts/create-new-repayment.php?account-id=$1 [L]
 
 
 # My Account
-RewriteRule    ^my-account/$                                                                    my-account/index.php  [L]
-RewriteRule    ^my-account/manage-users.html$                                                   my-account/manageUsers.php [L]
-RewriteRule    ^my-account/merge-user-([0-9]+)-with-([0-9]+).html$                              my-account/mergeUsers.php?id1=$1&id2=$2 [L]
-RewriteRule    ^my-account/send-invitation.html$                                                my-account/send-invitation.php [L]
+RewriteRule    ^my-parameters/$                                                                 my-parameters/index.php  [L]
+RewriteRule    ^my-parameters/manage-users.html$                                                my-parameters/manageUsers.php [L]
+RewriteRule    ^my-parameters/merge-user-([0-9]+)-with-([0-9]+).html$                           my-parameters/mergeUsers.php?id1=$1&id2=$2 [L]
+RewriteRule    ^my-parameters/send-invitation.html$                                             my-parameters/send-invitation.php [L]

@@ -251,42 +251,42 @@ class Event
 
     public function getUrlDetail()
     {
-        return Utils::makeUrl('events/'.Utils::urlize($this->_name).'-'.$this->_id.'/');
+        return Utils::makeUrl('my-accounts/'.Utils::urlize($this->_name).'-'.$this->_id.'/');
     }
 
     public function getUrlExpendituresList()
     {
-        return Utils::makeUrl('events/'.Utils::urlize($this->_name).'-'.$this->_id.'/expenditures-list.html');
+        return Utils::makeUrl('my-accounts/'.Utils::urlize($this->_name).'-'.$this->_id.'/expenditures-list.html');
     }
 
     public function getUrlRepaymentsList()
     {
-        return Utils::makeUrl('events/'.Utils::urlize($this->_name).'-'.$this->_id.'/repayments-list.html');
+        return Utils::makeUrl('my-accounts/'.Utils::urlize($this->_name).'-'.$this->_id.'/repayments-list.html');
     }
 
     public function getUrlNewExpenditure()
     {
-        return Utils::makeUrl('events/'.Utils::urlize($this->_name).'-'.$this->_id.'/create-new-expenditure.html');
+        return Utils::makeUrl('my-accounts/'.Utils::urlize($this->_name).'-'.$this->_id.'/create-new-expenditure.html');
     }
 
     public function getUrlNewRepayment()
     {
-        return Utils::makeUrl('events/'.Utils::urlize($this->_name).'-'.$this->_id.'/create-new-repayment.html');
+        return Utils::makeUrl('my-accounts/'.Utils::urlize($this->_name).'-'.$this->_id.'/create-new-repayment.html');
     }
 
     public function getUrlDeleteExpenditure(Expenditure $expenditure)
     {
-        return Utils::makeUrl('events/'.Utils::urlize($this->_name).'-'.$this->_id.'/expenditure/delete-'.Utils::urlize($expenditure->getTitle()).'-'.$expenditure->getId().'.html');
+        return Utils::makeUrl('my-accounts/'.Utils::urlize($this->_name).'-'.$this->_id.'/expenditure/delete-'.Utils::urlize($expenditure->getTitle()).'-'.$expenditure->getId().'.html');
     }
 
     public function getUrlEditExpenditure(Expenditure $expenditure)
     {
-        return Utils::makeUrl('events/'.Utils::urlize($this->_name).'-'.$this->_id.'/expenditure/edit-'.Utils::urlize($expenditure->getTitle()).'-'.$expenditure->getId().'.html');
+        return Utils::makeUrl('my-accounts/'.Utils::urlize($this->_name).'-'.$this->_id.'/expenditure/edit-'.Utils::urlize($expenditure->getTitle()).'-'.$expenditure->getId().'.html');
     }
 
     public function getUrlCashUp()
     {
-        return Utils::makeUrl('events/'.Utils::urlize($this->_name).'-'.$this->_id.'/cash-up.html');
+        return Utils::makeUrl('my-accounts/'.Utils::urlize($this->_name).'-'.$this->_id.'/cash-up.html');
     }
 
 }

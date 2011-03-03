@@ -73,7 +73,7 @@ if (isset($_POST['create-new-account-from-invitation'])) {
         $te->assign('user', $user);
         $te->display('new-account-from-invitation');
     } catch(Exception $e) {
-        $te->assign('currentEvent',$event);
+        $te->assign('currentAccount',$event);
         $te->assign('_POST',$_POST);
         $te->assign('messages', array(array('type'=>'error','content'=>$e->getMessage())));
         $te->display('error');

@@ -83,7 +83,7 @@ h1 span { display: none; }
     margin-left:5px;
 }
 
-#mainNav li a.events {
+#mainNav li a.my-accounts {
     background-image: url("../../px/default/snowish/24x24/apps/kedit.png");
     background-position: left center;
     background-repeat: no-repeat;
@@ -92,7 +92,7 @@ h1 span { display: none; }
     margin-left:5px;
 }
 
-#mainNav li a.my-account {
+#mainNav li a.my-parameters {
     background-image: url("../../px/default/snowish/24x24/apps/gnome-control-center.png");
     background-position: left center;
     background-repeat: no-repeat;
