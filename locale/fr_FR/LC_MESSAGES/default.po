@@ -20,11 +20,11 @@ msgstr "TABLEAU DE BORD"
 msgid "Dashboard"
 msgstr "Tableau de bord"
 
-msgid "Events"
-msgstr "Événements"
+msgid "My accounts"
+msgstr "Mes comptes"
 
-msgid "New event"
-msgstr "Nouvel événement"
+msgid "New account"
+msgstr "Nouveau compte"
 
 msgid "Name"
 msgstr "Nom"
@@ -53,9 +53,6 @@ msgstr "Payeurs"
 msgid "Beneficiaries"
 msgstr "Concernés"
 
-msgid "New account"
-msgstr "Nouveau compte"
-
 msgid "Email"
 msgstr "e-mail"
 
@@ -77,11 +74,11 @@ msgstr "S'inscrire"
 msgid "Sign in"
 msgstr "S'identifier"
 
-msgid "EVENTS"
-msgstr "ÉVÉNEMENTS"
+msgid "MY ACCOUNTS"
+msgstr "MES COMPTES"
 
-msgid "MY ACCOUNT"
-msgstr "MON COMPTE"
+msgid "MY PARAMETERS"
+msgstr "MES PARAMÈTRES"
 
 msgid "SIGN IN"
 msgstr "S'IDENTIFIER"
