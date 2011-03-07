@@ -51,7 +51,7 @@ msgid "Payers"
 msgstr "Payeurs"
 
 msgid "Beneficiaries"
-msgstr "Concernés"
+msgstr "Consommateurs"
 
 msgid "Email"
 msgstr "e-mail"
@@ -154,6 +154,9 @@ msgstr "N'a pas assez payé"
 
 msgid "%1$s repaid %2$.2f€ to %3$s"
 msgstr "%1$s a remboursé %2$.2f€ à %3$s"
+
+msgid "Amount payed"
+msgstr "Montant payé"
 
 #~ msgid "Involved users"
 #~ msgstr "Bénéficiaires"

@@ -8,7 +8,7 @@
         <p><label>{getText id='Payers'} :</label></p>
         <div class="subfieldset">
             <div id="clonable-payer">
-                <p class="inline-label"><label class="medium-inline">{getText id='Name'} :</label><label class="medium-inline">{getText id='Amount'} :</label></p>
+                <p class="inline-label"><label class="medium-inline">{getText id='Name'} :</label><label class="medium-inline">{getText id='Amount payed'} :</label></p>
                 <p>
                     <input type="hidden" name="payersId[]" />
                     <input type="text" class="text-medium payer-name" rel="{makeUrl url='ajax/autocomplete-user.php'}" name="payersName[]" value="" />
@@ -24,7 +24,7 @@
                 {foreach from=$_POST.payersName key="index" item="payerName"}
                     {if !empty($payerName)}
                         <div>
-                            <p class="inline-label"><label class="medium-inline">{getText id='Name'} :</label><label class="medium-inline">{getText id='Amount'} :</label></p>
+                            <p class="inline-label"><label class="medium-inline">{getText id='Name'} :</label><label class="medium-inline">{getText id='Amount payed'} :</label></p>
                             <p>
                                 <input type="hidden" name="payersId[]" value="{$_POST.payersId.{$index}|htmlProtect}" />
                                 <input type="text" class="text-medium payer-name" rel="{makeUrl url='ajax/autocomplete-user.php'}" name="payersName[]" value="{$payerName|htmlProtect}" />
@@ -40,7 +40,7 @@
                 {/foreach}
             {else}
                 <div>
-                    <p class="inline-label"><label class="medium-inline">{getText id='Name'} :</label><label class="medium-inline">{getText id='Amount'} :</label></p>
+                    <p class="inline-label"><label class="medium-inline">{getText id='Name'} :</label><label class="medium-inline">{getText id='Amount payed'} :</label></p>
                     <p>
                         <input type="hidden" name="payersId[]" />
                         <input type="text" class="text-medium payer-name" rel="{makeUrl url='ajax/autocomplete-user.php'}" name="payersName[]" value="" />
