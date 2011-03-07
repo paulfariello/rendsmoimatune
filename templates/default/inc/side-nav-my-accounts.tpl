@@ -6,8 +6,8 @@
                     <li class="active">
                         <a href="{$account->getUrlDetail()}">{$account->getName()}</a>
                         <ul class="subNav">
-                            <li><a href="{$currentAccount->getUrlExpendituresList()}" class="new">{getText id="Expenditures"}</a></li>
-                            <li><a href="{$currentAccount->getUrlRepaymentsList()}" class="new">{getText id="Repayments"}</a></li>
+                            <li><a href="{$currentAccount->getUrlExpendituresList()}" class="expenditure">{getText id="Expenditures"}</a></li>
+                            <li><a href="{$currentAccount->getUrlRepaymentsList()}" class="repayment">{getText id="Repayments"}</a></li>
                             <li><a href="{$currentAccount->getUrlCashUp()}" class="cash-up">{getText id="Cash up"}</a></li>
                         </ul>
                     </li>

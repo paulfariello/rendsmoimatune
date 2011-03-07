@@ -159,7 +159,6 @@ h1 span { display: none; }
 }
 
 #sidebar .sideNav li a.new {
-    background-image: url("../../px/default/snowish/24x24/actions/gtk-add.png");
     background-repeat: no-repeat;
     background-position: center left;
     padding: 0 19px 0 29px;
@@ -199,20 +198,27 @@ h1 span { display: none; }
 }
 
 
-#sidebar .sideNav .subNav li a.new {
-    background-image: url("../../px/default/snowish/24x24/actions/gtk-add.png");
+#sidebar .sideNav .subNav li a.new, #sidebar .sideNav li a.repayment, #sidebar .sideNav li a.expenditure, #sidebar .sideNav .subNav li a.cash-up {
     background-repeat: no-repeat;
     background-position: center left;
     padding: 0 0 0 29px;
     width: 131px;
 }
 
-#sidebar .sideNav .subNav li a.cash-up {
+#sidebar .sideNav li a.new {
+    background-image: url("../../px/default/snowish/24x24/actions/gtk-add.png");
+}
+
+#sidebar .sideNav li a.expenditure {
+    background-image: url("../../px/default/expenditure.png");
+}
+
+#sidebar .sideNav li a.repayment {
+    background-image: url("../../px/default/repayment.png");
+}
+
+#sidebar .sideNav li a.cash-up {
     background-image: url("../../px/default/snowish/24x24/apps/kedit.png");
-    background-repeat: no-repeat;
-    background-position: center left;
-    padding: 0 0 0 29px;
-    width: 131px;
 }
 
 /* Breadcrumb ---------------------------------------- */
