@@ -31,7 +31,9 @@ function addPayer(event)
     var euro = '\u20ac';
     var payer = $('clonable-payer').clone();
 
-    event.stop();
+    if (typeof(event) == "undefined") {
+        event.stop();
+    }
 
     payer.getElement('.remove-payer').addEvent("click", deletePayer);
     payer.getElements('input[type!=button]').each(function(input)
@@ -91,7 +93,9 @@ function addPayer(event)
         payer.getElement('select[name^=payersMetric]').set('value', newMetric);
     }
     
-    payer.inject(this.getParent(), 'before');
+    payer.inject($('add-new-payer').getParent(), 'before');
+
+    return payer;
 }
 
 function convertAmount(amount, from, to, expenditureAmount)
@@ -112,7 +116,10 @@ function convertAmount(amount, from, to, expenditureAmount)
 
 function addBeneficiary(event)
 {
-    event.stop();
+    if (typeof(event) != "undefined") {
+        event.stop();
+    }
+
     var beneficiary = $('clonable-beneficiary').clone();
     beneficiary.getElements('.remove-beneficiary').each(function(button)
     {
@@ -126,7 +133,9 @@ function addBeneficiary(event)
     {
         autocompleteBeneficiary(input);
     });
-    beneficiary.inject(this.getParent(), 'before');
+    beneficiary.inject($('add-new-beneficiary').getParent(), 'before');
+
+    return beneficiary;
 }
 
 function autocompleteBeneficiary(input)
@@ -163,6 +172,37 @@ function autocompletePayer(input)
     }
 }
 
+function autoaddBeneficiary(input)
+{
+    input.addEvent('blur', function(event)
+    {
+        payerName = event.target;
+        payerId = payerName.getPrevious('input[name^=payersId]');
+        cloned = false;
+        $$('input.beneficiary-name').each(function(beneficiaryName)
+        {
+            beneficiaryId = beneficiaryName.getPrevious('input[name^=beneficiariesId]');
+            if(!cloned && beneficiaryName.get('value') == '' && beneficiaryId.get('value') == '' && beneficiaryName.isVisible()) {
+                beneficiaryName.set('value', payerName.get('value'));
+                beneficiaryId.set('value', payerId.get('value'));
+                cloned = true;
+            }
+        });
+
+        if (!cloned) {
+            beneficiary = addBeneficiary();            
+            beneficiary.getElements('input.beneficiary-name').each(function(beneficiaryName)
+            {
+                beneficiaryName.set('value', payerName.get('value'));
+            });
+            beneficiary.getElements('input[name^=beneficiariesId]').each(function(beneficiaryId)
+            {
+                beneficiaryId.set('value', payerId.get('value'));
+            });
+        }
+    });
+}
+
 window.addEvent("domready", function()
 {
     // ADD PAYER
@@ -183,16 +223,32 @@ window.addEvent("domready", function()
         button.addEvent("click", deleteBeneficiary);
     });
 
-    // AUTO-COMPLETE PAYER
     $$('input.payer-name').each(function(input)
     {
+        // AUTO-COMPLETE PAYER
         autocompletePayer(input);
+        // AUTO-ADD BENEFICIARY
+        autoaddBeneficiary(input);
     });
 
-    // AUTO-COMPLETE BENEFICIARY
     $$('input.beneficiary-name').each(function(input)
     {
+        // AUTO-COMPLETE BENEFICIARY
         autocompleteBeneficiary(input);
     });
+
+    // AUTO-COMPLETE PAYER AMOUNT
+    $('expenditure-amount').addEvent('blur', function(event)
+    {
+        amount = event.target.get('value');
+        $$('input.payer-amount').each(function(input)
+        {
+            if (input.get('value') == '' && input.isVisible()) {
+                input.set('value', amount);
+            }
+        });
+    });
+
+
 
 });
