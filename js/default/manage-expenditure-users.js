@@ -40,7 +40,7 @@ function addPayer(event)
     {
         input.set('value','');
     });
-    autocompletePayer(payer.getElement('input.payer-name'));
+    autoCompletePayer(payer.getElement('input.payer-name'));
 
 
     // Autocomplete amount and metric
@@ -131,14 +131,14 @@ function addBeneficiary(event)
     });
     beneficiary.getElements('input.beneficiary-name').each(function(input)
     {
-        autocompleteBeneficiary(input);
+        autoCompleteBeneficiary(input);
     });
     beneficiary.inject($('add-new-beneficiary').getParent(), 'before');
 
     return beneficiary;
 }
 
-function autocompleteBeneficiary(input)
+function autoCompleteBeneficiary(input)
 {
     if ($chk(input)) {
         new Meio.Autocomplete.Select(input, input.get('rel'),
@@ -155,7 +155,7 @@ function autocompleteBeneficiary(input)
     }
 }
 
-function autocompletePayer(input)
+function autoCompletePayer(input)
 {
     if ($chk(input)) {
         new Meio.Autocomplete.Select(input, input.get('rel'),
@@ -172,9 +172,9 @@ function autocompletePayer(input)
     }
 }
 
-function autoaddBeneficiary(input)
+function autoAddBeneficiary(input)
 {
-    input.addEvent('blur', function(event)
+    input.addEvent('change', function(event)
     {
         payerName = event.target;
         payerId = payerName.getPrevious('input[name^=payersId]');
@@ -182,7 +182,9 @@ function autoaddBeneficiary(input)
         $$('input.beneficiary-name').each(function(beneficiaryName)
         {
             beneficiaryId = beneficiaryName.getPrevious('input[name^=beneficiariesId]');
-            if(!cloned && beneficiaryName.get('value') == '' && beneficiaryId.get('value') == '' && beneficiaryName.isVisible()) {
+            if (!cloned && beneficiaryName.get('value') == payerName.get('value') && beneficiaryId.get('value') == payerId.get('value')) {
+                cloned = true;
+            } else if (!cloned && beneficiaryName.get('value') == '' && beneficiaryId.get('value') == '' && beneficiaryName.isVisible()) {
                 beneficiaryName.set('value', payerName.get('value'));
                 beneficiaryId.set('value', payerId.get('value'));
                 cloned = true;
@@ -226,15 +228,15 @@ window.addEvent("domready", function()
     $$('input.payer-name').each(function(input)
     {
         // AUTO-COMPLETE PAYER
-        autocompletePayer(input);
+        autoCompletePayer(input);
         // AUTO-ADD BENEFICIARY
-        autoaddBeneficiary(input);
+        autoAddBeneficiary(input);
     });
 
     $$('input.beneficiary-name').each(function(input)
     {
         // AUTO-COMPLETE BENEFICIARY
-        autocompleteBeneficiary(input);
+        autoCompleteBeneficiary(input);
     });
 
     // AUTO-COMPLETE PAYER AMOUNT
