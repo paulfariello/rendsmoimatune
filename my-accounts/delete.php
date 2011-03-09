@@ -1,6 +1,6 @@
 <?php
 /**
- * Fichier d'autocompletion d'utilisateur
+ * Page de suppression d'un compte
  *
  * PHP version 5.3
  *
@@ -19,33 +19,44 @@
  * You should have received a copy of the GNU General Public License
  * along with Rendsmoimatune.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @category ClassFile
+ * @category ScriptFile
  * @package  Rendsmoimatune
- * @author   needle
+ * @author   Paul Fariello <paul.fariello@gmail.com>
  * @license  http://www.gnu.org/copyleft/gpl.html  GPL License 3.0
  * @version  SVN: 145
- * @link     http://www.rendsmoimatune.eu
+ * @link     http://www.bottedefoin.net
  */
 
 require_once '../inc/init.php';
+require_once '../inc/assignDefaultVar.php';
 
 $em = \Bdf\Core::getInstance()->getEntityManager();
 $te = \Bdf\Core::getInstance()->getTemplatesEngine();
-
-header('Content-type: application/json');
-
-$query = $em->createQuery("SELECT u FROM Eu\Rmmt\User u INNER JOIN u._events e INNER JOIN e._users uu WHERE uu._id = :id AND LOWER(u._name) LIKE :search");
-$query->setParameter('id', Eu\Rmmt\User::getCurrentUser()->getId());
-$query->setParameter('search', '%'.strtolower($_GET['q']).'%');
-if (!empty($_GET['limit'])) {
-    $query->setMaxResults($_GET['limit']);
+$currentUser = \Eu\Rmmt\User::getCurrentUser();
+if ($currentUser == null) {
+    \Bdf\Session::getInstance()->add('redirect',$_SERVER['REQUEST_URI']);
+    header('location: '.\Bdf\Utils::makeUrl('sign-in.html'));
+    die();
 }
-$users = $query->getResult();
 
-$result = array();
-foreach($users as $user) {
-    $result[] = array("identifier"=>$user->getId(), "value"=>$user->getName());
+if (!isset($_GET['account-id'])) {
+    header('location: '.\Bdf\Utils::makeUrl('my-accounts/'));
+    die();
+} else {
+    $account = \Eu\Rmmt\Event::getRepository()->find($_GET['account-id']);
+    if ($account === null) {
+        header('location: '.\Bdf\Utils::makeUrl('my-accounts/'));
+        die();
+    }
 }
-echo json_encode($result);
+
+if (!isset($_POST['confirm-deletion'])) {
+    $te->assign('currentAccount',$account);
+    $te->display('my-accounts/delete');
+} else {
+    $em->remove($account);
+    $em->flush();
+    header('location: '.Bdf\Utils::makeUrl('my-accounts'));
+}
 
 ?>

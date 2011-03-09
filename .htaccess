@@ -14,9 +14,10 @@ RewriteRule    ^dashboard/$                                                     
 
 # my-accounts
 RewriteRule    ^my-accounts/$                                                                   my-accounts/index.php  [L]
-RewriteRule    ^my-accounts/create-new-account.html$                                              my-accounts/create-new-account.php [L]
+RewriteRule    ^my-accounts/create-new-account.html$                                            my-accounts/create-new-account.php [L]
 RewriteRule    ^my-accounts/[a-z0-9-]*-([0-9]+)/$                                               my-accounts/account.php?id=$1 [L]
 RewriteRule    ^my-accounts/[a-z0-9-]*-([0-9]+)/cash-up.html$                                   my-accounts/cash-up.php?account-id=$1 [L]
+RewriteRule    ^my-accounts/[a-z0-9-]*-([0-9]+)/delete.html$                                    my-accounts/delete.php?account-id=$1 [L]
 
 # Expenditure
 RewriteRule    ^my-accounts/[a-z0-9-]*-([0-9]+)/expenditures-list.html$                         my-accounts/expenditures-list.php?account-id=$1 [L]

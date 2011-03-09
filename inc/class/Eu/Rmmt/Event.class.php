@@ -254,6 +254,11 @@ class Event
         return Utils::makeUrl('my-accounts/'.Utils::urlize($this->_name).'-'.$this->_id.'/');
     }
 
+    public function getUrlDelete()
+    {
+        return Utils::makeUrl('my-accounts/'.Utils::urlize($this->_name).'-'.$this->_id.'/delete.html');
+    }
+
     public function getUrlExpendituresList()
     {
         return Utils::makeUrl('my-accounts/'.Utils::urlize($this->_name).'-'.$this->_id.'/expenditures-list.html');

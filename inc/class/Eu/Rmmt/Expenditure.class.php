@@ -119,6 +119,7 @@ class Expenditure
         }
 
         $this->_payers->add($payer);
+        $this->_event->addUser($payer->getUser());
     }
 
     public function removePayer(User $user)

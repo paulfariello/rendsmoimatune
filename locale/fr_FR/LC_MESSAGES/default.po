@@ -199,3 +199,15 @@ msgstr "Gérer les utilisateurs"
 
 msgid "Send invitation"
 msgstr "Envoyer une invitation"
+
+msgid "Yes, delete it"
+msgstr "Confirmer la suppression"
+
+msgid "P_AccountDeletionWarning"
+msgstr ""
+"Vous êtes sur le point de supprimer définitivement le compte <b>%s</b>. Vous "
+"allez perdre toutes les données qui s'y trouve. Aucun retour en arrière "
+"n'est possible."
+
+msgid "Deletion"
+msgstr "Suppression"

@@ -41,6 +41,7 @@ function addPayer(event)
         input.set('value','');
     });
     autoCompletePayer(payer.getElement('input.payer-name'));
+    autoAddBeneficiary(payer.getElement('input.payer-name'));
 
 
     // Autocomplete amount and metric
