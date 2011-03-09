@@ -85,7 +85,7 @@ class FacebookAuthentication extends OAuthentication
     {
         $user = User::getRepository()->findOneBy(array('_facebookId'=>$ressources['id']));
         if (null == $user) {
-            $user = UserFactory::createFacebookUser($ressources['id'], $ressources['first_name'], $ressources['last_name']);
+            $user = UserFactory::createFacebookUser($ressources['id'], $ressources['first_name'].' '.$ressources['last_name']);
             $em = Core::getInstance()->getEntityManager();
             $em->persist($user);
             $em->flush();

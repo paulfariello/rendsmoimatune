@@ -47,22 +47,20 @@ class UserFactory
      * Create
      *
      */
-    public static function createUnregisteredUser(User $creator, $firstName, $lastName)
+    public static function createUnregisteredUser(User $creator, $name)
     {
         $user = new User(uniqid().'@rendsmoimatune.eu');
         $user->setRegistered(false);
-        $user->setFirstName($firstName);
-        $user->setLastName($lastName);
+        $user->setName($name);
         $user->setCreator($creator);
         return $user;
     }
 
-    public static function createFacebookUser($facebookId, $firstName, $lastName)
+    public static function createFacebookUser($facebookId, $name)
     {
         $user = new User(uniqid().'@rendsmoimatune.eu');
         $user->setRegistered(true);
-        $user->setFirstName($firstName);
-        $user->setLastName($lastName);
+        $user->setName($name);
         $user->setFacebookId($facebookId);
         return $user;
     }

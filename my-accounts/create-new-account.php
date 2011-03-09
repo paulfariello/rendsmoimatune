@@ -76,7 +76,7 @@ if (isset($_POST['create-new-account'])) {
         $te->display('my-accounts/create-new-account');
     } catch(Exception $e) {
         $te->assign('_POST',$_POST);
-        $te->assign('messages', array(array('type'=>'error','content'=>$e->getMessage())));
+        $te->assign('messages', array(array('type'=>'error','content'=>Bdf\Utils::getText('Internal error').' : '.$e->getMessage())));
         $te->display('my-accounts/create-new-account');
     }
 } else {

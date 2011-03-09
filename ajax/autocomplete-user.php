@@ -36,7 +36,7 @@ header('Content-type: application/json');
 
 $search = '%'.$_GET['q'].'%';
 
-$query = $em->createQuery("SELECT u FROM Eu\Rmmt\User u WHERE LOWER(u._firstName) LIKE :search OR LOWER(u._lastName) LIKE :search");
+$query = $em->createQuery("SELECT u FROM Eu\Rmmt\User u WHERE LOWER(u._name) LIKE :search");
 if (!empty($_GET['limit'])) {
     $query->setMaxResults($_GET['limit']);
 }

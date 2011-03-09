@@ -50,8 +50,7 @@ if (isset($_POST['create-new-account-from-invitation'])) {
     if ($doSave) {
         $user = new Eu\Rmmt\User($_POST['email']);
         $user->setPassword($_POST['password']);
-        $user->setFirstName($_POST['first-name']);
-        $user->setLastName($_POST['last-name']);
+        $user->setName($_POST['name']);
         $em->persist($user);
         $em->flush();
         \Bdf\Session::getInstance()->setCurrentUserId($user->getId());

@@ -7,8 +7,7 @@
             <sequence-generator sequence-name="user_user_pk_seq" initial-value="1" allocation-size="1" />
         </id>
 
-        <field name="_firstName"        column="first_name"         type="string"  />
-        <field name="_lastName"         column="last_name"          type="string"  />
+        <field name="_name"             column="name"               type="string"  />
         <field name="_email"            column="email"              type="string"  />
         <field name="_password"         column="password"           type="string"  />
         <field name="_isAdmin"          column="is_admin"           type="boolean" />

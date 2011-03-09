@@ -119,12 +119,8 @@ if (!isset($_POST['edit-expenditure'])) {
 
                 if ($unknown) {
                     // Create new user
-                    if (substr_count($name, ' ') > 0) {
-                        list($firstName, $lastName) = explode(' ', $name, 2);
-                        $user = Eu\Rmmt\UserFactory::createUnregisteredUser($currentUser, $firstName, $lastName);
-                    } else {
-                        $user = Eu\Rmmt\UserFactory::createUnregisteredUser($currentUser, $name, "");
-                    }
+                    $user = Eu\Rmmt\UserFactory::createUnregisteredUser($currentUser, $name);
+
                     $payer       = $user;
                     $newUsers[]  = $payer;
                 }
@@ -175,12 +171,8 @@ if (!isset($_POST['edit-expenditure'])) {
 
                 if ($unknown) {
                     // Create new user
-                    if (substr_count($name, ' ') > 0) {
-                        list($firstName, $lastName) = explode(' ', $name, 2);
-                        $user = Eu\Rmmt\UserFactory::createUnregisteredUser($currentUser, $firstName, $lastName);
-                    } else {
-                        $user = Eu\Rmmt\UserFactory::createUnregisteredUser($currentUser, $name, "");
-                    }
+                    $user = Eu\Rmmt\UserFactory::createUnregisteredUser($currentUser, $name);
+
                     $beneficiary = $user;
                     $newUsers[]  = $beneficiary;
                 }
@@ -230,7 +222,7 @@ if (!isset($_POST['edit-expenditure'])) {
         $te->assign('currentAccount',$account);
         $te->assign('expenditure',$expenditure);
         $te->assign('_POST',$_POST);
-        $te->assign('messages', array(array('type'=>'error','content'=>$e->getMessage())));
+        $te->assign('messages', array(array('type'=>'error','content'=>Bdf\Utils::getText('Internal error').' : '.$e->getMessage())));
         $te->display('my-accounts/edit-expenditure');
     }
 }

@@ -47,8 +47,7 @@ class User implements \Bdf\IUser
     private $_id;
     private $_email;
     private $_password;
-    private $_firstName;
-    private $_lastName;
+    private $_name;
     private $_isAdmin           = false;
     private $_registered        = true;
     private $_events;
@@ -136,29 +135,14 @@ class User implements \Bdf\IUser
         $this->_password = Utils::hashPassword($password);
     }
 
-    public function getFirstName()
+    public function setName($name)
     {
-        return $this->_firstName;
-    }
-
-    public function setFirstName($firstName)
-    {
-        $this->_firstName = $firstName;
-    }
-
-    public function getLastName()
-    {
-        return $this->_lastName;
-    }
-
-    public function setLastName($lastName)
-    {
-        $this->_lastName = $lastName;
+        $this->_name = $name;
     }
 
     public function getName()
     {
-        return $this->getFirstName()." ".$this->getLastName();
+        return $this->_name;
     }
 
     public function isAdmin()

@@ -51,8 +51,7 @@ if (isset($_POST['delete-users'])) {
     foreach($_POST['update'] as $userId => $name) {
         $user = \Eu\Rmmt\User::getRepository()->find($userId);
         if (null !== $user) {
-            $user->setFirstName($name['first-name']);
-            $user->setLastName($name['last-name']);
+            $user->setName($name);
         }
     }
 }

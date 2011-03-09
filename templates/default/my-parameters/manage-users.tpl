@@ -10,8 +10,7 @@
         <thead>
             <tr>
                 <td>{getText id="Id"}</td>
-                <td>{getText id="First name"}</td>
-                <td>{getText id="Last name"}</td>
+                <td>{getText id="Name"}</td>
                 <td>{getText id="Delete"}</td>
                 <td>{getText id="Invite"}</td>
             </tr>
@@ -20,8 +19,7 @@
             {foreach from=$currentUser->getCreatedUsers() item="user"}
                 <tr>
                     <td>{$user->getId()}</td>
-                    <td><input type="text" name="update[{$user->getId()}][first-name]" value="{$user->getFirstName()|htmlProtect}" /></td>
-                    <td><input type="text" name="update[{$user->getId()}][last-name]" value="{$user->getLastName()|htmlProtect}" /></td>
+                    <td><input type="text" name="update[{$user->getId()}]" value="{$user->getName()|htmlProtect}" /></td>
                     <td><input type="checkbox" name="delete[{$user->getId()}]" value="delete" /></td>
                     <td><a href="{$user->getUrlInvite()}">{getText id="Invite"}</a></td>
                 </tr>

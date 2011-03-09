@@ -101,14 +101,22 @@ if (!isset($_POST['create-new-expenditure'])) {
                     }
                 }
 
+                // Search for similar user name
+                if ($unknown) {
+                    $query = $em->createQuery("SELECT u FROM Eu\Rmmt\User u WHERE LOWER(u._name) = :search");
+                    $query->setParameter('search',strtolower($name));
+                    $users = $query->getResult();
+                    if (!empty($users)) {
+                        $unknown    = false;
+                        $payer      = $users[0];
+                    }
+                }
+
+                // Definitely unknown user
                 if ($unknown) {
                     // Create new user
-                    if (substr_count($name, ' ') > 0) {
-                        list($firstName, $lastName) = explode(' ', $name, 2);
-                        $user = Eu\Rmmt\UserFactory::createUnregisteredUser($currentUser, $firstName, $lastName);
-                    } else {
-                        $user = Eu\Rmmt\UserFactory::createUnregisteredUser($currentUser, $name, "");
-                    }
+                    $user = Eu\Rmmt\UserFactory::createUnregisteredUser($currentUser, $name);
+
                     $payer       = $user;
                     $newUsers[]  = $payer;
                 }
@@ -157,12 +165,8 @@ if (!isset($_POST['create-new-expenditure'])) {
 
                 if ($unknown) {
                     // Create new user
-                    if (substr_count($name, ' ') > 0) {
-                        list($firstName, $lastName) = explode(' ', $name, 2);
-                        $user = Eu\Rmmt\UserFactory::createUnregisteredUser($currentUser, $firstName, $lastName);
-                    } else {
-                        $user = Eu\Rmmt\UserFactory::createUnregisteredUser($currentUser, $name, "");
-                    }
+                    $user = Eu\Rmmt\UserFactory::createUnregisteredUser($currentUser, $name);
+
                     $beneficiary = $user;
                     $newUsers[]  = $beneficiary;
                 }
@@ -206,7 +210,7 @@ if (!isset($_POST['create-new-expenditure'])) {
     } catch(Exception $e) {
         $te->assign('currentAccount',$account);
         $te->assign('_POST',$_POST);
-        $te->assign('messages', array(array('type'=>'error','content'=>$e->getMessage())));
+        $te->assign('messages', array(array('type'=>'error','content'=>Bdf\Utils::getText('Internal Error').' : '.$e->getMessage())));
         $te->display('my-accounts/create-new-expenditure');
     }
 }
