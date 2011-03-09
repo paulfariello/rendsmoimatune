@@ -28,6 +28,7 @@
  */
 
 require_once '../inc/init.php';
+require_once '../inc/assignDefaultVar.php';
 
 $em = \Bdf\Core::getInstance()->getEntityManager();
 $te = \Bdf\Core::getInstance()->getTemplatesEngine();
