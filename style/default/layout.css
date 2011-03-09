@@ -84,7 +84,7 @@ h1 span { display: none; }
 }
 
 #mainNav li a.my-accounts {
-    background-image: url("../../px/default/snowish/24x24/apps/kedit.png");
+    background-image: url("../../px/default/account.png");
     background-position: left center;
     background-repeat: no-repeat;
     background-color: transparent;
@@ -140,18 +140,19 @@ h1 span { display: none; }
 }
 
 #sidebar .sideNav li a {
+    background: url("../../px/default/account-closed.png") no-repeat scroll left center transparent; 
 	display: block;
 	color: #646464;
-	background-color: transparent;
 	text-decoration: none;
 	height: 29px;
 	line-height: 29px;
-	padding: 0 19px;
-	width: 141px;
+	padding: 0 19px 0 30px;
+	width: 130px;
     overflow: hidden;
 }
 
-#sidebar .sideNav li a:hover { background: #fdfcf6; }
+#sidebar .sideNav li a:hover { background-color: #fdfcf6; }
+#sidebar .sideNav li.active a { background-image: url("../../px/default/account.png"); }
 
 #sidebar .sideNav li.active, #sidebar .sideNav li.active:hover {
 	background: #f0f7fa;
