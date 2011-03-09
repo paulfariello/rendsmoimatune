@@ -41,7 +41,7 @@ use Bdf\Utils;
  * @license  http://www.gnu.org/copyleft/gpl.html  GPL License 3.0
  * @link     http://www.rendsmoimatune.eu
  */
-class InvalidAmountPayedException extends \Exception {
+class InvalidAmountPayedException extends UserInputException {
     private $_expenditure;
 
     /**
@@ -51,7 +51,7 @@ class InvalidAmountPayedException extends \Exception {
      */
     public function __construct(Expenditure $expenditure) {
       $this->_expenditure = $expenditure;
-      parent::__construct(Utils::getText('Invalid amount payed'));
+      parent::__construct(Utils::getText('Invalid amount payed'), $this->_expenditure->getAmount(), 'amount-payed');
     }
 
     /**

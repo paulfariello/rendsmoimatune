@@ -315,6 +315,7 @@ h3 {
 	line-height: 12px;
 }
 
+
 #main fieldset .text-long {
 	border: 1px solid #ddd;
 	background: #fff url(../../px/default/input-shaddow.gif) no-repeat left top;
@@ -379,6 +380,11 @@ h3 {
 .select, #main fieldset .checkbox {
     float: left;
 }
+
+#main fieldset .user-input-exception {
+    border-color: #FF0000;
+}
+
 
 #main dl dt {
     font-weight: bold;

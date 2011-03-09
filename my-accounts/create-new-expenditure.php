@@ -57,11 +57,11 @@ if (!isset($_POST['create-new-expenditure'])) {
 } else {
     try {
         if (!isset($_POST['title']) OR empty($_POST['title'])) {
-            throw new Eu\Rmmt\Exception\UserInputException(\Bdf\Utils::getText('Title is required'), $_POST['title']);
+            throw new Eu\Rmmt\Exception\UserInputException(\Bdf\Utils::getText('Title is required'), $_POST['title'], 'title');
         }
 
         if (!isset($_POST['amount']) OR empty($_POST['amount'])) {
-            throw new Eu\Rmmt\Exception\UserInputException(\Bdf\Utils::getText('Amount is required'), $_POST['amount']);
+            throw new Eu\Rmmt\Exception\UserInputException(\Bdf\Utils::getText('Amount is required'), $_POST['amount'], 'amount');
         }
         $_POST['amount'] = strtr($_POST['amount'], ',', '.');
 
@@ -198,6 +198,7 @@ if (!isset($_POST['create-new-expenditure'])) {
         $te->assign('currentAccount',$account);
         $te->assign('_POST',$_POST);
         $te->assign('messages', array(array('type'=>'error','content'=>$e->getMessage())));
+        $te->assign('userInputException', $e);
         $te->display('my-accounts/create-new-expenditure');
     } catch(Exception $e) {
         $te->assign('currentAccount',$account);

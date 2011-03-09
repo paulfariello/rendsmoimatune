@@ -41,14 +41,16 @@ namespace Eu\Rmmt\Exception;
  */
 class UserInputException extends \Exception {
     private $_input;
+    private $_inputName;
 
     /**
      * Constructeur
      *
      * @return UserInputException
      */
-    public function __construct($message, $input) {
+    public function __construct($message, $input, $inputName) {
       $this->_input = $input;
+      $this->_inputName = $inputName;
       parent::__construct($message);
     }
 
@@ -58,5 +60,13 @@ class UserInputException extends \Exception {
      */
     public function getInput() {
       return $this->_input;
+    }
+
+    /**
+     * Getter
+     * @return string input name
+     */
+    public function getInputName() {
+      return $this->_inputName;
     }
 }

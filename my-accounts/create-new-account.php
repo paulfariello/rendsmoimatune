@@ -43,7 +43,7 @@ if (isset($_POST['create-new-account'])) {
 
     try {
         if (!isset($_POST['name']) OR empty($_POST['name'])) {
-            throw new Eu\Rmmt\UserInputException(\Bdf\Utils::getText('Name is required'), $_POST['name']);
+            throw new Eu\Rmmt\Exception\UserInputException(\Bdf\Utils::getText('Title is required'), $_POST['name'], 'title');
         }
 
         $account = new Eu\Rmmt\Event($_POST['name']);
@@ -58,7 +58,7 @@ if (isset($_POST['create-new-account'])) {
 
             // Est-ce que la date de début est inférieur à la date de fin
             if (date_diff($startDate,$endDate)->format('%R') == '-') {
-                throw new Eu\Rmmt\UserInputException(\Bdf\Utils::getText('Time period must be positive'), $_POST['end-date']);
+                throw new Eu\Rmmt\Exception\UserInputException(\Bdf\Utils::getText('Time period must be positive'), $_POST['end-date'], 'date');
             }
 
             $account->setStartDate($startDate);
@@ -69,13 +69,14 @@ if (isset($_POST['create-new-account'])) {
         $em->persist($account);
         $em->flush();
         header('location: '.$account->getUrlDetail());
-    } catch(Eu\Rmmt\UserInputException $e) {
+    } catch(Eu\Rmmt\Exception\UserInputException $e) {
         $te->assign('_POST',$_POST);
-        $te->assign('message', array('type'=>'error','content'=>$e->getMessage()));
+        $te->assign('messages', array(array('type'=>'error','content'=>$e->getMessage())));
+        $te->assign('userInputException', $e);
         $te->display('my-accounts/create-new-account');
     } catch(Exception $e) {
         $te->assign('_POST',$_POST);
-        $te->assign('message', array('type'=>'error','content'=>$e->getMessage()));
+        $te->assign('messages', array(array('type'=>'error','content'=>$e->getMessage())));
         $te->display('my-accounts/create-new-account');
     }
 } else {
