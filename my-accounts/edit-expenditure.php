@@ -117,6 +117,17 @@ if (!isset($_POST['edit-expenditure'])) {
                     }
                 }
 
+                // Search for similar user name
+                if ($unknown) {
+                    $query = $em->createQuery("SELECT u FROM Eu\Rmmt\User u WHERE LOWER(u._name) = :search");
+                    $query->setParameter('search',strtolower($name));
+                    $users = $query->getResult();
+                    if (!empty($users)) {
+                        $unknown    = false;
+                        $payer      = $users[0];
+                    }
+                }
+
                 if ($unknown) {
                     // Create new user
                     $user = Eu\Rmmt\UserFactory::createUnregisteredUser($currentUser, $name);
@@ -169,6 +180,28 @@ if (!isset($_POST['edit-expenditure'])) {
                     }
                 }
 
+                // Search in just created user
+                if ($unknown) {
+                    foreach($newUsers as $user) {
+                        if (strtolower($user->getName()) == strtolower($name)) {
+                            $unknown     = false;
+                            $beneficiary = $user;
+                            break;
+                        }
+                    }
+                }
+
+                // Search for similar user name
+                if ($unknown) {
+                    $query = $em->createQuery("SELECT u FROM Eu\Rmmt\User u WHERE LOWER(u._name) = :search");
+                    $query->setParameter('search',strtolower($name));
+                    $users = $query->getResult();
+                    if (!empty($users)) {
+                        $unknown        = false;
+                        $beneficiary    = $users[0];
+                    }
+                }
+
                 if ($unknown) {
                     // Create new user
                     $user = Eu\Rmmt\UserFactory::createUnregisteredUser($currentUser, $name);
@@ -206,7 +239,7 @@ if (!isset($_POST['edit-expenditure'])) {
                $usersString .= ', '; 
             }
         }
-        if (!empty($usresString)) {
+        if (!empty($usersString)) {
             $messages[] = array('type'=>'info','content'=>Bdf\Utils::getText('User %1$s has been created. <a href="%2$s">Invite them ?</a>', $usersString, Bdf\Utils::makeUrl('my-parameters/send-invitation.html')));
         }
         \Bdf\Session::getInstance()->add('messages',$messages);

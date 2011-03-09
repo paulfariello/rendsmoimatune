@@ -18,6 +18,7 @@
         <one-to-many target-entity="Expenditure" field="_expenditures" mapped-by="_event">
             <order-by>
                 <order-by-field name="_date" direction="DESC" />
+                <order-by-field name="_id" direction="DESC" />
             </order-by>
         </one-to-many>
 
