@@ -260,6 +260,7 @@ h2 a:hover { text-decoration: underline; }
 	width: 700px;
 	float: right;
 	padding: 0 19px 0 0;
+    padding-bottom: 1em; 
 }
 
 h3 {
