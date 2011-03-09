@@ -25,7 +25,7 @@
                     </span>
                 {/if}
             </td>
-            <td class="action"><a href="#" class="view">{getText id='View'}</a><a href="{$expenditure->getUrlEdit()}" class="edit">{getText id='Edit'}</a><a href="{$expenditure->getUrlDelete()}" class="delete">{getText id='Delete'}</a></td>
+            <td class="action"><a href="{$expenditure->getUrlView()}" class="view">{getText id='View'}</a><a href="{$expenditure->getUrlEdit()}" class="edit">{getText id='Edit'}</a><a href="{$expenditure->getUrlDelete()}" class="delete">{getText id='Delete'}</a></td>
         </tr>
     {/foreach}
 </table>

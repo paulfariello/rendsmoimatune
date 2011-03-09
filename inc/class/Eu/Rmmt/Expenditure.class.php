@@ -264,13 +264,18 @@ class Expenditure
         return \Bdf\Core::getInstance()->getEntityManager()->getRepository(__CLASS__);
     }
 
-    public function getUrlDelete()
+    public function getUrlView()
     {
-        return $this->_event->getUrlDeleteExpenditure($this);
+        return $this->_event->getUrlViewExpenditure($this);
     }
 
     public function getUrlEdit()
     {
         return $this->_event->getUrlEditExpenditure($this);
+    }
+
+    public function getUrlDelete()
+    {
+        return $this->_event->getUrlDeleteExpenditure($this);
     }
 }

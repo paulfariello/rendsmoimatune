@@ -380,6 +380,16 @@ h3 {
     float: left;
 }
 
+#main dl dt {
+    font-weight: bold;
+    margin-top: 1em;
+}
+
+#main dl dd {
+    padding-left: 2em;
+    margin-top: 0.5em;
+}
+
 
 /* Footer ---------------------------------------- */
 

@@ -274,14 +274,19 @@ class Event
         return Utils::makeUrl('my-accounts/'.Utils::urlize($this->_name).'-'.$this->_id.'/create-new-repayment.html');
     }
 
-    public function getUrlDeleteExpenditure(Expenditure $expenditure)
+    public function getUrlViewExpenditure(Expenditure $expenditure)
     {
-        return Utils::makeUrl('my-accounts/'.Utils::urlize($this->_name).'-'.$this->_id.'/expenditure/delete-'.Utils::urlize($expenditure->getTitle()).'-'.$expenditure->getId().'.html');
+        return Utils::makeUrl('my-accounts/'.Utils::urlize($this->_name).'-'.$this->_id.'/expenditure/view-'.Utils::urlize($expenditure->getTitle()).'-'.$expenditure->getId().'.html');
     }
 
     public function getUrlEditExpenditure(Expenditure $expenditure)
     {
         return Utils::makeUrl('my-accounts/'.Utils::urlize($this->_name).'-'.$this->_id.'/expenditure/edit-'.Utils::urlize($expenditure->getTitle()).'-'.$expenditure->getId().'.html');
+    }
+
+    public function getUrlDeleteExpenditure(Expenditure $expenditure)
+    {
+        return Utils::makeUrl('my-accounts/'.Utils::urlize($this->_name).'-'.$this->_id.'/expenditure/delete-'.Utils::urlize($expenditure->getTitle()).'-'.$expenditure->getId().'.html');
     }
 
     public function getUrlCashUp()
