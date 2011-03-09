@@ -27,5 +27,9 @@
             </td>
             <td class="action"><a href="{$expenditure->getUrlView()}" class="view">{getText id='View'}</a><a href="{$expenditure->getUrlEdit()}" class="edit">{getText id='Edit'}</a><a href="{$expenditure->getUrlDelete()}" class="delete">{getText id='Delete'}</a></td>
         </tr>
+    {foreachelse}
+        <tr>
+            <td>{getText id="No expenditure"}</td>
+        </tr>
     {/foreach}
 </table>
