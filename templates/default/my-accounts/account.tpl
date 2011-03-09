@@ -14,6 +14,8 @@
 <h3>{getText id='Recent repayments'}</h3>
     {include file="inc/repayment-list.tpl" repayments=$currentAccount->getRepayments(5)}
     <a href="{$currentAccount->getUrlNewRepayment()}" class="button add">{getText id="New repayment"}</a>
+{if $currentAccount->isCreator($currentUser)}
 <h3>{getText id='Actions'}</h3>
     <a href="{$currentAccount->getUrlDelete()}" class="button delete">{getText id="Delete this account"}</a>
+{/if}
 {include file='inc/footer.tpl'}

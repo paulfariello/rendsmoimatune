@@ -46,7 +46,7 @@ if (isset($_POST['create-new-account'])) {
             throw new Eu\Rmmt\Exception\UserInputException(\Bdf\Utils::getText('Title is required'), $_POST['name'], 'title');
         }
 
-        $account = new Eu\Rmmt\Event($_POST['name']);
+        $account = new Eu\Rmmt\Event($_POST['name'], \Eu\Rmmt\User::getCurrentUser());
 
 
         // Initialisation des dates
@@ -65,7 +65,6 @@ if (isset($_POST['create-new-account'])) {
             $account->setEndDate($endDate);
         }
 
-        $account->addUser(\Eu\Rmmt\User::getCurrentUser());
         $em->persist($account);
         $em->flush();
         header('location: '.$account->getUrlDetail());

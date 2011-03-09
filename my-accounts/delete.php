@@ -50,6 +50,10 @@ if (!isset($_GET['account-id'])) {
     }
 }
 
+if (!$account->isCreator($currentUser)) {
+    header('location: '.$account->getUrlDetail());
+}
+
 if (!isset($_POST['confirm-deletion'])) {
     $te->assign('currentAccount',$account);
     $te->display('my-accounts/delete');

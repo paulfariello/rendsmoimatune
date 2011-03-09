@@ -6,9 +6,14 @@
             <generator strategy="SEQUENCE" />
             <sequence-generator sequence-name="event_event_pk_seq" initial-value="1" allocation-size="1" />        </id>
 
-        <field name="_name"        column="name"         type="string" />
-        <field name="_startDate"   column="start_date"   type="date"   />
-        <field name="_endDate"    column="end_date"     type="date"   />
+        <field name="_name"         column="name"           type="string" />
+        <field name="_startDate"    column="start_date"     type="date"   />
+        <field name="_endDate"      column="end_date"       type="date"   />
+        <field name="_creationDate" column="creation_date"  type="date"   />
+
+        <many-to-one target-entity="User" field="_creator">
+            <join-column name="creator_fk" referenced-column-name="user_pk" />
+        </many-to-one>
 
         <one-to-many target-entity="Repayment"   field="_repayments"   mapped-by="_event">
             <order-by>

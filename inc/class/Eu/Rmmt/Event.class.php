@@ -50,11 +50,16 @@ class Event
     private $_expenditures;
     private $_users;
     private $_repayments;
+    private $_creator;
+    private $_creationDate;
 
-    public function  __construct($name)
+    public function  __construct($name, User $creator)
     {
-        $this->_name = $name;
-        $this->_users = new ArrayCollection();
+        $this->_name            = $name;
+        $this->_creator         = $creator;
+        $this->_creationDate    = new DateTime();
+        $this->_users           = new ArrayCollection();
+        $this->_users->add($creator);
     }
 
     public function getId()
@@ -145,6 +150,21 @@ class Event
     public function removeRepayments(Repayment $repayment)
     {
         $this->_repayments->removeElement($repayment);
+    }
+
+    public function getCreator()
+    {
+        return $this->_creator;
+    }
+
+    public function getCreationDate()
+    {
+        return $this->_creationDate;
+    }
+
+    public function isCreator(User $user)
+    {
+        return $this->_creator->equals($user);
     }
 
     public function grantAccess(User $user)
