@@ -36,11 +36,11 @@ header('Content-type: application/json');
 
 $search = '%'.$_GET['q'].'%';
 
-$query = $em->createQuery("SELECT u FROM Eu\Rmmt\User u WHERE u._firstName LIKE :search OR u._lastName LIKE :search OR u._email LIKE :search");
+$query = $em->createQuery("SELECT u FROM Eu\Rmmt\User u WHERE LOWER(u._firstName) LIKE :search OR LOWER(u._lastName) LIKE :search");
 if (!empty($_GET['limit'])) {
     $query->setMaxResults($_GET['limit']);
 }
-$users = $query->execute(array('search'=>$search));
+$users = $query->execute(array('search'=>strtolower($search)));
 
 $result = array();
 foreach($users as $user) {
