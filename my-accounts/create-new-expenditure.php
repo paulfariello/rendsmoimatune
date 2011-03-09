@@ -63,6 +63,7 @@ if (!isset($_POST['create-new-expenditure'])) {
         if (!isset($_POST['amount']) OR empty($_POST['amount'])) {
             throw new Eu\Rmmt\Exception\UserInputException(\Bdf\Utils::getText('Amount is required'), $_POST['amount']);
         }
+        $_POST['amount'] = strtr($_POST['amount'], ',', '.');
 
         $expenditure = new Eu\Rmmt\Expenditure($account, $_POST['title'], $_POST['amount']);
 

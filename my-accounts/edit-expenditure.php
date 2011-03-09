@@ -76,6 +76,7 @@ if (!isset($_POST['edit-expenditure'])) {
         if (!isset($_POST['amount']) OR empty($_POST['amount'])) {
             throw new Eu\Rmmt\Exception\UserInputException(\Bdf\Utils::getText('Amount is required'), $_POST['amount']);
         }
+        $_POST['amount'] = strtr($_POST['amount'], ',', '.');
 
         $expenditure->setTitle($_POST['title']);
         $expenditure->setAmount($_POST['amount']);
