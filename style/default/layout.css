@@ -140,7 +140,7 @@ h1 span { display: none; }
 }
 
 #sidebar .sideNav li a {
-    background: url("../../px/default/account-closed.png") no-repeat scroll left center transparent; 
+    background: transparent;
 	display: block;
 	color: #646464;
 	text-decoration: none;
@@ -151,8 +151,12 @@ h1 span { display: none; }
     overflow: hidden;
 }
 
+#sidebar .sideNav li a.account {
+    background: url("../../px/default/account-closed.png") no-repeat scroll left center transparent; 
+}
+
 #sidebar .sideNav li a:hover { background-color: #fdfcf6; }
-#sidebar .sideNav li.active a { background-image: url("../../px/default/account.png"); }
+#sidebar .sideNav li.active a.account { background-image: url("../../px/default/account.png"); }
 
 #sidebar .sideNav li.active, #sidebar .sideNav li.active:hover {
 	background: #f0f7fa;
@@ -275,7 +279,7 @@ h3 {
 #main table tr td {
 	background: #f6f6f6;
 	padding: 0px 20px;
-	height: 29px;
+	height: auto;
 	line-height: 29px;
 	border-bottom: 1px solid #ddd;
     min-width: 5em;

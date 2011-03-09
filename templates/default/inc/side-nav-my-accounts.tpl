@@ -4,7 +4,7 @@
             {foreach from=$currentUser->getEvents() item='account'}
                 {if isset($currentAccount) and $currentAccount->getId() == $account->getId()}
                     <li class="active">
-                        <a href="{$account->getUrlDetail()}">{$account->getName()}</a>
+                        <a class="account" href="{$account->getUrlDetail()}">{$account->getName()}</a>
                         <ul class="subNav">
                             <li><a href="{$currentAccount->getUrlExpendituresList()}" class="expenditure">{getText id="Expenditures"}</a></li>
                             <li><a href="{$currentAccount->getUrlRepaymentsList()}" class="repayment">{getText id="Repayments"}</a></li>
@@ -12,7 +12,7 @@
                         </ul>
                     </li>
                 {else}
-                    <li><a href="{$account->getUrlDetail()}">{$account->getName()|htmlProtect}</a></li>
+                    <li><a class="account" href="{$account->getUrlDetail()}">{$account->getName()|htmlProtect}</a></li>
                 {/if}
             {/foreach}
         {/if}

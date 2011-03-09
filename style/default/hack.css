@@ -60,13 +60,13 @@
 
 #main .button {
     display: block;
-    float: right;
     color: #5494AF;
     font-size: 14px;
     font-weight: bold;
     line-height: 24px;
     height: 24px;
     text-decoration: none;
+    margin-top: 0.5em;
 }
 
 #main .button:hover {
@@ -74,8 +74,8 @@
 }
 
 #main .button.add {
-    padding-left: 24px;
-    background: url("../../px/default/snowish/24x24/actions/gtk-add.png") transparent no-repeat center left;
+    padding-left: 34px;
+    background: url("../../px/default/snowish/24x24/actions/gtk-add.png") transparent no-repeat 10px center;
 }
 
 #main fieldset div.subfieldset {
