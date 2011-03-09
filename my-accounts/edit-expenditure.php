@@ -214,7 +214,9 @@ if (!isset($_POST['edit-expenditure'])) {
                $usersString .= ', '; 
             }
         }
-        $messages[] = array('type'=>'info','content'=>Bdf\Utils::getText('User %1$s has been created. <a href="%2$s">Invite them ?</a>', $usersString, Bdf\Utils::makeUrl('my-parameters/send-invitation.html')));
+        if (!empty($usresString)) {
+            $messages[] = array('type'=>'info','content'=>Bdf\Utils::getText('User %1$s has been created. <a href="%2$s">Invite them ?</a>', $usersString, Bdf\Utils::makeUrl('my-parameters/send-invitation.html')));
+        }
         \Bdf\Session::getInstance()->add('messages',$messages);
         header('location: '.$account->getUrlDetail());
     } catch(Eu\Rmmt\Exception\UserInputException $e) {
