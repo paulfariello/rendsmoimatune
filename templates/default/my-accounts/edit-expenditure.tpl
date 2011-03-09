@@ -7,7 +7,7 @@
 <h2>
     <a href="{makeUrl url='my-accounts/'}">{getText id='My accounts'}</a>
      &raquo; <a href="{$currentAccount->getUrlDetail()}">{$currentAccount->getName()|htmlProtect}</a>
-     &raquo; <a href="{$expenditure->getUrlDetail()}">{$expenditure->getTitle()|htmlProtect}</a>
+     &raquo; <a href="{$expenditure->getUrlView()}">{$expenditure->getTitle()|htmlProtect}</a>
 </h2>
 {include file='inc/main.tpl'}
     {include file='my-accounts/edit-expenditure-form.tpl'}

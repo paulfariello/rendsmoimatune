@@ -163,3 +163,39 @@ msgstr "Modifier"
 
 msgid "Delete"
 msgstr "Supprimer"
+
+msgid "Recent expenditures"
+msgstr "Dernières dépenses"
+
+msgid "Recent repayments"
+msgstr "Derniers remboursements"
+
+msgid "Summary"
+msgstr "Résumé"
+
+msgid "Is concerned by"
+msgstr "A consommé"
+
+msgid "Payed"
+msgstr "A payé"
+
+msgid "View expenditure"
+msgstr "Détail de la dépense"
+
+msgid "Edit expenditure"
+msgstr "Modification de la dépense"
+
+msgid "Save"
+msgstr "Enregistrer"
+
+msgid "Reset"
+msgstr "Réinitialiser"
+
+msgid "My parameters"
+msgstr "Mes paramètres"
+
+msgid "Manage users"
+msgstr "Gérer les utilisateurs"
+
+msgid "Send invitation"
+msgstr "Envoyer une invitation"

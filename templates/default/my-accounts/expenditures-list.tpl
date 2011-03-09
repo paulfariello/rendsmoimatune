@@ -4,7 +4,7 @@
 {include file='inc/js-includes/manage-expenditure-users.tpl'}
 {include file='inc/header.tpl'}
 {include file='inc/side-nav-my-accounts.tpl'}
-<h2><a href="{makeUrl url='my-accounts/'}">{getText id='My account'}</a> &raquo; <a href="{$currentAccount->getUrlDetail()}">{$currentAccount->getName()|htmlProtect}</a> &raquo; <a href="{$currentAccount->getUrlExpendituresList()}">{getText id="Expenditures"}</a></h2>
+<h2><a href="{makeUrl url='my-accounts/'}">{getText id='My accounts'}</a> &raquo; <a href="{$currentAccount->getUrlDetail()}">{$currentAccount->getName()|htmlProtect}</a> &raquo; <a href="{$currentAccount->getUrlExpendituresList()}">{getText id="Expenditures"}</a></h2>
 {include file='inc/main.tpl'}
 
                 	
