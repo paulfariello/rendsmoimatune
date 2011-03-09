@@ -158,5 +158,5 @@ msgstr "%1$s a remboursé %2$.2f€ à %3$s"
 msgid "Amount payed"
 msgstr "Montant payé"
 
-#~ msgid "Involved users"
-#~ msgstr "Bénéficiaires"
+msgid "Expenditure amount"
+msgstr "Montant de la dépense"
