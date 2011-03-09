@@ -10,10 +10,10 @@
                 	
 <h3>{getText id='Recent expenditures'}</h3>
     {include file="inc/expenditure-list.tpl" expenditures=$currentAccount->getExpenditures(5)}
-    <a href="{$currentAccount->getUrlNewExpenditure()}" class="button add">{getText id="New expenditure"}</a>
+    <a href="{$currentAccount->getUrlNewExpenditure()}" class="button add">{getText id="Add"}</a>
 <h3>{getText id='Recent repayments'}</h3>
     {include file="inc/repayment-list.tpl" repayments=$currentAccount->getRepayments(5)}
-    <a href="{$currentAccount->getUrlNewRepayment()}" class="button add">{getText id="New repayment"}</a>
+    <a href="{$currentAccount->getUrlNewRepayment()}" class="button add">{getText id="Add"}</a>
 {if $currentAccount->isCreator($currentUser)}
 <h3>{getText id='Actions'}</h3>
     <a href="{$currentAccount->getUrlDelete()}" class="button delete">{getText id="Delete this account"}</a>
