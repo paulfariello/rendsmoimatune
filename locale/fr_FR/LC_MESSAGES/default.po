@@ -214,3 +214,6 @@ msgstr "Suppression"
 
 msgid "Add"
 msgstr "Ajouter"
+
+msgid "Delete this account"
+msgstr "Supprimer le compte"

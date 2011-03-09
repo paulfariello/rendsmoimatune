@@ -10,5 +10,5 @@
                 	
 <h3>{getText id='Expenditures'}</h3>
     {include file="inc/expenditure-list.tpl" expenditures=$currentAccount->getExpenditures()}
-    <a href="{$currentAccount->getUrlNewExpenditure()}" class="button add">{getText id="New expenditure"}</a>
+    <a href="{$currentAccount->getUrlNewExpenditure()}" class="button add">{getText id="Add"}</a>
 {include file='inc/footer.tpl'}

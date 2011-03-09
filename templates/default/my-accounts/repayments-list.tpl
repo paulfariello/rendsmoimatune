@@ -9,5 +9,5 @@
 
 <h3>{getText id='Repayments'}</h3>
     {include file="inc/repayment-list.tpl" repayments=$currentAccount->getRepayments()}
-    <a href="{$currentAccount->getUrlNewRepayment()}" class="button add">{getText id="New repayment"}</a>
+    <a href="{$currentAccount->getUrlNewRepayment()}" class="button add">{getText id="Add"}</a>
 {include file='inc/footer.tpl'}
