@@ -63,7 +63,7 @@ class FacebookAuthentication extends OAuthentication
 
     protected function _constructServiceProviderUrl()
     {
-        return "https://graph.facebook.com/oauth/authorize?client_id=".$this->_clientId."&redirect_uri=".$this->_redirectUrl;
+        return "https://graph.facebook.com/oauth/authorize?display=popup&client_id=".$this->_clientId."&redirect_uri=".$this->_redirectUrl;
     }
 
     protected function _constructRequestRequestTokenUrl()

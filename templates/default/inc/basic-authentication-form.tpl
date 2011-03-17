@@ -5,4 +5,3 @@
         <input type="submit" name="sign-in" value="{getText id='Sign in'}" />
     </fieldset>
 </form>
-<a href="{makeUrl url='authentication/facebook.html'}" ><img src="{makeUrl url='facebook-login-button.png' type='img'}" alt="Login with faceebook" /></a>

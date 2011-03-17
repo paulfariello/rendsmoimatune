@@ -27,7 +27,7 @@ h1 {
 
 h1 a {
 	display: block;
-	width: 225px;
+	width: 401px;
 	height: 28px;
 }
 
@@ -263,6 +263,18 @@ h2 a:hover { text-decoration: underline; }
     padding-bottom: 1em; 
 }
 
+#main div.column-left, #main div.column-right {
+    width: 48%;
+}
+
+#main div.column-left {
+    float: left;
+}
+
+#main div.column-right {
+    float: right;
+}
+
 h3 {
 	font-size: 14px;
 	line-height: 14px;
@@ -304,7 +316,7 @@ h3 {
 
 #main table tr:hover .action a:hover { text-decoration: underline; }
 
-#main fieldset {
+#main fieldset, #main .fieldset {
 	border: 1px solid #ddd;
 	padding: 19px;
 	margin: 0 0 20px 0;
