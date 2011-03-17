@@ -61,18 +61,17 @@ if (isset($_POST['create-new-account-from-invitation'])) {
         if (isset($_GET['id'])) {
             $user = Eu\Rmmt\User::getRepository()->find($_GET['id']);
             if (null == $user) {
-                throw new Eu\Rmmt\Exception\UnkownUserException($_GET['id']); 
+                throw new Eu\Rmmt\Exception\UnknownUserException($_GET['id']); 
             }
         }
         
         if (!isset($_GET['token']) OR !$user->checkInvitationToken($_GET['token'])) {
-            throw new Eu\Rmmt\Exception\InvalidInvitationToken();
+            throw new Eu\Rmmt\Exception\InvalidInvitationTokenException($_GET['token']);
         }
 
         $te->assign('user', $user);
         $te->display('new-account-from-invitation');
     } catch(Exception $e) {
-        $te->assign('currentAccount',$event);
         $te->assign('_POST',$_POST);
         $te->assign('messages', array(array('type'=>'error','content'=>$e->getMessage())));
         $te->display('error');

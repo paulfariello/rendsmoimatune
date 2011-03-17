@@ -300,6 +300,11 @@ class User implements \Bdf\IUser
         return hash_hmac('sha256', $this->_invitationToken, $this->_id);
     }
 
+    public function checkInvitationToken($token)
+    {
+        return hash_hmac('sha256', $this->_invitationToken, $this->_id) === $token;
+    }
+
     public function getCreatedUsers()
     {
         $em = Core::getInstance()->getEntityManager();
