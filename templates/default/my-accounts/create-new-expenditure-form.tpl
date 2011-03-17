@@ -2,7 +2,7 @@
 <form action="{$currentAccount->getUrlNewExpenditure()}" method="post" class="jNice">
     <fieldset>
         <p><label>{getText id='Title'} :</label><input type="text" class="text-long{if isset($userInputException) && $userInputException->getInputName() == 'title'} user-input-exception{/if}" name="title" value="{if isset($_POST.title)}{$_POST.title|htmlProtect}{/if}" /></p>
-        <p><label>{getText id='Date'} :</label><input type="text" class="text-medium date{if isset($userInputException) && $userInputException->getInputName() == 'date'} user-input-exception{/if}" name="date" value="{if isset($_POST.date)}{$_POST.date|htmlProtect}{else}{date('m-d-Y')}{/if}" /></p>
+        <p><label>{getText id='Date'} :</label><input type="text" class="text-medium date{if isset($userInputException) && $userInputException->getInputName() == 'date'} user-input-exception{/if}" name="date" value="{if isset($_POST.date)}{$_POST.date|htmlProtect}{else}{date('d-m-Y')}{/if}" /></p>
         <p><label>{getText id='Expenditure amount'} :</label><input type="text" id="expenditure-amount" class="text-medium{if isset($userInputException) && ($userInputException->getInputName() == 'amount' || $userInputException->getInputName() == 'amount-payed')} user-input-exception{/if}" name="amount" value="{if isset($_POST.amount)}{$_POST.amount|htmlProtect}{/if}" /><span class="inter-input">€</span></p>
         <!-- Payers -->
         <p><label>{getText id='Payers'} :</label></p>
