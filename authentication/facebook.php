@@ -43,7 +43,7 @@ try {
 }
 
 if (null === \Bdf\Session::getInstance()->getCurrentUserId()) {
-    $te->assign("messages", array(array('type'=>'error','content'=>\Bdf\Utils::getText('Authantication failed'))));
+    $te->assign("messages", array(array('type'=>'error','content'=>\Bdf\Utils::getText('Authentication failed'))));
     $te->assign("_POST", $_POST);
     $te->display("authentication/facebook");
 } else {
