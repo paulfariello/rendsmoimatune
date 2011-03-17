@@ -99,7 +99,7 @@ if (!isset($_POST['edit-expenditure'])) {
         foreach( array_keys ($_POST['payersId']) as $index ) {
             $id     = $_POST['payersId'][$index];
             $name   = trim ($_POST['payersName'][$index]);
-            $amount = (float) $_POST['payersAmount'][$index];
+            $amount = (float) strtr($_POST['payersAmount'][$index], ',', '.');
             $metric = $_POST['payersMetric'][$index];
 
             if (!empty($name)) {
