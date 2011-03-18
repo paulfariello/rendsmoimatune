@@ -15,7 +15,7 @@
     {include file="inc/repayment-list.tpl" repayments=$currentAccount->getRepayments(5)}
     <a href="{$currentAccount->getUrlNewRepayment()}" class="button add">{getText id="Add"}</a>
 {if $currentAccount->isCreator($currentUser)}
-<h3>{getText id='Actions'}</h3>
+<h3>{getText id='Account administration'}</h3>
     <a href="{$currentAccount->getUrlDelete()}" class="button delete">{getText id="Delete this account"}</a>
 {/if}
 {include file='inc/footer.tpl'}

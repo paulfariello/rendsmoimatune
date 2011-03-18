@@ -2,7 +2,7 @@
 <!-- Additionnal javascript script -->
 {include file='inc/header.tpl'}
 {include file='inc/side-nav-my-parameters.tpl'}
-<h2><a href="{makeUrl url='my-parameters/'}">{getText id='My account'}</a> &raquo; <a href="{makeUrl url='my-parameters/manage-users.html'}">{getText id='Manage users'}</a></h2>
+<h2><a href="{makeUrl url='my-parameters/'}">{getText id='My parameters'}</a> &raquo; <a href="{makeUrl url='my-parameters/manage-users.html'}">{getText id='Manage users'}</a></h2>
 {include file='inc/main.tpl'}
 <h3>{getText id='Manage users'}</h3>
 <form method="post" action="{makeUrl url="my-parameters/manage-users.html"}">

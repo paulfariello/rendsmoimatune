@@ -217,3 +217,36 @@ msgstr "Ajouter"
 
 msgid "Delete this account"
 msgstr "Supprimer le compte"
+
+msgid "About us"
+msgstr "A propos de nous"
+
+msgid "No expenditure"
+msgstr "Aucune dépense"
+
+msgid "No repayment"
+msgstr "Aucun remboursement"
+
+msgid "Account administration"
+msgstr "Administration du compte"
+
+msgid "Invite"
+msgstr "Inviter"
+
+msgid "Update"
+msgstr "Mettre à jour"
+
+msgid "Delete selected users"
+msgstr "Supprimer les utilisateurs sélectionnés"
+
+msgid "Users you have created"
+msgstr "Utilisateurs que vous avez créés"
+
+msgid "Users you have invited"
+msgstr "Utilisateurs que vous avez invités"
+
+msgid "Send"
+msgstr "Envoyer"
+
+msgid "Send again"
+msgstr "Renvoyer une invitation"
