@@ -33,48 +33,63 @@ require_once 'inc/assignDefaultVar.php';
 $em = \Bdf\Core::getInstance()->getEntityManager();
 $te = \Bdf\Core::getInstance()->getTemplatesEngine();
 
+try {
+    if (isset($_REQUEST['id'])) {
+        $user = Eu\Rmmt\User::getRepository()->find($_REQUEST['id']);
+        if (null == $user) {
+            throw new Eu\Rmmt\Exception\UnknownUserException($_REQUEST['id']); 
+        }
+    }
+    
+    if (!isset($_REQUEST['token']) OR !$user->checkInvitationToken($_REQUEST['token'])) {
+        throw new Eu\Rmmt\Exception\InvalidInvitationTokenException($_REQUEST['token']);
+    }
+} catch(Exception $e) {
+    $te->assign('_POST',$_POST);
+    $te->assign('messages', array(array('type'=>'error','content'=>$e->getMessage())));
+    $te->display('error');
+}
+
 if (isset($_POST['create-new-account-from-invitation'])) {
-    $doSave = true;
-    if ($_POST['password'] !== $_POST['password-confirm']) {
-        $doSave = false;
-        $te->assign('message', array('type'=>'error','content'=>\Bdf\Utils::getText('Password are not identical')));
-        $te->display('new-account');
-    }
+    try {
+        if (!isset($_POST['name']) OR empty($_POST['name'])) {
+            throw new Eu\Rmmt\Exception\UserInputException(Bdf\Utils::getText('Name is required'), $_POST['name'], 'name');
+        }
 
-    if (!isset($_POST['email']) OR empty($_POST['email'])) {
-        $doSave = false;
-        $te->assign('message', array('type'=>'error','content'=>\Bdf\Utils::getText('Email is required')));
-        $te->display('new-account');
-    }
+        if (!isset($_POST['email']) OR empty($_POST['email'])) {
+            throw new Eu\Rmmt\Exception\UserInputException(Bdf\Utils::getText('Email is required'), $_POST['email'], 'email');
+        }
 
-    if ($doSave) {
-        $user = new Eu\Rmmt\User($_POST['email']);
-        $user->setPassword($_POST['password']);
+        if (!isset($_POST['password']) OR empty($_POST['password'])) {
+            throw new Eu\Rmmt\Exception\UserInputException(Bdf\Utils::getText('Password is required'), $_POST['password'], 'password');
+        }
+
+        if ($_POST['password'] !== $_POST['password-confirm']) {
+            throw new Eu\Rmmt\Exception\UserInputException(Bdf\Utils::getText('Password are not identicals'), $_POST['password'], 'password');
+        }
+
         $user->setName($_POST['name']);
-        $em->persist($user);
+        $user->setEmail($_POST['email']);
+        $user->setPassword($_POST['password']);
+        $user->setRegistered(true);
+
         $em->flush();
         \Bdf\Session::getInstance()->setCurrentUserId($user->getId());
         header('location: '.\Bdf\Utils::makeUrl(''));
+    } catch (Eu\Rmmt\Exception\UserInputException $e) {
+        $te->assign('_POST',$_POST);
+        $te->assign('user', $user);
+        $te->assign('messages', array(array('type'=>'error','content'=>$e->getMessage())));
+        $te->assign('userInputException', $e);
+        $te->display('new-account-from-invitation');
+    } catch (Exception $e) {
+        $te->assign('_POST',$_POST);
+        $te->assign('user', $user);
+        $te->assign('messages', array(array('type'=>'error','content'=>Bdf\Utils::getText('Internal error').' : '.$e->getMessage())));
+        $te->display('new-account-from-invitation');
     }
 } else {
-    try {
-        if (isset($_GET['id'])) {
-            $user = Eu\Rmmt\User::getRepository()->find($_GET['id']);
-            if (null == $user) {
-                throw new Eu\Rmmt\Exception\UnknownUserException($_GET['id']); 
-            }
-        }
-        
-        if (!isset($_GET['token']) OR !$user->checkInvitationToken($_GET['token'])) {
-            throw new Eu\Rmmt\Exception\InvalidInvitationTokenException($_GET['token']);
-        }
-
-        $te->assign('user', $user);
-        $te->display('new-account-from-invitation');
-    } catch(Exception $e) {
-        $te->assign('_POST',$_POST);
-        $te->assign('messages', array(array('type'=>'error','content'=>$e->getMessage())));
-        $te->display('error');
-    }
+    $te->assign('user', $user);
+    $te->display('new-account-from-invitation');
 }
 ?>
