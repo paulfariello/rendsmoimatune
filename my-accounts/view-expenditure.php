@@ -40,31 +40,28 @@ if ($currentUser == null) {
     die();
 }
 
-if (isset($_GET['account-id']) and !empty($_GET['account-id'])) {
-    $account = \Eu\Rmmt\Event::getRepository()->find($_GET['account-id']);
-}
 
 if (!isset($_GET['expenditure-id']) or empty($_GET['account-id'])) {
-    if (null !== $account) {
-        header('location: '.$account->getUrlDetail());
-    } else {
-        header('location: '.\Bdf\Utils::makeUrl('my-accounts/'));
-    }
+    header('location: '.$account->getUrlDetail());
     die();
-} else {
-    $expenditure = \Eu\Rmmt\Expenditure::getRepository()->find($_GET['expenditure-id']);
-    if (null === $expenditure) {
-        if (null !== $account) {
-            header('location: '.$account->getUrlDetail());
-        } else {
-            header('location: '.\Bdf\Utils::makeUrl('my-accounts/'));
-        }
-        die();
-    }
 }
 
-$te->assign("currentAccount",$account);
-$te->assign('expenditure', $expenditure);
-$te->display('my-accounts/view-expenditure');
+try {
+    $expenditure = \Eu\Rmmt\Expenditure::getRepository()->find($_GET['expenditure-id']);
+    if (null === $expenditure) {
+        header('location: '.\Bdf\Utils::makeUrl('my-accounts/'));
+        die();
+    }
+
+    $expenditure->getEvent()->checkViewRight($currentUser);
+
+    $te->assign("currentAccount",$account);
+    $te->assign('expenditure', $expenditure);
+    $te->display('my-accounts/view-expenditure');
+} catch(Eu\Rmmt\Exception\RightException $e) {
+    \Bdf\Session::getInstance()->add('messages', array(array('type'=>'error','content'=>$e->getMessage())));
+    header('location: '.\Bdf\Utils::makeUrl('my-accounts/'));
+}
+
 
 ?>

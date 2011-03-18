@@ -319,4 +319,17 @@ class Event
         return Utils::makeUrl('my-accounts/'.Utils::urlize($this->_name).'-'.$this->_id.'/cash-up.html');
     }
 
+    public function checkViewRight(User $user)
+    {
+        if (!$this->grantAccess($user)) {
+            throw new \Eu\Rmmt\Exception\RightException(\Bdf\Utils::getText("You can't access this account."));
+        }
+    }
+
+    public function checkDeleteRight(User $user)
+    {
+        if (!$this->_creator->equals($user)) {
+            throw new \Eu\Rmmt\Exception\RightException(\Bdf\Utils::getText("You can't delete this account because you haven't created it."));
+        }
+    }
 }

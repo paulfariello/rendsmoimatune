@@ -279,4 +279,14 @@ class Expenditure
     {
         return $this->_event->getUrlDeleteExpenditure($this);
     }
+
+    public function checkEditRight(User $user)
+    {
+        throw new \Eu\Rmmt\Exception\RightException(\Bdf\Utils::getText("You can't edit this expenditure because"));
+    }
+
+    public function checkDeleteRight(User $user)
+    {
+        throw new \Eu\Rmmt\Exception\RightException(\Bdf\Utils::getText("You can't delete this expenditure because"));
+    }
 }

@@ -50,17 +50,20 @@ if (!isset($_GET['account-id'])) {
     }
 }
 
-if (!$account->isCreator($currentUser)) {
-    header('location: '.$account->getUrlDetail());
-}
+try {
+    $account->checkDeleteRight($currentUser);
 
-if (!isset($_POST['confirm-deletion'])) {
-    $te->assign('currentAccount',$account);
-    $te->display('my-accounts/delete');
-} else {
-    $em->remove($account);
-    $em->flush();
-    header('location: '.Bdf\Utils::makeUrl('my-accounts'));
+    if (!isset($_POST['confirm-deletion'])) {
+        $te->assign('currentAccount',$account);
+        $te->display('my-accounts/delete');
+    } else {
+        $em->remove($account);
+        $em->flush();
+        header('location: '.Bdf\Utils::makeUrl('my-accounts'));
+    }
+} catch(Eu\Rmmt\Exception\RightException $e) {
+    \Bdf\Session::getInstance()->add('messages', array(array('type'=>'error','content'=>$e->getMessage())));
+    header('location: '.$account->getUrlDetail());
 }
 
 ?>

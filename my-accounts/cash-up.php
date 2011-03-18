@@ -44,26 +44,34 @@ if (!isset($_GET['account-id'])) {
     die();
 }
 
-$account = \Eu\Rmmt\Event::getRepository()->find($_GET['account-id']);
-if (null === $account OR !$account->grantAccess($currentUser)) {
+try {
+    $account = \Eu\Rmmt\Event::getRepository()->find($_GET['account-id']);
+    if (null === $account) {
+        header('location: '.\Bdf\Utils::makeUrl('my-accounts/'));
+        die();
+    }
+
+    $account->checkViewRight($currentUser);
+
+
+    $messages = \Bdf\Session::getInstance()->get('messages');
+
+    if (null !== $messages) {
+        $te->assign('messages',$messages);
+        \Bdf\Session::getInstance()->remove('messages');
+    }
+
+    $debtFactory = new \Eu\Rmmt\Debt\DebtFactory($account);
+    $debts = $debtFactory->createDebts();
+
+    $te->assign('currentAccount',$account);
+    $te->assign("users", $account->getUsers());
+    $te->assign("debts", $debts);
+
+    $te->display('my-accounts/cash-up');
+} catch(Eu\Rmmt\Exception\RightException $e) {
+    \Bdf\Session::getInstance()->add('messages', array(array('type'=>'error','content'=>$e->getMessage())));
     header('location: '.\Bdf\Utils::makeUrl('my-accounts/'));
-    die();
 }
-$te->assign('currentAccount',$account);
-
-$messages = \Bdf\Session::getInstance()->get('messages');
-
-if (null !== $messages) {
-    $te->assign('messages',$messages);
-    \Bdf\Session::getInstance()->remove('messages');
-}
-
-$debtFactory = new \Eu\Rmmt\Debt\DebtFactory($account);
-$debts = $debtFactory->createDebts();
-$te->assign("users", $account->getUsers());
-
-$te->assign("debts", $debts);
-
-$te->display('my-accounts/cash-up');
 
 ?>

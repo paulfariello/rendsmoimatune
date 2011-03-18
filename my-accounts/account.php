@@ -44,13 +44,25 @@ if (!isset($_GET['id'])) {
     die();
 }
 
-$event = $em->getRepository('Eu\Rmmt\Event')->find($_GET['id']);
-$te->assign('currentAccount',$event);
-$messages = \Bdf\Session::getInstance()->get('messages');
-if (null !== $messages) {
-    $te->assign('messages',$messages);
-    \Bdf\Session::getInstance()->remove('messages');
+try {
+    $account = $em->getRepository('Eu\Rmmt\Event')->find($_GET['id']);
+    if (null == $account) {
+        header('location: '.\Bdf\Utils::makeUrl('my-accounts/'));
+        die();
+    }
+
+    $account->checkViewRight($currentUser);
+
+    $te->assign('currentAccount',$account);
+    $messages = \Bdf\Session::getInstance()->get('messages');
+    if (null !== $messages) {
+        $te->assign('messages',$messages);
+        \Bdf\Session::getInstance()->remove('messages');
+    }
+    $te->display('my-accounts/account');
+} catch(Eu\Rmmt\Exception\RightException $e) {
+    \Bdf\Session::getInstance()->add('messages', array(array('type'=>'error','content'=>$e->getMessage())));
+    header('location: '.\Bdf\Utils::makeUrl('my-accounts/'));
 }
-$te->display('my-accounts/account');
 
 ?>

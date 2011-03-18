@@ -51,52 +51,59 @@ if (!isset($_GET['account-id'])) {
     }
 }
 
-if (!isset($_POST['create-new-repayment'])) {
-    $te->assign("currentAccount",$account);
-    $te->display('my-accounts/create-new-repayment');
-} else {
-    try {
-        if (!isset($_POST['payerId']) OR empty($_POST['payerId'])) {
-            throw new Eu\Rmmt\Exception\UserInputException(\Bdf\Utils::getText('Payer\'s name is required'), $_POST['amount']);
-        }
-        $payer = Eu\Rmmt\User::getRepository()->find($_POST['payerId']);
+try {
+    $account->checkViewRight($currentUser);
 
-        if (!isset($_POST['beneficiaryId']) OR empty($_POST['beneficiaryId'])) {
-            throw new Eu\Rmmt\Exception\UserInputException(\Bdf\Utils::getText('Beneficiary\'s is required'), $_POST['amount']);
-        }
-        $beneficiary = Eu\Rmmt\User::getRepository()->find($_POST['beneficiaryId']);
-
-
-        if (!isset($_POST['amount']) OR empty($_POST['amount'])) {
-            throw new Eu\Rmmt\Exception\UserInputException(\Bdf\Utils::getText('Amount is required'), $_POST['amount']);
-        }
-
-        $repayment = new Eu\Rmmt\Repayment($account, $payer, $beneficiary, $_POST['amount']);
-
-        $date = null;
-        if (isset($_POST['date']) AND !empty($_POST['date'])) {
-            $date = DateTime::createFromFormat('d-m-Y', $_POST['date']);
-
-            $repayment->setDate($date);
-        }
-
-        $em->persist($repayment);
-        $em->flush();
-        $messages = array();
-        $messages[] = array('type'=>'done','content'=>Bdf\Utils::getText('Repayment created'));
-        \Bdf\Session::getInstance()->add('messages',$messages);
-        header('location: '.$account->getUrlDetail());
-    } catch(Eu\Rmmt\Exception\UserInputException $e) {
-        $te->assign('currentAccount',$account);
-        $te->assign('_POST',$_POST);
-        $te->assign('messages', array(array('type'=>'error','content'=>$e->getMessage())));
+    if (!isset($_POST['create-new-repayment'])) {
+        $te->assign("currentAccount",$account);
         $te->display('my-accounts/create-new-repayment');
-    } catch(Exception $e) {
-        $te->assign('currentAccount',$account);
-        $te->assign('_POST',$_POST);
-        $te->assign('messages', array(array('type'=>'error','content'=>$e->getMessage())));
-        $te->display('my-accounts/create-new-repayment');
+    } else {
+        try {
+            if (!isset($_POST['payerId']) OR empty($_POST['payerId'])) {
+                throw new Eu\Rmmt\Exception\UserInputException(\Bdf\Utils::getText('Payer\'s name is required'), $_POST['amount']);
+            }
+            $payer = Eu\Rmmt\User::getRepository()->find($_POST['payerId']);
+
+            if (!isset($_POST['beneficiaryId']) OR empty($_POST['beneficiaryId'])) {
+                throw new Eu\Rmmt\Exception\UserInputException(\Bdf\Utils::getText('Beneficiary\'s is required'), $_POST['amount']);
+            }
+            $beneficiary = Eu\Rmmt\User::getRepository()->find($_POST['beneficiaryId']);
+
+
+            if (!isset($_POST['amount']) OR empty($_POST['amount'])) {
+                throw new Eu\Rmmt\Exception\UserInputException(\Bdf\Utils::getText('Amount is required'), $_POST['amount']);
+            }
+
+            $repayment = new Eu\Rmmt\Repayment($account, $payer, $beneficiary, $_POST['amount']);
+
+            $date = null;
+            if (isset($_POST['date']) AND !empty($_POST['date'])) {
+                $date = DateTime::createFromFormat('d-m-Y', $_POST['date']);
+
+                $repayment->setDate($date);
+            }
+
+            $em->persist($repayment);
+            $em->flush();
+            $messages = array();
+            $messages[] = array('type'=>'done','content'=>Bdf\Utils::getText('Repayment created'));
+            \Bdf\Session::getInstance()->add('messages',$messages);
+            header('location: '.$account->getUrlDetail());
+        } catch(Eu\Rmmt\Exception\UserInputException $e) {
+            $te->assign('currentAccount',$account);
+            $te->assign('_POST',$_POST);
+            $te->assign('messages', array(array('type'=>'error','content'=>$e->getMessage())));
+            $te->display('my-accounts/create-new-repayment');
+        } catch(Exception $e) {
+            $te->assign('currentAccount',$account);
+            $te->assign('_POST',$_POST);
+            $te->assign('messages', array(array('type'=>'error','content'=>$e->getMessage())));
+            $te->display('my-accounts/create-new-repayment');
+        }
     }
+} catch(Eu\Rmmt\Exception\RightException $e) {
+    \Bdf\Session::getInstance()->add('messages', array(array('type'=>'error','content'=>$e->getMessage())));
+    header('location: '.\Bdf\Utils::makeUrl('my-accounts/'));
 }
 
 ?>
