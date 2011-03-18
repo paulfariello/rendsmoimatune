@@ -1,3 +1,6 @@
+RewriteEngine On
+RewriteBase /dev
+
 RewriteRule    ^sign-in.html$                                                                   sign-in.php [L]
 RewriteRule    ^sign-out.html$                                                                  sign-out.php [L]
 RewriteRule    ^new-account.html$                                                               new-account.php [L]
