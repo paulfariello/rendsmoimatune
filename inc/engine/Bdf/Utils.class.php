@@ -349,7 +349,7 @@ class Utils
 
     public static function moneyFormat($amount)
     {
-        return money_format('%#5.2n €', $amount);
+        return money_format('%#5.2n&nbsp;€', $amount);
     }
 
     /**

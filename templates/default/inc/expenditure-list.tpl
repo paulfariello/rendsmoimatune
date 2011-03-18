@@ -2,7 +2,7 @@
     {foreach from=$expenditures item='expenditure'}
         <tr>
             <td>
-                {$expenditure->getTitle()|htmlProtect}
+                {$expenditure->getTitle()|htmlProtect|truncate:40}
             </td> 
             <td>
                 <span class="money">{$expenditure->getAmount()|moneyFormat}</span>

@@ -291,11 +291,11 @@ h3 {
 
 #main table tr td {
 	background: #f6f6f6;
-	padding: 0px 20px;
+	padding: 10px 10px;
 	height: auto;
-	line-height: 29px;
+    vertical-align: middle;
+    word-wrap: break-word;
 	border-bottom: 1px solid #ddd;
-    min-width: 5em;
 }
 
 #main table tr.odd td {
