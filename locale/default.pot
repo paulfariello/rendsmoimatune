@@ -1,168 +1,378 @@
-msgid "DASHBOARD"
+msgid ""
 msgstr ""
-msgid "Dashboard"
+"Project-Id-Version: Rendsmoimatune\n"
+"POT-Creation-Date: \n"
+"PO-Revision-Date: 2011-03-21 15:31+0100\n"
+"Last-Translator: Paul Fariello <paul.fariello@gmail.com>\n"
+"Language-Team: French\n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+msgid "%1$s gives %2$.2f€ to %3$s"
 msgstr ""
-msgid "My accounts"
+
+msgid "%1$s repaid %2$.2f€ to %3$s"
 msgstr ""
-msgid "New account"
-msgstr ""
-msgid "Name"
-msgstr ""
-msgid "From"
-msgstr ""
-msgid "to"
-msgstr ""
-msgid "Create"
-msgstr ""
-msgid "New expenditure"
-msgstr ""
-msgid "Date"
-msgstr ""
-msgid "Amount"
-msgstr ""
-msgid "Payers"
-msgstr ""
-msgid "Beneficiaries"
-msgstr ""
-msgid "Email"
-msgstr ""
-msgid "Password"
-msgstr ""
-msgid "Password Confirm"
-msgstr ""
-msgid "First Name"
-msgstr ""
-msgid "Last Name"
-msgstr ""
-msgid "Create new account"
-msgstr ""
-msgid "Sign in"
-msgstr ""
-msgid "MY ACCOUNTS"
-msgstr ""
-msgid "MY PARAMETERS"
-msgstr ""
-msgid "SIGN IN"
-msgstr ""
-msgid "SIGN OUT"
-msgstr ""
-msgid "Admin"
-msgstr ""
-msgid "Login"
-msgstr ""
-msgid "LOGOUT"
-msgstr ""
-msgid "Expenditures"
-msgstr ""
-msgid "repayments"
-msgstr ""
-msgid "Users"
-msgstr ""
-msgid "New user"
-msgstr ""
-msgid "My debts"
-msgstr ""
-msgid "My repayments"
-msgstr ""
-msgid "Repayments"
-msgstr ""
-msgid "Title"
-msgstr ""
-msgid "Cash up"
-msgstr ""
-msgid "New repayment"
-msgstr ""
-msgid "Balance of payments"
-msgstr ""
-msgid "Balancing"
-msgstr ""
-msgid "Expenditure title"
-msgstr ""
-msgid "Cash-up"
-msgstr ""
-msgid "P_Balancing"
-msgstr ""
+
 msgid "%s gives %.2f€ to %s"
 msgstr ""
-msgid "Overpaid"
-msgstr ""
-msgid "Not paid enough"
-msgstr ""
-msgid "User %s has been created. <a href=\"%s\">Invite her/him ?</a>"
-msgstr ""
-msgid "Amount payed"
-msgstr ""
-msgid "Expenditure amount"
-msgstr ""
-msgid "View"
-msgstr ""
-msgid "Edit"
-msgstr ""
-msgid "Delete"
-msgstr ""
-msgid "Recent expenditures"
-msgstr ""
-msgid "Recent repayments"
-msgstr ""
-msgid "Summary"
-msgstr ""
-msgid "Is concerned by"
-msgstr ""
-msgid "Payed"
-msgstr ""
-msgid "View expenditure"
-msgstr ""
-msgid "Edit expenditure"
-msgstr ""
-msgid "Save"
-msgstr ""
-msgid "Reset"
-msgstr ""
-msgid "My parameters"
-msgstr ""
-msgid "Manage users"
-msgstr ""
-msgid "Send invitation"
-msgstr ""
-msgid "Yes, delete it"
-msgstr ""
-msgid "P_AccountDeletionWarning"
-msgstr ""
-msgid "Deletion"
-msgstr ""
-msgid "Add"
-msgstr ""
-msgid "Delete this account"
-msgstr ""
+
 msgid "About us"
 msgstr ""
-msgid "No expenditure"
-msgstr ""
-msgid "No repayment"
-msgstr ""
+
 msgid "Account administration"
 msgstr ""
-msgid "Invite"
+
+msgid "Add"
 msgstr ""
-msgid "Update"
+
+msgid "Admin"
 msgstr ""
+
+msgid "Amount"
+msgstr ""
+
+msgid "Amount is required"
+msgstr ""
+
+msgid "Amount payed"
+msgstr ""
+
+msgid "Authentication failed"
+msgstr ""
+
+msgid "Balance of payments"
+msgstr ""
+
+msgid "Balancing"
+msgstr ""
+
+msgid "Beneficiaries"
+msgstr ""
+
+msgid "Beneficiary's is required"
+msgstr ""
+
+msgid "Cannot merge two registered users"
+msgstr ""
+
+msgid "Cash up"
+msgstr ""
+
+msgid "Cash-up"
+msgstr ""
+
+msgid "Create"
+msgstr ""
+
+msgid "Create new account"
+msgstr ""
+
+msgid "DASHBOARD"
+msgstr ""
+
+msgid "Dashboard"
+msgstr ""
+
+msgid "Date"
+msgstr ""
+
+msgid "Delete"
+msgstr ""
+
 msgid "Delete selected users"
 msgstr ""
-msgid "Users you have created"
+
+msgid "Delete this account"
 msgstr ""
-msgid "Users you have invited"
+
+msgid "Deletion"
 msgstr ""
-msgid "Send"
+
+msgid "Edit"
 msgstr ""
-msgid "Send again"
+
+msgid "Edit expenditure"
 msgstr ""
+
+msgid "Email"
+msgstr ""
+
+msgid "Email is required"
+msgstr ""
+
+msgid "Expenditure amount"
+msgstr ""
+
+msgid "Expenditure created"
+msgstr ""
+
 msgid "Expenditure deleted"
 msgstr ""
-msgid "You can't edit this expenditure because"
+
+msgid "Expenditure saved"
 msgstr ""
-msgid "You can't delete this expenditure because"
+
+msgid "Expenditure title"
 msgstr ""
+
+msgid "Expenditures"
+msgstr ""
+
+msgid "First Name"
+msgstr ""
+
+msgid "From"
+msgstr ""
+
+msgid "Id"
+msgstr ""
+
+msgid "Internal Error"
+msgstr ""
+
+msgid "Internal error"
+msgstr ""
+
+msgid "Invalid amount payed"
+msgstr ""
+
+msgid "Invitations sended !"
+msgstr ""
+
+msgid "Invitations sended again !"
+msgstr ""
+
+msgid "Invite"
+msgstr ""
+
+msgid "Invition to join Rendsmoimatune"
+msgstr ""
+
+msgid "Is concerned by"
+msgstr ""
+
+msgid "LOGOUT"
+msgstr ""
+
+msgid "Last Name"
+msgstr ""
+
+msgid "Login"
+msgstr ""
+
+msgid "Login with Facebook"
+msgstr ""
+
+msgid "MY ACCOUNTS"
+msgstr ""
+
+msgid "MY PARAMETERS"
+msgstr ""
+
+msgid "Manage users"
+msgstr ""
+
+msgid "Merge requests"
+msgstr ""
+
+msgid "My account"
+msgstr ""
+
+msgid "My accounts"
+msgstr ""
+
+msgid "My debts"
+msgstr ""
+
+msgid "My parameters"
+msgstr ""
+
+msgid "My repayments"
+msgstr ""
+
+msgid "Name"
+msgstr ""
+
+msgid "Name is required"
+msgstr ""
+
+msgid "New account"
+msgstr ""
+
+msgid "New expenditure"
+msgstr ""
+
+msgid "New repayment"
+msgstr ""
+
+msgid "New user"
+msgstr ""
+
+msgid "No expenditure"
+msgstr ""
+
+msgid "No repayment"
+msgstr ""
+
+msgid "Not paid enough"
+msgstr ""
+
+msgid "Overpaid"
+msgstr ""
+
+msgid "P_AccountDeletionWarning"
+msgstr ""
+
+msgid "P_Balancing"
+msgstr ""
+
+msgid "Password"
+msgstr ""
+
+msgid "Password Confirm"
+msgstr ""
+
+msgid "Password are not identical"
+msgstr ""
+
+msgid "Password are not identicals"
+msgstr ""
+
+msgid "Password is required"
+msgstr ""
+
+msgid "Payed"
+msgstr ""
+
+msgid "Payer's name"
+msgstr ""
+
+msgid "Payer's name is required"
+msgstr ""
+
+msgid "Payers"
+msgstr ""
+
+msgid "Recent expenditures"
+msgstr ""
+
+msgid "Recent repayments"
+msgstr ""
+
+msgid "Repayment created"
+msgstr ""
+
+msgid "Repayments"
+msgstr ""
+
+msgid "Reset"
+msgstr ""
+
+msgid "SIGN IN"
+msgstr ""
+
+msgid "SIGN OUT"
+msgstr ""
+
+msgid "Save"
+msgstr ""
+
+msgid "Send"
+msgstr ""
+
+msgid "Send again"
+msgstr ""
+
+msgid "Send invitation"
+msgstr ""
+
+msgid "Sign in"
+msgstr ""
+
+msgid "Sign in easily"
+msgstr ""
+
+msgid "Sign in in old school way"
+msgstr ""
+
+msgid "Sing-in"
+msgstr ""
+
+msgid "Summary"
+msgstr ""
+
+msgid "The e-mail address and password you entered do not match any accounts"
+msgstr ""
+
+msgid "Time period must be positive"
+msgstr ""
+
+msgid "Title"
+msgstr ""
+
+msgid "Title is required"
+msgstr ""
+
+msgid "Total"
+msgstr ""
+
+msgid "Unknown token %s"
+msgstr ""
+
+msgid "Unknown user with id %d"
+msgstr ""
+
+msgid "Update"
+msgstr ""
+
+msgid "User %1$s has been created. <a href=\"%2$s\">Invite them ?</a>"
+msgstr ""
+
+msgid "User %s has been created. <a href=\"%s\">Invite her/him ?</a>"
+msgstr ""
+
+msgid "User %s merged with %s"
+msgstr ""
+
+msgid "Users"
+msgstr ""
+
+msgid "Users you have created"
+msgstr ""
+
+msgid "Users you have invited"
+msgstr ""
+
+msgid "View"
+msgstr ""
+
+msgid "View expenditure"
+msgstr ""
+
+msgid "Yes, delete it"
+msgstr ""
+
+msgid "You can't access this account."
+msgstr ""
+
 msgid "You can't delete this account because you haven't created it."
 msgstr ""
-msgid "You can't access this account."
+
+msgid "You can't delete this expenditure because"
+msgstr ""
+
+msgid "You can't edit this expenditure because"
+msgstr ""
+
+msgid "You must be creator of user in order to merge it"
+msgstr ""
+
+msgid "repayments"
+msgstr ""
+
+msgid "to"
 msgstr ""

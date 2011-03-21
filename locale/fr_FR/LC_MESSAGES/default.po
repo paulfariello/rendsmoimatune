@@ -10,116 +10,38 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-msgid "DASHBOARD"
-msgstr "TABLEAU DE BORD"
+msgid "%1$s gives %2$.2f€ to %3$s"
+msgstr "%1$s doit %2$.2f€ à %3$s"
 
-msgid "Dashboard"
-msgstr "Tableau de bord"
+msgid "%1$s repaid %2$.2f€ to %3$s"
+msgstr "%1$s a payé %2$.2f€ à %3$s"
 
-msgid "My accounts"
-msgstr "Mes comptes"
+msgid "%s gives %.2f€ to %s"
+msgstr "%s doit %.2f€ à %s"
 
-msgid "New account"
-msgstr "Nouveau compte"
+msgid "About us"
+msgstr "A propos de nous"
 
-msgid "Name"
-msgstr "Nom"
+msgid "Account administration"
+msgstr "Administration du compte"
 
-msgid "From"
-msgstr "Du"
-
-msgid "to"
-msgstr "au"
-
-msgid "Create"
-msgstr "Créer"
-
-msgid "New expenditure"
-msgstr "Nouvelle dépense"
-
-msgid "Date"
-msgstr "Date"
-
-msgid "Amount"
-msgstr "Montant"
-
-msgid "Payers"
-msgstr "Payeurs"
-
-msgid "Beneficiaries"
-msgstr "Consommateurs"
-
-msgid "Email"
-msgstr "e-mail"
-
-msgid "Password"
-msgstr "Mot de passe"
-
-msgid "Password Confirm"
-msgstr "Confirmation du mot de passe"
-
-msgid "First Name"
-msgstr "Prénom"
-
-msgid "Last Name"
-msgstr "Nom"
-
-msgid "Create new account"
-msgstr "S'inscrire"
-
-msgid "Sign in"
-msgstr "S'identifier"
-
-msgid "MY ACCOUNTS"
-msgstr "MES COMPTES"
-
-msgid "MY PARAMETERS"
-msgstr "MES PARAMÈTRES"
-
-msgid "SIGN IN"
-msgstr "S'IDENTIFIER"
-
-msgid "SIGN OUT"
-msgstr "DÉCONNEXION"
+msgid "Add"
+msgstr "Ajouter"
 
 msgid "Admin"
 msgstr "Admin"
 
-msgid "Login"
-msgstr "S'identifier"
+msgid "Amount"
+msgstr "Montant"
 
-msgid "LOGOUT"
-msgstr "Deconnexion"
+msgid "Amount is required"
+msgstr "Montant requis"
 
-msgid "Expenditures"
-msgstr "Dépenses"
+msgid "Amount payed"
+msgstr "Montant payé"
 
-msgid "repayments"
-msgstr "remboursements"
-
-msgid "Users"
-msgstr "Utilisateurs"
-
-msgid "New user"
-msgstr "Nouvel utilisateur"
-
-msgid "My debts"
-msgstr "Mes dettes"
-
-msgid "My repayments"
-msgstr "Mes remboursements"
-
-msgid "Repayments"
-msgstr "Remboursements"
-
-msgid "Title"
-msgstr "Intitulé"
-
-msgid "Cash up"
-msgstr "Faire les comptes"
-
-msgid "New repayment"
-msgstr "Nouveau remboursement"
+msgid "Authentication failed"
+msgstr "Echec de l'identification"
 
 msgid "Balance of payments"
 msgstr "Balance des comptes"
@@ -127,99 +49,167 @@ msgstr "Balance des comptes"
 msgid "Balancing"
 msgstr "Équilibrage"
 
-msgid "Expenditure title"
-msgstr "Intitulé de la dépense"
+msgid "Beneficiaries"
+msgstr "Consommateurs"
+
+msgid "Beneficiary's is required"
+msgstr "Au moins un consommateur requis"
+
+msgid "Cannot merge two registered users"
+msgstr "Impossible de fusionner deux utilisateurs non enregistrés"
+
+msgid "Cash up"
+msgstr "Faire les comptes"
 
 msgid "Cash-up"
 msgstr "Faire les comptes"
 
-msgid "P_Balancing"
-msgstr "Voyez d'un coup d'œil qui a le plus payé."
+msgid "Create"
+msgstr "Créer"
 
-msgid "%s gives %.2f€ to %s"
-msgstr "%s doit %.2f€ à %s"
+msgid "Create new account"
+msgstr "S'inscrire"
 
-msgid "Overpaid"
-msgstr "A trop payé"
+msgid "DASHBOARD"
+msgstr "TABLEAU DE BORD"
 
-msgid "Not paid enough"
-msgstr "N'a pas assez payé"
+msgid "Dashboard"
+msgstr "Tableau de bord"
 
-#, fuzzy
-msgid "User %s has been created. <a href=\"%s\">Invite her/him ?</a>"
-msgstr "L'utilisateur %1$s a été créé. <a href=\"%2$s\">L'inviter ?</a>"
-
-msgid "Amount payed"
-msgstr "Montant payé"
-
-msgid "Expenditure amount"
-msgstr "Montant de la dépense"
-
-msgid "View"
-msgstr "Voir"
-
-msgid "Edit"
-msgstr "Modifier"
+msgid "Date"
+msgstr "Date"
 
 msgid "Delete"
 msgstr "Supprimer"
 
-msgid "Recent expenditures"
-msgstr "Dernières dépenses"
-
-msgid "Recent repayments"
-msgstr "Derniers remboursements"
-
-msgid "Summary"
-msgstr "Résumé"
-
-msgid "Is concerned by"
-msgstr "A consommé"
-
-msgid "Payed"
-msgstr "A payé"
-
-msgid "View expenditure"
-msgstr "Détail de la dépense"
-
-msgid "Edit expenditure"
-msgstr "Modification de la dépense"
-
-msgid "Save"
-msgstr "Enregistrer"
-
-msgid "Reset"
-msgstr "Réinitialiser"
-
-msgid "My parameters"
-msgstr "Mes paramètres"
-
-msgid "Manage users"
-msgstr "Gérer les utilisateurs"
-
-msgid "Send invitation"
-msgstr "Envoyer une invitation"
-
-msgid "Yes, delete it"
-msgstr "Confirmer la suppression"
-
-msgid "P_AccountDeletionWarning"
-msgstr ""
-"Vous êtes sur le point de supprimer définitivement le compte <b>%s</b>. Vous "
-"allez perdre toutes les données qui s'y trouve. Aucun retour en arrière "
-"n'est possible."
-
-msgid "Deletion"
-msgstr "Suppression"
-
-msgid "Add"
-msgstr "Ajouter"
+msgid "Delete selected users"
+msgstr "Supprimer les utilisateurs sélectionnés"
 
 msgid "Delete this account"
 msgstr "Supprimer le compte"
 
-msgid "About us"
-msgstr "A propos de nous"
+msgid "Deletion"
+msgstr "Suppression"
+
+msgid "Edit"
+msgstr "Modifier"
+
+msgid "Edit expenditure"
+msgstr "Modification de la dépense"
+
+msgid "Email"
+msgstr "e-mail"
+
+msgid "Email is required"
+msgstr ""
+
+msgid "Expenditure amount"
+msgstr "Montant de la dépense"
+
+msgid "Expenditure created"
+msgstr "Dépense créée"
+
+msgid "Expenditure deleted"
+msgstr "Dépense supprimée"
+
+msgid "Expenditure saved"
+msgstr "Dépense enregistrée"
+
+msgid "Expenditure title"
+msgstr "Intitulé de la dépense"
+
+msgid "Expenditures"
+msgstr "Dépenses"
+
+msgid "First Name"
+msgstr "Prénom"
+
+msgid "From"
+msgstr "Du"
+
+msgid "Id"
+msgstr "n°"
+
+msgid "Internal Error"
+msgstr "Erreur interne"
+
+msgid "Internal error"
+msgstr "Erreur interne"
+
+msgid "Invalid amount payed"
+msgstr "Montant payé incorrecte"
+
+msgid "Invitations sended !"
+msgstr "Invitations envoyées"
+
+msgid "Invitations sended again !"
+msgstr "Invitations réenvoyées"
+
+msgid "Invite"
+msgstr "Inviter"
+
+msgid "Invition to join Rendsmoimatune"
+msgstr "Invitation à rejoindre Rendsmoimatune"
+
+msgid "Is concerned by"
+msgstr "A consommé"
+
+msgid "LOGOUT"
+msgstr "Déconnexion"
+
+msgid "Last Name"
+msgstr "Nom"
+
+msgid "Login"
+msgstr "S'identifier"
+
+msgid "Login with Facebook"
+msgstr "Se connecter via Facebook"
+
+msgid "MY ACCOUNTS"
+msgstr "MES COMPTES"
+
+msgid "MY PARAMETERS"
+msgstr "MES PARAMÈTRES"
+
+msgid "Manage users"
+msgstr "Gérer les utilisateurs"
+
+msgid "Merge requests"
+msgstr "Requête de fusion"
+
+msgid "My account"
+msgstr "Mon compte"
+
+msgid "My accounts"
+msgstr "Mes comptes"
+
+msgid "My debts"
+msgstr "Mes dettes"
+
+msgid "My parameters"
+msgstr "Mes paramètres"
+
+msgid "My repayments"
+msgstr "Mes remboursements"
+
+msgid "Name"
+msgstr "Nom"
+
+msgid "Name is required"
+msgstr "Nom requis"
+
+msgid "New account"
+msgstr "Nouveau compte"
+
+msgid "New expenditure"
+msgstr "Nouvelle dépense"
+
+msgid "New repayment"
+msgstr "Nouveau remboursement"
+
+msgid "New user"
+msgstr "Nouvel utilisateur"
 
 msgid "No expenditure"
 msgstr "Aucune dépense"
@@ -227,17 +217,131 @@ msgstr "Aucune dépense"
 msgid "No repayment"
 msgstr "Aucun remboursement"
 
-msgid "Account administration"
-msgstr "Administration du compte"
+msgid "Not paid enough"
+msgstr "N'a pas assez payé"
 
-msgid "Invite"
-msgstr "Inviter"
+msgid "Overpaid"
+msgstr "A trop payé"
+
+msgid "P_AccountDeletionWarning"
+msgstr ""
+"Vous êtes sur le point de supprimer définitivement le compte <b>%s</b>. Vous "
+"allez perdre toutes les données qui s'y trouve. Aucun retour en arrière "
+"n'est possible."
+
+msgid "P_Balancing"
+msgstr "Voyez d'un coup d'œil qui a le plus payé."
+
+msgid "Password"
+msgstr "Mot de passe"
+
+msgid "Password Confirm"
+msgstr "Confirmation du mot de passe"
+
+msgid "Password are not identical"
+msgstr "Les mots de passes diffèrent"
+
+msgid "Password are not identicals"
+msgstr "Les mots de passes diffèrent"
+
+msgid "Password is required"
+msgstr "Mot de passe requis"
+
+msgid "Payed"
+msgstr "A payé"
+
+msgid "Payer's name"
+msgstr "Nom du payeur"
+
+msgid "Payer's name is required"
+msgstr "Nom du payeur requis"
+
+msgid "Payers"
+msgstr "Payeurs"
+
+msgid "Recent expenditures"
+msgstr "Dernières dépenses"
+
+msgid "Recent repayments"
+msgstr "Derniers remboursements"
+
+msgid "Repayment created"
+msgstr "Remboursement créé"
+
+msgid "Repayments"
+msgstr "Remboursements"
+
+msgid "Reset"
+msgstr "Réinitialiser"
+
+msgid "SIGN IN"
+msgstr "S'IDENTIFIER"
+
+msgid "SIGN OUT"
+msgstr "DÉCONNEXION"
+
+msgid "Save"
+msgstr "Enregistrer"
+
+msgid "Send"
+msgstr "Envoyer"
+
+msgid "Send again"
+msgstr "Renvoyer une invitation"
+
+msgid "Send invitation"
+msgstr "Envoyer une invitation"
+
+msgid "Sign in"
+msgstr "S'identifier"
+
+msgid "Sign in easily"
+msgstr "S'identifier simplement"
+
+msgid "Sign in in old school way"
+msgstr "S'identifier à l'ancienne"
+
+msgid "Sing-in"
+msgstr "S'identifier"
+
+msgid "Summary"
+msgstr "Résumé"
+
+msgid "The e-mail address and password you entered do not match any accounts"
+msgstr "L'email et le mot passe entrés ne correspondent à aucun compte connu"
+
+msgid "Time period must be positive"
+msgstr "La période temps doit être positive"
+
+msgid "Title"
+msgstr "Intitulé"
+
+msgid "Title is required"
+msgstr "Intitulé requis"
+
+msgid "Total"
+msgstr "Total"
+
+msgid "Unknown token %s"
+msgstr "Jeton inconnu"
+
+msgid "Unknown user with id %d"
+msgstr "Utilisateur %d inconnu"
 
 msgid "Update"
 msgstr "Mettre à jour"
 
-msgid "Delete selected users"
-msgstr "Supprimer les utilisateurs sélectionnés"
+msgid "User %1$s has been created. <a href=\"%2$s\">Invite them ?</a>"
+msgstr "L'utilisateur %1$s a été créé. <a href=\"%2$s\">L'inviter ?</a>"
+
+msgid "User %s has been created. <a href=\"%s\">Invite her/him ?</a>"
+msgstr "L'utilisateur %s a été créé. <a href=\"%s\">L'inviter ?</a>"
+
+msgid "User %s merged with %s"
+msgstr "Fusion réussie de l'utilisateur %s avec l'utilisateur %s"
+
+msgid "Users"
+msgstr "Utilisateurs"
 
 msgid "Users you have created"
 msgstr "Utilisateurs que vous avez créés"
@@ -245,8 +349,32 @@ msgstr "Utilisateurs que vous avez créés"
 msgid "Users you have invited"
 msgstr "Utilisateurs que vous avez invités"
 
-msgid "Send"
-msgstr "Envoyer"
+msgid "View"
+msgstr "Voir"
 
-msgid "Send again"
-msgstr "Renvoyer une invitation"
+msgid "View expenditure"
+msgstr "Détail de la dépense"
+
+msgid "Yes, delete it"
+msgstr "Confirmer la suppression"
+
+msgid "You can't access this account."
+msgstr "Vous n'avez pas le droit d'acceder à ce compte"
+
+msgid "You can't delete this account because you haven't created it."
+msgstr "Vous ne pouvez pas supprimer ce compte car vous n'en n'êtes pas l'auteur."
+
+msgid "You can't delete this expenditure because"
+msgstr "Vous ne pouvez pas supprimer ce compte car"
+
+msgid "You can't edit this expenditure because"
+msgstr "Vous ne pouvez pas modifier ce compte car"
+
+msgid "You must be creator of user in order to merge it"
+msgstr "Vous devez être le créateur d'un utilisateur pour pouvoir le fusionner"
+
+msgid "repayments"
+msgstr "remboursements"
+
+msgid "to"
+msgstr "au"
