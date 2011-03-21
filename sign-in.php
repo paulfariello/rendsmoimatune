@@ -40,13 +40,13 @@ if(isset ($_POST['sign-in'])) {
         $authentication->setPassword($_POST['password']);
         $user = $authentication->authenticate();
     } catch (Exception $e) {
-        $te->assign("message", $e->getMessage());
+        $te->assign("messages", array($e->getMessage()));
         $te->assign("_POST", $_POST);
         $te->display("sign-in");
         die();
     }
     if (null === \Bdf\Session::getInstance()->getCurrentUserId()) {
-        $te->assign("message", array('type'=>'error','content'=>\Bdf\Utils::getText('The e-mail address and password you entered do not match any accounts')));
+        $te->assign("messages", array(array('type'=>'error','content'=>\Bdf\Utils::getText('The e-mail address and password you entered do not match any accounts'))));
         $te->assign("_POST", $_POST);
         $te->display("sign-in");
     } else {
