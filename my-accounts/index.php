@@ -38,5 +38,12 @@ if ($currentUser == null) {
     header('location: '.\Bdf\Utils::makeUrl('sign-in.html'));
     die();
 }
+
+$messages = \Bdf\Session::getInstance()->get('messages');
+if (null !== $messages) {
+    $te->assign('messages',$messages);
+    \Bdf\Session::getInstance()->remove('messages');
+}
+
 $te->display('my-accounts/index');
 ?>

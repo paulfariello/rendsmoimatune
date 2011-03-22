@@ -63,201 +63,210 @@ if (!isset($_GET['expenditure-id']) or empty($_GET['account-id'])) {
     }
 }
 
-if (!isset($_POST['edit-expenditure'])) {
-    $te->assign("currentAccount",$account);
-    $te->assign('expenditure', $expenditure);
-    $te->display('my-accounts/edit-expenditure');
-} else {
-    try {
-        if (!isset($_POST['title']) OR empty($_POST['title'])) {
-            throw new Eu\Rmmt\Exception\UserInputException(\Bdf\Utils::getText('Title is required'), $_POST['title'], 'title');
-        }
+    
+try {
 
-        if (!isset($_POST['amount']) OR empty($_POST['amount'])) {
-            throw new Eu\Rmmt\Exception\UserInputException(\Bdf\Utils::getText('Amount is required'), $_POST['amount'], 'amount');
-        }
-        $_POST['amount'] = strtr($_POST['amount'], ',', '.');
+    $expenditure->checkEditRight($currentUser);
 
-        $expenditure->setTitle($_POST['title']);
-        $expenditure->setAmount($_POST['amount']);
-
-        $date = null;
-        if (isset($_POST['date']) AND !empty($_POST['date'])) {
-            $date = DateTime::createFromFormat('d-m-Y', $_POST['date']);
-
-            $expenditure->setDate($date);
-        }
-
-        // Store new users here in order to propose invitations
-        $newUsers       = array();
-
-        // Payers
-
-        $amountPayed    = 0;
-        $payers = array();
-
-        foreach( array_keys ($_POST['payersId']) as $index ) {
-            $id     = $_POST['payersId'][$index];
-            $name   = trim ($_POST['payersName'][$index]);
-            $amount = (float) strtr($_POST['payersAmount'][$index], ',', '.');
-            $metric = $_POST['payersMetric'][$index];
-
-            if (!empty($name)) {
-                $unknown = true;
-                $payer   = null;
-
-                // Get user
-                if (!empty($id) and ctype_digit ($id)) {
-                    $user = Eu\Rmmt\User::getRepository()->find((int)$id);
-
-                    // Check inconsistency between id and name
-                    if (null !== $user and $user->getName() == $name) {
-                        $unknown     = false;
-                        $payer       = $user;
-                    }
-                }
-
-                // Search for similar user name
-                if ($unknown) {
-                    $query = $em->createQuery("SELECT u FROM Eu\Rmmt\User u WHERE LOWER(u._name) = :search");
-                    $query->setParameter('search',strtolower($name));
-                    $users = $query->getResult();
-                    if (!empty($users)) {
-                        $unknown    = false;
-                        $payer      = $users[0];
-                    }
-                }
-
-                if ($unknown) {
-                    // Create new user
-                    $user = Eu\Rmmt\UserFactory::createUnregisteredUser($currentUser, $name);
-
-                    $payer       = $user;
-                    $newUsers[]  = $payer;
-                }
-
-                // Create payer
-                switch ($metric) {
-                    case '%':
-                        $amount = round($expenditure->getAmount() * $amount / 100, 2);
-                        break;
-                    case '€':
-                        $amount = $amount;
-                        break;
-                }
-
-                $payers[] = new Eu\Rmmt\Payer($expenditure, $payer, $amount);
-
-                $amountPayed += $amount;
+    if (!isset($_POST['edit-expenditure'])) {
+        $te->assign("currentAccount",$account);
+        $te->assign('expenditure', $expenditure);
+        $te->display('my-accounts/edit-expenditure');
+    } else {
+        try {
+            if (!isset($_POST['title']) OR empty($_POST['title'])) {
+                throw new Eu\Rmmt\Exception\UserInputException(\Bdf\Utils::getText('Title is required'), $_POST['title'], 'title');
             }
-        }
 
-        if ($amountPayed != $expenditure->getAmount()) {
-            throw new Eu\Rmmt\Exception\InvalidAmountPayedException($expenditure);
-        }
+            if (!isset($_POST['amount']) OR empty($_POST['amount'])) {
+                throw new Eu\Rmmt\Exception\UserInputException(\Bdf\Utils::getText('Amount is required'), $_POST['amount'], 'amount');
+            }
+            $_POST['amount'] = strtr($_POST['amount'], ',', '.');
 
-        $expenditure->updatePayers($payers);
+            $expenditure->setTitle($_POST['title']);
+            $expenditure->setAmount($_POST['amount']);
 
-        // Beneficiaries
+            $date = null;
+            if (isset($_POST['date']) AND !empty($_POST['date'])) {
+                $date = DateTime::createFromFormat('d-m-Y', $_POST['date']);
 
-        $beneficiaries = array();
+                $expenditure->setDate($date);
+            }
 
-        foreach( array_keys ($_POST['beneficiariesId']) as $index ) {
-            $id   = $_POST['beneficiariesId'][$index];
-            $name = trim ($_POST['beneficiariesName'][$index]);
+            // Store new users here in order to propose invitations
+            $newUsers       = array();
 
-            if (!empty ($name)) {
-                $unknown     = true;
-                $beneficiary = null;
+            // Payers
 
-                if (!empty ($id) and ctype_digit ($id)) {
-                    $user = Eu\Rmmt\User::getRepository()->find((int)$id);
+            $amountPayed    = 0;
+            $payers = array();
 
-                    // Check inconsistency between id and name
-                    if (null !== $user and $user->getName() == $name) {
-                        $unknown     = false;
-                        $beneficiary = $user;
-                    }
-                }
+            foreach( array_keys ($_POST['payersId']) as $index ) {
+                $id     = $_POST['payersId'][$index];
+                $name   = trim ($_POST['payersName'][$index]);
+                $amount = (float) strtr($_POST['payersAmount'][$index], ',', '.');
+                $metric = $_POST['payersMetric'][$index];
 
-                // Search in just created user
-                if ($unknown) {
-                    foreach($newUsers as $user) {
-                        if (strtolower($user->getName()) == strtolower($name)) {
+                if (!empty($name)) {
+                    $unknown = true;
+                    $payer   = null;
+
+                    // Get user
+                    if (!empty($id) and ctype_digit ($id)) {
+                        $user = Eu\Rmmt\User::getRepository()->find((int)$id);
+
+                        // Check inconsistency between id and name
+                        if (null !== $user and $user->getName() == $name) {
                             $unknown     = false;
-                            $beneficiary = $user;
-                            break;
+                            $payer       = $user;
                         }
                     }
-                }
 
-                // Search for similar user name
-                if ($unknown) {
-                    $query = $em->createQuery("SELECT u FROM Eu\Rmmt\User u WHERE LOWER(u._name) = :search");
-                    $query->setParameter('search',strtolower($name));
-                    $users = $query->getResult();
-                    if (!empty($users)) {
-                        $unknown        = false;
-                        $beneficiary    = $users[0];
+                    // Search for similar user name
+                    if ($unknown) {
+                        $query = $em->createQuery("SELECT u FROM Eu\Rmmt\User u WHERE LOWER(u._name) = :search");
+                        $query->setParameter('search',strtolower($name));
+                        $users = $query->getResult();
+                        if (!empty($users)) {
+                            $unknown    = false;
+                            $payer      = $users[0];
+                        }
                     }
+
+                    if ($unknown) {
+                        // Create new user
+                        $user = Eu\Rmmt\UserFactory::createUnregisteredUser($currentUser, $name);
+
+                        $payer       = $user;
+                        $newUsers[]  = $payer;
+                    }
+
+                    // Create payer
+                    switch ($metric) {
+                        case '%':
+                            $amount = round($expenditure->getAmount() * $amount / 100, 2);
+                            break;
+                        case '€':
+                            $amount = $amount;
+                            break;
+                    }
+
+                    $payers[] = new Eu\Rmmt\Payer($expenditure, $payer, $amount);
+
+                    $amountPayed += $amount;
                 }
+            }
 
-                if ($unknown) {
-                    // Create new user
-                    $user = Eu\Rmmt\UserFactory::createUnregisteredUser($currentUser, $name);
+            if ($amountPayed != $expenditure->getAmount()) {
+                throw new Eu\Rmmt\Exception\InvalidAmountPayedException($expenditure);
+            }
 
-                    $beneficiary = $user;
-                    $newUsers[]  = $beneficiary;
+            $expenditure->updatePayers($payers);
+
+            // Beneficiaries
+
+            $beneficiaries = array();
+
+            foreach( array_keys ($_POST['beneficiariesId']) as $index ) {
+                $id   = $_POST['beneficiariesId'][$index];
+                $name = trim ($_POST['beneficiariesName'][$index]);
+
+                if (!empty ($name)) {
+                    $unknown     = true;
+                    $beneficiary = null;
+
+                    if (!empty ($id) and ctype_digit ($id)) {
+                        $user = Eu\Rmmt\User::getRepository()->find((int)$id);
+
+                        // Check inconsistency between id and name
+                        if (null !== $user and $user->getName() == $name) {
+                            $unknown     = false;
+                            $beneficiary = $user;
+                        }
+                    }
+
+                    // Search in just created user
+                    if ($unknown) {
+                        foreach($newUsers as $user) {
+                            if (strtolower($user->getName()) == strtolower($name)) {
+                                $unknown     = false;
+                                $beneficiary = $user;
+                                break;
+                            }
+                        }
+                    }
+
+                    // Search for similar user name
+                    if ($unknown) {
+                        $query = $em->createQuery("SELECT u FROM Eu\Rmmt\User u WHERE LOWER(u._name) = :search");
+                        $query->setParameter('search',strtolower($name));
+                        $users = $query->getResult();
+                        if (!empty($users)) {
+                            $unknown        = false;
+                            $beneficiary    = $users[0];
+                        }
+                    }
+
+                    if ($unknown) {
+                        // Create new user
+                        $user = Eu\Rmmt\UserFactory::createUnregisteredUser($currentUser, $name);
+
+                        $beneficiary = $user;
+                        $newUsers[]  = $beneficiary;
+                    }
+
+                    $beneficiaries[] = new Eu\Rmmt\Beneficiary($expenditure, $beneficiary, 0);
                 }
-
-                $beneficiaries[] = new Eu\Rmmt\Beneficiary($expenditure, $beneficiary, 0);
             }
-        }
 
-        // Calculate amount due per user
-        $amountPerBeneficiary = round($expenditure->getAmount() / count($beneficiaries), 2);
+            // Calculate amount due per user
+            $amountPerBeneficiary = round($expenditure->getAmount() / count($beneficiaries), 2);
 
-        $amountOwed = $expenditure->getAmount();
-        foreach($beneficiaries as $index=>$beneficiary) {
-            $amountOwed = round($amountOwed - $amountPerBeneficiary, 2);
-            $beneficiary->setAmount($amountPerBeneficiary);
-        }
-
-        #We let the last guy take the remaining amount owed it for its own. It happens when total amount isn't divisible by number of beneficiaries.
-        #Note that remaining amount can be negative.
-        $beneficiary->setAmount($amountPerBeneficiary + $amountOwed);
-
-        $expenditure->updateBeneficiaries($beneficiaries);
-
-        $em->flush();
-        $messages = array();
-        $messages[] = array('type'=>'done','content'=>Bdf\Utils::getText('Expenditure saved'));
-        $usersString = "";
-        foreach($newUsers as $index => $user) {
-            $usersString .= $user->getName();
-            if ($index < sizeof($newUsers)-1) {
-               $usersString .= ', '; 
+            $amountOwed = $expenditure->getAmount();
+            foreach($beneficiaries as $index=>$beneficiary) {
+                $amountOwed = round($amountOwed - $amountPerBeneficiary, 2);
+                $beneficiary->setAmount($amountPerBeneficiary);
             }
+
+            #We let the last guy take the remaining amount owed it for its own. It happens when total amount isn't divisible by number of beneficiaries.
+            #Note that remaining amount can be negative.
+            $beneficiary->setAmount($amountPerBeneficiary + $amountOwed);
+
+            $expenditure->updateBeneficiaries($beneficiaries);
+
+            $em->flush();
+            $messages = array();
+            $messages[] = array('type'=>'done','content'=>Bdf\Utils::getText('Expenditure saved'));
+            $usersString = "";
+            foreach($newUsers as $index => $user) {
+                $usersString .= $user->getName();
+                if ($index < sizeof($newUsers)-1) {
+                   $usersString .= ', '; 
+                }
+            }
+            if (!empty($usersString)) {
+                $messages[] = array('type'=>'info','content'=>Bdf\Utils::getText('User %1$s has been created. <a href="%2$s">Invite them ?</a>', $usersString, Bdf\Utils::makeUrl('my-parameters/send-invitation.html')));
+            }
+            \Bdf\Session::getInstance()->add('messages',$messages);
+            header('location: '.$account->getUrlDetail());
+        } catch(Eu\Rmmt\Exception\UserInputException $e) {
+            $te->assign('currentAccount',$account);
+            $te->assign('expenditure',$expenditure);
+            $te->assign('_POST',$_POST);
+            $te->assign('messages', array(array('type'=>'error','content'=>$e->getMessage())));
+            $te->assign('userInputException', $e);
+            $te->display('my-accounts/edit-expenditure');
+        } catch(Exception $e) {
+            $te->assign('currentAccount',$account);
+            $te->assign('expenditure',$expenditure);
+            $te->assign('_POST',$_POST);
+            $te->assign('messages', array(array('type'=>'error','content'=>Bdf\Utils::getText('Internal error').' : '.$e->getMessage())));
+            $te->display('my-accounts/edit-expenditure');
         }
-        if (!empty($usersString)) {
-            $messages[] = array('type'=>'info','content'=>Bdf\Utils::getText('User %1$s has been created. <a href="%2$s">Invite them ?</a>', $usersString, Bdf\Utils::makeUrl('my-parameters/send-invitation.html')));
-        }
-        \Bdf\Session::getInstance()->add('messages',$messages);
-        header('location: '.$account->getUrlDetail());
-    } catch(Eu\Rmmt\Exception\UserInputException $e) {
-        $te->assign('currentAccount',$account);
-        $te->assign('expenditure',$expenditure);
-        $te->assign('_POST',$_POST);
-        $te->assign('messages', array(array('type'=>'error','content'=>$e->getMessage())));
-        $te->assign('userInputException', $e);
-        $te->display('my-accounts/edit-expenditure');
-    } catch(Exception $e) {
-        $te->assign('currentAccount',$account);
-        $te->assign('expenditure',$expenditure);
-        $te->assign('_POST',$_POST);
-        $te->assign('messages', array(array('type'=>'error','content'=>Bdf\Utils::getText('Internal error').' : '.$e->getMessage())));
-        $te->display('my-accounts/edit-expenditure');
     }
+} catch(Eu\Rmmt\Exception\RightException $e) {
+    \Bdf\Session::getInstance()->add('messages', array(array('type'=>'error','content'=>$e->getMessage())));
+    header('location: '.$expenditure->getEvent()->getUrlDetail()); 
 }
 
 ?>

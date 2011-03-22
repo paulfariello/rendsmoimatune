@@ -46,17 +46,23 @@ if (!isset($_GET['expenditure-id'])) {
     if ($expenditure === null) {
         header('location: '.\Bdf\Utils::makeUrl('my-accounts/'));
     } else {
-        $url = $expenditure->getEvent()->getUrlDetail();
-        $em->remove($expenditure);
-        $em->flush();
+        try {
+            $url = $expenditure->getEvent()->getUrlDetail();
 
-        $messages = array();
-        $messages[] = array('type'=>'done','content'=>Bdf\Utils::getText('Expenditure deleted'));
-        \Bdf\Session::getInstance()->add('messages',$messages);
-        header('location: '.$url);
+            $expenditure->checkDeleteRight($currentUser);
+
+            $em->remove($expenditure);
+            $em->flush();
+
+            $messages = array();
+            $messages[] = array('type'=>'done','content'=>Bdf\Utils::getText('Expenditure deleted'));
+            \Bdf\Session::getInstance()->add('messages',$messages);
+            header('location: '.$url);
+        } catch(Eu\Rmmt\Exception\RightException $e) {
+            \Bdf\Session::getInstance()->add('messages', array(array('type'=>'error','content'=>$e->getMessage())));
+            header('location: '.$url);
+        }
     }
 }
-
-
 
 ?>

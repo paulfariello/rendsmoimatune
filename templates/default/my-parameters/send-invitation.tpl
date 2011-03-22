@@ -2,7 +2,7 @@
 <!-- Additionnal javascript script -->
 {include file='inc/header.tpl'}
 {include file='inc/side-nav-my-parameters.tpl'}
-<h2><a href="{makeUrl url='my-parameters/'}">{getText id='My account'}</a> &raquo; <a href="{makeUrl url='my-parameters/send-invitation.html'}">{getText id='Send invitation'}</a></h2>
+<h2><a href="{makeUrl url='my-parameters/'}">{getText id='My parameters'}</a> &raquo; <a href="{makeUrl url='my-parameters/send-invitation.html'}">{getText id='Send invitation'}</a></h2>
 {include file='inc/main.tpl'}
 <h3>{getText id='Users you have created'}</h3>
 <form action="{makeUrl url='my-parameters/send-invitation.html'}" class="jNice" method="post">

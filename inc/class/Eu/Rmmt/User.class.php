@@ -208,6 +208,10 @@ class User implements \Bdf\IUser
     public function setRegistered($registered) 
     {
         $this->_registered = (boolean)$registered;
+        if ($this->_registered) {
+            $this->_invitationToken = null;
+            $this->_invited = false;
+        }
     }
 
     public function getCreator() 
