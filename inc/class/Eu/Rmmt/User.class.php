@@ -32,6 +32,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Bdf\Core;
 use Bdf\Utils;
 use Eu\Rmmt\Exception\MergeException;
+use Eu\Rmmt\Exception\RightException;
 
 /**
  * User
@@ -324,6 +325,30 @@ class User implements \Bdf\IUser
         }
 
         $em->remove($this);
+    }
+
+    public function sendInvitation($email = null)
+    {
+        $currentUser = User::getCurrentUser();
+
+        $title = Utils::getText('Invition to join Rendsmoimatune');
+        $message = "Bonjour %s, ".$currentUser->getName()." vous a invité à rejoindre rendsmoimatune.
+Rendsmoimatune vous permet de savoir en permanance qui vous doit de l'argent, blablabla.
+Pour nous rejoindre cliquez sur le lien suivant : %s";
+        $header = '';
+
+
+        if ($this->getCreator()->equals($currentUser)) {
+            if (null != $email) {
+                $this->setEmail($email);
+            }
+
+            $this->setInvited(true);
+            $this->generateInvitationToken();
+            mail($this->getEmail(), $title, sprintf($message, $this->getName(), Utils::makeUrl('new-account-invitation.html?id='.$this->getId().'&token='.$this->getInvitationToken()))); 
+        } else {
+           throw new RightException(Utils::getText("You can't send invitation to user you haven't created")); 
+        }
     }
 
 }

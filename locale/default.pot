@@ -218,6 +218,9 @@ msgstr ""
 msgid "No repayment"
 msgstr ""
 
+msgid "No users"
+msgstr ""
+
 msgid "Not paid enough"
 msgstr ""
 
@@ -375,4 +378,10 @@ msgid "repayments"
 msgstr ""
 
 msgid "to"
+msgstr ""
+
+msgid "Invitation sended"
+msgstr ""
+
+msgid "You can't send invitation to user you haven't created"
 msgstr ""

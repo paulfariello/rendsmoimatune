@@ -39,63 +39,87 @@ if ($currentUser == null) {
     die();
 }
 
-function sendInvitation($email, $userId)
-{
-    global $currentUser;
+$query = $em->createQuery("SELECT u FROM Eu\Rmmt\User u INNER JOIN u._creator c WHERE c._id = :userId AND u._registered = false AND u._invited = false");
+$query->setParameter('userId', $currentUser->getId());
+$users = $query->execute();
+$te->assign('users', $users);
 
-    $title = Bdf\Utils::getText('Invition to join Rendsmoimatune');
-    $message = "Bonjour %s, ".$currentUser->getName()." vous a invité à rejoindre rendsmoimatune.
-        Rendsmoimatune vous permet de savoir en permanance qui vous doit de l'argent, blablabla.
-        Pour nous rejoindre cliquez sur le lien suivant : %s";
-    $header = '';
-
-
-    if (!empty($email)) {
-        $user = Eu\Rmmt\User::getRepository()->find($userId);
-        if (null != $user AND $user->getCreator()->equals($currentUser)) {
-            $user->setEmail($email);
-            $user->setInvited(true);
-            $user->generateInvitationToken();
-
-            mail($email, $title, sprintf($message, $user->getName(), Bdf\Utils::makeUrl('new-account-invitation.html?id='.$user->getId().'&token='.$user->getInvitationToken()))); 
-        }
-    }
-
-}
+$query = $em->createQuery("SELECT u FROM Eu\Rmmt\User u INNER JOIN u._creator c WHERE c._id = :userId AND u._registered = false AND u._invited = true");
+$query->setParameter('userId', $currentUser->getId());
+$invitedUsers = $query->execute();
+$te->assign('invitedUsers', $invitedUsers);
 
 if (isset($_POST['send-invitation']) OR isset($_POST['resend-invitation'])) {
+    try {
+        $messages = array();
 
-    $messages = array();
+        if (isset($_POST['resend-invitation']) and isset($_POST['invite'])) {
+            foreach($_POST['invite'] as $userId) {
+                $email = $_POST['email'][$userId];
+                if (!empty($email)) {
+                    $user = Eu\Rmmt\User::getRepository()->find($userId);
+                    if (null == $user) {
+                        throw new Eu\Rmmt\Exception\UnknownUserException($userId);
+                    }
+                    $user->sendInvitation($email);
+                }
+            }
+            $messages[] = array('type'=>'info', 'content'=>Bdf\Utils::getText('Invitations sended again !'));
+        } elseif(isset($_POST['send-invitation'])) {
+            foreach($_POST['email'] as $userId => $email) {
+                if (!empty($email)) {
+                    $user = Eu\Rmmt\User::getRepository()->find($userId);
+                    if (null == $user) {
+                        throw new Eu\Rmmt\Exception\UnknownUserException($userId);
+                    }
+                    $user->sendInvitation($email);
+                }
+            }
+            $messages[] = array('type'=>'info', 'content'=>Bdf\Utils::getText('Invitations sended !'));
+        }
 
-    if (isset($_POST['resend-invitation']) and isset($_POST['invite'])) {
-        foreach($_POST['invite'] as $userId) {
-            $email = $_POST['email'][$userId];
-            sendInvitation($email, $userId);
-        }
-        $messages[] = array('type'=>'info', 'content'=>Bdf\Utils::getText('Invitations sended again !'));
-    } elseif(isset($_POST['send-invitation'])) {
-        foreach($_POST['email'] as $userId => $email) {
-            sendInvitation($email, $userId);
-        }
-        $messages[] = array('type'=>'info', 'content'=>Bdf\Utils::getText('Invitations sended !'));
+        $em->flush();
+
+        \Bdf\Session::getInstance()->add('messages',$messages);
+
+        header('location: '.Bdf\Utils::makeUrl('/my-parameters/send-invitation.html'));
+    } catch(Exception $e) {
+        $te->assign('_POST',$_POST);
+        $te->assign('messages', array(array('type'=>'error','content'=>Bdf\Utils::getText('Internal error').' : '.$e->getMessage())));
+        $te->display('my-parameters/send-invitation');
+    }
+} elseif(isset($_POST['send-invitation-to-new-user'])) {
+    try {
+        if (!isset($_POST['email']) or empty($_POST['email'])) {
+            throw new Eu\Rmmt\Exception\UserInputException(Bdf\Utils::getText("Email is required"), $_POST['email'], 'email');
+        } 
+
+        if (!isset($_POST['name']) or empty($_POST['name'])) {
+            throw new Eu\Rmmt\Exception\UserInputException(Bdf\Utils::getText("Name is required"), $_POST['name'], 'name');
+        } 
+        
+        $user = Eu\Rmmt\UserFactory::createUnregisteredUser($currentUser, $_POST['name']);
+        $user->sendInvitation($_POST['email']);
+        $em->persist($user);
+
+        $em->flush();
+
+        $messages[] = array('type'=>'info', 'content'=>Bdf\Utils::getText('Invitation sended !'));
+        \Bdf\Session::getInstance()->add('messages',$messages);
+        
+        header('location: '.Bdf\Utils::makeUrl('/my-parameters/send-invitation.html'));
+    } catch(Eu\Rmmt\Exception\UserInputException $e) {
+        $te->assign('_POST',$_POST);
+        $te->assign('messages', array(array('type'=>'error','content'=>$e->getMessage())));
+        $te->assign('userInputException', $e);
+        $te->display('my-parameters/send-invitation');
+    } catch(Exception $e) {
+        $te->assign('_POST',$_POST);
+        $te->assign('messages', array(array('type'=>'error','content'=>Bdf\Utils::getText('Internal error').' : '.$e->getMessage())));
+        $te->display('my-parameters/send-invitation');
     }
 
-    $em->flush();
-
-    \Bdf\Session::getInstance()->add('messages',$messages);
-
-    header('location: '.Bdf\Utils::makeUrl('/my-parameters/send-invitation.html'));
 } else {
-    $query = $em->createQuery("SELECT u FROM Eu\Rmmt\User u INNER JOIN u._creator c WHERE c._id = :userId AND u._registered = false AND u._invited = false");
-    $query->setParameter('userId', $currentUser->getId());
-    $users = $query->execute();
-    $te->assign('users', $users);
-
-    $query = $em->createQuery("SELECT u FROM Eu\Rmmt\User u INNER JOIN u._creator c WHERE c._id = :userId AND u._registered = false AND u._invited = true");
-    $query->setParameter('userId', $currentUser->getId());
-    $invitedUsers = $query->execute();
-    $te->assign('invitedUsers', $invitedUsers);
-
     $messages = \Bdf\Session::getInstance()->get('messages');
     if (null !== $messages) {
         $te->assign('messages',$messages);
