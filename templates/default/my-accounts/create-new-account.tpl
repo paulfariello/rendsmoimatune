@@ -8,8 +8,8 @@
                 	<form action="{makeUrl url='my-accounts/create-new-account.html'}" class="jNice" method="post">
                       <fieldset>
                           <p><label for="name">{getText id='Title'}</label><input type="text" class="text-long{if isset($userInputException) && $userInputException->getInputName() == 'title'} user-input-exception{/if}" name="name" value="{if isset($_POST)}{$_POST.name|htmlProtect}{/if}" /></p>
-                          <p><label for="start-date" class="float-left">{getText id='From'}</label><input type="text" id="start-date" class="text-medium date{if isset($userInputException) && $userInputException->getInputName() == 'date'} user-input-exception{/if}" name="start-date" value="{if isset($_POST)}{$_POST.{'start-date'}|htmlProtect}{else}{date('m-d-Y')}{/if}" />
-                          <label for="end-date" class="float-left">{getText id='to'}</label><input type="text" id="end-date" class="text-medium date{if isset($userInputException) && $userInputException->getInputName() == 'date'} user-input-exception{/if}" name="end-date" value="{if isset($_POST)}{$_POST.{'end-date'}|htmlProtect}{else}{date('m-d-Y')}{/if}" /></p>
+                          <p><label for="start-date" class="float-left">{getText id='From'}</label><input type="text" id="start-date" class="text-medium date{if isset($userInputException) && $userInputException->getInputName() == 'date'} user-input-exception{/if}" name="start-date" value="{if isset($_POST)}{$_POST.{'start-date'}|htmlProtect}{else}{date('d-m-Y')}{/if}" />
+                          <label for="end-date" class="float-left">{getText id='to'}</label><input type="text" id="end-date" class="text-medium date{if isset($userInputException) && $userInputException->getInputName() == 'date'} user-input-exception{/if}" name="end-date" value="{if isset($_POST)}{$_POST.{'end-date'}|htmlProtect}{else}{date('d-m-Y')}{/if}" /></p>
                           <input type="submit" name="create-new-account" value="{getText id='Create'}" />
                       </fieldset>
                   </form>
