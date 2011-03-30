@@ -53,7 +53,7 @@ try {
         die();
     }
 
-    $expenditure->getEvent()->checkViewRight($currentUser);
+    $expenditure->getAccount()->checkViewRight($currentUser);
 
     $te->assign("currentAccount",$account);
     $te->assign('expenditure', $expenditure);

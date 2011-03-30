@@ -50,11 +50,11 @@ class Expenditure
     private $_payers;
     private $_beneficiaries;
     private $_tags;
-    private $_event;
+    private $_account;
 
-    public function __construct(Event $event, $title, $amount)
+    public function __construct(Account $account, $title, $amount)
     {
-        $this->_event          = $event;
+        $this->_account          = $account;
         $this->_title          = $title;
         $this->_amount         = $amount;
         $this->_payers         = new ArrayCollection();
@@ -119,7 +119,7 @@ class Expenditure
         }
 
         $this->_payers->add($payer);
-        $this->_event->addUser($payer->getUser());
+        $this->_account->addUser($payer->getUser());
     }
 
     public function removePayer(User $user)
@@ -161,7 +161,7 @@ class Expenditure
 
         foreach($payers as $newPayer) {
             $this->_payers->add($newPayer);
-            $this->_event->addUser($newPayer->getUser());
+            $this->_account->addUser($newPayer->getUser());
         }
     }
 
@@ -187,7 +187,7 @@ class Expenditure
         }
 
         $this->_beneficiaries->add($beneficiary);
-        $this->_event->addUser($beneficiary->getUser());
+        $this->_account->addUser($beneficiary->getUser());
     }
 
     public function removeBeneficiary(User $user)
@@ -231,7 +231,7 @@ class Expenditure
         foreach($beneficiaries as $newBeneficiary) {
             $beneficiary = new Beneficiary($this, $newBeneficiary->getUser(), $newBeneficiary->getAmount());
             $this->_beneficiaries->add($beneficiary);
-            $this->_event->addUser($beneficiary->getUser());
+            $this->_account->addUser($beneficiary->getUser());
         }
     }
 
@@ -250,14 +250,14 @@ class Expenditure
         $this->_tags->removeElement($tag);
     }
 
-    public function getEvent()
+    public function getAccount()
     {
-        return $this->_event;
+        return $this->_account;
     }
 
-    public function setEvent($event)
+    public function setAccount($account)
     {
-        $this->_event = $event;
+        $this->_account = $account;
     }
 
     public static function getRepository()
@@ -267,17 +267,17 @@ class Expenditure
 
     public function getUrlView()
     {
-        return $this->_event->getUrlViewExpenditure($this);
+        return $this->_account->getUrlViewExpenditure($this);
     }
 
     public function getUrlEdit()
     {
-        return $this->_event->getUrlEditExpenditure($this);
+        return $this->_account->getUrlEditExpenditure($this);
     }
 
     public function getUrlDelete()
     {
-        return $this->_event->getUrlDeleteExpenditure($this);
+        return $this->_account->getUrlDeleteExpenditure($this);
     }
 
     public function checkEditRight(User $user)

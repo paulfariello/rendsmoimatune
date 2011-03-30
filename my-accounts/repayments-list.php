@@ -44,7 +44,7 @@ if (!isset($_GET['account-id'])) {
     die();
 }
 
-$account = \Eu\Rmmt\Event::getRepository()->find($_GET['account-id']);
+$account = \Eu\Rmmt\Account::getRepository()->find($_GET['account-id']);
 $te->assign('currentAccount',$account);
 $messages = \Bdf\Session::getInstance()->get('messages');
 if (null !== $messages) {

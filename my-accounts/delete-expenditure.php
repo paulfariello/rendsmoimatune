@@ -47,7 +47,7 @@ if (!isset($_GET['expenditure-id'])) {
         header('location: '.\Bdf\Utils::makeUrl('my-accounts/'));
     } else {
         try {
-            $url = $expenditure->getEvent()->getUrlDetail();
+            $url = $expenditure->getAccount()->getUrlDetail();
 
             $expenditure->checkDeleteRight($currentUser);
 

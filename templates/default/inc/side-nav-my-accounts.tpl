@@ -1,7 +1,7 @@
 <div id="sidebar">
     <ul class="sideNav">
         {if isset($currentUser)}
-            {foreach from=$currentUser->getEvents() item='account'}
+            {foreach from=$currentUser->getAccounts() item='account'}
                 {if isset($currentAccount) and $currentAccount->getId() == $account->getId()}
                     <li class="active">
                         <a class="account" href="{$account->getUrlDetail()}">{$account->getName()}</a>

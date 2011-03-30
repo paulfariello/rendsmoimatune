@@ -47,11 +47,11 @@ class Repayment
     private $_amount;
     private $_payer;
     private $_beneficiary;
-    private $_event;
+    private $_account;
 
-    public function  __construct(Event $event, User $payer, User $beneficiary, $amount)
+    public function  __construct(Account $account, User $payer, User $beneficiary, $amount)
     {
-        $this->_event       = $event;
+        $this->_account       = $account;
         $this->_payer       = $payer;
         $this->_beneficiary = $beneficiary;
         $this->_amount      = $amount;
@@ -107,14 +107,14 @@ class Repayment
         $this->_beneficiary = $toUser;
     }
 
-    public function getEvent()
+    public function getAccount()
     {
-        return $this->_event;
+        return $this->_account;
     }
 
-    public function setEvent(Event $event)
+    public function setAccount(Account $account)
     {
-        $this->_event = $event;
+        $this->_account = $account;
     }
 
     public function getDescription()

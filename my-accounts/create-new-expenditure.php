@@ -44,7 +44,7 @@ if (!isset($_GET['account-id'])) {
     header('location: '.\Bdf\Utils::makeUrl('my-accounts/'));
     die();
 } else {
-    $account = \Eu\Rmmt\Event::getRepository()->find($_GET['account-id']);
+    $account = \Eu\Rmmt\Account::getRepository()->find($_GET['account-id']);
     if ($account === null) {
         header('location: '.\Bdf\Utils::makeUrl('my-accounts/'));
         die();

@@ -26,6 +26,6 @@
             <join-column name="creator_fk" referenced-column-name="user_pk" />
         </many-to-one>
 
-        <many-to-many target-entity="Event" field="_events" mapped-by="_users"/>
+        <many-to-many target-entity="Account" field="_accounts" mapped-by="_users"/>
     </entity>
 </doctrine-mapping>

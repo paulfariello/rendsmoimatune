@@ -33,7 +33,7 @@ use Bdf\Utils;
 use Doctrine\Common\Collections\ArrayCollection;
 
 /**
- * Event
+ * Account
  *
  * @category Class
  * @package
@@ -41,7 +41,7 @@ use Doctrine\Common\Collections\ArrayCollection;
  * @license  http://www.gnu.org/copyleft/gpl.html  GPL License 3.0
  * @link
  */
-class Event
+class Account
 {
     private $_id;
     private $_name;
@@ -175,7 +175,7 @@ class Event
 
         // If user has payed for an expenditure
         $em = \Bdf\Core::getInstance()->getEntityManager();
-        $query = $em->createQuery("SELECT count(p._id) FROM \Eu\Rmmt\Payer p INNER JOIN p._expenditure ex INNER JOIN p._user u INNER JOIN ex._event ev WHERE u._id = ?1 AND ev._id = ?2");
+        $query = $em->createQuery("SELECT count(p._id) FROM \Eu\Rmmt\Payer p INNER JOIN p._expenditure ex INNER JOIN p._user u INNER JOIN ex._account a WHERE u._id = ?1 AND a._id = ?2");
         $query->setParameter(1, $user->getId());
         $query->setParameter(2, $this->getId());
         $count = $query->getSingleScalarResult();
@@ -185,7 +185,7 @@ class Event
 
         // If user is concerned by an expenditure
         $em = \Bdf\Core::getInstance()->getEntityManager();
-        $query = $em->createQuery("SELECT count(b._id) FROM \Eu\Rmmt\Beneficiary b INNER JOIN b._expenditure ex INNER JOIN b._user u INNER JOIN ex._event ev WHERE u._id = ?1 AND ev._id = ?2");
+        $query = $em->createQuery("SELECT count(b._id) FROM \Eu\Rmmt\Beneficiary b INNER JOIN b._expenditure ex INNER JOIN b._user u INNER JOIN ex._account a WHERE u._id = ?1 AND a._id = ?2");
         $query->setParameter(1, $user->getId());
         $query->setParameter(2, $this->getId());
         $count = $query->getSingleScalarResult();
@@ -198,9 +198,9 @@ class Event
     public function getPayedAmount(User $user)
     {
         $em = \Bdf\Core::getInstance()->getEntityManager();
-        $query = $em->createQuery("SELECT sum(p._amount) FROM \Eu\Rmmt\Payer p INNER JOIN p._expenditure ex INNER JOIN ex._event e INNER JOIN p._user u WHERE u._id = :user AND e._id = :event");
+        $query = $em->createQuery("SELECT sum(p._amount) FROM \Eu\Rmmt\Payer p INNER JOIN p._expenditure ex INNER JOIN ex._account a INNER JOIN p._user u WHERE u._id = :user AND a._id = :account");
         $query->setParameter("user", $user->getId());
-        $query->setParameter("event", $this->getId());
+        $query->setParameter("account", $this->getId());
         $payedAmount = $query->getSingleScalarResult();
         if(null == $payedAmount) {
             return 0;
@@ -213,9 +213,9 @@ class Event
     public function getOwesAmount(User $user)
     {
         $em = \Bdf\Core::getInstance()->getEntityManager();
-        $query = $em->createQuery("SELECT sum(b._amount) FROM \Eu\Rmmt\Beneficiary b INNER JOIN b._expenditure ex INNER JOIN ex._event e INNER JOIN b._user u WHERE u._id = :user AND e._id = :event");
+        $query = $em->createQuery("SELECT sum(b._amount) FROM \Eu\Rmmt\Beneficiary b INNER JOIN b._expenditure ex INNER JOIN ex._account a INNER JOIN b._user u WHERE u._id = :user AND a._id = :account");
         $query->setParameter("user", $user->getId());
-        $query->setParameter("event", $this->getId());
+        $query->setParameter("account", $this->getId());
         $owesAmount = $query->getSingleScalarResult();
         if(null == $owesAmount) {
             return 0;
@@ -227,8 +227,8 @@ class Event
     public function getMaxPayedAmount()
     {
         $em = \Bdf\Core::getInstance()->getEntityManager();
-        $query = $em->createQuery("SELECT sum(p._amount) as payed FROM \Eu\Rmmt\Payer p INNER JOIN p._expenditure ex INNER JOIN ex._event e INNER JOIN p._user u WHERE e._id = :event GROUP BY u._id ORDER BY payed DESC")->setMaxResults(1);
-        $query->setParameter("event", $this->getId());
+        $query = $em->createQuery("SELECT sum(p._amount) as payed FROM \Eu\Rmmt\Payer p INNER JOIN p._expenditure ex INNER JOIN ex._account a INNER JOIN p._user u WHERE a._id = :account GROUP BY u._id ORDER BY payed DESC")->setMaxResults(1);
+        $query->setParameter("account", $this->getId());
         $maxPayedAmout = $query->getSingleScalarResult();
         if(null == $maxPayedAmout) {
             return 0;
@@ -241,8 +241,8 @@ class Event
     public function getMaxOwesAmount()
     {
         $em = \Bdf\Core::getInstance()->getEntityManager();
-        $query = $em->createQuery("SELECT sum(b._amount) as owes FROM \Eu\Rmmt\Beneficiary b INNER JOIN b._expenditure ex INNER JOIN ex._event e INNER JOIN b._user u WHERE e._id = :event GROUP BY u._id ORDER BY owes DESC")->setMaxResults(1);
-        $query->setParameter("event", $this->getId());
+        $query = $em->createQuery("SELECT sum(b._amount) as owes FROM \Eu\Rmmt\Beneficiary b INNER JOIN b._expenditure ex INNER JOIN ex._account a INNER JOIN b._user u WHERE a._id = :account GROUP BY u._id ORDER BY owes DESC")->setMaxResults(1);
+        $query->setParameter("account", $this->getId());
         $maxOwesAmout = $query->getSingleScalarResult();
         if(null == $maxOwesAmout) {
             return 0;

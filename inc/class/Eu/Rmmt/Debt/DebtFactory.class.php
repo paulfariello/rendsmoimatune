@@ -30,7 +30,7 @@
 namespace Eu\Rmmt\Debt;
 use Doctrine\Common\Collections\ArrayCollection;
 use Bdf\Core;
-use Eu\Rmmt\Event;
+use Eu\Rmmt\Account;
 use Eu\Rmmt\User;
 
 
@@ -45,20 +45,20 @@ use Eu\Rmmt\User;
  */
 class DebtFactory
 {
-    private $_event;
+    private $_account;
 
-    public function __construct(Event $event) {
-        $this->_event = $event;
+    public function __construct(Account $account) {
+        $this->_account = $account;
     }
 
-    public function getEvent()
+    public function getAccount()
     {
-        return $this->_event;
+        return $this->_account;
     }
 
-    public function setEvent(Event $event)
+    public function setAccount(Account $account)
     {
-        $this->_event = $event;
+        $this->_account = $account;
     }
 
     private function _sortUsers($a, $b)
@@ -98,9 +98,9 @@ class DebtFactory
         $debitors  = array();
         $creditors = array();
 
-        $users = $this->_event->getUsers();
+        $users = $this->_account->getUsers();
         foreach($users as $user) {
-            $balance = $this->_event->getBalance($user);
+            $balance = $this->_account->getBalance($user);
             if ($balance > 0) {
                 $creditors[] = array('user'=>$user, 'balance'=>$balance);
             } elseif($balance < 0) {

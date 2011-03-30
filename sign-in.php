@@ -40,7 +40,7 @@ if(isset ($_POST['sign-in'])) {
         $authentication->setPassword($_POST['password']);
         $user = $authentication->authenticate();
     } catch (Exception $e) {
-        $te->assign("messages", array($e->getMessage()));
+        $te->assign("messages", array(array('type'=>'error', 'content'=>Bdf\Utils::getText('Internal error').' : '.$e->getMessage())));
         $te->assign("_POST", $_POST);
         $te->display("sign-in");
         die();
@@ -60,7 +60,7 @@ if(isset ($_POST['sign-in'])) {
     }
 }else {
     if (null !== \Bdf\Session::getInstance()->get('redirect')) {
-        $te->assign('message',array('type'=>'warning','content'=>'Authentification requise'));
+        $te->assign('messages',array(array('type'=>'warning','content'=>'Authentification requise')));
     }
     $te->display("sign-in");
 }

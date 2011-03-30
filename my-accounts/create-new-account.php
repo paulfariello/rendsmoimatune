@@ -46,7 +46,7 @@ if (isset($_POST['create-new-account'])) {
             throw new Eu\Rmmt\Exception\UserInputException(\Bdf\Utils::getText('Title is required'), $_POST['name'], 'title');
         }
 
-        $account = new Eu\Rmmt\Event($_POST['name'], \Eu\Rmmt\User::getCurrentUser());
+        $account = new Eu\Rmmt\Account($_POST['name'], \Eu\Rmmt\User::getCurrentUser());
 
 
         // Initialisation des dates

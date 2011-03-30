@@ -32,8 +32,8 @@
             </cascade>
         </one-to-many>
 
-        <many-to-one target-entity="Event" field="_event" inversed-by="_expenditures" >
-            <join-column name="event_fk" referenced-column-name="event_pk" />
+        <many-to-one target-entity="Account" field="_account" inversed-by="_expenditures" >
+            <join-column name="account_fk" referenced-column-name="account_pk" />
         </many-to-one>
 
     </entity>

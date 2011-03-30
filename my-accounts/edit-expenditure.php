@@ -41,7 +41,7 @@ if ($currentUser == null) {
 }
 
 if (isset($_GET['account-id']) and !empty($_GET['account-id'])) {
-    $account = \Eu\Rmmt\Event::getRepository()->find($_GET['account-id']);
+    $account = \Eu\Rmmt\Account::getRepository()->find($_GET['account-id']);
 }
 
 if (!isset($_GET['expenditure-id']) or empty($_GET['account-id'])) {
@@ -266,7 +266,7 @@ try {
     }
 } catch(Eu\Rmmt\Exception\RightException $e) {
     \Bdf\Session::getInstance()->add('messages', array(array('type'=>'error','content'=>$e->getMessage())));
-    header('location: '.$expenditure->getEvent()->getUrlDetail()); 
+    header('location: '.$expenditure->getAccount()->getUrlDetail());
 }
 
 ?>

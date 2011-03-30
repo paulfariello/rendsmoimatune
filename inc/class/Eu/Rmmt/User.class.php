@@ -51,7 +51,7 @@ class User implements \Bdf\IUser
     private $_name;
     private $_isAdmin           = false;
     private $_registered        = null;
-    private $_events;
+    private $_accounts;
     private $_payers;
     private $_beneficiaries;
     private $_repaymentsFromMe;
@@ -156,19 +156,19 @@ class User implements \Bdf\IUser
         $this->_isAdmin = $isAdmin;
     }
 
-    public function getEvents()
+    public function getAccounts()
     {
-        return $this->_events;
+        return $this->_accounts;
     }
 
-    public function addEvent(Event $event)
+    public function addAccount(Account $account)
     {
-        $this->_events->add($event);
+        $this->_accounts->add($account);
     }
 
-    public function removeEvent(Event $event)
+    public function removeAccount(Account $account)
     {
-        $this->_events->removeElement($event);
+        $this->_accounts->removeElement($account);
     }
 
     public function getPayers()
@@ -274,9 +274,9 @@ class User implements \Bdf\IUser
             $beneficiary->setUser($this);
         }
 
-        foreach($user->getEvents() as $event) {
-            $event->removeUser($user);
-            $event->addUser($this);
+        foreach($user->getAccounts() as $account) {
+            $account->removeUser($user);
+            $account->addUser($this);
         }
 
         $em->remove($user); 
