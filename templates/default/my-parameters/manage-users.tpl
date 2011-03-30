@@ -23,6 +23,10 @@
                     <td><input type="checkbox" name="delete[{$user->getId()}]" value="delete" /></td>
                     <td><a href="{$user->getUrlInvite()}">{getText id="Invite"}</a></td>
                 </tr>
+            {foreachelse}
+                <tr>
+                    <td>{getText id="No users"}</td>
+                </tr>
             {/foreach}
         </tbody>
     </table>
