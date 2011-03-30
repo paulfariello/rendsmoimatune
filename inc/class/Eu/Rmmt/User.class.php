@@ -50,7 +50,7 @@ class User implements \Bdf\IUser
     private $_password;
     private $_name;
     private $_isAdmin           = false;
-    private $_registered        = true;
+    private $_registered        = null;
     private $_events;
     private $_payers;
     private $_beneficiaries;
