@@ -9,8 +9,13 @@
         <ul id="mainNav">
         	<li {if 'dashboard/'|isCurrentPage}class="active"{/if}><a class="home" href="{makeUrl url='dashboard/'}" >{getText id='DASHBOARD'}</a></li> <!-- Use the "active" class for the active menu item  -->
         	<li {if 'my-accounts/'|isCurrentPage}class="active"{/if}><a class="my-accounts" href="{makeUrl url='my-accounts/'}">{getText id='MY ACCOUNTS'}</a></li>
-        	<li {if 'my-parameters/'|isCurrentPage}class="active"{/if}><a class="my-parameters" href="{makeUrl url='my-parameters/'}">{getText id='MY PARAMETERS'}</a></li>
-        	<li class="logout">{if $currentUser == null}<a href="{makeUrl url='sign-in.html'}" {if 'sign-in.html'|isCurrentPage}class="active"{/if}>{getText id='SIGN IN'}</a>{else}<a class="sign-out" href="{makeUrl url='sign-out.html'}">{getText id='SIGN OUT'}</a>{/if}</li>
+        	{* <li {if 'my-parameters/'|isCurrentPage}class="active"{/if}><a class="my-parameters" href="{makeUrl url='my-parameters/'}">{getText id='MY PARAMETERS'}</a></li> *}
+            {if $currentUser == null}
+                <li class="logout"><a class="sign-out" href="{makeUrl url='sign-out.html'}">{getText id='SIGN OUT'}</a></li>
+            {else}
+                <li class="logout"><a class="sign-out" href="{makeUrl url='sign-out.html'}">{getText id='SIGN OUT'}</a></li>
+                <li {if 'my-parameters/'|isCurrentPage}class="active"{/if} class="current-user"><a href="{makeUrl url='my-parameters/'}">{$currentUser->getName()}</a></li>
+            {/if}
         </ul>
         <!-- // #end mainNav -->
         

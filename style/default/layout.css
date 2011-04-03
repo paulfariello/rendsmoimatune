@@ -61,7 +61,7 @@ h1 span { display: none; }
 	padding: 0 20px;
 }
 
-#mainNav li.logout {
+#mainNav li.logout, #mainNav li.current-user {
 	float: right;
 	border-left: 1px solid #ddd;
 	border-right: none;
@@ -94,6 +94,15 @@ h1 span { display: none; }
 
 #mainNav li a.my-parameters {
     background-image: url("../../px/default/snowish/24x24/apps/gnome-control-center.png");
+    background-position: left center;
+    background-repeat: no-repeat;
+    background-color: transparent;
+    padding: 0 20px 0 30px;
+    margin-left:5px;
+}
+
+#mainNav li.current-user a {
+    background-image: url("../../px/default/emblem-people.png");
     background-position: left center;
     background-repeat: no-repeat;
     background-color: transparent;
