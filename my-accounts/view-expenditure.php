@@ -53,9 +53,9 @@ try {
         die();
     }
 
-    $expenditure->getAccount()->checkViewRight($currentUser);
+    $expenditure->checkViewRight($currentUser);
 
-    $te->assign("currentAccount",$account);
+    $te->assign("currentAccount",$expenditure->getAccount());
     $te->assign('expenditure', $expenditure);
     $te->display('my-accounts/view-expenditure');
 } catch(Eu\Rmmt\Exception\RightException $e) {

@@ -326,6 +326,13 @@ class Account
         }
     }
 
+    public function checkCreateRight(User $user)
+    {
+        if (!$this->grantAccess($user)) {
+            throw new \Eu\Rmmt\Exception\RightException(\Bdf\Utils::getText("You can't create expenditure neither repayment in this account."));
+        }
+    }
+
     public function checkDeleteRight(User $user)
     {
         if (!$this->_creator->equals($user)) {

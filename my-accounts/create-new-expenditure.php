@@ -52,7 +52,7 @@ if (!isset($_GET['account-id'])) {
 }
 
 try {
-    $account->checkViewRight($currentUser);
+    $account->checkCreateRight($currentUser);
 
     if (!isset($_POST['create-new-expenditure'])) {
         $te->assign("currentAccount",$account);

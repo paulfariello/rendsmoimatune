@@ -31,6 +31,7 @@ namespace Eu\Rmmt;
 use Bdf\Core;
 use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
+use Eu\Rmmt\Exception\RightException;
 
 /**
  * Expenditure
@@ -51,15 +52,17 @@ class Expenditure
     private $_beneficiaries;
     private $_tags;
     private $_account;
+    private $_creator;
 
-    public function __construct(Account $account, $title, $amount)
+    public function __construct(Account $account, $title, $amount, User $creator)
     {
-        $this->_account          = $account;
+        $this->_account        = $account;
         $this->_title          = $title;
         $this->_amount         = $amount;
         $this->_payers         = new ArrayCollection();
         $this->_beneficiaries  = new ArrayCollection();
         $this->_tags           = new ArrayCollection();
+        $this->_creator        = $creator;
     }
 
     public function getId()
@@ -280,13 +283,26 @@ class Expenditure
         return $this->_account->getUrlDeleteExpenditure($this);
     }
 
+    public function checkViewRight(User $user)
+    {
+        try {
+            $this->_account->checkViewRight($user);
+        } catch(RightException $e) {
+            throw new RightException(\Bdf\Utils::getText("You can't view this expenditure"));
+        }
+    }
+
     public function checkEditRight(User $user)
     {
-        throw new \Eu\Rmmt\Exception\RightException(\Bdf\Utils::getText("You can't edit this expenditure because"));
+        if (!$this->_creator->equals($user) and !$this->_account->getCreator()->equals($user)) {
+            throw new RightException(\Bdf\Utils::getText("You can't edit this expenditure because you are not creator of this expenditure neither of this account"));
+        }
     }
 
     public function checkDeleteRight(User $user)
     {
-        throw new \Eu\Rmmt\Exception\RightException(\Bdf\Utils::getText("You can't delete this expenditure because"));
+        if (!$this->_creator->equals($user) and !$this->_account->getCreator()->equals($user)) {
+            throw new RightException(\Bdf\Utils::getText("You can't delete this expenditure because you are not creator of this expenditure neither of this account"));
+        }
     }
 }
