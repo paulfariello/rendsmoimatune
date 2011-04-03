@@ -14,7 +14,7 @@
                 <li class="logout"><a href="{makeUrl url='sign-in.html'}" {if 'sign-in.html'|isCurrentPage}class="active"{/if}>{getText id='SIGN IN'}</a></li>
             {else}
                 <li class="logout"><a class="sign-out" href="{makeUrl url='sign-out.html'}">{getText id='SIGN OUT'}</a></li>
-                <li {if 'my-parameters/'|isCurrentPage}class="active"{/if} class="current-user"><a href="{makeUrl url='my-parameters/'}">{$currentUser->getName()}</a></li>
+                <li class="{if 'my-parameters/'|isCurrentPage}active{/if} current-user"><a href="{makeUrl url='my-parameters/'}">{$currentUser->getName()}</a></li>
             {/if}
         </ul>
         <!-- // #end mainNav -->
