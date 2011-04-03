@@ -11,7 +11,7 @@
         	<li {if 'my-accounts/'|isCurrentPage}class="active"{/if}><a class="my-accounts" href="{makeUrl url='my-accounts/'}">{getText id='MY ACCOUNTS'}</a></li>
         	{* <li {if 'my-parameters/'|isCurrentPage}class="active"{/if}><a class="my-parameters" href="{makeUrl url='my-parameters/'}">{getText id='MY PARAMETERS'}</a></li> *}
             {if $currentUser == null}
-                <li class="logout"><a class="sign-out" href="{makeUrl url='sign-out.html'}">{getText id='SIGN OUT'}</a></li>
+                <li class="logout"><a href="{makeUrl url='sign-in.html'}" {if 'sign-in.html'|isCurrentPage}class="active"{/if}>{getText id='SIGN IN'}</a></li>
             {else}
                 <li class="logout"><a class="sign-out" href="{makeUrl url='sign-out.html'}">{getText id='SIGN OUT'}</a></li>
                 <li {if 'my-parameters/'|isCurrentPage}class="active"{/if} class="current-user"><a href="{makeUrl url='my-parameters/'}">{$currentUser->getName()}</a></li>
