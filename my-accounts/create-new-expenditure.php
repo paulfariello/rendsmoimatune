@@ -68,7 +68,7 @@ try {
             }
             $_POST['amount'] = strtr($_POST['amount'], ',', '.');
 
-            $expenditure = new Eu\Rmmt\Expenditure($account, $_POST['title'], $_POST['amount']);
+            $expenditure = new Eu\Rmmt\Expenditure($account, $_POST['title'], $_POST['amount'], $currentUser);
 
             $date = null;
             if (isset($_POST['date']) AND !empty($_POST['date'])) {
