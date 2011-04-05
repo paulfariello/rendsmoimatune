@@ -55,6 +55,12 @@ msgstr "Consommateurs"
 msgid "Beneficiary's is required"
 msgstr "Au moins un consommateur requis"
 
+msgid "Beneficiary's name"
+msgstr "Nom du bénéficiaire"
+
+msgid "Beneficiary's name is required"
+msgstr "Nom du bénéficiaire requis"
+
 msgid "Cannot merge two registered users"
 msgstr "Impossible de fusionner deux utilisateurs non enregistrés"
 
@@ -101,7 +107,7 @@ msgid "Email"
 msgstr "e-mail"
 
 msgid "Email is required"
-msgstr ""
+msgstr "Email requis"
 
 msgid "Expenditure amount"
 msgstr "Montant de la dépense"
@@ -138,6 +144,9 @@ msgstr "Erreur interne"
 
 msgid "Invalid amount payed"
 msgstr "Montant payé incorrecte"
+
+msgid "Invitation sended"
+msgstr "Invitation envoyée"
 
 msgid "Invitations sended !"
 msgstr "Invitations envoyées"
@@ -217,9 +226,8 @@ msgstr "Aucune dépense"
 msgid "No repayment"
 msgstr "Aucun remboursement"
 
-#, fuzzy
 msgid "No users"
-msgstr "Nouvel utilisateur"
+msgstr "Pas d'utilisateurs"
 
 msgid "Not paid enough"
 msgstr "N'a pas assez payé"
@@ -228,10 +236,7 @@ msgid "Overpaid"
 msgstr "A trop payé"
 
 msgid "P_AccountDeletionWarning"
-msgstr ""
-"Vous êtes sur le point de supprimer définitivement le compte <b>%s</b>. Vous "
-"allez perdre toutes les données qui s'y trouve. Aucun retour en arrière "
-"n'est possible."
+msgstr "Vous êtes sur le point de supprimer définitivement le compte <b>%s</b>. Vous allez perdre toutes les données qui s'y trouve. Aucun retour en arrière n'est possible."
 
 msgid "P_Balancing"
 msgstr "Voyez d'un coup d'œil qui a le plus payé."
@@ -366,45 +371,31 @@ msgid "You can't access this account."
 msgstr "Vous n'avez pas le droit d'acceder à ce compte"
 
 msgid "You can't create expenditure neither repayment in this account."
-msgstr ""
+msgstr "Vous ne pouvez créer ni dépenses ni remboursements dans ce compte."
 
 msgid "You can't delete this account because you haven't created it."
-msgstr ""
-"Vous ne pouvez pas supprimer ce compte car vous n'en n'êtes pas l'auteur."
+msgstr "Vous ne pouvez pas supprimer ce compte car vous n'en n'êtes pas l'auteur."
 
-#, fuzzy
-msgid ""
-"You can't delete this expenditure because you are not creator of this "
-"expenditure neither of this account"
-msgstr ""
-"Vous ne pouvez pas supprimer ce compte car vous n'en n'êtes pas l'auteur."
+msgid "You can't delete this expenditure because you are not creator of this expenditure neither of this account"
+msgstr "Vous ne pouvez pas supprimer cette dépense car vous n'en n'êtes pas l'auteur."
 
-msgid ""
-"You can't edit this expenditure because you are not creator of this "
-"expenditure neither of this account"
-msgstr ""
+msgid "You can't edit this expenditure because you are not creator of this expenditure neither of this account"
+msgstr "Vous ne pouvez pas modifier cette dépense car vous n'en n'êtes pas l'auteur."
 
-#, fuzzy
 msgid "You can't send invitation to user you haven't created"
-msgstr ""
-"Vous ne pouvez pas supprimer ce compte car vous n'en n'êtes pas l'auteur."
+msgstr "Vous ne pouvez pas envoyer d'invitation à un utilisateur que vous n'avez pas créé."
 
-#, fuzzy
 msgid "You can't view this expenditure"
-msgstr "Vous ne pouvez pas modifier ce compte car"
+msgstr "Vous ne pouvez pas voir cette dépense."
 
 msgid "You must be creator of user in order to merge it"
 msgstr "Vous devez être le créateur d'un utilisateur pour pouvoir le fusionner"
+
+msgid "gives to"
+msgstr "donne à"
 
 msgid "repayments"
 msgstr "remboursements"
 
 msgid "to"
 msgstr "au"
-
-#, fuzzy
-msgid "Invitation sended"
-msgstr "Invitations envoyées"
-
-#~ msgid "You can't delete this expenditure because"
-#~ msgstr "Vous ne pouvez pas supprimer ce compte car"

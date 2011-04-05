@@ -56,6 +56,12 @@ msgstr ""
 msgid "Beneficiary's is required"
 msgstr ""
 
+msgid "Beneficiary's name"
+msgstr ""
+
+msgid "Beneficiary's name is required"
+msgstr ""
+
 msgid "Cannot merge two registered users"
 msgstr ""
 
@@ -138,6 +144,9 @@ msgid "Internal error"
 msgstr ""
 
 msgid "Invalid amount payed"
+msgstr ""
+
+msgid "Invitation sended"
 msgstr ""
 
 msgid "Invitations sended !"
@@ -381,13 +390,13 @@ msgid "You can't view this expenditure"
 msgstr ""
 
 msgid "You must be creator of user in order to merge it"
+msgstr "Vous devez être le créateur d'un utilisateur pour pouvoir le fusionner"
+
+msgid "gives to"
 msgstr ""
 
 msgid "repayments"
 msgstr ""
 
 msgid "to"
-msgstr ""
-
-msgid "Invitation sended"
 msgstr ""
