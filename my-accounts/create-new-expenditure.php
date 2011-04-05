@@ -87,42 +87,18 @@ try {
             foreach( array_keys ($_POST['payersId']) as $index ) {
                 $id     = $_POST['payersId'][$index];
                 $name   = trim ($_POST['payersName'][$index]);
-                $amount = (float) strtr($_POST['payersAmount'][$index], ',', '.');
+                $amount = (float) strtr ($_POST['payersAmount'][$index], ',', '.');
                 $metric = $_POST['payersMetric'][$index];
 
                 if (!empty($name)) {
                     $unknown = true;
                     $payer   = null;
 
-                    // Get user
-                    if (!empty($id) and ctype_digit ($id)) {
-                        $user = Eu\Rmmt\User::getRepository()->find((int)$id);
+                    $payer = Eu\Rmmt\User::findByIdOrName($id, $name);
 
-                        // Check inconsistency between id and name
-                        if (null !== $user and $user->getName() == $name) {
-                            $unknown     = false;
-                            $payer       = $user;
-                        }
-                    }
-
-                    // Search for similar user name
-                    if ($unknown) {
-                        $query = $em->createQuery("SELECT u FROM Eu\Rmmt\User u WHERE LOWER(u._name) = :search");
-                        $query->setParameter('search',strtolower($name));
-                        $users = $query->getResult();
-                        if (!empty($users)) {
-                            $unknown    = false;
-                            $payer      = $users[0];
-                        }
-                    }
-
-                    // Definitely unknown user
-                    if ($unknown) {
+                    if (null == $payer) {
                         // Create new user
-                        $user = Eu\Rmmt\UserFactory::createUnregisteredUser($currentUser, $name);
-
-                        $payer       = $user;
-                        $newUsers[]  = $payer;
+                        $payer = Eu\Rmmt\UserFactory::createUnregisteredUser($currentUser, $name);
                     }
 
                     // Create payer
@@ -157,45 +133,11 @@ try {
                     $unknown     = true;
                     $beneficiary = null;
 
-                    // We do know user because he has been auto completed
-                    if (!empty ($id) and ctype_digit ($id)) {
-                        $user = Eu\Rmmt\User::getRepository()->find((int)$id);
+                    $beneficiary = Eu\Rmmt\User::findByIdOrName($id, $name);
 
-                        // Check inconsistency between id and name
-                        if (null !== $user and $user->getName() == $name) {
-                            $unknown     = false;
-                            $beneficiary = $user;
-                        }
-                    }
-
-                    // Search in just created user
-                    if ($unknown) {
-                        foreach($newUsers as $user) {
-                            if (strtolower($user->getName()) == strtolower($name)) {
-                                $unknown     = false;
-                                $beneficiary = $user;
-                                break;
-                            }
-                        }
-                    }
-
-                    // Search for similar user name
-                    if ($unknown) {
-                        $query = $em->createQuery("SELECT u FROM Eu\Rmmt\User u WHERE LOWER(u._name) = :search");
-                        $query->setParameter('search',strtolower($name));
-                        $users = $query->getResult();
-                        if (!empty($users)) {
-                            $unknown        = false;
-                            $beneficiary    = $users[0];
-                        }
-                    }
-
-                    if ($unknown) {
+                    if (null == $beneficiary) {
                         // Create new user
-                        $user = Eu\Rmmt\UserFactory::createUnregisteredUser($currentUser, $name);
-
-                        $beneficiary = $user;
-                        $newUsers[]  = $beneficiary;
+                        $beneficiary = Eu\Rmmt\UserFactory::createUnregisteredUser($currentUser, $name);
                     }
 
                     $beneficiaries[] = $beneficiary;
@@ -216,9 +158,9 @@ try {
             $messages[] = array('type'=>'done','content'=>Bdf\Utils::getText('Expenditure created'));
 
             $usersString = "";
-            foreach($newUsers as $index => $user) {
+            foreach(Eu\Rmmt\UserFactory::getNewUsers() as $index => $user) {
                 $usersString .= $user->getName();
-                if ($index < sizeof($newUsers)-1) {
+                if ($index < sizeof(Eu\Rmmt\UserFactory::getNewUsers())-1) {
                    $usersString .= ', '; 
                 }
             }

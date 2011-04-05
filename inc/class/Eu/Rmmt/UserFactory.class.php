@@ -43,6 +43,8 @@ use Eu\Rmmt\User;
  */
 class UserFactory
 {
+    private static $_newUsers = array();
+    
     /**
      * Create
      *
@@ -53,6 +55,7 @@ class UserFactory
         $user->setRegistered(false);
         $user->setName($name);
         $user->setCreator($creator);
+        self::$_newUsers[] = $user;
         return $user;
     }
 
@@ -62,6 +65,12 @@ class UserFactory
         $user->setRegistered(true);
         $user->setName($name);
         $user->setFacebookId($facebookId);
+        self::$_newUsers[] = $user;
         return $user;
+    }
+
+    public static function getNewUsers()
+    {
+        return self::$_newUsers;
     }
 }

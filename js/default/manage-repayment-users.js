@@ -43,7 +43,7 @@ window.addEvent("domready", function()
     {
         new Meio.Autocomplete.Select(input, input.get('rel'),
         {
-            valueField: input.getPrevious('input[name$=Id]'),
+            valueField: input.getPrevious('input[name$=id]'),
             valueFilter: function(data){
                 return data.identifier;
             },

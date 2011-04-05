@@ -351,4 +351,44 @@ Pour nous rejoindre cliquez sur le lien suivant : %s";
         }
     }
 
+    public static function findByIdOrName($id, $name)
+    {
+        $em      = Core::getInstance()->getEntityManager();
+        $unknown = true;
+        $user    = null;
+
+        // Search with id
+        if (!empty($id) and ctype_digit($id)) {
+            $user = Eu\Rmmt\User::getRepository()->find($id);
+
+            // Check inconsistency between id and name
+            if (null !== $user and $user->getName() == $name) {
+                $unknown     = false;
+            }
+        }
+
+        // Search for similar user name
+        if ($unknown) {
+            $query = $em->createQuery("SELECT u FROM Eu\Rmmt\User u WHERE LOWER(u._name) = :search");
+            $query->setParameter('search',strtolower($name));
+            $users = $query->getResult();
+            if (!empty($users)) {
+                $unknown    = false;
+                $user      = $users[0];
+            }
+        }
+
+        // Search for similar user name in non persisted users
+        foreach(UserFactory::getNewUsers() as $newUser) {
+            if (strtolower($newUser->getName()) == strtolower($name)) {
+                $unknown     = false;
+                $user = $newUser;
+                break;
+            }
+        }
+
+        return $user;
+
+    }
+
 }
