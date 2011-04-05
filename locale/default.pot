@@ -341,11 +341,10 @@ msgstr ""
 msgid "Update"
 msgstr ""
 
-msgid "User %1$s has been created. <a href=\"%2$s\">Invite them ?</a>"
-msgstr ""
-
-msgid "User %s has been created. <a href=\"%s\">Invite her/him ?</a>"
-msgstr ""
+msgid "User %1$s has been created. <a href=\"%2$s\">Invite him ?</a>"
+msgid_plural "Users %1$s has been created. <a href=\"%2$s\">Invite them ?</a>"
+msgstr[0] ""
+msgstr[1] ""
 
 msgid "User %s merged with %s"
 msgstr ""

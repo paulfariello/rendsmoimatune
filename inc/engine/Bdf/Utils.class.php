@@ -182,6 +182,22 @@ class Utils
     }
 
     /**
+     * Get plural translation of the string
+     */
+    public static function nGetText($str1, $str2, $n)
+    {
+        if (func_num_args() > 3) {
+            if (is_array(func_get_arg(3))) {
+                return vsprintf(ngetText($str1, $str2, $n), func_get_arg(3));
+            } else {
+                return vsprintf(ngetText($str1, $str2, $n), array_slice(func_get_args(), 3));
+            }
+        } else {
+            return ngetText($str);
+        }
+    }
+
+    /**
      * Check if a string has utf7 characters in it
      *
      * By bmorel at ssi dot fr

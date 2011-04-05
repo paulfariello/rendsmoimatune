@@ -107,7 +107,7 @@ try {
             }
 
             if (!empty($usersString)) {
-                $messages[] = array('type'=>'info','content'=>Bdf\Utils::getText('User %1$s has been created. <a href="%2$s">Invite them ?</a>', $usersString, Bdf\Utils::makeUrl('my-parameters/send-invitation.html')));
+                $messages[] = array('type'=>'info','content'=>Bdf\Utils::nGetText('User %1$s has been created. <a href="%2$s">Invite him ?</a>', 'Users %1$s has been created. <a href="%2$s">Invite them ?</a>', sizeof(Eu\Rmmt\UserFactory::getNewUsers()), $usersString, Bdf\Utils::makeUrl('my-parameters/send-invitation.html')));
             }
 
             \Bdf\Session::getInstance()->add('messages',$messages);

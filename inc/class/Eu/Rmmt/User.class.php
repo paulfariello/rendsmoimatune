@@ -359,7 +359,7 @@ Pour nous rejoindre cliquez sur le lien suivant : %s";
 
         // Search with id
         if (!empty($id) and ctype_digit($id)) {
-            $user = Eu\Rmmt\User::getRepository()->find($id);
+            $user = User::getRepository()->find($id);
 
             // Check inconsistency between id and name
             if (null !== $user and $user->getName() == $name) {
