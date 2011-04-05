@@ -67,6 +67,7 @@ try {
                 // Create new user
                 $payer = Eu\Rmmt\UserFactory::createUnregisteredUser($currentUser, $_POST['payer-name']);
                 $em->persist($payer);
+                $account->addUser($payer);
             }
 
             if (empty($_POST['beneficiary-name'])) {
@@ -77,6 +78,7 @@ try {
                 // Create new user
                 $beneficiary = Eu\Rmmt\UserFactory::createUnregisteredUser($currentUser, $_POST['beneficiary-name']);
                 $em->persist($beneficiary);
+                $account->addUser($beneficiary);
             }
 
             if (!isset($_POST['amount']) OR empty($_POST['amount'])) {
