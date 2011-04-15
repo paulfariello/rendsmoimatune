@@ -55,7 +55,7 @@ if(isset ($_POST['sign-in'])) {
       if (null != $redirect) {
         \Bdf\Session::getInstance()->remove('redirect');
         header("location: ".$redirect);
-      } elseif ($currentUser->getConnectionCounter() < 1) {
+      } elseif ($currentUser->getConnectionCounter() < 2) {
         $messages = array();
         $messages[] = array('type'=>'info','content'=>Bdf\Utils::getText('Thank you for registering in Rendsmoimatune. You can start with the creation of your first account. An account is a group of expenditures and repayments related by something relevant for you. That thing could be holidays, roommate or even your every day expenditures.'));
         \Bdf\Session::getInstance()->add('messages',$messages);
