@@ -150,7 +150,7 @@ abstract class OAuthentication implements IAuthentication
         if (null != $this->_user) {
             \Bdf\Session::getInstance()->setCurrentUserId($this->_user->getId());
             \Bdf\Session::getInstance()->remove('authentication');
-            $user->isAuthenticated();
+            $this->_user->isAuthenticated();
         } else {
             throw new \Exception("Error while authenticating");
         }
