@@ -382,6 +382,9 @@ msgstr ""
 msgid "You can't edit this expenditure because you are not creator of this expenditure neither of this account"
 msgstr ""
 
+msgid "You can't rename this account because you haven't created it."
+msgstr ""
+
 msgid "You can't send invitation to user you haven't created"
 msgstr ""
 
@@ -395,6 +398,9 @@ msgid "gives to"
 msgstr ""
 
 msgid "repayments"
+msgstr ""
+
+msgid "Rename"
 msgstr ""
 
 msgid "to"

@@ -16,6 +16,10 @@
     <a href="{$currentAccount->getUrlNewRepayment()}" class="button add">{getText id="Add"}</a>
 {if $currentAccount->isCreator($currentUser)}
 <h3>{getText id='Account administration'}</h3>
+    <form action="{$currentAccount->getUrlRename()}" method="POST">
+        <input type="text" name="name" value="{$currentAccount->getName()|htmlProtect}" />
+        <input type="submit" name="rename" value="{getText id="Rename"}" />
+    </form>
     <a href="{$currentAccount->getUrlDelete()}" class="button delete">{getText id="Delete this account"}</a>
 {/if}
 {include file='inc/footer.tpl'}
