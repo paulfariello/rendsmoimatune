@@ -245,6 +245,13 @@ msgstr ""
 msgid "P_Balancing"
 msgstr "Voyez d'un coup d'œil qui a le plus payé."
 
+msgid ""
+"Thank you for registering in Rendsmoimatune. You can start with the creation "
+"of your first account. An account is a group of expenditures and repayments "
+"related by something relevant for you. That thing could be holidays, "
+"roommate or even your every day expenditures."
+msgstr "Merci de vous être inscrit sur Rendsmoimatune. Nous vous proposons de commencer par la création d'un compte. Un compte est un regroupement de dépenses et de remboursements relié par quelque chose. Ce quelque chose peut être des vacances, une colloction ou même vos dépenses courantes."
+
 msgid "Password"
 msgstr "Mot de passe"
 
@@ -394,7 +401,8 @@ msgstr ""
 "Vous ne pouvez pas modifier cette dépense car vous n'en n'êtes pas l'auteur."
 
 msgid "You can't rename this account because you haven't created it."
-msgstr "Vous ne pouvez pas renomer ce compte car vous n'en n'êtes pas l'auteur."
+msgstr ""
+"Vous ne pouvez pas renomer ce compte car vous n'en n'êtes pas l'auteur."
 
 msgid "You can't send invitation to user you haven't created"
 msgstr ""

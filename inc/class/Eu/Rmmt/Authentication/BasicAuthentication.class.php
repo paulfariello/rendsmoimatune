@@ -90,6 +90,7 @@ class BasicAuthentication implements IAuthentication
         if($user !== NULL) {
             if($user->isRegistered() and Utils::comparePassword($this->_password, $user->getPassword()) === TRUE) {
                 \Bdf\Session::getInstance()->setCurrentUserId($user->getId());
+                $user->isAuthenticated();
             }
         }
     }

@@ -79,6 +79,11 @@ if (isset($_POST['create-new-account'])) {
         $te->display('my-accounts/create-new-account');
     }
 } else {
+    $messages = \Bdf\Session::getInstance()->get('messages');
+    if (null !== $messages) {
+        $te->assign('messages',$messages);
+        \Bdf\Session::getInstance()->remove('messages');
+    }
     $te->display('my-accounts/create-new-account');
 }
 

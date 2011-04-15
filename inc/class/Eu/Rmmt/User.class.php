@@ -60,6 +60,7 @@ class User implements \Bdf\IUser
     private $_facebookId;
     private $_invited           = false;
     private $_invitationToken   = null;
+    private $_connectionCounter = 0;
 
     /**
      * Constructeur
@@ -232,7 +233,12 @@ class User implements \Bdf\IUser
 
     public function setFacebookId($facebookId)
     {
-        return $this->_facebookId = (int)$facebookId;
+        $this->_facebookId = (int)$facebookId;
+    }
+    
+    public function getConnectionCounter()
+    {
+        return $this->_connectionCounter;
     }
 
     public static function getRepository()
@@ -389,6 +395,14 @@ Pour nous rejoindre cliquez sur le lien suivant : %s";
 
         return $user;
 
+    }
+
+    public function isAuthenticated()
+    {
+        $em = Core::getInstance()->getEntityManager();
+        $this->_connectionCounter++;
+        $em->flush();
+        
     }
 
 }
