@@ -50,9 +50,11 @@ if (isset($_GET['page'])) {
     $page = 1;
 }
 
-$te->assign("page", $page);
 
 $account = Eu\Rmmt\Account::getRepository()->find($_GET['account-id']);
+
+$te->assign("page", $page);
+$te->assign("lastPage", ceil($account->getExpenditures()->count() / Bdf\Core::getInstance()->getConfig('rmmt', 'expenditure_limit_number')));
 $te->assign('currentAccount', $account);
 $te->assign('expenditures', $account->getExpenditures(Bdf\Core::getInstance()->getConfig('rmmt', 'expenditure_limit_number'), $page)); 
 $messages = \Bdf\Session::getInstance()->get('messages');

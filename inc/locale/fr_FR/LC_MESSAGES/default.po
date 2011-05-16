@@ -443,6 +443,12 @@ msgstr "Plus récent"
 msgid "Older"
 msgstr "Plus ancien"
 
+msgid "Newest"
+msgstr "Dernier en date"
+
+msgid "Oldest"
+msgstr "Premier en date"
+
 msgid "page %d"
 msgstr "page %d"
 

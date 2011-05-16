@@ -421,5 +421,11 @@ msgstr ""
 msgid "Older"
 msgstr ""
 
+msgid "Newest"
+msgstr ""
+
+msgid "Oldest"
+msgstr ""
+
 msgid "page %d"
 msgstr ""

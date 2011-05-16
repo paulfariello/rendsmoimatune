@@ -12,10 +12,12 @@
     {include file="inc/expenditure-list.tpl" expenditures=$expenditures}
     <a href="{$currentAccount->getUrlNewExpenditure()}" class="button add">{getText id="Add"}</a>
     <div class="pagination">
-        {if $page > 1}
-        <a href="{$currentAccount->getUrlExpendituresList($page-1)}" class="newer">{getText id="Newer"}</a>
-        {/if}
-        <a href="{$currentAccount->getUrlExpendituresList($page+1)}" class="older">{getText id="Older"}</a>
+        <div class="newer">
+            <a href="{$currentAccount->getUrlExpendituresList(1)}" class="newest{if $page < 2} hidden{/if}">{getText id="Newest"}</a><a href="{$currentAccount->getUrlExpendituresList($page-1)}" class="newer{if $page < 3} hidden{/if}">{getText id="Newer"}</a>
+        </div>
+        <div class="older">
+            <a href="{$currentAccount->getUrlExpendituresList($page+1)}" class="older{if $page > ($lastPage - 2)} hidden{/if}">{getText id="Older"}</a><a href="{$currentAccount->getUrlExpendituresList($lastPage)}" class="oldest{if $page > ($lastPage - 1)} hidden{/if}">{getText id="Oldest"}</a>
+        </div>
         <span class="current">{getText id="page %d" arg1=$page}</span>
     </div>
 {include file='inc/footer.tpl'}

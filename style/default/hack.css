@@ -461,19 +461,31 @@ div.clear {
     margin: 1em 0px;
 }
 
-#main div.pagination .newer, #main div.pagination .older {
+#main div.pagination div.newer a, #main div.pagination div.older a {
     color: grey;
 }
 
-#main div.pagination .newer:hover, #main div.pagination .older:hover {
+#main div.pagination div.newer a.newer {
+    margin-left: 0.5em;
+}
+
+#main div.pagination div.older a.older {
+    margin-right: 0.5em;
+}
+
+#main div.pagination div.newer a:hover, #main div.pagination div.older a:hover {
     color: inherit;
 }
 
-#main div.pagination .newer {
+#main div.pagination div.newer a.hidden, #main div.pagination div.older a.hidden {
+    visibility: hidden;
+}
+
+#main div.pagination div.newer {
     float: left;
 }
 
-#main div.pagination .older {
+#main div.pagination div.older {
     float: right;
 }
 
