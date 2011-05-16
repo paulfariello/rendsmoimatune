@@ -452,3 +452,32 @@ div.clear {
     height: 24px;
     background: url("../../px/default/snowish/24x24/actions/mail_new.png") transparent no-repeat center center;
 }
+
+#main div.pagination {
+    background: none repeat scroll 0 0 #F6F6F6;
+    border: 1px solid #DDDDDD;
+    padding: 10px;
+    vertical-align: middle;
+    margin: 1em 0px;
+}
+
+#main div.pagination .newer, #main div.pagination .older {
+    color: grey;
+}
+
+#main div.pagination .newer:hover, #main div.pagination .older:hover {
+    color: inherit;
+}
+
+#main div.pagination .newer {
+    float: left;
+}
+
+#main div.pagination .older {
+    float: right;
+}
+
+#main div.pagination .current {
+    display: block;
+    text-align: center;
+}

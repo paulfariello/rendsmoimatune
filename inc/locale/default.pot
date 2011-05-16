@@ -414,3 +414,12 @@ msgstr ""
 
 msgid "Yesterday"
 msgstr ""
+
+msgid "Newer"
+msgstr ""
+
+msgid "Older"
+msgstr ""
+
+msgid "page %d"
+msgstr ""

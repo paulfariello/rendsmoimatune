@@ -437,5 +437,14 @@ msgstr "Aujourd'hui"
 msgid "Yesterday"
 msgstr "Hier"
 
+msgid "Newer"
+msgstr "Plus récent"
+
+msgid "Older"
+msgstr "Plus ancien"
+
+msgid "page %d"
+msgstr "page %d"
+
 #~ msgid "User %s has been created. <a href=\"%s\">Invite her/him ?</a>"
 #~ msgstr "L'utilisateur %s a été créé. <a href=\"%s\">L'inviter ?</a>"

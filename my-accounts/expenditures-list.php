@@ -44,8 +44,17 @@ if (!isset($_GET['account-id'])) {
     die();
 }
 
+if (isset($_GET['page'])) {
+    $page = (int)$_GET['page'];
+} else {
+    $page = 1;
+}
+
+$te->assign("page", $page);
+
 $account = Eu\Rmmt\Account::getRepository()->find($_GET['account-id']);
-$te->assign('currentAccount',$account);
+$te->assign('currentAccount', $account);
+$te->assign('expenditures', $account->getExpenditures(Bdf\Core::getInstance()->getConfig('rmmt', 'expenditure_limit_number'), $page)); 
 $messages = \Bdf\Session::getInstance()->get('messages');
 if (null !== $messages) {
     $te->assign('messages',$messages);

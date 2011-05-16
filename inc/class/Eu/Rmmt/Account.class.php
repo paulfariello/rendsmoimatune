@@ -97,10 +97,10 @@ class Account
         $this->_endDate = $endDate;
     }
 
-    public function getExpenditures($limit = null)
+    public function getExpenditures($limit = null, $page = 1)
     {
         if (null != $limit) {
-            return $this->_expenditures->slice(0, $limit);
+            return $this->_expenditures->slice(($page - 1) * $limit, $limit);
         } else {
             return $this->_expenditures;
         }
@@ -269,6 +269,10 @@ class Account
         return \Bdf\Core::getInstance()->getEntityManager()->getRepository(__CLASS__);
     }
 
+    /**
+     * Url management
+     */
+
     public function getUrlDetail()
     {
         return Utils::makeUrl('my-accounts/'.Utils::urlize($this->_name).'-'.$this->_id.'/');
@@ -279,14 +283,22 @@ class Account
         return Utils::makeUrl('my-accounts/'.Utils::urlize($this->_name).'-'.$this->_id.'/delete.html');
     }
 
-    public function getUrlExpendituresList()
+    public function getUrlExpendituresList($page = 1)
     {
-        return Utils::makeUrl('my-accounts/'.Utils::urlize($this->_name).'-'.$this->_id.'/expenditures-list.html');
+        if ($page > 1) {
+            return Utils::makeUrl('my-accounts/'.Utils::urlize($this->_name).'-'.$this->_id.'/expenditures-list-page-'.(int)$page.'.html');
+        } else {
+            return Utils::makeUrl('my-accounts/'.Utils::urlize($this->_name).'-'.$this->_id.'/expenditures-list.html');
+        }
     }
 
-    public function getUrlRepaymentsList()
+    public function getUrlRepaymentsList($page = 1)
     {
-        return Utils::makeUrl('my-accounts/'.Utils::urlize($this->_name).'-'.$this->_id.'/repayments-list.html');
+        if ($page > 1) {
+            return Utils::makeUrl('my-accounts/'.Utils::urlize($this->_name).'-'.$this->_id.'/repayments-list-page-'.(int)$page.'.html');
+        } else {
+            return Utils::makeUrl('my-accounts/'.Utils::urlize($this->_name).'-'.$this->_id.'/repayments-list.html');
+        }
     }
 
     public function getUrlNewExpenditure()
@@ -323,6 +335,10 @@ class Account
     {
         return Utils::makeUrl('my-accounts/'.Utils::urlize($this->_name).'-'.$this->_id.'/rename.html');
     }
+
+    /**
+     * Access control
+     */
 
     public function checkViewRight(User $user)
     {
