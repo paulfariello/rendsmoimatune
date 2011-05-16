@@ -18,7 +18,7 @@
     width: auto;
 }
 
-#main span.payers, #main span.beneficiaries {
+#main span.payers, #main span.beneficiaries, #main span.date {
     font-size: 75%;
     color: grey;
     line-height: normal;

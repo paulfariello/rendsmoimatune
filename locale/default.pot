@@ -408,3 +408,9 @@ msgstr ""
 
 msgid "to"
 msgstr ""
+
+msgid "Today"
+msgstr ""
+
+msgid "Yesterday"
+msgstr ""

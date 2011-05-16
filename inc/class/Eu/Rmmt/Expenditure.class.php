@@ -29,6 +29,7 @@
 
 namespace Eu\Rmmt;
 use Bdf\Core;
+use Bdf\Utils;
 use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
 use Eu\Rmmt\Exception\RightException;
@@ -83,6 +84,18 @@ class Expenditure
     public function getDate()
     {
         return $this->_date;
+    }
+
+    public function getRelativeDate()
+    {
+        $interval = $this->_date->diff(new DateTime());
+        if ($interval->d < 1) {
+            return Utils::getText("Today");
+        } elseif ($interval->d < 2) {
+            return Utils::getText("Yesterday");
+        } else {
+            return $this->_date->format("d-m-Y");
+        }
     }
 
     public function setDate(DateTime $date)
@@ -268,6 +281,10 @@ class Expenditure
         return \Bdf\Core::getInstance()->getEntityManager()->getRepository(__CLASS__);
     }
 
+    /**
+     * Url management
+     */
+
     public function getUrlView()
     {
         return $this->_account->getUrlViewExpenditure($this);
@@ -282,6 +299,10 @@ class Expenditure
     {
         return $this->_account->getUrlDeleteExpenditure($this);
     }
+
+    /**
+     * Access control
+     */
 
     public function checkViewRight(User $user)
     {

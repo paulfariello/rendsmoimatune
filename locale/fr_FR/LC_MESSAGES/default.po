@@ -250,7 +250,11 @@ msgid ""
 "of your first account. An account is a group of expenditures and repayments "
 "related by something relevant for you. That thing could be holidays, "
 "roommate or even your every day expenditures."
-msgstr "Merci de vous être inscrit sur Rendsmoimatune. Nous vous proposons de commencer par la création d'un compte. Un compte est un regroupement de dépenses et de remboursements relié par quelque chose. Ce quelque chose peut être des vacances, une colloction ou même vos dépenses courantes."
+msgstr ""
+"Merci de vous être inscrit sur Rendsmoimatune. Nous vous proposons de "
+"commencer par la création d'un compte. Un compte est un regroupement de "
+"dépenses et de remboursements relié par quelque chose. Ce quelque chose peut "
+"être des vacances, une colloction ou même vos dépenses courantes."
 
 msgid "Password"
 msgstr "Mot de passe"
@@ -426,6 +430,12 @@ msgstr "Renomer"
 
 msgid "to"
 msgstr "au"
+
+msgid "Today"
+msgstr "Aujourd'hui"
+
+msgid "Yesterday"
+msgstr "Hier"
 
 #~ msgid "User %s has been created. <a href=\"%s\">Invite her/him ?</a>"
 #~ msgstr "L'utilisateur %s a été créé. <a href=\"%s\">L'inviter ?</a>"

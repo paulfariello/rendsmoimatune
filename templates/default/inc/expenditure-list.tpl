@@ -2,6 +2,9 @@
     {foreach from=$expenditures item='expenditure'}
         <tr>
             <td>
+                <span class="date">{$expenditure->getRelativeDate()}</span>
+            </td> 
+            <td>
                 {$expenditure->getTitle()|htmlProtect|truncate:40}
             </td> 
             <td>
