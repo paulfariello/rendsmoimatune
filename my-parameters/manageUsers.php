@@ -41,12 +41,24 @@ if ($currentUser == null) {
 }
 
 if (isset($_POST['delete-users'])) {
-    foreach($_POST['delete'] as $userId => $delete) {
-        $user = \Eu\Rmmt\User::getRepository()->find($userId);
-        if (null !== $user) {
-            $user->delete();
+    $messages = array();
+    try {
+        foreach($_POST['delete'] as $userId => $delete) {
+            try {
+                $user = \Eu\Rmmt\User::getRepository()->find($userId);
+                $user->checkDeleteRight($currentUser);
+                if (null !== $user) {
+                    $user->delete();
+                }
+            } catch(Eu\Rmmt\Exception\RightException $e) {
+                $messages[] = array('type'=>'error','content'=>$e->getMessage());
+            }
         }
+    } catch (Exception $e) {
+        $te->assign('messages', array(array('type'=>'error','content'=>Bdf\Utils::getText('Internal error').' : '.$e->getMessage())));
+        $te->display("error.tpl");
     }
+    $te->assign('messages', $messages);
 } elseif(isset($_POST['update-users'])) {
     foreach($_POST['update'] as $userId => $name) {
         $user = \Eu\Rmmt\User::getRepository()->find($userId);

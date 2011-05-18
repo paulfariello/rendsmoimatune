@@ -405,4 +405,26 @@ Pour nous rejoindre cliquez sur le lien suivant : %s";
         
     }
 
+
+    /**
+     * Access control
+     */
+
+    /**
+     * Check that this can be deleted by given user
+     *
+     * @param User $user user who want to delete this user
+     *
+     * @return void
+     */
+    public function checkDeleteRight(User $user)
+    {
+        if (!$this->_creator->equals($user)) {
+            throw new RightException(\Bdf\Utils::getText("You can't delete %s's account because you are not his/her creator", $this->getName()));
+        }
+
+        if ($this->isRegistered()) {
+            throw new RightException(\Bdf\Utils::getText("You can't delete %s's account because he/she is registered", $this->getName()));
+        }
+    }
 }

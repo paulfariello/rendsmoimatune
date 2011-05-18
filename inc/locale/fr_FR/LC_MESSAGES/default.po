@@ -452,5 +452,13 @@ msgstr "Premier en date"
 msgid "page %d"
 msgstr "page %d"
 
+msgid "You can't delete %s's account because you are not his/her creator"
+msgstr ""
+"Vous ne pouvez pas supprimer le compte utilisateur de %s car vous n'en n'êtes pas le créateur"
+
+msgid "You can't delete %s's account because he/she is registered"
+msgstr ""
+"Vous ne pouvez pas supprimer le compte utilisateur de %s car il ou elle s'est enregistré(e)"
+
 #~ msgid "User %s has been created. <a href=\"%s\">Invite her/him ?</a>"
 #~ msgstr "L'utilisateur %s a été créé. <a href=\"%s\">L'inviter ?</a>"

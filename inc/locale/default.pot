@@ -429,3 +429,9 @@ msgstr ""
 
 msgid "page %d"
 msgstr ""
+
+msgid "You can't delete %s's account because you are not his/her creator"
+msgstr ""
+
+msgid "You can't delete %s's account because he/she is registered"
+msgstr ""
