@@ -51,6 +51,7 @@ if (!isset($_POST['create-new-account'])) {
 
     if ($doSave) {
         $user = new Eu\Rmmt\User($_POST['email']);
+        $user->setRegistered(true);
         $user->setPassword($_POST['password']);
         $user->setName($_POST['name']);
         $em->persist($user);
