@@ -23,6 +23,9 @@ msgstr "%s doit %.2f€ à %s"
 msgid "About us"
 msgstr "A propos de nous"
 
+msgid "Account"
+msgstr "Compte"
+
 msgid "Account administration"
 msgstr "Administration du compte"
 
@@ -236,6 +239,10 @@ msgstr "N'a pas assez payé"
 msgid "Overpaid"
 msgstr "A trop payé"
 
+msgid "P_AccountAdvice"
+msgstr ""
+"Un compte vous permet de regrouper l'ensemble de vos transactions (remboursement, dépenses...) autour d'un évenement (vacances, colocation...). Chaque participant peut ensuite ajouter ses propres transactions."
+
 msgid "P_AccountDeletionWarning"
 msgstr ""
 "Vous êtes sur le point de supprimer définitivement le compte <b>%s</b>. Vous "
@@ -245,16 +252,10 @@ msgstr ""
 msgid "P_Balancing"
 msgstr "Voyez d'un coup d'œil qui a le plus payé."
 
-msgid ""
-"Thank you for registering in Rendsmoimatune. You can start with the creation "
-"of your first account. An account is a group of expenditures and repayments "
-"related by something relevant for you. That thing could be holidays, "
-"roommate or even your every day expenditures."
+msgid "P_Welcome"
 msgstr ""
 "Merci de vous être inscrit sur Rendsmoimatune. Nous vous proposons de "
-"commencer par la création d'un compte. Un compte est un regroupement de "
-"dépenses et de remboursements relié par quelque chose. Ce quelque chose peut "
-"être des vacances, une colloction ou même vos dépenses courantes."
+"commencer par la création d'un compte."
 
 msgid "Password"
 msgstr "Mot de passe"
@@ -454,11 +455,16 @@ msgstr "page %d"
 
 msgid "You can't delete %s's account because you are not his/her creator"
 msgstr ""
-"Vous ne pouvez pas supprimer le compte utilisateur de %s car vous n'en n'êtes pas le créateur"
+"Vous ne pouvez pas supprimer le compte utilisateur de %s car vous n'en "
+"n'êtes pas le créateur"
 
 msgid "You can't delete %s's account because he/she is registered"
 msgstr ""
-"Vous ne pouvez pas supprimer le compte utilisateur de %s car il ou elle s'est enregistré(e)"
+"Vous ne pouvez pas supprimer le compte utilisateur de %s car il ou elle "
+"s'est enregistré(e)"
+
+msgid "Forgot my password"
+msgstr "Mot de passe oublié"
 
 #~ msgid "User %s has been created. <a href=\"%s\">Invite her/him ?</a>"
 #~ msgstr "L'utilisateur %s a été créé. <a href=\"%s\">L'inviter ?</a>"

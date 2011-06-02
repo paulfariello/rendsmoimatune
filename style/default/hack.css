@@ -431,11 +431,30 @@ div.clear {
     padding: 0.5em;
 }
 
-#main div.site-presentation.img-right img {
+#main div.site-advice {
+	/* border: 1px solid #ddd; */
+    margin: 1em;
+    font-size: 120%;
+    min-height: 75px;
+}
+
+#main div.site-advice.img-right p {
+    border-right: 3px solid #ddd;
+    margin-right: 75px;
+    padding: 0.5em;
+}
+
+#main div.site-advice.img-left p {
+    border-left: 3px solid #ddd;
+    margin-left: 75px;
+    padding: 0.5em;
+}
+
+#main div.site-presentation.img-right img, #main div.site-advice.img-right img {
     float: right;
 }
 
-#main div.site-presentation.img-left img {
+#main div.site-presentation.img-left img, #main div.site-advice.img-left img {
     float: left;
 }
 

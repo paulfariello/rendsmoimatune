@@ -84,7 +84,7 @@ h1 span { display: none; }
 }
 
 #mainNav li a.my-accounts {
-    background-image: url("../../px/default/account.png");
+    background-image: url("../../px/default/account-open-small.png");
     background-position: left center;
     background-repeat: no-repeat;
     background-color: transparent;
@@ -161,7 +161,7 @@ h1 span { display: none; }
 }
 
 #sidebar .sideNav li a.account {
-    background: url("../../px/default/account-closed.png") no-repeat scroll left center transparent; 
+    background: url("../../px/default/account-closed-small.png") no-repeat scroll left center transparent; 
 }
 
 #sidebar .sideNav li a:hover { background-color: #fdfcf6; }

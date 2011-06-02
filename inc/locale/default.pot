@@ -23,6 +23,9 @@ msgstr ""
 msgid "About us"
 msgstr ""
 
+msgid "Account"
+msgstr ""
+
 msgid "Account administration"
 msgstr ""
 
@@ -236,13 +239,16 @@ msgstr ""
 msgid "Overpaid"
 msgstr ""
 
+msgid "P_AccountAdvice"
+msgstr ""
+
 msgid "P_AccountDeletionWarning"
 msgstr ""
 
 msgid "P_Balancing"
 msgstr ""
 
-msgid "Thank you for registering in Rendsmoimatune. You can start with the creation of your first account. An account is a group of expenditures and repayments related by something relevant for you. That thing could be holidays, roommate or even your every day expenditures."
+msgid "P_Welcome"
 msgstr ""
 
 msgid "Password"
@@ -434,4 +440,7 @@ msgid "You can't delete %s's account because you are not his/her creator"
 msgstr ""
 
 msgid "You can't delete %s's account because he/she is registered"
+msgstr ""
+
+msgid "Forgot my password"
 msgstr ""

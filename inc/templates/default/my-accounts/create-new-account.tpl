@@ -5,6 +5,12 @@
 {include file='inc/side-nav-my-accounts.tpl'}
 <h2><a href="{makeUrl url='my-accounts/'}">{getText id='My accounts'}</a> &raquo; <a href="{makeUrl url='my-accounts/create-new-account.html'}">{getText id='New account'}</a></h2>
 {include file='inc/main.tpl'}
+                    <div class="site-advice img-left">
+                        <img src="{makeUrl url='account-open-medium.png' type='img'}" />
+                        <h3>{getText id='Account'}</h3>
+                        <p>{getText id='P_AccountAdvice'}</p>
+                        <div class="clear"></div>
+                    </div>
                 	<form action="{makeUrl url='my-accounts/create-new-account.html'}" class="jNice" method="post">
                       <fieldset>
                           <p><label for="name">{getText id='Title'}</label><input type="text" class="text-long{if isset($userInputException) && $userInputException->getInputName() == 'title'} user-input-exception{/if}" name="name" value="{if isset($_POST)}{$_POST.name|htmlProtect}{/if}" /></p>
