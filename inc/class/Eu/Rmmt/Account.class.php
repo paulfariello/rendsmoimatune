@@ -201,11 +201,25 @@ class Account
         $query = $em->createQuery("SELECT sum(p._amount) FROM \Eu\Rmmt\Payer p INNER JOIN p._expenditure ex INNER JOIN ex._account a INNER JOIN p._user u WHERE u._id = :user AND a._id = :account");
         $query->setParameter("user", $user->getId());
         $query->setParameter("account", $this->getId());
-        $payedAmount = $query->getSingleScalarResult();
-        if(null == $payedAmount) {
+        $amount = $query->getSingleScalarResult();
+        if(null == $amount) {
             return 0;
         } else {
-            return $payedAmount;
+            return $amount;
+        }
+    }
+
+    public function getRepaymentPayedAmount(User $user)
+    {
+        $em = \Bdf\Core::getInstance()->getEntityManager();
+        $query = $em->createQuery("SELECT sum(r._amount) FROM \Eu\Rmmt\Repayment r INNER JOIN r._account a INNER JOIN r._payer u WHERE u._id = :user AND a._id = :account");
+        $query->setParameter("user", $user->getId());
+        $query->setParameter("account", $this->getId());
+        $amount = $query->getSingleScalarResult();
+        if(null == $amount) {
+            return 0;
+        } else {
+            return $amount;
         }
     }
 
@@ -216,11 +230,25 @@ class Account
         $query = $em->createQuery("SELECT sum(b._amount) FROM \Eu\Rmmt\Beneficiary b INNER JOIN b._expenditure ex INNER JOIN ex._account a INNER JOIN b._user u WHERE u._id = :user AND a._id = :account");
         $query->setParameter("user", $user->getId());
         $query->setParameter("account", $this->getId());
-        $owesAmount = $query->getSingleScalarResult();
-        if(null == $owesAmount) {
+        $amount = $query->getSingleScalarResult();
+        if(null == $amount) {
             return 0;
         } else {
-            return $owesAmount;
+            return $amount;
+        }
+    }
+
+    public function getRepaymentReceivedAmount(User $user)
+    {
+        $em = \Bdf\Core::getInstance()->getEntityManager();
+        $query = $em->createQuery("SELECT sum(r._amount) FROM \Eu\Rmmt\Repayment r INNER JOIN r._account a INNER JOIN r._beneficiary u WHERE u._id = :user AND a._id = :account");
+        $query->setParameter("user", $user->getId());
+        $query->setParameter("account", $this->getId());
+        $amount = $query->getSingleScalarResult();
+        if(null == $amount) {
+            return 0;
+        } else {
+            return $amount;
         }
     }
 
@@ -253,7 +281,7 @@ class Account
 
     public function getBalance(User $user)
     {
-        return $this->getPayedAmount($user) - $this->getOwesAmount($user);
+        return $this->getPayedAmount($user) + $this->getRepaymentPayedAmount($user) - $this->getOwesAmount($user) - $this->getRepaymentReceivedAmount($user);
     }
 
     public function getTotalExpenditure() {

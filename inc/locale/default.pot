@@ -125,6 +125,9 @@ msgstr ""
 msgid "Expenditure saved"
 msgstr ""
 
+msgid "Expenditure summary"
+msgstr ""
+
 msgid "Expenditure title"
 msgstr ""
 
@@ -285,6 +288,9 @@ msgid "Recent repayments"
 msgstr ""
 
 msgid "Repayment created"
+msgstr ""
+
+msgid "Repayment summary"
 msgstr ""
 
 msgid "Repayments"

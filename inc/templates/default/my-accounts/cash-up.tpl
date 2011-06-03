@@ -9,7 +9,7 @@
 {assign var="totalExpenditure" value=$currentAccount->getTotalExpenditure()}
 {*assign var="maxPayedAmount" value=$currentAccount->getMaxPayedAmount()*}
 {*assign var="maxOwesAmount" value=$currentAccount->getMaxOwesAmount()*}
-<h3>{getText id='Summary'}</h3>
+<h3>{getText id='Expenditure summary'}</h3>
 <h4 class="summary-owes">
     {getText id="Is concerned by"}
 </h4>
@@ -63,6 +63,30 @@
     <div class="balance-name">{$user->getName()|htmlProtect}</div>
 {/foreach}
 
+<h3>{getText id='Repayment summary'}</h3>
+<h4 class="summary-owes">
+    {getText id="Received"}
+</h4>
+<h4 class="summary-payed">
+    {getText id="Repayed"}
+</h4>
+{foreach from=$users item="user"}
+    {assign var="payedAmount" value=$currentAccount->getRepaymentPayedAmount($user)}
+    {assign var="receivedAmount" value=$currentAccount->getRepaymentReceivedAmount($user)}
+    <div class="summary-payed-amount">
+        <div class="balance-bar gradient-{round($payedAmount / $totalExpenditure * 100, -1)}">
+            {$payedAmount} €
+        </div>
+    </div>
+    <div class="summary-owes-amount">
+        <div class="balance-bar gradient-{round($receivedAmount / $totalExpenditure * 100, -1)}">
+            {$receivedAmount} €
+        </div>
+    </div>
+    <div class="summary-name">{$user->getName()|htmlProtect}</div>
+    <div class="clear"></div>
+{/foreach}
+<h4>{getText id="Total"} : {$totalExpenditure} €</h4>
 <h3>{getText id='Balancing'}</h3>
 <ul>
     {foreach from=$debts item="debt"}
