@@ -408,6 +408,44 @@
     float: left;
 }
 
+#main h4.repayer, #main h4.repaid {
+    display: block;
+    float: left;
+    min-width: 100px;
+    padding-top: 100px;
+    margin: 0px 50px 1em;
+    background: url('../../px/default/user-big.png') no-repeat;
+    vertical-align: bottom;
+    text-align: center;
+}
+
+#main h4.repayment {
+    display: block;
+    float: left;
+    min-width: 300px;
+    padding-top: 100px;
+    margin-bottom: 1em;
+    background: url('../../px/default/repayment-arrow-big.png') no-repeat;
+    vertical-align: bottom;
+    text-align: center;
+}
+
+#main div.repayer, #main div.repaid {
+    display: block;
+    float: left;
+    width: 200px;
+    font-weight: bold;
+    text-align: center;
+}
+
+#main div.amount-owes {
+    display: block;
+    float: left;
+    width: 300px;
+    font-weight: bold;
+    text-align: center;
+}
+
 div.clear {
     clear: both;
 }

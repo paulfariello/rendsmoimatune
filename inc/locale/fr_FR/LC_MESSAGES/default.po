@@ -125,6 +125,9 @@ msgstr "Dépense supprimée"
 msgid "Expenditure saved"
 msgstr "Dépense enregistrée"
 
+msgid "Expenditure summary"
+msgstr "Résumé des dépenses"
+
 msgid "Expenditure title"
 msgstr "Intitulé de la dépense"
 
@@ -133,6 +136,9 @@ msgstr "Dépenses"
 
 msgid "First Name"
 msgstr "Prénom"
+
+msgid "Forgot my password"
+msgstr "Mot de passe oublié"
 
 msgid "From"
 msgstr "Du"
@@ -224,6 +230,12 @@ msgstr "Nouveau remboursement"
 msgid "New user"
 msgstr "Nouvel utilisateur"
 
+msgid "Newer"
+msgstr "Plus récent"
+
+msgid "Newest"
+msgstr "Dernier en date"
+
 msgid "No expenditure"
 msgstr "Aucune dépense"
 
@@ -236,12 +248,21 @@ msgstr "Pas d'utilisateurs"
 msgid "Not paid enough"
 msgstr "N'a pas assez payé"
 
+msgid "Older"
+msgstr "Plus ancien"
+
+msgid "Oldest"
+msgstr "Premier en date"
+
 msgid "Overpaid"
 msgstr "A trop payé"
 
 msgid "P_AccountAdvice"
 msgstr ""
-"Un compte vous permet de regrouper l'ensemble de vos transactions (remboursement, dépenses...) autour d'un évenement (vacances, colocation...). Chaque participant peut ensuite ajouter ses propres transactions."
+"Un compte vous permet de regrouper l'ensemble de vos transactions "
+"(remboursement, dépenses...) autour d'un évenement (vacances, "
+"colocation...). Chaque participant peut ensuite ajouter ses propres "
+"transactions."
 
 msgid "P_AccountDeletionWarning"
 msgstr ""
@@ -290,8 +311,14 @@ msgstr "Dernières dépenses"
 msgid "Recent repayments"
 msgstr "Derniers remboursements"
 
+msgid "Rename"
+msgstr "Renomer"
+
 msgid "Repayment created"
 msgstr "Remboursement créé"
+
+msgid "Repayment summary"
+msgstr "Résumé des remboursements"
 
 msgid "Repayments"
 msgstr "Remboursements"
@@ -344,6 +371,9 @@ msgstr "Intitulé"
 msgid "Title is required"
 msgstr "Intitulé requis"
 
+msgid "Today"
+msgstr "Aujourd'hui"
+
 msgid "Total"
 msgstr "Total"
 
@@ -383,11 +413,24 @@ msgstr "Détail de la dépense"
 msgid "Yes, delete it"
 msgstr "Confirmer la suppression"
 
+msgid "Yesterday"
+msgstr "Hier"
+
 msgid "You can't access this account."
 msgstr "Vous n'avez pas le droit d'acceder à ce compte"
 
 msgid "You can't create expenditure neither repayment in this account."
 msgstr "Vous ne pouvez créer ni dépenses ni remboursements dans ce compte."
+
+msgid "You can't delete %s's account because he/she is registered"
+msgstr ""
+"Vous ne pouvez pas supprimer le compte utilisateur de %s car il ou elle "
+"s'est enregistré(e)"
+
+msgid "You can't delete %s's account because you are not his/her creator"
+msgstr ""
+"Vous ne pouvez pas supprimer le compte utilisateur de %s car vous n'en "
+"n'êtes pas le créateur"
 
 msgid "You can't delete this account because you haven't created it."
 msgstr ""
@@ -423,48 +466,14 @@ msgstr "Vous devez être le créateur d'un utilisateur pour pouvoir le fusionner
 msgid "gives to"
 msgstr "donne à"
 
-msgid "repayments"
-msgstr "remboursements"
-
-msgid "Rename"
-msgstr "Renomer"
-
-msgid "to"
-msgstr "au"
-
-msgid "Today"
-msgstr "Aujourd'hui"
-
-msgid "Yesterday"
-msgstr "Hier"
-
-msgid "Newer"
-msgstr "Plus récent"
-
-msgid "Older"
-msgstr "Plus ancien"
-
-msgid "Newest"
-msgstr "Dernier en date"
-
-msgid "Oldest"
-msgstr "Premier en date"
+msgid "owes"
+msgstr "doit"
 
 msgid "page %d"
 msgstr "page %d"
 
-msgid "You can't delete %s's account because you are not his/her creator"
-msgstr ""
-"Vous ne pouvez pas supprimer le compte utilisateur de %s car vous n'en "
-"n'êtes pas le créateur"
+msgid "repayments"
+msgstr "remboursements"
 
-msgid "You can't delete %s's account because he/she is registered"
-msgstr ""
-"Vous ne pouvez pas supprimer le compte utilisateur de %s car il ou elle "
-"s'est enregistré(e)"
-
-msgid "Forgot my password"
-msgstr "Mot de passe oublié"
-
-#~ msgid "User %s has been created. <a href=\"%s\">Invite her/him ?</a>"
-#~ msgstr "L'utilisateur %s a été créé. <a href=\"%s\">L'inviter ?</a>"
+msgid "to"
+msgstr "au"

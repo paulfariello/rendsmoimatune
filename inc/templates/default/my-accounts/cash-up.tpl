@@ -88,9 +88,14 @@
 {/foreach}
 <h4>{getText id="Total"} : {$totalExpenditure} €</h4>
 <h3>{getText id='Balancing'}</h3>
-<ul>
+<h4 class="repayer"></h4>
+<h4 class="repayment">{getText id="owes"}</h4>
+<h4 class="repaid"></h4>
+<div class="clear"></div>
     {foreach from=$debts item="debt"}
-        <li>{getText id="%1\$s gives %2\$.2f€ to %3\$s" arg1=$debt->getFrom()->getName() arg2=$debt->getAmount() arg3=$debt->getTo()->getName()}</li>
+        <div class="repayer">{$debt->getFrom()->getName()|htmlProtect}</div>
+        <div class="amount-owes">{$debt->getAmount()}</div>
+        <div class="repaid">{$debt->getTo()->getName()|htmlProtect}</div>
+        <div class="clear"></div>
     {/foreach}
-</ul>
 {include file='inc/footer.tpl'}

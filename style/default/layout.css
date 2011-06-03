@@ -102,7 +102,7 @@ h1 span { display: none; }
 }
 
 #mainNav li.current-user a {
-    background-image: url("../../px/default/emblem-people.png");
+    background-image: url("../../px/default/user-small.png");
     background-position: left center;
     background-repeat: no-repeat;
     background-color: transparent;
@@ -228,7 +228,7 @@ h1 span { display: none; }
 }
 
 #sidebar .sideNav li a.repayment {
-    background-image: url("../../px/default/repayment.png");
+    background-image: url("../../px/default/repayment-small.png");
 }
 
 #sidebar .sideNav li a.cash-up {

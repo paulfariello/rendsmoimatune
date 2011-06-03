@@ -137,6 +137,9 @@ msgstr ""
 msgid "First Name"
 msgstr ""
 
+msgid "Forgot my password"
+msgstr ""
+
 msgid "From"
 msgstr ""
 
@@ -227,6 +230,12 @@ msgstr ""
 msgid "New user"
 msgstr ""
 
+msgid "Newer"
+msgstr ""
+
+msgid "Newest"
+msgstr ""
+
 msgid "No expenditure"
 msgstr ""
 
@@ -237,6 +246,12 @@ msgid "No users"
 msgstr ""
 
 msgid "Not paid enough"
+msgstr ""
+
+msgid "Older"
+msgstr ""
+
+msgid "Oldest"
 msgstr ""
 
 msgid "Overpaid"
@@ -285,6 +300,9 @@ msgid "Recent expenditures"
 msgstr ""
 
 msgid "Recent repayments"
+msgstr ""
+
+msgid "Rename"
 msgstr ""
 
 msgid "Repayment created"
@@ -344,6 +362,9 @@ msgstr ""
 msgid "Title is required"
 msgstr ""
 
+msgid "Today"
+msgstr ""
+
 msgid "Total"
 msgstr ""
 
@@ -382,19 +403,32 @@ msgstr ""
 msgid "Yes, delete it"
 msgstr ""
 
+msgid "Yesterday"
+msgstr ""
+
 msgid "You can't access this account."
 msgstr ""
 
 msgid "You can't create expenditure neither repayment in this account."
 msgstr ""
 
+msgid "You can't delete %s's account because he/she is registered"
+msgstr ""
+
+msgid "You can't delete %s's account because you are not his/her creator"
+msgstr ""
+
 msgid "You can't delete this account because you haven't created it."
 msgstr ""
 
-msgid "You can't delete this expenditure because you are not creator of this expenditure neither of this account"
+msgid ""
+"You can't delete this expenditure because you are not creator of this "
+"expenditure neither of this account"
 msgstr ""
 
-msgid "You can't edit this expenditure because you are not creator of this expenditure neither of this account"
+msgid ""
+"You can't edit this expenditure because you are not creator of this "
+"expenditure neither of this account"
 msgstr ""
 
 msgid "You can't rename this account because you haven't created it."
@@ -412,41 +446,14 @@ msgstr "Vous devez être le créateur d'un utilisateur pour pouvoir le fusionner
 msgid "gives to"
 msgstr ""
 
-msgid "repayments"
-msgstr ""
-
-msgid "Rename"
-msgstr ""
-
-msgid "to"
-msgstr ""
-
-msgid "Today"
-msgstr ""
-
-msgid "Yesterday"
-msgstr ""
-
-msgid "Newer"
-msgstr ""
-
-msgid "Older"
-msgstr ""
-
-msgid "Newest"
-msgstr ""
-
-msgid "Oldest"
+msgid "owes"
 msgstr ""
 
 msgid "page %d"
 msgstr ""
 
-msgid "You can't delete %s's account because you are not his/her creator"
+msgid "repayments"
 msgstr ""
 
-msgid "You can't delete %s's account because he/she is registered"
-msgstr ""
-
-msgid "Forgot my password"
+msgid "to"
 msgstr ""
