@@ -31,6 +31,9 @@ RewriteRule    ^my-accounts/[a-z0-9-]*-([0-9]+)/expenditure/delete-[a-z0-9-]*-([
 # Repayment
 RewriteRule    ^my-accounts/[a-z0-9-]*-([0-9]+)/repayments-list.html$                           my-accounts/repayments-list.php?account-id=$1 [L]
 RewriteRule    ^my-accounts/[a-z0-9-]*-([0-9]+)/create-new-repayment.html$                      my-accounts/create-new-repayment.php?account-id=$1 [L]
+RewriteRule    ^my-accounts/[a-z0-9-]*-([0-9]+)/repayment/view-[a-z0-9-]*-([0-9]+).html$        my-accounts/view-repayment.php?account-id=$1&repayment-id=$2 [L]
+RewriteRule    ^my-accounts/[a-z0-9-]*-([0-9]+)/repayment/edit-[a-z0-9-]*-([0-9]+).html$        my-accounts/edit-repayment.php?account-id=$1&repayment-id=$2 [L]
+RewriteRule    ^my-accounts/[a-z0-9-]*-([0-9]+)/repayment/delete-[a-z0-9-]*-([0-9]+).html$      my-accounts/delete-repayment.php?account-id=$1&repayment-id=$2 [L]
 
 
 # My Account

@@ -1,6 +1,6 @@
 <?php
 /**
- * Fichier de création d'un nouveau remboursement
+ * Fichier de modification d'une dépense
  *
  * PHP version 5.3
  *
@@ -40,23 +40,38 @@ if ($currentUser == null) {
     die();
 }
 
-if (!isset($_GET['account-id'])) {
-    header('location: '.\Bdf\Utils::makeUrl('my-accounts/'));
+if (isset($_GET['account-id']) and !empty($_GET['account-id'])) {
+    $account = \Eu\Rmmt\Account::getRepository()->find($_GET['account-id']);
+}
+
+if (!isset($_GET['repayment-id']) or empty($_GET['account-id'])) {
+    if (null !== $account) {
+        header('location: '.$account->getUrlDetail());
+    } else {
+        header('location: '.\Bdf\Utils::makeUrl('my-accounts/'));
+    }
     die();
 } else {
-    $account = \Eu\Rmmt\Account::getRepository()->find($_GET['account-id']);
-    if ($account === null) {
-        header('location: '.\Bdf\Utils::makeUrl('my-accounts/'));
+    $repayment = \Eu\Rmmt\Repayment::getRepository()->find($_GET['repayment-id']);
+    if (null === $repayment) {
+        if (null !== $account) {
+            header('location: '.$account->getUrlDetail());
+        } else {
+            header('location: '.\Bdf\Utils::makeUrl('my-accounts/'));
+        }
         die();
     }
 }
 
+    
 try {
-    $account->checkCreateRight($currentUser);
 
-    if (!isset($_POST['create-new-repayment'])) {
+    $repayment->checkEditRight($currentUser);
+
+    if (!isset($_POST['edit-repayment'])) {
         $te->assign("currentAccount",$account);
-        $te->display('my-accounts/create-new-repayment');
+        $te->assign('repayment', $repayment);
+        $te->display('my-accounts/edit-repayment');
     } else {
         try {
             if (empty($_POST['payer-name'])) {
@@ -86,7 +101,9 @@ try {
             }
             $_POST['amount'] = strtr($_POST['amount'], ',', '.');
 
-            $repayment = new Eu\Rmmt\Repayment($account, $payer, $beneficiary, $_POST['amount'], $currentUser);
+            $repayment->setPayer($payer);
+            $repayment->setBeneficiary($beneficiary);
+            $repayment->setAmount($_POST['amount']);
 
             $date = null;
             if (isset($_POST['date']) AND !empty($_POST['date'])) {
@@ -95,10 +112,9 @@ try {
                 $repayment->setDate($date);
             }
 
-            $em->persist($repayment);
             $em->flush();
             $messages = array();
-            $messages[] = array('type'=>'done','content'=>Bdf\Utils::getText('Repayment created'));
+            $messages[] = array('type'=>'done','content'=>Bdf\Utils::getText('Repayment saved'));
 
             $usersString = "";
             foreach(Eu\Rmmt\UserFactory::getNewUsers() as $index => $user) {
@@ -116,20 +132,22 @@ try {
             header('location: '.$account->getUrlDetail());
         } catch(Eu\Rmmt\Exception\UserInputException $e) {
             $te->assign('currentAccount',$account);
+            $te->assign('repayment',$repayment);
             $te->assign('_POST',$_POST);
-            $te->assign('userInputException', $e);
             $te->assign('messages', array(array('type'=>'error','content'=>$e->getMessage())));
-            $te->display('my-accounts/create-new-repayment');
+            $te->assign('userInputException', $e);
+            $te->display('my-accounts/edit-repayment');
         } catch(Exception $e) {
             $te->assign('currentAccount',$account);
+            $te->assign('repayment',$repayment);
             $te->assign('_POST',$_POST);
-            $te->assign('messages', array(array('type'=>'error','content'=>Bdf\Utils::getText('Internal Error').' : '.$e->getMessage())));
-            $te->display('my-accounts/create-new-repayment');
+            $te->assign('messages', array(array('type'=>'error','content'=>Bdf\Utils::getText('Internal error').' : '.$e->getMessage())));
+            $te->display('my-accounts/edit-repayment');
         }
     }
 } catch(Eu\Rmmt\Exception\RightException $e) {
     \Bdf\Session::getInstance()->add('messages', array(array('type'=>'error','content'=>$e->getMessage())));
-    header('location: '.\Bdf\Utils::makeUrl('my-accounts/'));
+    header('location: '.$repayment->getAccount()->getUrlDetail());
 }
 
 ?>

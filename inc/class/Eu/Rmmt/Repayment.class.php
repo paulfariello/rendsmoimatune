@@ -48,13 +48,15 @@ class Repayment
     private $_payer;
     private $_beneficiary;
     private $_account;
+    private $_creator;
 
-    public function  __construct(Account $account, User $payer, User $beneficiary, $amount)
+    public function  __construct(Account $account, User $payer, User $beneficiary, $amount, User $creator)
     {
         $this->_account       = $account;
         $this->_payer       = $payer;
         $this->_beneficiary = $beneficiary;
         $this->_amount      = $amount;
+        $this->_creator        = $creator;
     }
 
     public function getId()
@@ -120,6 +122,56 @@ class Repayment
     public function getDescription()
     {
         return Utils::getText('%1$s repaid %2$.2f€ to %3$s', $this->_payer->getName(), $this->_amount, $this->_beneficiary->getName());
+    }
+
+    /**
+     * Url management
+     */
+
+    public function getUrlView()
+    {
+        return $this->_account->getUrlViewRepayment($this);
+    }
+
+    public function getUrlEdit()
+    {
+        return $this->_account->getUrlEditRepayment($this);
+    }
+
+    public function getUrlDelete()
+    {
+        return $this->_account->getUrlDeleteRepayment($this);
+    }
+
+    /**
+     * Access control
+     */
+
+    public function checkViewRight(User $user)
+    {
+        try {
+            $this->_account->checkViewRight($user);
+        } catch(RightException $e) {
+            throw new RightException(\Bdf\Utils::getText("You can't view this repayment"));
+        }
+    }
+
+    public function checkEditRight(User $user)
+    {
+        if (!$this->_creator->equals($user) and !$this->_account->getCreator()->equals($user)) {
+            throw new RightException(\Bdf\Utils::getText("You can't edit this repayment because you are not creator of this repayment neither of this account"));
+        }
+    }
+
+    public function checkDeleteRight(User $user)
+    {
+        if (!$this->_creator->equals($user) and !$this->_account->getCreator()->equals($user)) {
+            throw new RightException(\Bdf\Utils::getText("You can't delete this repayment because you are not creator of this repayment neither of this account"));
+        }
+    }
+    public static function getRepository()
+    {
+        return \Bdf\Core::getInstance()->getEntityManager()->getRepository(__CLASS__);
     }
 
 }

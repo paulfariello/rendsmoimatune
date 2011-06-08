@@ -317,6 +317,12 @@ msgstr "Renomer"
 msgid "Repayment created"
 msgstr "Remboursement créé"
 
+msgid "Repayment deleted"
+msgstr "Remboursement supprimé"
+
+msgid "Repayment saved"
+msgstr "Remboursement enregistré"
+
 msgid "Repayment summary"
 msgstr "Résumé des remboursements"
 

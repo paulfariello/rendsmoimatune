@@ -2,7 +2,7 @@
     {foreach from=$repayments item='repayment'}
         <tr>
             <td>{$repayment->getDescription()|htmlProtect}</td>
-            <td class="action"><a href="#" class="view">View</a><a href="#" class="edit">Edit</a><a href="#" class="delete">Delete</a></td>
+            <td class="action"><a href="{$repayment->getUrlView()}" class="view">View</a><a href="{$repayment->getUrlEdit()}" class="edit">Edit</a><a href="{$repayment->getUrlDelete()}" class="delete">Delete</a></td>
         </tr>
     {foreachelse}
         <tr>

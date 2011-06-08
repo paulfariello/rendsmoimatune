@@ -362,6 +362,21 @@ class Account
         return Utils::makeUrl('my-accounts/'.Utils::urlize($this->_name).'-'.$this->_id.'/expenditure/delete-'.Utils::urlize($expenditure->getTitle()).'-'.$expenditure->getId().'.html');
     }
 
+    public function getUrlViewRepayment(Repayment $repayment)
+    {
+        return Utils::makeUrl('my-accounts/'.Utils::urlize($this->_name).'-'.$this->_id.'/repayment/view-'.Utils::urlize($repayment->getDescription()).'-'.$repayment->getId().'.html');
+    }
+
+    public function getUrlEditRepayment(Repayment $repayment)
+    {
+        return Utils::makeUrl('my-accounts/'.Utils::urlize($this->_name).'-'.$this->_id.'/repayment/edit-'.Utils::urlize($repayment->getDescription()).'-'.$repayment->getId().'.html');
+    }
+
+    public function getUrlDeleteRepayment(Repayment $repayment)
+    {
+        return Utils::makeUrl('my-accounts/'.Utils::urlize($this->_name).'-'.$this->_id.'/repayment/delete-'.Utils::urlize($repayment->getDescription()).'-'.$repayment->getId().'.html');
+    }
+
     public function getUrlCashUp()
     {
         return Utils::makeUrl('my-accounts/'.Utils::urlize($this->_name).'-'.$this->_id.'/cash-up.html');

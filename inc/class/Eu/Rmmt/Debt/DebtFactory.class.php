@@ -61,6 +61,9 @@ class DebtFactory
         $this->_account = $account;
     }
 
+    /**
+     * Compare deux utilisateurs par rapport à leur balances respectives.
+     */
     private function _sortUsers($a, $b)
     {
         if ($a['balance'] == $b['balance']) {

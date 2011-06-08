@@ -308,6 +308,12 @@ msgstr ""
 msgid "Repayment created"
 msgstr ""
 
+msgid "Repayment deleted"
+msgstr ""
+
+msgid "Repayment saved"
+msgstr ""
+
 msgid "Repayment summary"
 msgstr ""
 

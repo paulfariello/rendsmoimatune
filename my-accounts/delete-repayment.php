@@ -1,6 +1,6 @@
 <?php
 /**
- * Page de renomage d'un compte
+ * Fichier de suppression d'une nouvelle dépense
  *
  * PHP version 5.3
  *
@@ -19,19 +19,19 @@
  * You should have received a copy of the GNU General Public License
  * along with Rendsmoimatune.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @category ScriptFile
+ * @category ClassFile
  * @package  Rendsmoimatune
- * @author   Paul Fariello <paul.fariello@gmail.com>
+ * @author   needle
  * @license  http://www.gnu.org/copyleft/gpl.html  GPL License 3.0
  * @version  SVN: 145
- * @link     http://www.bottedefoin.net
+ * @link     http://www.rendsmoimatune.eu
  */
 
 require_once '../inc/init.php';
-require_once '../inc/assignDefaultVar.php';
 
 $em = \Bdf\Core::getInstance()->getEntityManager();
 $te = \Bdf\Core::getInstance()->getTemplatesEngine();
+
 $currentUser = \Eu\Rmmt\User::getCurrentUser();
 if ($currentUser == null) {
     \Bdf\Session::getInstance()->add('redirect',$_SERVER['REQUEST_URI']);
@@ -39,31 +39,30 @@ if ($currentUser == null) {
     die();
 }
 
-if (!isset($_GET['account-id'])) {
+if (!isset($_GET['repayment-id'])) {
     header('location: '.\Bdf\Utils::makeUrl('my-accounts/'));
-    die();
 } else {
-    $account = \Eu\Rmmt\Account::getRepository()->find($_GET['account-id']);
-    if ($account === null) {
+    $repayment = Eu\Rmmt\Repayment::getRepository()->find($_GET['repayment-id']);
+    if ($repayment === null) {
         header('location: '.\Bdf\Utils::makeUrl('my-accounts/'));
-        die();
-    }
-}
-
-try {
-    $account->checkRenameRight($currentUser);
-
-    if (!isset($_POST['rename'])) {
-        $te->assign('currentAccount',$account);
-        $te->display('my-accounts/delete');
     } else {
-        $account->setName($_POST['name']);
-        $em->flush();
-        header('location: '.$account->getUrlDetail());
+        try {
+            $url = $repayment->getAccount()->getUrlDetail();
+
+            $repayment->checkDeleteRight($currentUser);
+
+            $em->remove($repayment);
+            $em->flush();
+
+            $messages = array();
+            $messages[] = array('type'=>'done','content'=>Bdf\Utils::getText('Repayment deleted'));
+            \Bdf\Session::getInstance()->add('messages',$messages);
+            header('location: '.$url);
+        } catch(Eu\Rmmt\Exception\RightException $e) {
+            \Bdf\Session::getInstance()->add('messages', array(array('type'=>'error','content'=>$e->getMessage())));
+            header('location: '.$url);
+        }
     }
-} catch(Eu\Rmmt\Exception\RightException $e) {
-    \Bdf\Session::getInstance()->add('messages', array(array('type'=>'error','content'=>$e->getMessage())));
-    header('location: '.$account->getUrlDetail());
 }
 
 ?>
