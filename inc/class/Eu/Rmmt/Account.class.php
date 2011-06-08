@@ -292,6 +292,14 @@ class Account
         return $total;
     }
 
+    public function getTotalRepayment() {
+        $total = 0;
+        foreach($this->getRepayments() as $repayment) {
+            $total += $repayment->getAmount();
+        }
+        return $total;
+    }
+
     public static function getRepository()
     {
         return \Bdf\Core::getInstance()->getEntityManager()->getRepository(__CLASS__);
