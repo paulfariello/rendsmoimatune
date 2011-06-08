@@ -430,10 +430,21 @@
     text-align: center;
 }
 
+#main div.repayment {
+    background: none repeat scroll 0 0 #F6F6F6;
+    border: 1px solid #DDDDDD;
+    padding: 9px;
+    vertical-align: middle;
+    margin: 1em 0px;
+}
+#main div.repayment:hover {
+    background: #fdfcf6; 
+}
+
 #main div.repayer, #main div.repaid {
     display: block;
     float: left;
-    width: 200px;
+    width: 190px;
     font-weight: bold;
     text-align: center;
 }

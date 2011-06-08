@@ -93,9 +93,11 @@
 <h4 class="repaid"></h4>
 <div class="clear"></div>
     {foreach from=$debts item="debt"}
-        <div class="repayer">{$debt->getFrom()->getName()|htmlProtect}</div>
-        <div class="amount-owes">{$debt->getAmount()}</div>
-        <div class="repaid">{$debt->getTo()->getName()|htmlProtect}</div>
-        <div class="clear"></div>
+        <div class="repayment">
+            <div class="repayer">{$debt->getFrom()->getName()|htmlProtect}</div>
+            <div class="amount-owes">{$debt->getAmount()} €</div>
+            <div class="repaid">{$debt->getTo()->getName()|htmlProtect}</div>
+            <div class="clear"></div>
+        </div>
     {/foreach}
 {include file='inc/footer.tpl'}
