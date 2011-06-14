@@ -318,19 +318,19 @@
 }
 
 #main div.balance-bar, #main h4.balance-payed, #main h4.balance-due {
-  -moz-border-radius: 5px;
-	-webkit-border-radius: 5px;
-	-moz-box-shadow: 0 1px 3px rgba(0,0,0,0.5);
-	-webkit-box-shadow: 0 1px 3px rgba(0,0,0,0.5);
-	text-shadow: 0 -1px 1px rgba(0,0,0,0.25);
-	border-bottom: 1px solid rgba(0,0,0,0.25);
-  color: #fff;
-  text-decoration: none;
-  font-weight: bold;
-  line-height: 2em;
-  text-shadow: 0 -1px 1px rgba(0,0,0,0.25);
-  text-align: center;
-  overflow: visible;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    -moz-box-shadow: 0 1px 3px rgba(0,0,0,0.5);
+    -webkit-box-shadow: 0 1px 3px rgba(0,0,0,0.5);
+    text-shadow: 0 -1px 1px rgba(0,0,0,0.25);
+    border-bottom: 1px solid rgba(0,0,0,0.25);
+    color: #fff;
+    text-decoration: none;
+    font-weight: bold;
+    line-height: 2em;
+    text-shadow: 0 -1px 1px rgba(0,0,0,0.25);
+    text-align: center;
+    overflow: visible;
 }
 
 #main h4.summary-owes, #main h4.summary-payed {
@@ -560,4 +560,38 @@ div.clear {
 #main div.pagination .current {
     display: block;
     text-align: center;
+}
+
+.tips {
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    -moz-box-shadow: 0 1px 3px rgba(0,0,0,0.5);
+    -webkit-box-shadow: 0 1px 3px rgba(0,0,0,0.5);
+    text-shadow: 0 -1px 1px rgba(0,0,0,0.25);
+    border-bottom: 1px solid rgba(0,0,0,0.25);
+    color: #000;
+    text-decoration: none;
+    line-height: 2em;
+    text-shadow: 0 -1px 1px rgba(0,0,0,0.25);
+    text-align: center;
+    overflow: visible;
+    padding: 0.5em 1em 0.5em 40px;
+    background: #F0F7FA url("../../px/default/snowish/24x24/status/dialog-info.png") 10px 50% no-repeat;
+    background: url("../../px/default/snowish/24x24/status/dialog-info.png") 10px 50% no-repeat, -webkit-gradient(
+        linear,
+        left top,
+        left bottom,
+        color-stop(0, rgb(240,247,250)),
+        color-stop(1, rgb(221,237,244))
+    );
+    background: url("../../px/default/snowish/24x24/status/dialog-info.png") 10px 50% no-repeat, -moz-linear-gradient(
+        center top,
+        rgb(240,247,250) 0%,
+        rgb(221,237,244) 100%
+    );
+    max-width: 300px;
+}
+
+span.tips-text {
+    display: none;
 }

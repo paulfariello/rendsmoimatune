@@ -3,9 +3,9 @@
     <fieldset>
         <p><label>{getText id='Title'} :</label><input type="text" class="text-long{if isset($userInputException) && $userInputException->getInputName() == 'title'} user-input-exception{/if}" name="title" value="{if isset($_POST.title)}{$_POST.title|htmlProtect}{/if}" /></p>
         <p><label>{getText id='Date'} :</label><input type="text" class="text-medium date{if isset($userInputException) && $userInputException->getInputName() == 'date'} user-input-exception{/if}" name="date" value="{if isset($_POST.date)}{$_POST.date|htmlProtect}{else}{date('d-m-Y')}{/if}" /></p>
-        <p><label>{getText id='Expenditure amount'} :</label><input type="text" id="expenditure-amount" class="text-medium{if isset($userInputException) && ($userInputException->getInputName() == 'amount' || $userInputException->getInputName() == 'amount-payed')} user-input-exception{/if}" name="amount" value="{if isset($_POST.amount)}{$_POST.amount|htmlProtect}{/if}" /><span class="inter-input">€</span></p>
+        <p><label class="tips-handler" rel="{getText id="What the expenditure really cost."}">{getText id='Expenditure amount'} :</label><input type="text" id="expenditure-amount" class="text-medium{if isset($userInputException) && ($userInputException->getInputName() == 'amount' || $userInputException->getInputName() == 'amount-payed')} user-input-exception{/if}" name="amount" value="{if isset($_POST.amount)}{$_POST.amount|htmlProtect}{/if}" /><span class="inter-input">€</span></p>
         <!-- Payers -->
-        <p><label>{getText id='Payers'} :</label></p>
+        <p><label class="tips-handler" rel="{getText id="Here are everyone who participated in the expenditure."}">{getText id='Payers'} :</label></p>
         <div class="subfieldset">
             <div id="clonable-payer">
                 <p class="inline-label"><label class="medium-inline">{getText id='Name'} :</label><label class="medium-inline">{getText id='Amount payed'} :</label></p>
@@ -56,7 +56,7 @@
             <p><a href="#" id="add-new-payer"></a></p>
         </div>
         <!-- Beneficiaries -->
-        <p><label>{getText id='Beneficiaries'} :</label></p>
+        <p><label class="tips-handler" rel="{getText id="Here are everyone who enjoy the expenditure. In other words those who should pay the cost one way or another. Don't forget to also add those who paid."}">{getText id='Beneficiaries'} :</label></p>
         <div class="subfieldset">
             <div id="clonable-beneficiary">
                 <p class="inline-label"><label class="medium-inline">{getText id='Name'} :</label></p>
