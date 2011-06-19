@@ -63,7 +63,7 @@ class FacebookAuthentication extends OAuthentication
 
     protected function _constructServiceProviderUrl()
     {
-        return "https://graph.facebook.com/oauth/authorize?display=popup&client_id=".$this->_clientId."&redirect_uri=".$this->_redirectUrl;
+        return "https://graph.facebook.com/oauth/authorize?display=popup&client_id=".$this->_clientId."&redirect_uri=".$this->_redirectUrl."&scope=email";
     }
 
     protected function _constructRequestRequestTokenUrl()
@@ -83,14 +83,19 @@ class FacebookAuthentication extends OAuthentication
 
     protected function _handleProtectedRessources(array $ressources)
     {
+        $em = Core::getInstance()->getEntityManager();
+
         $user = User::getRepository()->findOneBy(array('_facebookId'=>$ressources['id']));
         if (null == $user) {
             $user = UserFactory::createFacebookUser($ressources['id'], $ressources['first_name'].' '.$ressources['last_name']);
-            $em = Core::getInstance()->getEntityManager();
             $em->persist($user);
-            $em->flush();
+        }
+
+        if (isset($ressources['email'])) {
+            $user->setEmail($ressources['email']);
         }
 
         $this->_user = $user;
+        $em->flush();
     }
 }
