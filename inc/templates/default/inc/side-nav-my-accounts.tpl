@@ -6,9 +6,17 @@
                     <li class="active">
                         <a class="account" href="{$account->getUrlDetail()}">{$account->getName()}</a>
                         <ul class="subNav">
-                            <li><a href="{$currentAccount->getUrlExpendituresList()}" class="expenditure">{getText id="Expenditures"}</a></li>
-                            <li><a href="{$currentAccount->getUrlRepaymentsList()}" class="repayment">{getText id="Repayments"}</a></li>
-                            <li><a href="{$currentAccount->getUrlCashUp()}" class="cash-up">{getText id="Cash up"}</a></li>
+                            <li>
+                                <a href="{$currentAccount->getUrlExpendituresList()}" class="expenditure">{getText id="Expenditures"}</a>
+                                <a href="{$currentAccount->getUrlNewExpenditure()}" class="add-expenditure"></a>
+                            </li>
+                            <li>
+                                <a href="{$currentAccount->getUrlRepaymentsList()}" class="repayment">{getText id="Repayments"}</a>
+                                <a href="{$currentAccount->getUrlNewRepayment()}" class="add-repayment"></a>
+                            </li>
+                            <li>
+                                <a href="{$currentAccount->getUrlCashUp()}" class="cash-up">{getText id="Cash up"}</a>
+                            </li>
                         </ul>
                     </li>
                 {else}

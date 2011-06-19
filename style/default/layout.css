@@ -216,7 +216,11 @@ h1 span { display: none; }
     background-repeat: no-repeat;
     background-position: center left;
     padding: 0 0 0 29px;
-    width: 131px;
+}
+
+#sidebar .sideNav li a.repayment, #sidebar .sideNav li a.expenditure {
+    width: 106px;
+    float: left;
 }
 
 #sidebar .sideNav li a.new {
@@ -233,6 +237,15 @@ h1 span { display: none; }
 
 #sidebar .sideNav li a.cash-up {
     background-image: url("../../px/default/snowish/24x24/apps/kedit.png");
+}
+
+#sidebar .sideNav li a.add-repayment, #sidebar .sideNav li a.add-expenditure {
+    width: 24px;
+    float: right;
+    margin: 0px;
+    padding: 0px;
+    background: transparent no-repeat center center url("../../px/default/snowish/24x24/actions/gtk-add.png");
+    border-left: 1px solid #DDDDDD;
 }
 
 /* Breadcrumb ---------------------------------------- */
