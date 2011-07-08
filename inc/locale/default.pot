@@ -263,6 +263,12 @@ msgstr ""
 msgid "P_AccountDeletionWarning"
 msgstr ""
 
+msgid "P_AutomaticRecall"
+msgstr ""
+
+msgid "P_AutomaticUserCreation"
+msgstr ""
+
 msgid "P_Balancing"
 msgstr ""
 

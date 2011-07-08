@@ -270,8 +270,14 @@ msgstr ""
 "allez perdre toutes les données qui s'y trouve. Aucun retour en arrière "
 "n'est possible."
 
+msgid "P_AutomaticRecall"
+msgstr "Quelqu'un vous doit de l'argent ? Rappelez-le lui en cliquant sur un bouton. Rends-moi ma tune lui enverra un mail cordial."
+
+msgid "P_AutomaticUserCreation"
+msgstr "Pas confiance en vos amis ? Vous pouvez gérer vos dépenses seul dans votre coin sans obliger vos amis à s'inscrire."
+
 msgid "P_Balancing"
-msgstr "Voyez d'un coup d'œil qui a le plus payé."
+msgstr "Elle vous permet de voir d'un coup d'œil qui a le plus ou le moins payé."
 
 msgid "P_MainDesc"
 msgstr "Gérer les dépenses faites à plusieurs c'est galère. Ne perdez plus de temps à calculer qui doit quoi à qui, Rends-moi ma tune le fait pour vous !"
