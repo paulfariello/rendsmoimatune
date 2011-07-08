@@ -266,6 +266,9 @@ msgstr ""
 msgid "P_Balancing"
 msgstr ""
 
+msgid "P_MainDesc"
+msgstr ""
+
 msgid "P_Welcome"
 msgstr ""
 

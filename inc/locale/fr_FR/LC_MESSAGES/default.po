@@ -273,6 +273,9 @@ msgstr ""
 msgid "P_Balancing"
 msgstr "Voyez d'un coup d'œil qui a le plus payé."
 
+msgid "P_MainDesc"
+msgstr "Gérer les dépenses faites à plusieurs c'est galère. Ne perdez plus de temps à calculer qui doit quoi à qui, Rends-moi ma tune le fait pour vous !"
+
 msgid "P_Welcome"
 msgstr ""
 "Merci de vous être inscrit sur Rendsmoimatune. Nous vous proposons de "

@@ -3,6 +3,8 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>Rends-moi ma tune{if isset($title) AND !empty($title)} — {getText id=$title}{/if}</title>
+<meta name="description" content="{if isset($description) AND !empty($description)}{getText id=$description}{else}{getText id="P_MainDesc"}{/if}" /> 
+<meta name="keywords" content="tune, thune, argent, remboursement, dépense, groupe, amis, dette" /> 
 
 <!-- CSS -->
 <link href="{makeUrl url='transdmin.css' type='css'}" rel="stylesheet" type="text/css" media="screen" />
