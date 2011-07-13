@@ -4,6 +4,12 @@
 {include file='inc/side-nav-index.tpl'}
 {include file='inc/main.tpl'}
     <div class="site-presentation img-left">
+        <img src="{makeUrl url='account-presentation.png' type='img'}" />
+        <h3>{getText id='Account'}</h3>
+        <p>{getText id='P_Account'}</p>
+        <div class="clear"></div>
+    </div>
+    <div class="site-presentation img-left">
         <img src="{makeUrl url='balance.png' type='img'}" />
         <h3>{getText id='Balance of payments'}</h3>
         <p>{getText id='P_Balancing'}</p>

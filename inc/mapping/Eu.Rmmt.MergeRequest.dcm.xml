@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping http://doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+
+    <entity name="Eu\Rmmt\MergeRequest" table="merge_request">
+        <id name="_id" type="integer" column="merge_request_pk">
+            <generator strategy="SEQUENCE" />
+            <sequence-generator sequence-name="merge_request_merge_request_pk_seq" initial-value="1" allocation-size="1" />
+        </id>
+
+        <field name="_firstUserAgreement"       column="first_user_agreement"       type="boolean"   />
+        <field name="_secondUserAgreement"      column="second_user_agreement"      type="boolean"   />
+        <field name="_firstUserRequestToken"    column="first_user_request_token"   type="string"   />
+        <field name="_secondUserRequestToken"   column="second_user_request_token"  type="string"   />
+
+        <many-to-one target-entity="User" field="_firstUser">
+            <join-column name="first_user_fk" referenced-column-name="user_pk" />
+        </many-to-one>
+        <many-to-one target-entity="User" field="_secondUser">
+            <join-column name="second_user_fk" referenced-column-name="user_pk" />
+        </many-to-one>
+        <many-to-one target-entity="User" field="_requester">
+            <join-column name="requester_fk" referenced-column-name="user_pk" />
+        </many-to-one>
+
+    </entity>
+</doctrine-mapping>

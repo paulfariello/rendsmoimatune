@@ -251,11 +251,6 @@ class User implements \Bdf\IUser
         return $this->getId() === $user->getId();
     }
 
-    public function getUrlInvite()
-    {
-        return Utils::makeUrl('user-'.$this->getId().'/invite.html');
-    }
-
     public function mergeWith(User $user)
     {
         $em = Core::getInstance()->getEntityManager();
@@ -405,6 +400,14 @@ Pour nous rejoindre cliquez sur le lien suivant : %s";
         
     }
 
+    /**
+     * Url management
+     */
+
+    public function getUrlInvite()
+    {
+        return Utils::makeUrl('user-'.$this->getId().'/invite.html');
+    }
 
     /**
      * Access control

@@ -1,6 +1,6 @@
 <?php
 /**
- * Page de fusion de deux utilisateurs
+ * Page d'acceptation d'une demande de fusion
  *
  * PHP version 5.3
  *
@@ -27,8 +27,8 @@
  * @link     http://www.bottedefoin.net
  */
 
-require_once '../inc/init.php';
-require_once '../inc/assignDefaultVar.php';
+require_once 'inc/init.php';
+require_once 'inc/assignDefaultVar.php';
 
 $em = \Bdf\Core::getInstance()->getEntityManager();
 $te = \Bdf\Core::getInstance()->getTemplatesEngine();
@@ -40,33 +40,37 @@ if ($currentUser == null) {
 }
 
 try {
-    $user1 = \Eu\Rmmt\User::getRepository()->find($_GET['id1']);
-    if (null == $user1) {
-        throw new \Eu\Rmmt\Exception\UnknownUserException($_GET['id1']);
-    }
-    $user2 = \Eu\Rmmt\User::getRepository()->find($_GET['id2']);
-    if (null == $user2) {
-        throw new \Eu\Rmmt\Exception\UnknownUserException($_GET['id2']);
+    $mergeRequest = \Eu\Rmmt\MergeRequest::getRepository()->find($_GET["request"]);
+
+    if (null == $mergeRequest) {
+        throw new \Eu\Rmmt\Exception\UnknownMergeRequestException($_GET['id']);
     }
 
-    if ($user1->isRegistered() and $user2->isRegistered()) {
-        throw new \Eu\Rmmt\Exception\MergeException(\Bdf\Utils::getText('Cannot merge two registered users'));
-    }
+    $te->assign('mergeRequest', $mergeRequest);
 
-    if ($user1->isRegistered()) {
-        $user1->mergeWith($user2);
-    } elseif ($user2->isRegistered()) {
-        $user2->mergeWith($user1);
-    } else {
-        $user1->mergeWith($user2);
-    }
-
+    $mergeRequest->acceptMerge($currentUser, $_GET['token']);
     $em->flush();
-    $te->assign('messages', array(array('type'=>'done','content'=>sprintf(\Bdf\Utils::getText('User %s merged with %s'), $user1->getName(), $user2->getName()))));
+
+
+    $mergeRequest->checkMergeRight();
+
+    $te->assign('messages', array(array('type'=>'done','content'=>sprintf(\Bdf\Utils::getText('User %s merged with %s'), $mergeRequest->getFirstUser()->getName(), $mergeRequest->getSecondUser()->getName()))));
     $te->display('my-parameters/merge-request');
 
+} catch(Eu\Rmmt\Exception\InvalidMergeRequestTokenException $e) {
+    $te->assign('invalidMergeRequestTokenException', $e);
+    $te->assign('messages', array(array('type'=>'warning','content'=>$e->getMessage())));
+    $te->display('my-parameters/merge-request-accept');
+} catch(Eu\Rmmt\Exception\UnknownUserException $e) {
+    $te->assign('unknownUserException', $e);
+    $te->assign('messages', array(array('type'=>'warning','content'=>$e->getMessage())));
+    $te->display('my-parameters/merge-request-accept');
+} catch(Eu\Rmmt\Exception\MergeAuthorizationException $e) {
+    $te->assign('mergeAuthorizationException', $e);
+    $te->assign('messages', array(array('type'=>'warning','content'=>$e->getMessage())));
+    $te->display('my-parameters/merge-request-accept');
 } catch(Exception $e) {
     $te->assign('messages', array(array('type'=>'error','content'=>$e->getMessage())));
-    $te->display('my-parameters/merge-request');
+    $te->display('my-parameters/merge-request-accept');
 }
 ?>

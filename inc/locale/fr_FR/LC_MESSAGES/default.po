@@ -17,6 +17,9 @@ msgstr "%1$s doit %2$.2f€ à %3$s"
 msgid "%1$s repaid %2$.2f€ to %3$s"
 msgstr "%1$s a payé %2$.2f€ à %3$s"
 
+msgid "%1$s suggest you merge your account"
+msgstr "%1$s vous suggère une fusion"
+
 msgid "%s gives %.2f€ to %s"
 msgstr "%s doit %.2f€ à %s"
 
@@ -113,6 +116,12 @@ msgstr "e-mail"
 msgid "Email is required"
 msgstr "Email requis"
 
+msgid "Exclude"
+msgstr "Exclure"
+
+msgid "Exclusion"
+msgstr "Exclusion"
+
 msgid "Expenditure amount"
 msgstr "Montant de la dépense"
 
@@ -142,6 +151,17 @@ msgstr "Mot de passe oublié"
 
 msgid "From"
 msgstr "Du"
+
+msgid ""
+"Hi %1$s,\n"
+"%2$s suggest you merge your account with %3$s's account because he thinks "
+"they both are yours.\n"
+"If you think %2$s is right please go to %4$s."
+msgstr ""
+"Salut %1$s,\n"
+"%2$s propose que tu fusionne ton compte avec le compte %3$s parce qu'il "
+"pense que les deux t'appartiennent.\n"
+"Si %2$s a raison rends-toi à cette adresse %4$s."
 
 msgid "Id"
 msgstr "n°"
@@ -194,8 +214,17 @@ msgstr "MES PARAMÈTRES"
 msgid "Manage users"
 msgstr "Gérer les utilisateurs"
 
+msgid "Merge"
+msgstr "Fusion"
+
+msgid "Merge request of users %1$s and %2$s"
+msgstr "Demande du fusion de %1$s avec %2$s"
+
 msgid "Merge requests"
 msgstr "Requête de fusion"
+
+msgid "Merge selected users"
+msgstr "Fusionner les utilisateurs sélectionnés"
 
 msgid "My account"
 msgstr "Mon compte"
@@ -238,6 +267,9 @@ msgstr "Dernier en date"
 
 msgid "No expenditure"
 msgstr "Aucune dépense"
+
+msgid "No participants"
+msgstr "Pas de participants"
 
 msgid "No repayment"
 msgstr "Aucun remboursement"
@@ -286,6 +318,12 @@ msgid "P_Welcome"
 msgstr ""
 "Merci de vous être inscrit sur Rendsmoimatune. Nous vous proposons de "
 "commencer par la création d'un compte."
+
+msgid "Participants"
+msgstr "Participants"
+
+msgid "Participants list"
+msgstr "Liste des participants"
 
 msgid "Password"
 msgstr "Mot de passe"
@@ -374,6 +412,17 @@ msgstr "S'identifier"
 msgid "Summary"
 msgstr "Résumé"
 
+msgid ""
+"Thank you for registering in Rendsmoimatune. You can start with the creation "
+"of your first account. An account is a group of expenditures and repayments "
+"related by something relevant for you. That thing could be holidays, "
+"roommate or even your every day expenditures."
+msgstr ""
+"Merci de vous être inscrit sur Rendsmoimatune. Nous vous proposons de "
+"commencer par la création d'un compte. Un compte est un regroupement de "
+"dépenses et de remboursements relié par quelque chose. Ce quelque chose peut "
+"être des vacances, une colloction ou même vos dépenses courantes."
+
 msgid "The e-mail address and password you entered do not match any accounts"
 msgstr "L'email et le mot passe entrés ne correspondent à aucun compte connu"
 
@@ -413,6 +462,11 @@ msgstr "Fusion réussie de l'utilisateur %s avec l'utilisateur %s"
 msgid "Users"
 msgstr "Utilisateurs"
 
+msgid "Users %1$s and %2$s seems to be the same, you should request a merge."
+msgstr ""
+"Les utilisateurs %1$s et %2$s semble correspondre à la même personne, nous "
+"vous conseillons de demander une fusion."
+
 msgid "Users you have created"
 msgstr "Utilisateurs que vous avez créés"
 
@@ -424,6 +478,13 @@ msgstr "Voir"
 
 msgid "View expenditure"
 msgstr "Détail de la dépense"
+
+msgid ""
+"We just sent e-mail to the concerned persons, please wait for their "
+"agreements."
+msgstr ""
+"On vient d'envoyer des emails aux personnes concernées. Soit patient, "
+"attends leur accord."
 
 msgid "Yes, delete it"
 msgstr "Confirmer la suppression"
@@ -463,6 +524,9 @@ msgid ""
 msgstr ""
 "Vous ne pouvez pas modifier cette dépense car vous n'en n'êtes pas l'auteur."
 
+msgid "You can't merge user %1$s with user %2$s on your own."
+msgstr "Vous n'avez pas le droit de fusionner les utilisateurs %1$s et %2$s."
+
 msgid "You can't rename this account because you haven't created it."
 msgstr ""
 "Vous ne pouvez pas renomer ce compte car vous n'en n'êtes pas l'auteur."
@@ -477,6 +541,14 @@ msgstr "Vous ne pouvez pas voir cette dépense."
 
 msgid "You must be creator of user in order to merge it"
 msgstr "Vous devez être le créateur d'un utilisateur pour pouvoir le fusionner"
+
+msgid ""
+"You need the agreement of the other user. You should have received similar "
+"mail for that."
+msgstr "Vous devez encore obtenir l'accord du second utilisateur pour terminer la fusion. Vous devriez avoir reçu un second mail à ce sujet."
+
+msgid "You need to be logged in as the user who received the email."
+msgstr "Vous devez être connecté en tant que l'utilisateur ayant reçu l'email de fusion."
 
 msgid "gives to"
 msgstr "donne à"

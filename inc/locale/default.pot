@@ -17,6 +17,9 @@ msgstr ""
 msgid "%1$s repaid %2$.2f€ to %3$s"
 msgstr ""
 
+msgid "%1$s suggest you merge your account"
+msgstr ""
+
 msgid "%s gives %.2f€ to %s"
 msgstr ""
 
@@ -113,6 +116,12 @@ msgstr ""
 msgid "Email is required"
 msgstr ""
 
+msgid "Exclude"
+msgstr ""
+
+msgid "Exclusion"
+msgstr ""
+
 msgid "Expenditure amount"
 msgstr ""
 
@@ -141,6 +150,13 @@ msgid "Forgot my password"
 msgstr ""
 
 msgid "From"
+msgstr ""
+
+msgid ""
+"Hi %1$s,\n"
+"%2$s suggest you merge your account with %3$s's account because he thinks "
+"they both are yours.\n"
+"If you think %2$s is right please go to %4$s."
 msgstr ""
 
 msgid "Id"
@@ -194,7 +210,16 @@ msgstr ""
 msgid "Manage users"
 msgstr ""
 
+msgid "Merge"
+msgstr ""
+
+msgid "Merge request of users %1$s and %2$s"
+msgstr ""
+
 msgid "Merge requests"
+msgstr ""
+
+msgid "Merge selected users"
 msgstr ""
 
 msgid "My account"
@@ -239,6 +264,9 @@ msgstr ""
 msgid "No expenditure"
 msgstr ""
 
+msgid "No participants"
+msgstr ""
+
 msgid "No repayment"
 msgstr ""
 
@@ -276,6 +304,12 @@ msgid "P_MainDesc"
 msgstr ""
 
 msgid "P_Welcome"
+msgstr ""
+
+msgid "Participants"
+msgstr ""
+
+msgid "Participants list"
 msgstr ""
 
 msgid "Password"
@@ -365,6 +399,13 @@ msgstr ""
 msgid "Summary"
 msgstr ""
 
+msgid ""
+"Thank you for registering in Rendsmoimatune. You can start with the creation "
+"of your first account. An account is a group of expenditures and repayments "
+"related by something relevant for you. That thing could be holidays, "
+"roommate or even your every day expenditures."
+msgstr ""
+
 msgid "The e-mail address and password you entered do not match any accounts"
 msgstr ""
 
@@ -403,6 +444,9 @@ msgstr ""
 msgid "Users"
 msgstr ""
 
+msgid "Users %1$s and %2$s seems to be the same, you should request a merge."
+msgstr ""
+
 msgid "Users you have created"
 msgstr ""
 
@@ -416,6 +460,39 @@ msgid "View expenditure"
 msgstr ""
 
 msgid "Yes, delete it"
+msgstr ""
+
+msgid "Yesterday"
+msgstr ""
+
+msgid "You can't access this account."
+msgstr ""
+
+msgid ""
+"We just sent e-mail to the concerned persons, please wait for their "
+"agreements."
+msgstr ""
+
+msgid "Yes, delete it"
+msgstr ""
+
+msgid "You can't delete %s's account because he/she is registered"
+msgstr ""
+
+msgid "You can't delete %s's account because you are not his/her creator"
+msgstr ""
+
+msgid "You can't delete this account because you haven't created it."
+msgstr ""
+
+msgid ""
+"You can't delete this expenditure because you are not creator of this "
+"expenditure neither of this account"
+msgstr ""
+
+msgid ""
+"You can't edit this expenditure because you are not creator of this "
+"expenditure neither of this account"
 msgstr ""
 
 msgid "Yesterday"
@@ -441,9 +518,15 @@ msgid ""
 "expenditure neither of this account"
 msgstr ""
 
+msgid "owes"
+msgstr ""
+
 msgid ""
 "You can't edit this expenditure because you are not creator of this "
 "expenditure neither of this account"
+msgstr ""
+
+msgid "You can't merge user %1$s with user %2$s on your own."
 msgstr ""
 
 msgid "You can't rename this account because you haven't created it."
@@ -458,10 +541,15 @@ msgstr ""
 msgid "You must be creator of user in order to merge it"
 msgstr "Vous devez être le créateur d'un utilisateur pour pouvoir le fusionner"
 
-msgid "gives to"
+msgid ""
+"You need the agreement of the other user. You should have received similar "
+"mail for that."
 msgstr ""
 
-msgid "owes"
+msgid "You need to be logged in as the user who received the email."
+msgstr ""
+
+msgid "gives to"
 msgstr ""
 
 msgid "page %d"

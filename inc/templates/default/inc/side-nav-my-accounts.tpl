@@ -17,6 +17,7 @@
                             <li>
                                 <a href="{$currentAccount->getUrlCashUp()}" class="cash-up">{getText id="Cash up"}</a>
                             </li>
+                            <li><a href="{$currentAccount->getUrlParticipants()}" class="participants">{getText id="Participants"}</a></li>
                         </ul>
                     </li>
                 {else}

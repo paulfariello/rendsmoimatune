@@ -212,7 +212,7 @@ h1 span { display: none; }
 }
 
 
-#sidebar .sideNav .subNav li a.new, #sidebar .sideNav li a.repayment, #sidebar .sideNav li a.expenditure, #sidebar .sideNav .subNav li a.cash-up {
+#sidebar .sideNav .subNav li a.new, #sidebar .sideNav li a.repayment, #sidebar .sideNav li a.expenditure, #sidebar .sideNav .subNav li a.cash-up, #sidebar .sideNav .subNav li a.participants {
     background-repeat: no-repeat;
     background-position: center left;
     padding: 0 0 0 29px;
@@ -246,6 +246,10 @@ h1 span { display: none; }
     padding: 0px;
     background: transparent no-repeat center center url("../../px/default/snowish/24x24/actions/gtk-add.png");
     border-left: 1px solid #DDDDDD;
+}
+
+#sidebar .sideNav li a.participants {
+    background-image: url("../../px/default/emblem-people.png");
 }
 
 /* Breadcrumb ---------------------------------------- */
