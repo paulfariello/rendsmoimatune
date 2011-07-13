@@ -14,13 +14,13 @@
    height="48"
    id="svg7854"
    sodipodi:version="0.32"
-   inkscape:version="0.48.0 r9654"
+   inkscape:version="0.48.1 r9760"
    version="1.0"
-   sodipodi:docname="User-info.svg"
+   sodipodi:docname="user.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape"
-   inkscape:export-filename="/Users/needle/Devel/Php/Rendsmoimatune/px/default/user-test.png"
-   inkscape:export-xdpi="45"
-   inkscape:export-ydpi="45">
+   inkscape:export-filename="/Users/paulfariello/Devel/Rendsmoimatune/px/default/user-small.png"
+   inkscape:export-xdpi="45.81863"
+   inkscape:export-ydpi="45.81863">
   <defs
      id="defs7856">
     <linearGradient
@@ -238,15 +238,15 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="11.313708"
-     inkscape:cx="27.241248"
-     inkscape:cy="18.173244"
+     inkscape:cx="37.84785"
+     inkscape:cy="25.244312"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      width="48px"
      height="48px"
      inkscape:showpageshadow="false"
-     inkscape:window-width="1920"
-     inkscape:window-height="1095"
+     inkscape:window-width="1280"
+     inkscape:window-height="756"
      inkscape:window-x="0"
      inkscape:window-y="0"
      showgrid="false"
