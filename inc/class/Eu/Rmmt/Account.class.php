@@ -397,11 +397,6 @@ class Account
         return Utils::makeUrl('my-accounts/'.Utils::urlize($this->_name).'-'.$this->_id.'/exlude-'.Utils::urlize($user->getName()).'-'.$user->getId().'.html');
     }
 
-    public function getUrlMergeUsers($id1, $id2)
-    {
-        return Utils::makeUrl('my-accounts/'.Utils::urlize($this->_name).'-'.$this->_id.'/merge-user-'.(int)$id1.'-with-'.(int)$id2.'.html');
-    }
-
     /**
      * Access control
      */

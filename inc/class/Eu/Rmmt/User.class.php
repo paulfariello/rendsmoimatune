@@ -251,38 +251,6 @@ class User implements \Bdf\IUser
         return $this->getId() === $user->getId();
     }
 
-    public function mergeWith(User $user)
-    {
-        $em = Core::getInstance()->getEntityManager();
-        $currentUser = User::getCurrentUser(); 
-        if ( ! $currentUser->equals($user->getCreator()) ) {
-            throw new MergeException(Utils::getText('You must be creator of user in order to merge it'));
-        }
-
-        foreach($user->getRepaymentsToMe() as $repayment) {
-            $repayment->setBeneficiary($this);
-        }
-
-        foreach($user->getRepaymentsFromMe() as $repayment) {
-            $repayment->setPayer($this);
-        }
-
-        foreach($user->getPayers() as $payer) {
-            $payer->setUser($this);
-        }
-
-        foreach($user->getBeneficiaries() as $beneficiary) {
-            $beneficiary->setUser($this);
-        }
-
-        foreach($user->getAccounts() as $account) {
-            $account->removeUser($user);
-            $account->addUser($this);
-        }
-
-        $em->remove($user); 
-    }
-
     public function setInvited($invited)
     {
         $this->_invited = (boolean)$invited;

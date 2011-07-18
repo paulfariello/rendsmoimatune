@@ -55,12 +55,19 @@ class MergeRequest extends Entity
     private $_firstUserRequestToken     = null;
     private $_secondUserRequestToken    = null;
     private $_requester                 = null;
+    private $_keepName                  = 1;
+    private $_keepEmail                 = null;
 
     public function  __construct(User $firstUser, User $secondUser, User $requester)
     {
         $this->_firstUser   = $firstUser;
         $this->_secondUser  = $secondUser;
         $this->_requester   = $requester;
+    }
+    
+    public function getId()
+    {
+        return $this->_id;
     }
     
     public function getFirstUser()
@@ -132,6 +139,108 @@ class MergeRequest extends Entity
         }
     }
 
+    public function keepName($user)
+    {
+        if ($user > 0 and $user < 3)
+            $this->_keepName = (int)$user;
+    }
+
+    public function keepEmail($user)
+    {
+        if ($user > 0 and $user < 3)
+            $this->_keepEmail = (int)$user;
+    }
+
+    public function doMerge()
+    {
+        $em = Core::getInstance()->getEntityManager();
+        $keptUser = null;
+        $deletedUser = null;
+
+        // Choosing wich user to keep
+        if ($this->_keepEmail == null) {
+            if ($this->getFirstUser()->isRegistered() AND $this->getSecondUser()->isRegistered()) {
+                throw new Eu\Rmmt\Exception\MergeException(Utils::getText("Cannot choose which account to keep"));
+            } elseif ($this->getSecondUser()->isRegistered()) {
+                $keptUser = $this->getSecondUser();
+                $deletedUser = $this->getFirstUser();
+            } else { // Weither first user is registered or none of them is.
+                $keptUser = $this->getFirstUser();
+                $deletedUser = $this->getSecondUser();
+            }
+        }  else {
+            if ($this->_keepEmail == 1) {
+                $keptUser = $this->getFirstUser();
+                $deletedUser = $this->getSecondUser();
+            } elseif($this->_keepEmail == 2) {
+                $keptUser = $this->getSecondUser();
+                $deletedUser = $this->getFirstUser();
+            } else {
+                throw new Eu\Rmmt\Exception\MergeException(Utils::getText("Cannot choose which account to keep"));
+            }
+        }
+
+        // Setting name
+        if ($this->_keepName == 1) {
+            $keptUser->setName($this->getFirstUser()->getName());
+        } else {
+            $keptUser->setName($this->getSecondUser()->getName());
+        }
+
+
+        // Merging collections 
+        foreach($deletedUser->getRepaymentsToMe() as $repayment) {
+            $repayment->setBeneficiary($keptUser);
+        }
+
+        foreach($deletedUser->getRepaymentsFromMe() as $repayment) {
+            $repayment->setPayer($keptUser);
+        }
+
+        foreach($deletedUser->getPayers() as $payer) {
+            $alreadyPayer = false;
+            foreach ($payer->getExpenditure()->getPayers() as $keptPayer) {
+                if ($keptPayer->getUser()->equals($keptUser)) {
+                    $alreadyPayer = true;
+                    break; // Can only be payer once
+                }
+            }
+
+            if ($alreadyPayer) {
+                $keptPayer->setAmount($keptPayer->getAmount() + $payer->getAmount());
+                $em->remove($payer);
+            } else {
+                $payer->setUser($keptUser);
+            }
+        }
+
+        foreach($deletedUser->getBeneficiaries() as $beneficiary) {
+            $alreadyBeneficiary = false;
+            foreach ($beneficiary->getExpenditure()->getBeneficiaries() as $keptBeneficiary) {
+                if ($keptBeneficiary->getUser()->equals($keptUser)) {
+                    $alreadyBeneficiary = true;
+                    break; // Can only be beneficiary once
+                }
+            }
+
+            if ($alreadyBeneficiary) {
+                $keptBeneficiary->setAmount($keptBeneficiary->getAmount() + $beneficiary->getAmount());
+                $em->remove($beneficiary);
+            } else {
+                $beneficiary->setUser($keptUser);
+            }
+        }
+
+        foreach($deletedUser->getAccounts() as $account) {
+            $account->removeUser($deletedUser);
+            if (!$account->getUsers()->contains($keptUser))
+                $account->addUser($keptUser);
+        }
+
+        $em->remove($deletedUser); 
+        $em->flush();
+    }
+
     private function _generateRequestToken(User $user)
     {
         return hash_hmac('sha256', uniqid(mt_rand(), true), $user->getId());
@@ -153,5 +262,15 @@ class MergeRequest extends Entity
     private function _getUrlAcceptRequest($token)
     {
         return Utils::makeUrl('accept-merge.php?request='.$this->_id.'&token='.$token);
+    }
+
+    public static function getUrlFromIds($uid1, $uid2)
+    {
+        return Utils::makeUrl('merge-user-'.(int)$uid1.'-with-'.(int)$uid2.'.html');
+    }
+
+    public function getUrl()
+    {
+        return Utils::makeUrl('merge-user-'.$this->_firstUser->getId().'-with-'.$this->_secondUser->getId().'.html');
     }
 }

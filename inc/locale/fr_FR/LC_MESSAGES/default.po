@@ -68,6 +68,9 @@ msgstr "Nom du bénéficiaire"
 msgid "Beneficiary's name is required"
 msgstr "Nom du bénéficiaire requis"
 
+msgid "Cannot choose which account to keep"
+msgstr "Impossible de choisir quel compte utilisateur conserver"
+
 msgid "Cannot merge two registered users"
 msgstr "Impossible de fusionner deux utilisateurs non enregistrés"
 
@@ -92,6 +95,9 @@ msgstr "Tableau de bord"
 msgid "Date"
 msgstr "Date"
 
+msgid "Decinding what informations to keep"
+msgstr "Choix des informations à conserver"
+
 msgid "Delete"
 msgstr "Supprimer"
 
@@ -103,6 +109,9 @@ msgstr "Supprimer le compte"
 
 msgid "Deletion"
 msgstr "Suppression"
+
+msgid "Do merge"
+msgstr "Fusionner"
 
 msgid "Edit"
 msgstr "Modifier"
@@ -218,7 +227,7 @@ msgid "Merge"
 msgstr "Fusion"
 
 msgid "Merge request of users %1$s and %2$s"
-msgstr "Demande du fusion de %1$s avec %2$s"
+msgstr "Demande de fusion de « %1$s » avec « %2$s »"
 
 msgid "Merge requests"
 msgstr "Requête de fusion"
@@ -456,15 +465,15 @@ msgstr[0] "L'utilisateur %1$s a été créé. <a href=\"%2$s\">L'inviter ?</a>"
 msgstr[1] ""
 "Les utilisateurs %1$s ont été créés. <a href=\"%2$s\">Les inviter ?</a>"
 
-msgid "User %s merged with %s"
-msgstr "Fusion réussie de l'utilisateur %s avec l'utilisateur %s"
+msgid "User %1$s merged with %1$s"
+msgstr "Fusion réussie de l'utilisateur « %1$s » avec l'utilisateur « %2$s »"
 
 msgid "Users"
 msgstr "Utilisateurs"
 
 msgid "Users %1$s and %2$s seems to be the same, you should request a merge."
 msgstr ""
-"Les utilisateurs %1$s et %2$s semble correspondre à la même personne, nous "
+"Les utilisateurs « %1$s » et « %2$s » semble correspondre à la même personne, nous "
 "vous conseillons de demander une fusion."
 
 msgid "Users you have created"
@@ -525,7 +534,7 @@ msgstr ""
 "Vous ne pouvez pas modifier cette dépense car vous n'en n'êtes pas l'auteur."
 
 msgid "You can't merge user %1$s with user %2$s on your own."
-msgstr "Vous n'avez pas le droit de fusionner les utilisateurs %1$s et %2$s."
+msgstr "Vous n'avez pas le droit de fusionner les utilisateurs « %1$s » et « %2$s »."
 
 msgid "You can't rename this account because you haven't created it."
 msgstr ""
@@ -545,10 +554,14 @@ msgstr "Vous devez être le créateur d'un utilisateur pour pouvoir le fusionner
 msgid ""
 "You need the agreement of the other user. You should have received similar "
 "mail for that."
-msgstr "Vous devez encore obtenir l'accord du second utilisateur pour terminer la fusion. Vous devriez avoir reçu un second mail à ce sujet."
+msgstr ""
+"Vous devez encore obtenir l'accord du second utilisateur pour terminer la "
+"fusion. Vous devriez avoir reçu un second mail à ce sujet."
 
 msgid "You need to be logged in as the user who received the email."
-msgstr "Vous devez être connecté en tant que l'utilisateur ayant reçu l'email de fusion."
+msgstr ""
+"Vous devez être connecté en tant que l'utilisateur ayant reçu l'email de "
+"fusion."
 
 msgid "gives to"
 msgstr "donne à"

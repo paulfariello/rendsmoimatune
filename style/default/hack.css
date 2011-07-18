@@ -625,3 +625,58 @@ span.tips-text {
 #main .oauth.facebook span {
     background-image: url("../../px/default/facebook.png");
 }
+
+#main form#merge-user .first-user, #main form#merge-user .second-user {
+    display: block;
+    width: 320px;
+    padding: 0px;
+    margin: 0.5em 0em;
+}
+
+#main form#merge-user label {
+    border: 1px #DDDDDD solid;
+    color: grey;
+    background: #FBFBFB;
+    font-weight: normal;
+    width: 285px;
+    padding: 5px 10px;
+    margin: 0px;
+    font-style: italic;
+    cursor: pointer;
+}
+
+#main form#merge-user .first-user label {
+    padding-right: 25px;
+}
+
+#main form#merge-user .second-user label {
+    padding-left: 25px;
+    text-align: right;
+}
+
+#main form#merge-user input {
+    margin: 5px;
+}
+
+#main form#merge-user input[type="radio"]:checked + label {
+    font-weight: bold;
+    background: white;
+    border: 1px solid #BBDF8D;
+    font-style: normal;
+}
+
+#main form#merge-user .first-user {
+    float: left;
+}
+
+#main form#merge-user .first-user input {
+    float: right;
+}
+
+#main form#merge-user .second-user {
+    float: right;
+}
+
+#main form#merge-user .second-user input {
+    float: left;
+}

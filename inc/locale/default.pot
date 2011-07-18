@@ -68,6 +68,9 @@ msgstr ""
 msgid "Beneficiary's name is required"
 msgstr ""
 
+msgid "Cannot choose which account to keep"
+msgstr ""
+
 msgid "Cannot merge two registered users"
 msgstr ""
 
@@ -92,6 +95,9 @@ msgstr ""
 msgid "Date"
 msgstr ""
 
+msgid "Decinding what informations to keep"
+msgstr ""
+
 msgid "Delete"
 msgstr ""
 
@@ -102,6 +108,9 @@ msgid "Delete this account"
 msgstr ""
 
 msgid "Deletion"
+msgstr ""
+
+msgid "Do merge"
 msgstr ""
 
 msgid "Edit"
@@ -438,7 +447,7 @@ msgid_plural "Users %1$s has been created. <a href=\"%2$s\">Invite them ?</a>"
 msgstr[0] ""
 msgstr[1] ""
 
-msgid "User %s merged with %s"
+msgid "User %1$s merged with %1$s"
 msgstr ""
 
 msgid "Users"
