@@ -34,6 +34,8 @@ $em = \Bdf\Core::getInstance()->getEntityManager();
 $te = \Bdf\Core::getInstance()->getTemplatesEngine();
 $currentUser = \Eu\Rmmt\User::getCurrentUser();
 
+$messages = array();
+
 if ($currentUser == null) {
     \Bdf\Session::getInstance()->add('redirect',$_SERVER['REQUEST_URI']);
     header('location: '.\Bdf\Utils::makeUrl('sign-in.html'));
@@ -75,7 +77,6 @@ if (isset($_POST['merge-users'])) {
     }
 }
 //if (isset($_POST['delete-users'])) {
-//    $messages = array();
 //    try {
 //        foreach($_POST['delete'] as $userId => $delete) {
 //            try {
