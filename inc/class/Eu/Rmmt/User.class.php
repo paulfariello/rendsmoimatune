@@ -246,9 +246,12 @@ class User implements \Bdf\IUser
         return Core::getInstance()->getEntityManager()->getRepository(__CLASS__);
     }
 
-    public function equals(User $user)
+    public function equals(User $user = null)
     {
-        return $this->getId() === $user->getId();
+        if ($user == null)
+            return false;
+        else
+            return $this->getId() === $user->getId();
     }
 
     public function setInvited($invited)
