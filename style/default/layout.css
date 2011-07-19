@@ -249,7 +249,7 @@ h1 span { display: none; }
 }
 
 #sidebar .sideNav li a.participants {
-    background-image: url("../../px/default/emblem-people.png");
+    background-image: url("../../px/default/participants.png");
 }
 
 /* Breadcrumb ---------------------------------------- */
