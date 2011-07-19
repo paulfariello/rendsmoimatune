@@ -122,7 +122,7 @@ class MergeRequest extends Entity
 
     public function acceptMerge(User $user, $token)
     {
-        if (($this->_firstUser->IsRegistered() AND $this->_firstUser->equals($user)) OR $this->_firstUser->getCreator()->equals($user)) {
+        if (($this->_firstUser->IsRegistered() AND $this->_firstUser->equals($user)) OR $user->equals($this->_firstUser->getCreator())) {
             if ($token == $this->_firstUserRequestToken) {
                 $this->_firstUserAgreement = true; 
             } else {
