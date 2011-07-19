@@ -54,23 +54,22 @@ try {
 
     $mergeRequest->checkMergeRight();
 
-    $te->assign('messages', array(array('type'=>'done','content'=>sprintf(\Bdf\Utils::getText('User %s merged with %s'), $mergeRequest->getFirstUser()->getName(), $mergeRequest->getSecondUser()->getName()))));
-    $te->display('my-parameters/merge-request');
+    header('location: '.$mergeRequest->getUrl());
 
 } catch(Eu\Rmmt\Exception\InvalidMergeRequestTokenException $e) {
     $te->assign('invalidMergeRequestTokenException', $e);
     $te->assign('messages', array(array('type'=>'warning','content'=>$e->getMessage())));
-    $te->display('my-parameters/merge-request-accept');
+    $te->display('merge-request-accept');
 } catch(Eu\Rmmt\Exception\UnknownUserException $e) {
     $te->assign('unknownUserException', $e);
     $te->assign('messages', array(array('type'=>'warning','content'=>$e->getMessage())));
-    $te->display('my-parameters/merge-request-accept');
+    $te->display('merge-request-accept');
 } catch(Eu\Rmmt\Exception\MergeAuthorizationException $e) {
     $te->assign('mergeAuthorizationException', $e);
     $te->assign('messages', array(array('type'=>'warning','content'=>$e->getMessage())));
-    $te->display('my-parameters/merge-request-accept');
+    $te->display('merge-request-accept');
 } catch(Exception $e) {
     $te->assign('messages', array(array('type'=>'error','content'=>$e->getMessage())));
-    $te->display('my-parameters/merge-request-accept');
+    $te->display('merge-request-accept');
 }
 ?>
