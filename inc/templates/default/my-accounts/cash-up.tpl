@@ -1,7 +1,5 @@
 {include file='inc/header-html.tpl'}
 <!-- Additionnal javascript script -->
-{include file='inc/js-includes/date-picker.tpl'}
-{include file='inc/js-includes/manage-expenditure-users.tpl'}
 {include file='inc/header.tpl'}
 {include file='inc/side-nav-my-accounts.tpl'}
 <h2><a href="{makeUrl url='my-accounts/'}">{getText id='My accounts'}</a> &raquo; <a href="{$currentAccount->getUrlDetail()}">{$currentAccount->getName()|htmlProtect}</a> &raquo; <a href="{$currentAccount->getUrlCashUp()}">{getText id='Cash-up'}</a></h2>
@@ -10,34 +8,67 @@
 {assign var="totalRepayment" value=$currentAccount->getTotalRepayment()}
 {*assign var="maxPayedAmount" value=$currentAccount->getMaxPayedAmount()*}
 {*assign var="maxOwesAmount" value=$currentAccount->getMaxOwesAmount()*}
-<h3>{getText id='Expenditure summary'}</h3>
+<h3 class="slider">{getText id='Expenditure summary'}</h3>
 {if $totalExpenditure > 0}
-    <h4 class="summary-owes">
-        {getText id="Is concerned by"}
-    </h4>
-    <h4 class="summary-payed">
-        {getText id="Payed"}
-    </h4>
-    {foreach from=$users item="user"}
-        {assign var="payedAmount" value=$currentAccount->getPayedAmount($user)}
-        {assign var="owesAmount" value=$currentAccount->getOwesAmount($user)}
-        <div class="summary-payed-amount">
-            <div class="balance-bar gradient-{round($payedAmount / $totalExpenditure * 100, -1)}" style="width: {round($payedAmount / $totalExpenditure * 100)}%; min-width: {strlen($payedAmount)+1}em;">
-                {$payedAmount}&nbsp;€
+    <div class="slide">
+        <h4 class="summary-owes">
+            {getText id="Is concerned by"}
+        </h4>
+        <h4 class="summary-payed">
+            {getText id="Payed"}
+        </h4>
+        {foreach from=$users item="user"}
+            {assign var="payedAmount" value=$currentAccount->getPayedAmount($user)}
+            {assign var="owesAmount" value=$currentAccount->getOwesAmount($user)}
+            <div class="summary-payed-amount">
+                <div class="balance-bar gradient-{round($payedAmount / $totalExpenditure * 100, -1)}" style="width: {round($payedAmount / $totalExpenditure * 100)}%; min-width: {strlen($payedAmount)+1}em;">
+                    {$payedAmount}&nbsp;€
+                </div>
             </div>
-        </div>
-        <div class="summary-owes-amount">
-            <div class="balance-bar gradient-{round($owesAmount / $totalExpenditure * 100, -1)}" style="width: {round($owesAmount / $totalExpenditure * 100)}%; min-width: {strlen($owesAmount)+1}em;">
-                {$owesAmount}&nbsp;€
+            <div class="summary-owes-amount">
+                <div class="balance-bar gradient-{100 - round($owesAmount / $totalExpenditure * 100, -1)}" style="width: {round($owesAmount / $totalExpenditure * 100)}%; min-width: {strlen($owesAmount)+1}em;">
+                    {$owesAmount}&nbsp;€
+                </div>
             </div>
-        </div>
-        <div class="summary-name">{$user->getName()|htmlProtect}</div>
-        <div class="clear"></div>
-    {/foreach}
+            <div class="summary-name">{$user->getName()|htmlProtect}</div>
+            <div class="clear"></div>
+        {/foreach}
+        <h4>{getText id="Total"} : {$totalExpenditure} €</h4>
+    </div>
 {else}
     <h4>{getText id="No expenditure"}</h4>
 {/if}
-<h4>{getText id="Total"} : {$totalExpenditure} €</h4>
+
+<h3 class="slider">{getText id='Repayment summary'}</h3>
+{if $totalRepayment > 0}
+    <div class="slide">
+        <h4 class="summary-owes">
+            {getText id="Received"}
+        </h4>
+        <h4 class="summary-payed">
+            {getText id="Repayed"}
+        </h4>
+        {foreach from=$users item="user"}
+            {assign var="payedAmount" value=$currentAccount->getRepaymentPayedAmount($user)}
+            {assign var="receivedAmount" value=$currentAccount->getRepaymentReceivedAmount($user)}
+            <div class="summary-payed-amount">
+                <div class="balance-bar gradient-{round($payedAmount / $totalRepayment * 100, -1)}" style="width: {round($payedAmount / $totalRepayment * 100)}%; min-width: {strlen($payedAmount)+1}em;">
+                    {$payedAmount}&nbsp;€
+                </div>
+            </div>
+            <div class="summary-owes-amount">
+                <div class="balance-bar gradient-{round($receivedAmount / $totalRepayment * 100, -1)}" style="width: {round($receivedAmount / $totalRepayment * 100)}%; min-width: {strlen($receivedAmount)+1}em;">
+                    {$receivedAmount}&nbsp;€
+                </div>
+            </div>
+            <div class="summary-name">{$user->getName()|htmlProtect}</div>
+            <div class="clear"></div>
+        {/foreach}
+        <h4>{getText id="Total"} : {$totalRepayment} €</h4>
+    </div>
+{else}
+    <h4>{getText id="No repayment"}</h4>
+{/if}
 
 {if $totalExpenditure > 0}
     <h3>{getText id='Balance of payments'}</h3>
@@ -70,34 +101,6 @@
     {/foreach}
 {/if}
 
-<h3>{getText id='Repayment summary'}</h3>
-{if $totalRepayment > 0}
-    <h4 class="summary-owes">
-        {getText id="Received"}
-    </h4>
-    <h4 class="summary-payed">
-        {getText id="Repayed"}
-    </h4>
-    {foreach from=$users item="user"}
-        {assign var="payedAmount" value=$currentAccount->getRepaymentPayedAmount($user)}
-        {assign var="receivedAmount" value=$currentAccount->getRepaymentReceivedAmount($user)}
-        <div class="summary-payed-amount">
-            <div class="balance-bar gradient-{round($payedAmount / $totalRepayment * 100, -1)}" style="width: {round($payedAmount / $totalRepayment * 100)}%; min-width: {strlen($payedAmount)+1}em;">
-                {$payedAmount}&nbsp;€
-            </div>
-        </div>
-        <div class="summary-owes-amount">
-            <div class="balance-bar gradient-{round($receivedAmount / $totalRepayment * 100, -1)}" style="width: {round($receivedAmount / $totalRepayment * 100)}%; min-width: {strlen($receivedAmount)+1}em;">
-                {$receivedAmount}&nbsp;€
-            </div>
-        </div>
-        <div class="summary-name">{$user->getName()|htmlProtect}</div>
-        <div class="clear"></div>
-    {/foreach}
-    <h4>{getText id="Total"} : {$totalRepayment} €</h4>
-{else}
-    <h4>{getText id="No repayment"}</h4>
-{/if}
 <h3>{getText id='Balancing'}</h3>
 <h4 class="repayer"></h4>
 <h4 class="repayment">{getText id="owes"}</h4>

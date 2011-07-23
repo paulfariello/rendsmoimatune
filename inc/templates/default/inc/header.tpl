@@ -1,4 +1,5 @@
     <script type="text/javascript" src="{makeUrl url='tips.js' type="js"}"></script>
+    <script type="text/javascript" src="{makeUrl url='slide.js' type="js"}"></script>
 </head>
 
 <body>

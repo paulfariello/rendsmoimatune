@@ -680,3 +680,7 @@ span.tips-text {
 #main form#merge-user .second-user input {
     float: left;
 }
+
+.slider {
+    cursor: pointer;
+}
