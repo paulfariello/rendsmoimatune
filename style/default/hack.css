@@ -44,10 +44,8 @@
 }
 
 #main #add-new-payer, #main #add-new-beneficiary {
-    display: block;
-    width: 24px;
-    height: 24px;
-    background: url("../../px/default/snowish/24x24/actions/gtk-add.png") transparent no-repeat center center;
+    background: url("../../px/default/snowish/24x24/actions/gtk-add.png") transparent no-repeat center left;
+    padding-left: 28px;
 }
 
 #main .remove-payer, #main .remove-beneficiary {

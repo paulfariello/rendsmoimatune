@@ -53,7 +53,7 @@
                     </p>
                 </div>
             {/if}
-            <p><a href="#" id="add-new-payer"></a></p>
+            <p><a href="#" id="add-new-payer" class="button">{getText id="Another payer"}</a></p>
         </div>
         <!-- Beneficiaries -->
         <p><label class="tips-handler" rel="{getText id="Here are everyone who enjoy the expenditure. In other words those who should pay the cost one way or another. Don't forget to also add those who paid."}">{getText id='Beneficiaries'} :</label></p>
@@ -89,7 +89,7 @@
                     </p>
                 </div>
             {/if}
-            <p><a href="#" id="add-new-beneficiary"></a></p>
+            <p><a href="#" id="add-new-beneficiary" class="button">{getText id="Another beneficiary"}</a></p>
         </div>
 
         <input type="submit" name="create-new-expenditure" value="{getText id='Create'}" />

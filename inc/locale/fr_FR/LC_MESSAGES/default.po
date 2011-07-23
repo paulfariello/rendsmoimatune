@@ -47,6 +47,12 @@ msgstr "Montant requis"
 msgid "Amount payed"
 msgstr "Montant payé"
 
+msgid "Another beneficiary"
+msgstr "Autre consommateur"
+
+msgid "Another payer"
+msgstr "Autre payeur"
+
 msgid "Authentication failed"
 msgstr "Echec de l'identification"
 
@@ -160,6 +166,16 @@ msgstr "Mot de passe oublié"
 
 msgid "From"
 msgstr "Du"
+
+msgid ""
+"Here are everyone who enjoy the expenditure. In other words those who should "
+"pay the cost one way or another. Don't forget to also add those who paid."
+msgstr ""
+"Les consommateurs sont les personnes qui ont profités de la dépense. "
+"Ce sont donc celles qui devront la rembourser. N'oubliez pas d'ajouter, si besoin, les payeurs."
+
+msgid "Here are everyone who participated in the expenditure."
+msgstr "Les payeurs sont ceux qui ont payé pour la dépense."
 
 msgid ""
 "Hi %1$s,\n"
@@ -312,16 +328,23 @@ msgstr ""
 "n'est possible."
 
 msgid "P_AutomaticRecall"
-msgstr "Quelqu'un vous doit de l'argent ? Rappelez-le lui en cliquant sur un bouton. Rends-moi ma tune lui enverra un mail cordial."
+msgstr ""
+"Quelqu'un vous doit de l'argent ? Rappelez-le lui en cliquant sur un bouton. "
+"Rends-moi ma tune lui enverra un mail cordial."
 
 msgid "P_AutomaticUserCreation"
-msgstr "Pas confiance en vos amis ? Vous pouvez gérer vos dépenses seul dans votre coin sans obliger vos amis à s'inscrire."
+msgstr ""
+"Pas confiance en vos amis ? Vous pouvez gérer vos dépenses seul dans votre "
+"coin sans obliger vos amis à s'inscrire."
 
 msgid "P_Balancing"
-msgstr "Elle vous permet de voir d'un coup d'œil qui a le plus ou le moins payé."
+msgstr ""
+"Elle vous permet de voir d'un coup d'œil qui a le plus ou le moins payé."
 
 msgid "P_MainDesc"
-msgstr "Gérer les dépenses faites à plusieurs c'est galère. Ne perdez plus de temps à calculer qui doit quoi à qui, Rends-moi ma tune le fait pour vous !"
+msgstr ""
+"Gérer les dépenses faites à plusieurs c'est galère. Ne perdez plus de temps "
+"à calculer qui doit quoi à qui, Rends-moi ma tune le fait pour vous !"
 
 msgid "P_Welcome"
 msgstr ""
@@ -473,8 +496,8 @@ msgstr "Utilisateurs"
 
 msgid "Users %1$s and %2$s seems to be the same, you should request a merge."
 msgstr ""
-"Les utilisateurs « %1$s » et « %2$s » semble correspondre à la même personne, nous "
-"vous conseillons de demander une fusion."
+"Les utilisateurs « %1$s » et « %2$s » semble correspondre à la même "
+"personne, nous vous conseillons de demander une fusion."
 
 msgid "Users you have created"
 msgstr "Utilisateurs que vous avez créés"
@@ -492,8 +515,11 @@ msgid ""
 "We just sent e-mail to the concerned persons, please wait for their "
 "agreements."
 msgstr ""
-"On vient d'envoyer des emails aux personnes concernées. Soit patient, "
-"attends leur accord."
+"Rendsmoimatune vient d'envoyer des emails aux personnes concernées. Il faut maintenant "
+"attendre leur accord."
+
+msgid "What the expenditure really cost."
+msgstr "Le coût réel de la dépense."
 
 msgid "Yes, delete it"
 msgstr "Confirmer la suppression"
@@ -534,7 +560,8 @@ msgstr ""
 "Vous ne pouvez pas modifier cette dépense car vous n'en n'êtes pas l'auteur."
 
 msgid "You can't merge user %1$s with user %2$s on your own."
-msgstr "Vous n'avez pas le droit de fusionner les utilisateurs « %1$s » et « %2$s »."
+msgstr ""
+"Vous n'avez pas le droit de fusionner les utilisateurs « %1$s » et « %2$s »."
 
 msgid "You can't rename this account because you haven't created it."
 msgstr ""

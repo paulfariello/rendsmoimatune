@@ -47,6 +47,12 @@ msgstr ""
 msgid "Amount payed"
 msgstr ""
 
+msgid "Another beneficiary"
+msgstr ""
+
+msgid "Another payer"
+msgstr ""
+
 msgid "Authentication failed"
 msgstr ""
 
@@ -159,6 +165,14 @@ msgid "Forgot my password"
 msgstr ""
 
 msgid "From"
+msgstr ""
+
+msgid ""
+"Here are everyone who enjoy the expenditure. In other words those who should "
+"pay the cost one way or another. Don't forget to also add those who paid."
+msgstr ""
+
+msgid "Here are everyone who participated in the expenditure."
 msgstr ""
 
 msgid ""
@@ -468,40 +482,15 @@ msgstr ""
 msgid "View expenditure"
 msgstr ""
 
-msgid "Yes, delete it"
-msgstr ""
-
-msgid "Yesterday"
-msgstr ""
-
-msgid "You can't access this account."
-msgstr ""
-
 msgid ""
 "We just sent e-mail to the concerned persons, please wait for their "
 "agreements."
 msgstr ""
 
+msgid "What the expenditure really cost."
+msgstr ""
+
 msgid "Yes, delete it"
-msgstr ""
-
-msgid "You can't delete %s's account because he/she is registered"
-msgstr ""
-
-msgid "You can't delete %s's account because you are not his/her creator"
-msgstr ""
-
-msgid "You can't delete this account because you haven't created it."
-msgstr ""
-
-msgid ""
-"You can't delete this expenditure because you are not creator of this "
-"expenditure neither of this account"
-msgstr ""
-
-msgid ""
-"You can't edit this expenditure because you are not creator of this "
-"expenditure neither of this account"
 msgstr ""
 
 msgid "Yesterday"
@@ -525,9 +514,6 @@ msgstr ""
 msgid ""
 "You can't delete this expenditure because you are not creator of this "
 "expenditure neither of this account"
-msgstr ""
-
-msgid "owes"
 msgstr ""
 
 msgid ""
@@ -559,6 +545,9 @@ msgid "You need to be logged in as the user who received the email."
 msgstr ""
 
 msgid "gives to"
+msgstr ""
+
+msgid "owes"
 msgstr ""
 
 msgid "page %d"
