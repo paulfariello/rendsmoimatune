@@ -11,7 +11,7 @@
                 <p class="inline-label"><label class="medium-inline">{getText id='Name'} :</label><label class="medium-inline">{getText id='Amount payed'} :</label></p>
                 <p>
                     <input type="hidden" name="payersId[]" />
-                    <input type="text" class="text-medium payer-name" rel="{makeUrl url='ajax/autocomplete-user.php'}" name="payersName[]" value="" />
+                    <input type="text" class="text-medium payer-name" rel="{$currentAccount->getUrlAutocompleteUser()}" name="payersName[]" value="" />
                     <input type="text" class="text-medium payer-amount" name="payersAmount[]" value="" />
                     <select name="payersMetric[]" class="select">
                         <option value="€">€</option>
@@ -27,7 +27,7 @@
                             <p class="inline-label"><label class="medium-inline">{getText id='Name'} :</label><label class="medium-inline">{getText id='Amount payed'} :</label></p>
                             <p>
                                 <input type="hidden" name="payersId[]" value="{$_POST.payersId.{$index}|htmlProtect}" />
-                                <input type="text" class="text-medium payer-name" rel="{makeUrl url='ajax/autocomplete-user.php'}" name="payersName[]" value="{$payerName|htmlProtect}" />
+                                <input type="text" class="text-medium payer-name" rel="{$currentAccount->getUrlAutocompleteUser()}" name="payersName[]" value="{$payerName|htmlProtect}" />
                                 <input type="text" class="text-medium payer-amount{if isset($userInputException) && $userInputException->getInputName() == 'amount-payed'} user-input-exception{/if}" name="payersAmount[]" value="{$_POST.payersAmount.{$index}|htmlProtect}" />
                                 <select name="payersMetric[]" class="select">
                                     <option value="%" {if $_POST.payersMetric.{$index} == '%'}selected="selected"{/if}>%</option>
@@ -43,7 +43,7 @@
                     <p class="inline-label"><label class="medium-inline">{getText id='Name'} :</label><label class="medium-inline">{getText id='Amount payed'} :</label></p>
                     <p>
                         <input type="hidden" name="payersId[]" />
-                        <input type="text" class="text-medium payer-name" rel="{makeUrl url='ajax/autocomplete-user.php'}" name="payersName[]" value="" />
+                        <input type="text" class="text-medium payer-name" rel="{$currentAccount->getUrlAutocompleteUser()}" name="payersName[]" value="" />
                         <input type="text" class="text-medium payer-amount" name="payersAmount[]" value="" />
                         <select name="payersMetric[]" class="select">
                             <option value="€">€</option>
@@ -62,7 +62,7 @@
                 <p class="inline-label"><label class="medium-inline">{getText id='Name'} :</label></p>
                 <p>
                     <input type="hidden" name="beneficiariesId[]" />
-                    <input type="text" class="text-medium beneficiary-name" rel="{makeUrl url='ajax/autocomplete-user.php'}" name="beneficiariesName[]" value="" />
+                    <input type="text" class="text-medium beneficiary-name" rel="{$currentAccount->getUrlAutocompleteUser()}" name="beneficiariesName[]" value="" />
                     <a href="#" class="remove-beneficiary"></a>
                 </p>
             </div>
@@ -73,7 +73,7 @@
                             <p class="inline-label"><label class="medium-inline">{getText id='Name'} :</label></p>
                             <p>
                                 <input type="hidden" name="beneficiariesId[]" value="{$_POST.beneficiariesId.{$index}|htmlProtect}" />
-                                <input type="text" class="text-medium beneficiary-name" rel="{makeUrl url='ajax/autocomplete-user.php'}" name="beneficiariesName[]" value="{$beneficiaryName|htmlProtect}" />
+                                <input type="text" class="text-medium beneficiary-name" rel="{$currentAccount->getUrlAutocompleteUser()}" name="beneficiariesName[]" value="{$beneficiaryName|htmlProtect}" />
                                 <a href="#" class="remove-beneficiary"></a>
                             </p>
                         </div>
@@ -84,7 +84,7 @@
                     <p class="inline-label"><label class="medium-inline">{getText id='Name'} :</label></p>
                     <p>
                         <input type="hidden" name="beneficiariesId[]" />
-                        <input type="text" class="text-medium beneficiary-name" rel="{makeUrl url='ajax/autocomplete-user.php'}" name="beneficiariesName[]" value="" />
+                        <input type="text" class="text-medium beneficiary-name" rel="{$currentAccount->getUrlAutocompleteUser()}" name="beneficiariesName[]" value="" />
                         <a href="#" class="remove-beneficiary"></a>
                     </p>
                 </div>

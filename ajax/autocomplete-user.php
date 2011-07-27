@@ -34,8 +34,9 @@ $te = \Bdf\Core::getInstance()->getTemplatesEngine();
 
 header('Content-type: application/json');
 
-$query = $em->createQuery("SELECT u FROM Eu\Rmmt\User u INNER JOIN u._accounts a INNER JOIN a._users uu WHERE uu._id = :id AND LOWER(u._name) LIKE :search");
+$query = $em->createQuery("SELECT u FROM Eu\Rmmt\User u INNER JOIN u._accounts a INNER JOIN a._users uu WHERE ( u._registered = true OR a._id = :aid ) AND uu._id = :id AND LOWER(u._name) LIKE :search");
 $query->setParameter('id', Eu\Rmmt\User::getCurrentUser()->getId());
+$query->setParameter('aid', $_GET['aid']);
 $query->setParameter('search', '%'.strtolower($_GET['q']).'%');
 if (!empty($_GET['limit'])) {
     $query->setMaxResults($_GET['limit']);

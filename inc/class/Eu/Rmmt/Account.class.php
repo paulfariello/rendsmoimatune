@@ -397,6 +397,11 @@ class Account
         return Utils::makeUrl('my-accounts/'.Utils::urlize($this->_name).'-'.$this->_id.'/exlude-'.Utils::urlize($user->getName()).'-'.$user->getId().'.html');
     }
 
+    public function getUrlAutocompleteUser()
+    {
+        return Utils::makeUrl('ajax/autocomplete-user.php?aid='.$this->_id);
+    }
+
     /**
      * Access control
      */
