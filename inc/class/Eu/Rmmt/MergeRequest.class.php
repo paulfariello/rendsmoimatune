@@ -280,7 +280,6 @@ class MergeRequest extends Entity
 
         $headers = "From: no-reply@rendsmoimatune.eu\r\n";
 
-        echo $email; echo $title; echo $message; echo $headers; 
         mail($email, $title, $message, $headers); 
     }
 
