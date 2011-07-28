@@ -1,5 +1,6 @@
 {include file='inc/header-html.tpl' title='Dashboard'}
 <!-- Additionnal javascript script -->
+{include file='inc/js-includes/merge-select.tpl'}
 {include file='inc/header.tpl'}
 {include file='inc/side-nav-my-accounts.tpl'}
 <h2><a href="{makeUrl url='my-accounts/'}">{getText id='My accounts'}</a> &raquo; <a href="{$currentAccount->getUrlDetail()}">{$currentAccount->getName()|htmlProtect}</a> &raquo; <a href="{$currentAccount->getUrlParticipants()}">{getText id="Participants"}</a></h2>
