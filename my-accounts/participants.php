@@ -61,7 +61,7 @@ $merges = array();
 foreach ($account->getUsers() as $user) {
     $name = mb_strtolower($user->getName());
     if (isset($users[$name])) {
-        $merges[] = new \Eu\Rmmt\MergeRequest($users[$name], $user, $currentUser); 
+        $merges[] = new \Eu\Rmmt\MergeRequest($account, $users[$name], $user, $currentUser); 
         $messages[] = array('type'=>'warning', 'content'=>\Bdf\Utils::getText('Users %1$s and %2$s seems to be the same, you should request a merge.', $users[$name]->getName(), $user->getName()));
     } else {
         $users[$name] = $user;
