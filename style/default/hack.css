@@ -48,6 +48,11 @@
     padding-left: 28px;
 }
 
+#main .exclude-user {
+    background: url("../../px/default/snowish/24x24/actions/stock_stop.png") transparent no-repeat center left;
+    padding-left: 28px;
+}
+
 #main .remove-payer, #main .remove-beneficiary {
     display: block;
     width: 24px;

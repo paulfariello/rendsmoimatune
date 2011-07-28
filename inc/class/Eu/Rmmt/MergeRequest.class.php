@@ -48,6 +48,7 @@ use Eu\Rmmt\Exception\UnknownUserException;
 class MergeRequest extends Entity
 {
     private $_id;
+    private $_account                   = null;
     private $_firstUser                 = null;
     private $_secondUser                = null;
     private $_firstUserAgreement        = false;
@@ -58,8 +59,9 @@ class MergeRequest extends Entity
     private $_keepName                  = 1;
     private $_keepEmail                 = null;
 
-    public function  __construct(User $firstUser, User $secondUser, User $requester)
+    public function  __construct(Account $account, User $firstUser, User $secondUser, User $requester)
     {
+        $this->_account     = $account;
         $this->_firstUser   = $firstUser;
         $this->_secondUser  = $secondUser;
         $this->_requester   = $requester;
@@ -70,6 +72,16 @@ class MergeRequest extends Entity
         return $this->_id;
     }
     
+    public function getAccount()
+    {
+        return $this->_account;
+    }
+
+    public function setAccount(Account $account)
+    {
+        $this->_account = $account;
+    }
+
     public function getFirstUser()
     {
         return $this->_firstUser;
@@ -268,12 +280,13 @@ class MergeRequest extends Entity
 
         $headers = "From: no-reply@rendsmoimatune.eu\r\n";
 
+        echo $email; echo $title; echo $message; echo $headers; 
         mail($email, $title, $message, $headers); 
     }
 
     private function _getUrlAcceptRequest($token)
     {
-        return Utils::makeUrl('accept-merge.php?request='.$this->_id.'&token='.$token);
+        return $this->_account->getUrlAcceptMergeRequest($this, $token);
     }
 
     public static function getUrlFromIds($uid1, $uid2)
@@ -283,6 +296,6 @@ class MergeRequest extends Entity
 
     public function getUrl()
     {
-        return Utils::makeUrl('merge-user-'.$this->_firstUser->getId().'-with-'.$this->_secondUser->getId().'.html');
+        return $this->_account->getUrlMergeRequest($this->_firstUser, $this->_secondUser);
     }
 }

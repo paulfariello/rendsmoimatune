@@ -22,7 +22,7 @@
                     <td>{$user->getId()}</td>
                     <td>{$user->getName()|htmlProtect}</td>
                     <td><input type="checkbox" name="merge[]" value="{$user->getId()}" /></td>
-                    <td><a href="{$currentAccount->getUrlExclusion($user)}">{getText id="Exclude"}</a></td>
+                    <td><a href="{$currentAccount->getUrlExclusion($user)}" class="button exclude-user">{getText id="Exclude"}</a></td>
                 </tr>
             {foreachelse}
                 <tr>

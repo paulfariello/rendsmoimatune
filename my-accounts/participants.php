@@ -73,7 +73,7 @@ $te->assign('merges', $merges);
 
 if (isset($_POST['merge-users'])) {
     if (isset($_POST['merge']) and sizeof($_POST['merge']) == 2) {
-        header('location: '.\Eu\Rmmt\MergeRequest::getUrlFromIds($_POST['merge'][0], $_POST['merge'][1]));
+        header('location: '.$account->getUrlMergeRequestFromIds($_POST['merge'][0], $_POST['merge'][1]));
     }
 }
 //if (isset($_POST['delete-users'])) {

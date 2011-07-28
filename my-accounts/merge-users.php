@@ -27,8 +27,8 @@
  * @link     http://www.bottedefoin.net
  */
 
-require_once 'inc/init.php';
-require_once 'inc/assignDefaultVar.php';
+require_once '../inc/init.php';
+require_once '../inc/assignDefaultVar.php';
 
 $em = \Bdf\Core::getInstance()->getEntityManager();
 $te = \Bdf\Core::getInstance()->getTemplatesEngine();
@@ -39,7 +39,19 @@ if ($currentUser == null) {
     die();
 }
 
+if (!isset($_GET['account-id'])) {
+    header('location: '.\Bdf\Utils::makeUrl('my-accounts/'));
+    die();
+}
+
 try {
+    $account = \Eu\Rmmt\Account::getRepository()->find($_GET['account-id']);
+    if (null === $account) {
+        header('location: '.\Bdf\Utils::makeUrl('my-accounts/'));
+        die();
+    }
+    $te->assign('currentAccount', $account);
+
     if (isset($_POST['merge'])) {
         $mergeRequest = Eu\Rmmt\MergeRequest::getRepository()->find($_POST['merge-id']);
         if ($mergeRequest == null)
@@ -71,15 +83,14 @@ try {
                 throw new \Eu\Rmmt\Exception\UnknownUserException($_GET['id2']);
             }
 
-            $query = $em->createQuery( "SELECT mr FROM \Eu\Rmmt\MergeRequest mr INNER JOIN mr._firstUser fu INNER JOIN mr._secondUser su INNER JOIN mr._requester r WHERE r._id = :rid AND ((fu._id = :fuid AND su._id = :suid) OR (fu._id = :suid AND su._id = :fuid))" );
-            $query->setParameter("rid", $currentUser->getId());
+            $query = $em->createQuery( "SELECT mr FROM \Eu\Rmmt\MergeRequest mr INNER JOIN mr._firstUser fu INNER JOIN mr._secondUser su INNER JOIN mr._requester r WHERE (fu._id = :fuid AND su._id = :suid) OR (fu._id = :suid AND su._id = :fuid)" );
             $query->setParameter("fuid", $user1->getId());
             $query->setParameter("suid", $user2->getId());
             $query->setMaxResults(1);
             $mergeRequest = $query->execute();
 
             if (null == $mergeRequest) {
-                $mergeRequest = new \Eu\Rmmt\MergeRequest($user1, $user2, $currentUser);
+                $mergeRequest = new \Eu\Rmmt\MergeRequest($account, $user1, $user2, $currentUser);
                 $em->persist($mergeRequest);
                 $em->flush();
             } else {
@@ -102,6 +113,6 @@ try {
     $te->display('merge-request');
 } catch(Exception $e) {
     $te->assign('messages', array(array('type'=>'error','content'=>$e->getMessage())));
-    $te->display('error');
+    $te->display('merge-request');
 }
 ?>

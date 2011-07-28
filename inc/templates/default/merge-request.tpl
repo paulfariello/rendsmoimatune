@@ -1,7 +1,7 @@
 {include file='inc/header-html.tpl' title='Dashboard'}
 <!-- Additionnal javascript script -->
 {include file='inc/header.tpl'}
-{include file='inc/side-nav-my-parameters.tpl'}
+{include file='inc/side-nav-my-accounts.tpl'}
 <h2><a href="{makeUrl url='merge-requests.html'}">{getText id='Merge requests'}</a></h2>
 {include file='inc/main.tpl'}
 

@@ -12,6 +12,9 @@
         <field name="_firstUserRequestToken"    column="first_user_request_token"   type="string"   />
         <field name="_secondUserRequestToken"   column="second_user_request_token"  type="string"   />
 
+        <many-to-one target-entity="Account" field="_account">
+            <join-column name="account_fk" referenced-column-name="account_pk" />
+        </many-to-one>
         <many-to-one target-entity="User" field="_firstUser">
             <join-column name="first_user_fk" referenced-column-name="user_pk" />
         </many-to-one>

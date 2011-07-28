@@ -402,6 +402,21 @@ class Account
         return Utils::makeUrl('ajax/autocomplete-user.php?aid='.$this->_id);
     }
 
+    public function getUrlMergeRequest(User $firstUser, User $secondUser)
+    {
+        return Utils::makeUrl('my-accounts/'.Utils::urlize($this->_name).'-'.$this->_id.'/merge-user-'.$firstUser->getId().'-with-'.$secondUser->getId().'.html');
+    }
+
+    public function getUrlMergeRequestFromIds($firstUser, $secondUser)
+    {
+        return Utils::makeUrl('my-accounts/'.Utils::urlize($this->_name).'-'.$this->_id.'/merge-user-'.$firstUser.'-with-'.$secondUser.'.html');
+    }
+
+    public function getUrlAcceptMergeRequest(MergeRequest $mergeRequest, $token)
+    {
+        return Utils::makeUrl('my-accounts/'.Utils::urlize($this->_name).'-'.$this->_id.'/accept-merge-'.$mergeRequest->getId().'-'.$token.'.html');
+    }
+
     /**
      * Access control
      */

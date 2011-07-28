@@ -27,8 +27,8 @@
  * @link     http://www.bottedefoin.net
  */
 
-require_once 'inc/init.php';
-require_once 'inc/assignDefaultVar.php';
+require_once '../inc/init.php';
+require_once '../inc/assignDefaultVar.php';
 
 $em = \Bdf\Core::getInstance()->getEntityManager();
 $te = \Bdf\Core::getInstance()->getTemplatesEngine();
@@ -43,9 +43,10 @@ try {
     $mergeRequest = \Eu\Rmmt\MergeRequest::getRepository()->find($_GET["request"]);
 
     if (null == $mergeRequest) {
-        throw new \Eu\Rmmt\Exception\UnknownMergeRequestException($_GET['id']);
+        throw new \Eu\Rmmt\Exception\UnknownMergeRequestException($_GET['request']);
     }
 
+    $te->assign('currentAccount', $mergeRequest->getAccount());
     $te->assign('mergeRequest', $mergeRequest);
 
     $mergeRequest->acceptMerge($currentUser, $_GET['token']);
@@ -59,15 +60,15 @@ try {
 } catch(Eu\Rmmt\Exception\InvalidMergeRequestTokenException $e) {
     $te->assign('invalidMergeRequestTokenException', $e);
     $te->assign('messages', array(array('type'=>'warning','content'=>$e->getMessage())));
-    $te->display('error');
+    $te->display('merge-request');
 } catch(Eu\Rmmt\Exception\UnknownUserException $e) {
     $te->assign('unknownUserException', $e);
     $te->assign('messages', array(array('type'=>'warning','content'=>$e->getMessage())));
-    $te->display('error');
+    $te->display('merge-request');
 } catch(Eu\Rmmt\Exception\MergeAuthorizationException $e) {
     $te->assign('mergeAuthorizationException', $e);
     $te->assign('messages', array(array('type'=>'warning','content'=>$e->getMessage())));
-    $te->display('error');
+    $te->display('merge-request');
 } catch(Exception $e) {
     $te->assign('messages', array(array('type'=>'error','content'=>$e->getMessage())));
     $te->display('error');
