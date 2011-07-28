@@ -59,17 +59,17 @@ try {
 } catch(Eu\Rmmt\Exception\InvalidMergeRequestTokenException $e) {
     $te->assign('invalidMergeRequestTokenException', $e);
     $te->assign('messages', array(array('type'=>'warning','content'=>$e->getMessage())));
-    $te->display('merge-request-accept');
+    $te->display('error');
 } catch(Eu\Rmmt\Exception\UnknownUserException $e) {
     $te->assign('unknownUserException', $e);
     $te->assign('messages', array(array('type'=>'warning','content'=>$e->getMessage())));
-    $te->display('merge-request-accept');
+    $te->display('error');
 } catch(Eu\Rmmt\Exception\MergeAuthorizationException $e) {
     $te->assign('mergeAuthorizationException', $e);
     $te->assign('messages', array(array('type'=>'warning','content'=>$e->getMessage())));
-    $te->display('merge-request-accept');
+    $te->display('error');
 } catch(Exception $e) {
     $te->assign('messages', array(array('type'=>'error','content'=>$e->getMessage())));
-    $te->display('merge-request-accept');
+    $te->display('error');
 }
 ?>
