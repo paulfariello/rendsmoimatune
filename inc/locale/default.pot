@@ -17,6 +17,9 @@ msgstr ""
 msgid "%1$s repaid %2$.2f€ to %3$s"
 msgstr ""
 
+msgid "%1$s suggest you merge an account you have created"
+msgstr ""
+
 msgid "%1$s suggest you merge your account"
 msgstr ""
 
@@ -173,6 +176,13 @@ msgid ""
 msgstr ""
 
 msgid "Here are everyone who participated in the expenditure."
+msgstr ""
+
+msgid ""
+"Hi %1$s,\n"
+"%2$s suggest you merge %3$s's account with %4$s's account because he thinks "
+"they both are yours.\n"
+"If you think %2$s is right please go to %5$s."
 msgstr ""
 
 msgid ""
