@@ -128,7 +128,7 @@ class MergeRequest extends Entity
             } else {
                 throw new InvalidMergeRequestTokenException($token);
             }
-        } elseif (($this->_secondUser->IsRegistered() AND $this->_secondUser->equals($user)) OR $this->_secondUser->getCreator()->equals($user)) {
+        } elseif (($this->_secondUser->IsRegistered() AND $this->_secondUser->equals($user)) OR $user->equals($this->_secondUser->getCreator())) {
             if ($token == $this->_secondUserRequestToken) {
                 $this->_secondUserAgreement = true; 
             } else {
