@@ -71,7 +71,7 @@ try {
         $mergeRequest->doMerge(); 
 
         $te->assign('messages', array(array('type'=>'done','content'=>sprintf(\Bdf\Utils::getText('User %1$s merged with %1$s'), $firstUserName, $secondUserName))));
-        $te->display('error');
+        $te->display('mergeRequest');
 
     } else {
             $user1 = \Eu\Rmmt\User::getRepository()->find($_GET['id1']);
