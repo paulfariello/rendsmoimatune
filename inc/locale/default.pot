@@ -497,6 +497,9 @@ msgid ""
 "agreements."
 msgstr ""
 
+msgid "We successfully registered your agreement for the merge."
+msgstr ""
+
 msgid "What the expenditure really cost."
 msgstr ""
 
@@ -534,6 +537,17 @@ msgstr ""
 msgid "You can't merge user %1$s with user %2$s on your own."
 msgstr ""
 
+msgid ""
+"You can't merge user %1$s with user %2$s on your own. You need the agreement "
+"of %3$s and %4$s. For this purpose email have been sent respectively to %5$s "
+"and %6$s."
+msgstr ""
+
+msgid ""
+"You can't merge user %1$s with user %2$s on your own. You need the agreement "
+"of %3$s. For this purpose an email has been sent to %4$s."
+msgstr ""
+
 msgid "You can't rename this account because you haven't created it."
 msgstr ""
 
@@ -552,6 +566,16 @@ msgid ""
 msgstr ""
 
 msgid "You need to be logged in as the user who received the email."
+msgstr ""
+
+msgid ""
+"You steel need the agreement of %1$s and %2$s. For this purpose email have "
+"been sent respectively to %3$s and %4$s."
+msgstr ""
+
+msgid ""
+"You steel need the agreement of %1$s. For this purpose an email has been "
+"sent to %2$s."
 msgstr ""
 
 msgid "gives to"

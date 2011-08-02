@@ -52,6 +52,7 @@ try {
     $mergeRequest->acceptMerge($currentUser, $_GET['token']);
     $em->flush();
 
+    $messages[] = array('type'=>'done','content'=>Bdf\Utils::getText('We successfully registered your agreement for the merge.'));
 
     $mergeRequest->checkMergeRight();
 
@@ -59,18 +60,47 @@ try {
 
 } catch(Eu\Rmmt\Exception\InvalidMergeRequestTokenException $e) {
     $te->assign('invalidMergeRequestTokenException', $e);
-    $te->assign('messages', array(array('type'=>'warning','content'=>$e->getMessage())));
+    $messages[] = array('type'=>'warning','content'=>$e->getMessage());
+    $te->assign('messages', $messages);
     $te->display('merge-request');
 } catch(Eu\Rmmt\Exception\UnknownUserException $e) {
     $te->assign('unknownUserException', $e);
-    $te->assign('messages', array(array('type'=>'warning','content'=>$e->getMessage())));
+    $messages[] = array('type'=>'warning','content'=>$e->getMessage());
+    $te->assign('messages', $messages);
     $te->display('merge-request');
 } catch(Eu\Rmmt\Exception\MergeAuthorizationException $e) {
     $te->assign('mergeAuthorizationException', $e);
-    $te->assign('messages', array(array('type'=>'warning','content'=>$e->getMessage())));
+    $requiredAgreement = $e->getRequiredAgreement();
+    if (sizeof($requiredAgreement) == 1) {
+        $messages[] = array(
+            'type'    => 'warning',
+            'content' => Bdf\Utils::getText(
+                'You steel need the agreement of %1$s. For this purpose an email has been sent to %2$s.',
+                $requiredAgreement[0]->getName(),
+                $requiredAgreement[0]->getEmail()
+            )
+        );
+    } elseif (sizeof($requiredAgreement) == 2) {
+        // Should never happen but never know...
+        $messages[] = array(
+            'type'    => 'warning',
+            'content' => Bdf\Utils::getText(
+                'You steel need the agreement of %1$s and %2$s. For this purpose email have been sent respectively to %3$s and %4$s.',
+                $requiredAgreement[0]->getName(),
+                $requiredAgreement[1]->getName(),
+                $requiredAgreement[0]->getEmail(),
+                $requiredAgreement[1]->getEmail()
+            )
+        );
+    } else {
+        // Should never happen
+    }
+    $te->assign('messages', $messages);
     $te->display('merge-request');
 } catch(Exception $e) {
-    $te->assign('messages', array(array('type'=>'error','content'=>$e->getMessage())));
+    $messages[] = array('type'=>'warning','content'=>$e->getMessage());
+    $te->assign('messages', $messages);
     $te->display('error');
 }
+
 ?>

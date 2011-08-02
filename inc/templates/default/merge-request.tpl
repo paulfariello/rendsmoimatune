@@ -4,11 +4,8 @@
 {include file='inc/side-nav-my-accounts.tpl'}
 <h2><a href="{makeUrl url='merge-requests.html'}">{getText id='Merge requests'}</a></h2>
 {include file='inc/main.tpl'}
-
-					<h3>{getText id='Merge request of users %1$s and %2$s' arg1=$mergeRequest->getFirstUser()->getName() arg2=$mergeRequest->getSecondUser()->getName()}</h3>
-                    {if isset($mergeAuthorizationException)}
-                        <p>{getText id="We just sent e-mail to the concerned persons, please wait for their agreements."}</p>
-                    {elseif $doMerge}
+                    {if $doMerge}
+                        <h3>{getText id='Merge request of users %1$s and %2$s' arg1=$mergeRequest->getFirstUser()->getName() arg2=$mergeRequest->getSecondUser()->getName()}</h3>
                         <form action="{$mergeRequest->getUrl()}" method="post" id="merge-user">
                             <input type="hidden" name="merge-id" value="{$mergeRequest->getId()}" />
                             <fieldset>

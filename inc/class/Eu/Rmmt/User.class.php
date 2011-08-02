@@ -317,6 +317,7 @@ Pour nous rejoindre cliquez sur le lien suivant : %s";
 
             $this->setInvited(true);
             $this->generateInvitationToken();
+            echo sprintf($message, $this->getName(), Utils::makeUrl('new-account-invitation.html?id='.$this->getId().'&token='.$this->getInvitationToken()));
             mail($this->getEmail(), $title, sprintf($message, $this->getName(), Utils::makeUrl('new-account-invitation.html?id='.$this->getId().'&token='.$this->getInvitationToken()))); 
         } else {
            throw new RightException(Utils::getText("You can't send invitation to user you haven't created")); 

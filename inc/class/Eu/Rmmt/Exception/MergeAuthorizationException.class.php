@@ -29,7 +29,9 @@
  */
 
 namespace Eu\Rmmt\Exception;
+
 use Bdf\Utils;
+use Eu\Rmmt\User;
 use Eu\Rmmt\MergeRequest;
 
 /**
@@ -43,6 +45,7 @@ use Eu\Rmmt\MergeRequest;
  */
 class MergeAuthorizationException extends \Exception {
     private $_mergeRequest;
+    private $_requiredAgreement = array();
 
     /**
      * Constructeur
@@ -53,5 +56,35 @@ class MergeAuthorizationException extends \Exception {
       $this->_mergeRequest = $mergeRequest;
       parent::__construct(Utils::getText('You can\'t merge user %1$s with user %2$s on your own.', $this->_mergeRequest->getFirstUser()->getName(), $this->_mergeRequest->getSecondUser()->getName()));
     }
+    
+    public function addRequiredAgreement(User $user)
+    {
+        $this->_requiredAgreement[] = $user;
+        if (sizeof($this->_requiredAgreement) == 1) {
+            $this->message = Utils::getText(
+                'You can\'t merge user %1$s with user %2$s on your own. You need the agreement of %3$s. For this purpose an email has been sent to %4$s.',
+                $this->_mergeRequest->getFirstUser()->getName(),
+                $this->_mergeRequest->getSecondUser()->getName(),
+                $this->_requiredAgreement[0]->getName(),
+                $this->_requiredAgreement[0]->getEmail()
+            );
+        } elseif (sizeof($this->_requiredAgreement) == 2) {
+            $this->message = Utils::getText(
+                'You can\'t merge user %1$s with user %2$s on your own. You need the agreement of %3$s and %4$s. For this purpose email have been sent respectively to %5$s and %6$s.',
+                $this->_mergeRequest->getFirstUser()->getName(),
+                $this->_mergeRequest->getSecondUser()->getName(),
+                $this->_requiredAgreement[0]->getName(),
+                $this->_requiredAgreement[1]->getName(),
+                $this->_requiredAgreement[0]->getEmail(),
+                $this->_requiredAgreement[1]->getEmail()
+            );
+        } else {
+            // Should never happen
+        }
+    }
 
+    public function getRequiredAgreement()
+    {
+        return $this->_requiredAgreement;
+    }
 }

@@ -114,8 +114,20 @@ class MergeRequest extends Entity
 
     public function checkMergeRight()
     {
-        if (!$this->_hasFirstUserAgreement() OR !$this->_hasSecondUserAgreement()) {
-            throw new MergeAuthorizationException($this);
+        $agreement = true;
+
+        $exception = new MergeAuthorizationException($this);
+        if (!$this->_hasFirstUserAgreement()) {
+            $exception->addRequiredAgreement($this->_firstUser);    
+            $agreement = false;
+        }
+        if (!$this->_hasSecondUserAgreement()) {
+            $exception->addRequiredAgreement($this->_secondUser);    
+            $agreement = false;
+        }
+        
+        if (!$agreement) {
+            throw $exception;
         }
     }
 
@@ -280,6 +292,7 @@ class MergeRequest extends Entity
 
         $headers = "From: no-reply@rendsmoimatune.eu\r\n";
 
+        echo $message;
         mail($email, $title, $message, $headers); 
     }
 
