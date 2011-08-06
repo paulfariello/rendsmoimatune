@@ -405,6 +405,9 @@ msgstr "Dernières dépenses"
 msgid "Recent repayments"
 msgstr "Derniers remboursements"
 
+msgid "Register"
+msgstr "S'inscrire"
+
 msgid "Rename"
 msgstr "Renomer"
 
@@ -427,7 +430,7 @@ msgid "Reset"
 msgstr "Réinitialiser"
 
 msgid "SIGN IN"
-msgstr "S'IDENTIFIER"
+msgstr "SE CONNECTER"
 
 msgid "SIGN OUT"
 msgstr "DÉCONNEXION"
@@ -445,16 +448,13 @@ msgid "Send invitation"
 msgstr "Envoyer une invitation"
 
 msgid "Sign in"
-msgstr "S'identifier"
+msgstr "Se connecter"
 
 msgid "Sign in easily"
-msgstr "S'identifier simplement"
+msgstr "Se connecter simplement"
 
 msgid "Sign in in old school way"
-msgstr "S'identifier à l'ancienne"
-
-msgid "Sing-in"
-msgstr "S'identifier"
+msgstr "Se connecter à l'ancienne"
 
 msgid "Summary"
 msgstr "Résumé"

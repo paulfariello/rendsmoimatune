@@ -33,20 +33,20 @@ require_once 'inc/assignDefaultVar.php';
 $em = \Bdf\Core::getInstance()->getEntityManager();
 $te = \Bdf\Core::getInstance()->getTemplatesEngine();
 
-if (!isset($_POST['create-new-account'])) {
-    $te->display('new-account');
+if (!isset($_POST['register'])) {
+    $te->display('register');
 } else {
     $doSave = true;
     if ($_POST['password'] !== $_POST['password-confirm']) {
         $doSave = false;
-        $te->assign('message', array('type'=>'error','content'=>\Bdf\Utils::getText('Password are not identical')));
-        $te->display('new-account');
+        $te->assign('messages', array(array('type'=>'error','content'=>\Bdf\Utils::getText('Password are not identical'))));
+        $te->display('register');
     }
 
     if (!isset($_POST['email']) OR empty($_POST['email'])) {
         $doSave = false;
-        $te->assign('message', array('type'=>'error','content'=>\Bdf\Utils::getText('Email is required')));
-        $te->display('new-account');
+        $te->assign('messages', array(array('type'=>'error','content'=>\Bdf\Utils::getText('Email is required'))));
+        $te->display('register');
     }
 
     if ($doSave) {

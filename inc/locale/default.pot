@@ -378,6 +378,9 @@ msgstr ""
 msgid "Recent repayments"
 msgstr ""
 
+msgid "Register"
+msgstr ""
+
 msgid "Rename"
 msgstr ""
 
@@ -424,9 +427,6 @@ msgid "Sign in easily"
 msgstr ""
 
 msgid "Sign in in old school way"
-msgstr ""
-
-msgid "Sing-in"
 msgstr ""
 
 msgid "Summary"

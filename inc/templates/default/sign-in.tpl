@@ -13,4 +13,7 @@
     <h3>{getText id='Sign in in old school way'}</h3>
     {include file='inc/basic-authentication-form.tpl'}
 </div>
+<div class="clear">
+    {include file='inc/register-form.tpl'}
+</div>
 {include file='inc/footer.tpl'}
