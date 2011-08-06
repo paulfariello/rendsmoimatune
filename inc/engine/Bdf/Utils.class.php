@@ -114,7 +114,7 @@ class Utils
      */
     public static function comparePassword($password, $hash)
     {
-        $hashLen = array('SHA256' => 64,'SHA512' => 128);
+        $hashLen = array('SHA256' => 64, 'SHA512' => 128);
         $algo = strtoupper(substr($hash, 1, strpos($hash, '}')-1));
 
         if (!isset($hashLen[$algo])) {
@@ -127,18 +127,6 @@ class Utils
     }
 
     /**
-     * Est-ce que l'url correspond à la page courante
-     *
-     * @param string $url L'url à tester
-     *
-     * @return boolean
-     */
-    public static function isCurrentPage($url)
-    {
-        return strstr($_SERVER['REQUEST_URI'], $url) !== false;
-    }
-
-    /**
      * Protect a string from XSS
      *
      * @param string $str string to protect
@@ -148,6 +136,23 @@ class Utils
     public static function htmlProtect($str)
     {
         return htmlspecialchars($str);
+    }
+
+    /**
+     * Est-ce que l'url correspond à la page courante
+     *
+     * @param string $url L'url à tester
+     *
+     * @return boolean
+     */
+    public static function isCurrentPage($url)
+    {
+        $path = parse_url(self::makeUrl($url), PHP_URL_PATH);
+        if ($path[strlen($path)-1] == "*") {
+            return strstr($_SERVER['REQUEST_URI'], substr($path, 0, -1)) !== false;
+        } else {
+            return $_SERVER['REQUEST_URI'] == $path;
+        }
     }
 
     /**
