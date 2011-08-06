@@ -381,6 +381,9 @@ msgstr ""
 msgid "Register"
 msgstr ""
 
+msgid "Register easily"
+msgstr ""
+
 msgid "Rename"
 msgstr ""
 

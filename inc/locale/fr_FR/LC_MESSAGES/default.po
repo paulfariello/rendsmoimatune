@@ -408,6 +408,9 @@ msgstr "Derniers remboursements"
 msgid "Register"
 msgstr "S'inscrire"
 
+msgid "Register easily"
+msgstr "S'inscrire simplement"
+
 msgid "Rename"
 msgstr "Renomer"
 
