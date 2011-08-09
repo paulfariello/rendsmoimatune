@@ -7,15 +7,16 @@
             <sequence-generator sequence-name="user_user_pk_seq" initial-value="1" allocation-size="1" />
         </id>
 
-        <field name="_name"                 column="name"               type="string"  />
-        <field name="_email"                column="email"              type="string"  />
-        <field name="_password"             column="password"           type="string"  />
-        <field name="_isAdmin"              column="is_admin"           type="boolean" />
-        <field name="_registered"           column="registered"         type="boolean" />
-        <field name="_facebookId"           column="facebook_id"        type="integer" />
-        <field name="_invited"              column="invited"            type="boolean" />
-        <field name="_invitationToken"      column="invitation_token"   type="string" />
-        <field name="_connectionCounter"    column="connection_counter" type="integer" />
+        <field name="_name"                     column="name"                       type="string"  />
+        <field name="_email"                    column="email"                      type="string"  />
+        <field name="_password"                 column="password"                   type="string"  />
+        <field name="_isAdmin"                  column="is_admin"                   type="boolean" />
+        <field name="_registered"               column="registered"                 type="boolean" />
+        <field name="_facebookId"               column="facebook_id"                type="integer" />
+        <field name="_invited"                  column="invited"                    type="boolean" />
+        <field name="_invitationToken"          column="invitation_token"           type="string" />
+        <field name="_passwordRecoveryToken"    column="password_recovery_token"    type="string" />
+        <field name="_connectionCounter"        column="connection_counter"         type="integer" />
 
 
         <one-to-many target-entity="Repayment"    mapped-by="_payer"        field="_repaymentsFromMe" />

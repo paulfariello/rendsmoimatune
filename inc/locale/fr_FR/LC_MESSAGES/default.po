@@ -50,6 +50,10 @@ msgstr "Montant requis"
 msgid "Amount payed"
 msgstr "Montant payé"
 
+msgid "An email has been sent to you in order to reset your password."
+msgstr ""
+"Un email vient de vous être envoyé afin de réinitialiser votre mot de passe."
+
 msgid "Another beneficiary"
 msgstr "Autre consommateur"
 
@@ -166,6 +170,9 @@ msgstr "Prénom"
 
 msgid "Forgot my password"
 msgstr "Mot de passe oublié"
+
+msgid "Forgot password ?"
+msgstr "Mot de passe oublié ?"
 
 msgid "From"
 msgstr "Du"
@@ -387,6 +394,12 @@ msgstr "Les mots de passes diffèrent"
 msgid "Password is required"
 msgstr "Mot de passe requis"
 
+msgid "Password recovery"
+msgstr "Récupération de mot de passe"
+
+msgid "Password successfully changed"
+msgstr "Mot de passe changé avec succès"
+
 msgid "Payed"
 msgstr "A payé"
 
@@ -404,6 +417,9 @@ msgstr "Dernières dépenses"
 
 msgid "Recent repayments"
 msgstr "Derniers remboursements"
+
+msgid "Recover my password"
+msgstr "Retrouver mon mot de passe"
 
 msgid "Register"
 msgstr "S'inscrire"
@@ -431,6 +447,12 @@ msgstr "Remboursements"
 
 msgid "Reset"
 msgstr "Réinitialiser"
+
+msgid "Reset my password"
+msgstr "Reinitialiser mon mot de passe"
+
+msgid "Reset password"
+msgstr "Reinitialisation de mot de passe"
 
 msgid "SIGN IN"
 msgstr "SE CONNECTER"
@@ -491,11 +513,14 @@ msgstr "Aujourd'hui"
 msgid "Total"
 msgstr "Total"
 
+msgid "Unknown email %s"
+msgstr "Adresse email « %s » inconnue"
+
 msgid "Unknown token %s"
-msgstr "Jeton inconnu"
+msgstr "Jeton « %s » inconnu"
 
 msgid "Unknown user with id %d"
-msgstr "Utilisateur %d inconnu"
+msgstr "Utilisateur « %d » inconnu"
 
 msgid "Update"
 msgstr "Mettre à jour"
@@ -547,6 +572,20 @@ msgstr "Confirmer la suppression"
 
 msgid "Yesterday"
 msgstr "Hier"
+
+msgid ""
+"You asked to reset your Sync password. To do so, please click this link:\n"
+"%s\n"
+"This will let you change your password to something new. If you didn't ask "
+"for this, don't worry, we'll keep your password safe.\n"
+"Best regards, Rendsmoimatune."
+msgstr ""
+"Vous avez demandé la réinitialisation de votre mot de passe. Pour ce faire, "
+"cliquez sur le lien suivant:\n"
+"%s\n"
+"Vous pourrez alors choisir un nouveau mot de passe. Si vous n'avez rien "
+"demandé, aucun soucis votre mot de passe restera identique.\n"
+"Cordialement, Rendsmoimatune."
 
 msgid "You can't access this account."
 msgstr "Vous n'avez pas le droit d'acceder à ce compte"

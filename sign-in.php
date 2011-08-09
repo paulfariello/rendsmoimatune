@@ -66,9 +66,16 @@ if(isset ($_POST['sign-in'])) {
       }
     }
 }else {
+    $messages = \Bdf\Session::getInstance()->get('messages');
+    if (null !== $messages) {
+        \Bdf\Session::getInstance()->remove('messages');
+    } else {
+        $messages = array();
+    } 
     if (null !== \Bdf\Session::getInstance()->get('redirect')) {
-        $te->assign('messages',array(array('type'=>'warning','content'=>'Authentification requise')));
+        $messages[] = array('type'=>'warning','content'=>'Authentification requise');
     }
+    $te->assign('messages',$messages);
     $te->display("sign-in");
 }
 ?>

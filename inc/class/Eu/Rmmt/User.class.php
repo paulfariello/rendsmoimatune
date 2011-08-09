@@ -49,8 +49,8 @@ class User implements \Bdf\IUser
     private $_email;
     private $_password;
     private $_name;
-    private $_isAdmin           = false;
-    private $_registered        = null;
+    private $_isAdmin       = false;
+    private $_registered    = null;
     private $_accounts;
     private $_payers;
     private $_beneficiaries;
@@ -58,9 +58,10 @@ class User implements \Bdf\IUser
     private $_repaymentsToMe;
     private $_creator;
     private $_facebookId;
-    private $_invited           = false;
-    private $_invitationToken   = null;
-    private $_connectionCounter = 0;
+    private $_invited               = false;
+    private $_invitationToken       = null;
+    private $_passwordRecoveryToken = null;
+    private $_connectionCounter     = 0;
 
     /**
      * Constructeur
@@ -280,6 +281,29 @@ class User implements \Bdf\IUser
     public function checkInvitationToken($token)
     {
         return hash_hmac('sha256', $this->_invitationToken, $this->_id) === $token;
+    }
+
+    public function generatePasswordRecoveryToken()
+    {
+        $this->_passwordRecoveryToken = uniqid();
+    }
+
+    public function getPasswordRecoveryToken()
+    {
+        if (null == $this->_passwordRecoveryToken) {
+            throw new \Exception('passwordRecoveryToken token must have been generated first');
+        }
+        return hash_hmac('sha256', $this->_passwordRecoveryToken, $this->_id);
+    }
+
+    public function checkPasswordRecoveryToken($token)
+    {
+        return hash_hmac('sha256', $this->_passwordRecoveryToken, $this->_id) === $token;
+    }
+
+    public function clearPasswordRecoveryToken()
+    {
+        $this->_passwordRecoveryToken = null;
     }
 
     public function getCreatedUsers()

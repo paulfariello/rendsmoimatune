@@ -50,6 +50,9 @@ msgstr ""
 msgid "Amount payed"
 msgstr ""
 
+msgid "An email has been sent to you in order to reset your password."
+msgstr ""
+
 msgid "Another beneficiary"
 msgstr ""
 
@@ -165,6 +168,9 @@ msgid "First Name"
 msgstr ""
 
 msgid "Forgot my password"
+msgstr ""
+
+msgid "Forgot password ?"
 msgstr ""
 
 msgid "From"
@@ -360,6 +366,12 @@ msgstr ""
 msgid "Password is required"
 msgstr ""
 
+msgid "Password recovery"
+msgstr ""
+
+msgid "Password successfully changed"
+msgstr ""
+
 msgid "Payed"
 msgstr ""
 
@@ -376,6 +388,9 @@ msgid "Recent expenditures"
 msgstr ""
 
 msgid "Recent repayments"
+msgstr ""
+
+msgid "Recover my password"
 msgstr ""
 
 msgid "Register"
@@ -403,6 +418,12 @@ msgid "Repayments"
 msgstr ""
 
 msgid "Reset"
+msgstr ""
+
+msgid "Reset my password"
+msgstr ""
+
+msgid "Reset password"
 msgstr ""
 
 msgid "SIGN IN"
@@ -460,6 +481,9 @@ msgstr ""
 msgid "Total"
 msgstr ""
 
+msgid "Unknown email %s"
+msgstr ""
+
 msgid "Unknown token %s"
 msgstr ""
 
@@ -510,6 +534,14 @@ msgid "Yes, delete it"
 msgstr ""
 
 msgid "Yesterday"
+msgstr ""
+
+msgid ""
+"You asked to reset your Sync password. To do so, please click this link:\n"
+"%s\n"
+"This will let you change your password to something new. If you didn't ask "
+"for this, don't worry, we'll keep your password safe.\n"
+"Best regards, Rendsmoimatune."
 msgstr ""
 
 msgid "You can't access this account."
