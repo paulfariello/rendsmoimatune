@@ -264,6 +264,7 @@ class Core
     private function _sessionInitialization()
     {
         $this->_session = Session::getInstance();
+        $this->_session->initialization();
     }
 
     /**

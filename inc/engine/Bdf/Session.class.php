@@ -49,6 +49,7 @@ class Session
     const FIELD_USER_ID = "bdf-user-id";
     const FIELD_CRASH = "bdf-crash";
     const FIELD_CHALLENGE = "bdf-challenge-id";
+    const COOKIE_LIFETIME = 604800;
 
     /**
      * Constructeur
@@ -60,21 +61,6 @@ class Session
 
         $this->_values = array();
 
-        session_start();
-        // On récupère toutes les variables de session
-        if (isset($_SESSION[self::FIELD_CRASH])) {
-            $this->_values = $_SESSION[self::FIELD_CRASH];
-        } else {
-            $this->_values = $_SESSION;
-        }
-
-        $_SESSION = array();
-        $_SESSION[self::FIELD_CRASH] = $this->_values;
-
-        // Récupération des variables particulières
-        $this->_getValidChallenges();
-
-        $this->_userId = isset($this->_values[self::FIELD_USER_ID])?$this->_values[self::FIELD_USER_ID]:null;
     }
 
     /**
@@ -102,6 +88,57 @@ class Session
         trigger_error('Le clônage n\'est pas autorisé.', E_USER_ERROR);
     }
 
+    /**
+     * Set cookie parameters.
+     * Actually set cookie lifetime, domain and path.
+     *
+     * @return void
+     */
+    private function _setCookieParams()
+    {
+        $path   = parse_url(Core::getInstance()->getConfig('site', 'url'), PHP_URL_PATH);
+        $domain = parse_url(Core::getInstance()->getConfig('site', 'url'), PHP_URL_HOST);
+        session_set_cookie_params (self::COOKIE_LIFETIME, $path, $domain, false, false);
+    }
+
+    /**
+     * Session recover.
+     * Recover last session. Can be recovered after a crash.
+     *
+     * @return void
+     */
+    private function _variableRecover()
+    {
+        // On récupère toutes les variables de session
+        if (isset($_SESSION[self::FIELD_CRASH])) {
+            $this->_values = $_SESSION[self::FIELD_CRASH];
+        } else {
+            $this->_values = $_SESSION;
+        }
+
+        // On réinitialize la variable de session
+        $_SESSION = array();
+        $_SESSION[self::FIELD_CRASH] = $this->_values;
+
+        // Récupération des variables particulières
+        $this->_getValidChallenges();
+
+        $this->_userId = isset($this->_values[self::FIELD_USER_ID])?$this->_values[self::FIELD_USER_ID]:null;
+    }
+
+    /**
+     * Initialization des sessions
+     *
+     * @return void
+     */
+    public function initialization()
+    {
+        $this->_setCookieParams();
+
+        session_start();
+
+        $this->_variableRecover();
+    }
 
     /**
      * Ajoute une variable en session
