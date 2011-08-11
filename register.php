@@ -36,20 +36,28 @@ $te = \Bdf\Core::getInstance()->getTemplatesEngine();
 if (!isset($_POST['register'])) {
     $te->display('register');
 } else {
-    $doSave = true;
-    if ($_POST['password'] !== $_POST['password-confirm']) {
-        $doSave = false;
-        $te->assign('messages', array(array('type'=>'error','content'=>\Bdf\Utils::getText('Password are not identical'))));
-        $te->display('register');
-    }
+    try {
+        if (!isset($_POST['email']) OR empty($_POST['email'])) {
+            throw new Eu\Rmmt\Exception\UserInputException(\Bdf\Utils::getText('Email is required'), '', 'email');
+        }
 
-    if (!isset($_POST['email']) OR empty($_POST['email'])) {
-        $doSave = false;
-        $te->assign('messages', array(array('type'=>'error','content'=>\Bdf\Utils::getText('Email is required'))));
-        $te->display('register');
-    }
+        $user = Eu\Rmmt\User::getRepository()->findOneBy(array('_email'=>$_POST['email']));
+        if ($user !== null) {
+            throw new Eu\Rmmt\Exception\UserInputException(\Bdf\Utils::getText('Email %s is already registered, pleasse choose another email.', $_POST['email']), $_POST['email'], 'email');
+        }
 
-    if ($doSave) {
+        if (!isset($_POST['password']) OR empty($_POST['password'])) {
+            throw new Eu\Rmmt\Exception\UserInputException(\Bdf\Utils::getText('Password is required'), '', 'password');
+        }
+
+        if ($_POST['password'] !== $_POST['password-confirm']) {
+            throw new Eu\Rmmt\Exception\UserInputException(\Bdf\Utils::getText('Password are not identical'), '', 'password');
+        }
+
+        if (!isset($_POST['name']) OR empty($_POST['name'])) {
+            throw new Eu\Rmmt\Exception\UserInputException(\Bdf\Utils::getText('Name is required'), '', 'name');
+        }
+
         $user = new Eu\Rmmt\User($_POST['email']);
         $user->setRegistered(true);
         $user->setPassword($_POST['password']);
@@ -58,6 +66,15 @@ if (!isset($_POST['register'])) {
         $em->flush();
         \Bdf\Session::getInstance()->setCurrentUserId($user->getId());
         header('location: '.\Bdf\Utils::makeUrl(''));
+    } catch (Eu\Rmmt\Exception\UserInputException $e) {
+        $te->assign('_POST', $_POST);
+        $te->assign('userInputException', $e);
+        $te->assign('messages', array(array('type'=>'error', 'content'=>$e->getMessage())));
+        $te->display('register');
+    } catch (Exception $e) {
+        $te->assign('_POST', $_POST);
+        $te->assign('messages', array(array('type'=>'error','content'=>\Bdf\Utils::getText('Internal error :').$e->getMessage())));
+        $te->display('register');
     }
 }
 ?>

@@ -134,6 +134,9 @@ msgstr ""
 msgid "Email"
 msgstr ""
 
+msgid "Email %s is already registered, pleasse choose another email."
+msgstr ""
+
 msgid "Email is required"
 msgstr ""
 

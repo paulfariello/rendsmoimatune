@@ -135,6 +135,9 @@ msgstr "Modification de la dépense"
 msgid "Email"
 msgstr "e-mail"
 
+msgid "Email %s is already registered, pleasse choose another email."
+msgstr "L'email « %s » est déjà enregistré. Veuillez en choisir un autre."
+
 msgid "Email is required"
 msgstr "Email requis"
 
