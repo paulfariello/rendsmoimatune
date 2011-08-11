@@ -106,16 +106,31 @@ class Core
     }
 
     /**
-     * Chargement de la configuration via les fichiers *.ini
+     * Loading configuration from ini files.
+     * First load config.dist.ini and then config.ini.
+     * config.dist.ini should contains global configuration which doesn't change from site to site.
+     * config.ini should contains specific configuration for a particular site like database password.
      *
      * @return void
      */
     private function _loadConfiguration()
     {
-        if (file_exists(CONF."config.ini")) {
-            $this->_config = parse_ini_file(CONF."config.ini", true);
-        } else {
+        if (!file_exists(CONF."config.dist.ini") OR !file_exists(CONF."config.ini")) {
             trigger_error('Le fichier de configuration n\'est pas présent. Utiliser le script install/index.php pour en créer un nouveau.', E_USER_ERROR);
+        }
+
+        $configDist = parse_ini_file(CONF."config.dist.ini", true);
+        $config = parse_ini_file(CONF."config.ini", true);
+
+        $sections = array_keys($configDist) + array_keys($config);
+        foreach($sections as $section) {
+            if (isset($configDist[$section]) and isset($config[$section])) {
+                $this->_config[$section] = array_merge($configDist[$section], $config[$section]);
+            } elseif (isset($configDist[$section])) {
+                $this->_config[$section] = $configDist[$section];
+            } elseif (isset($config[$section])) {
+                $this->_config[$section] = $config[$section];
+            }
         }
     }
 
