@@ -655,6 +655,9 @@ msgstr ""
 msgid "You can't view this expenditure"
 msgstr "Vous ne pouvez pas voir cette dépense."
 
+msgid "You have successfully been authenticated through Facebook."
+msgstr "Vous avez été authentifié avec succès grâce à Facebook."
+
 msgid "You must be creator of user in order to merge it"
 msgstr "Vous devez être le créateur d'un utilisateur pour pouvoir le fusionner"
 

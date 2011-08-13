@@ -33,6 +33,11 @@ require_once 'inc/assignDefaultVar.php';
 $em = \Bdf\Core::getInstance()->getEntityManager();
 $te = \Bdf\Core::getInstance()->getTemplatesEngine();
 
+$messages = \Bdf\Session::getInstance()->get('messages');
+if (null !== $messages) {
+    $te->assign('messages',$messages);
+    \Bdf\Session::getInstance()->remove('messages');
+}
 
 $te->display('index');
 ?>
