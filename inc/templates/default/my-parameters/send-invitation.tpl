@@ -10,7 +10,7 @@
     <form action="{makeUrl url='my-parameters/send-invitation.html'}" class="jNice" method="post">
         <fieldset>
             {foreach from=$users item='user'}
-                <p><label for="email[{$user->getId()}]">{$user->getName()}</label><input type="text" class="text-long" name="email[{$user->getId()}]" value="" /></p>
+                <p><label for="email[{$user->getId()}]">{$user->getName()}</label><input type="text" class="text-long {if isset({$_POST.send-invitation}) && isset($alreadyRegistered[$user->getId()])}user-input-exception{/if}" name="email[{$user->getId()}]" value="{if isset({$_POST.send-invitation}) && isset($_POST.email[$user->getId()])}{$_POST.email[$user->getId()]}{/if}" /></p>
             {/foreach}
             <input type="submit" name="send-invitation" value="{getText id='Send'}" />
         </fieldset>
@@ -21,8 +21,8 @@
 <h3>{getText id='New user'}</h3>
 <form action="{makeUrl url='my-parameters/send-invitation.html'}" class="jNice" method="post">
     <fieldset>
-        <p><label for="name">{getText id='Name'}</label><input type="text" class="text-long" name="name" value="" /></p>
-        <p><label for="email">{getText id='E-mail'}</label><input type="text" class="text-long" name="email" value="" /></p>
+        <p><label for="name">{getText id='Name'}</label><input type="text" class="text-long" name="name" value="{if isset({$_POST.send-invitation-to-new-user}) && isset($_POST.name)}{$_POST.name}{/if}" /></p>
+        <p><label for="email">{getText id='E-mail'}</label><input type="text" class="text-long{if isset({$_POST.send-invitation-to-new-user}) && isset($userInputException) && $userInputException->getInputName() == 'email'} user-input-exception{/if}" name="email" value="{if isset({$_POST.send-invitation-to-new-user}) && isset($_POST.email)}{$_POST.email}{/if}" /></p>
         <input type="submit" name="send-invitation-to-new-user" value="{getText id='Send'}" />
     </fieldset>
 </form>

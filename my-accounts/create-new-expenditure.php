@@ -94,7 +94,7 @@ try {
                     $unknown = true;
                     $payer   = null;
 
-                    $payer = Eu\Rmmt\User::findByIdOrName($id, $name);
+                    $payer = Eu\Rmmt\User::findByIdOrName($id, $name, $account, $currentUser);
 
                     if (null == $payer) {
                         // Create new user
@@ -133,7 +133,7 @@ try {
                     $unknown     = true;
                     $beneficiary = null;
 
-                    $beneficiary = Eu\Rmmt\User::findByIdOrName($id, $name);
+                    $beneficiary = Eu\Rmmt\User::findByIdOrName($id, $name, $account, $currentUser);
 
                     if (null == $beneficiary) {
                         // Create new user

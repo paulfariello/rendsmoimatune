@@ -348,7 +348,7 @@ Pour nous rejoindre cliquez sur le lien suivant : %s";
         }
     }
 
-    public static function findByIdOrName($id, $name)
+    public static function findByIdOrName($id, $name, Account $account, User $requestingUser)
     {
         $em      = Core::getInstance()->getEntityManager();
         $unknown = true;
@@ -356,18 +356,25 @@ Pour nous rejoindre cliquez sur le lien suivant : %s";
 
         // Search with id
         if (!empty($id) and ctype_digit($id)) {
-            $user = User::getRepository()->find($id);
+            $query = $em->createQuery("SELECT u FROM Eu\Rmmt\User u INNER JOIN u._accounts a INNER JOIN a._users ru WHERE ( u._registered = true OR a._id = :aid ) AND ru._id = :ruid AND u._id = :uid");
+            $query->setParameter('uid', $id);
+            $query->setParameter('ruid', $requestingUser->getId());
+            $query->setParameter('aid', $account->getId());
 
-            // Check inconsistency between id and name
-            if (null !== $user and $user->getName() == $name) {
-                $unknown     = false;
+            $users = $query->getResult();
+            if (!empty($users)) {
+                $unknown    = false;
+                $user      = $users[0];
             }
         }
 
         // Search for similar user name
         if ($unknown) {
-            $query = $em->createQuery("SELECT u FROM Eu\Rmmt\User u WHERE LOWER(u._name) = :search");
+            $query = $em->createQuery("SELECT u FROM Eu\Rmmt\User u INNER JOIN u._accounts a INNER JOIN a._users ru WHERE ( u._registered = true OR a._id = :aid ) AND ru._id = :id AND LOWER(u._name) = :search");
             $query->setParameter('search',strtolower($name));
+            $query->setParameter('id', $requestingUser->getId());
+            $query->setParameter('aid', $account->getId());
+
             $users = $query->getResult();
             if (!empty($users)) {
                 $unknown    = false;

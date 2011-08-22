@@ -62,7 +62,7 @@ try {
             if (empty($_POST['payer-name'])) {
                 throw new Eu\Rmmt\Exception\UserInputException(\Bdf\Utils::getText('Payer\'s name is required'), $_POST['payer-name'], 'payer-name');
             }
-            $payer = Eu\Rmmt\User::findByIdOrName($_POST['payer-id'], $_POST['payer-name']);
+            $payer = Eu\Rmmt\User::findByIdOrName($_POST['payer-id'], $_POST['payer-name'], $account, $currentUser);
             if (null == $payer) {
                 // Create new user
                 $payer = Eu\Rmmt\UserFactory::createUnregisteredUser($currentUser, $_POST['payer-name']);
@@ -73,7 +73,7 @@ try {
             if (empty($_POST['beneficiary-name'])) {
                 throw new Eu\Rmmt\Exception\UserInputException(\Bdf\Utils::getText('Beneficiary\'s name is required'), $_POST['beneficiary-name'], 'beneficiary-name');
             }
-            $beneficiary = Eu\Rmmt\User::findByIdOrName($_POST['beneficiary-id'], $_POST['beneficiary-name']);
+            $beneficiary = Eu\Rmmt\User::findByIdOrName($_POST['beneficiary-id'], $_POST['beneficiary-name'], $account, $currentUser);
             if (null == $beneficiary) {
                 // Create new user
                 $beneficiary = Eu\Rmmt\UserFactory::createUnregisteredUser($currentUser, $_POST['beneficiary-name']);

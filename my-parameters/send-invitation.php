@@ -52,37 +52,87 @@ $te->assign('invitedUsers', $invitedUsers);
 if (isset($_POST['send-invitation']) OR isset($_POST['resend-invitation'])) {
     try {
         $messages = array();
+        $sended = array();
+        $merged = array();
+        $mergeRequested = array();
+
+        $invitations = array();
 
         if (isset($_POST['resend-invitation']) and isset($_POST['invite'])) {
             foreach($_POST['invite'] as $userId) {
                 $email = $_POST['email'][$userId];
-                if (!empty($email)) {
-                    $user = Eu\Rmmt\User::getRepository()->find($userId);
-                    if (null == $user) {
-                        throw new Eu\Rmmt\Exception\UnknownUserException($userId);
-                    }
-                    $user->sendInvitation($email);
-                }
+                $invitations[$userId] = $email;
             }
-            $messages[] = array('type'=>'info', 'content'=>Bdf\Utils::getText('Invitations sended again !'));
         } elseif(isset($_POST['send-invitation'])) {
-            foreach($_POST['email'] as $userId => $email) {
-                if (!empty($email)) {
-                    $user = Eu\Rmmt\User::getRepository()->find($userId);
-                    if (null == $user) {
-                        throw new Eu\Rmmt\Exception\UnknownUserException($userId);
+            $invitations = $_POST['email'];
+        }
+
+        foreach($invitations as $userId => $email) {
+            if (!empty($email)) {
+                $user = Eu\Rmmt\User::getRepository()->find($userId);
+                if (null == $user OR $user->isRegistered()) {
+                    continue;
+                }
+
+                $invitedUser = Eu\Rmmt\User::getRepository()->findOneBy(array('_email'=>$email));
+                if ($invitedUser != null) {
+                    // It's a merge, baby !
+                    $query = $em->createQuery( "SELECT mr FROM \Eu\Rmmt\MergeRequest mr INNER JOIN mr._firstUser fu INNER JOIN mr._secondUser su INNER JOIN mr._requester r WHERE (fu._id = :fuid AND su._id = :suid) OR (fu._id = :suid AND su._id = :fuid)" );
+                    $query->setParameter("fuid", $user->getId());
+                    $query->setParameter("suid", $invitedUser->getId());
+                    $query->setMaxResults(1);
+                    $mergeRequest = $query->execute();
+
+                    if (null == $mergeRequest) {
+                        $accounts = $user->getAccounts();
+                        if ($accounts->count() < 1) {
+                            throw new Exception("Euuh je m'en doutais mais c'est chiant quand même...");
+                        }
+                        $mergeRequest = new \Eu\Rmmt\MergeRequest($accounts->first(), $user, $invitedUser, $currentUser);
+                        $em->persist($mergeRequest);
+                        $em->flush();
+                    } else {
+                        $mergeRequest = $mergeRequest[0];
                     }
+
+                    try {
+                        $mergeRequest->checkMergeRight();
+                        $merged[$userId] = $email;
+                        // TODO is it to currentUser to do the merge ? Don't think so...
+                        $mergeRequest->doMerge(); 
+                    } catch(Eu\Rmmt\Exception\MergeAuthorizationException $e) {
+                        $mergeRequest->requestAgreements();
+                        $mergeRequested[$userId] = $email;
+                    }
+
+
+                } else {
                     $user->sendInvitation($email);
+                    $sended[$userId] = $email;
                 }
             }
-            $messages[] = array('type'=>'info', 'content'=>Bdf\Utils::getText('Invitations sended !'));
         }
 
         $em->flush();
 
-        \Bdf\Session::getInstance()->add('messages',$messages);
+        if (!empty($sended)) {
+            $messages[] = array('type'=>'info', 'content'=>Bdf\Utils::nGetText('Invitation sended to %s.', 'Invitations sended to %s.', sizeof($sended), 'toto'));
+        }
+        if (!empty($merged)) {
+            $messages[] = array('type'=>'info', 'content'=>Bdf\Utils::nGetText('%s is already on Rendsmoimatune so we merged his account with your user.', '%s are already on Rendsmoimatune so we merged their account with your users.', sizeof($merged), 'toto'));
+        }
+        if (!empty($mergeRequested)) {
+            $messages[] = array('type'=>'info', 'content'=>Bdf\Utils::nGetText('%s is already on Rendsmoimatune so we proposed him to merged his account with your user.', '%s are already on Rendsmoimatune so we proposed them to merged their account with your users.', sizeof($mergeRequested), 'toto'));
+        }
 
+        \Bdf\Session::getInstance()->add('messages',$messages);
+        
         header('location: '.Bdf\Utils::makeUrl('/my-parameters/send-invitation.html'));
+    } catch(Eu\Rmmt\Exception\UserInputException $e) {
+        $te->assign('_POST',$_POST);
+        $te->assign('messages', array(array('type'=>'error','content'=>$e->getMessage())));
+        $te->assign('userInputException', $e);
+        $te->display('my-parameters/send-invitation');
     } catch(Exception $e) {
         $te->assign('_POST',$_POST);
         $te->assign('messages', array(array('type'=>'error','content'=>Bdf\Utils::getText('Internal error').' : '.$e->getMessage())));
@@ -98,6 +148,11 @@ if (isset($_POST['send-invitation']) OR isset($_POST['resend-invitation'])) {
             throw new Eu\Rmmt\Exception\UserInputException(Bdf\Utils::getText("Name is required"), $_POST['name'], 'name');
         } 
         
+        $user = Eu\Rmmt\User::getRepository()->findOneBy(array('_email'=>$_POST['email']));
+        if ($user != null) {
+            throw new Eu\Rmmt\Exception\UserInputException(Bdf\Utils::getText("Email %s is already registered.", $_POST['email']), $_POST['email'], 'email');
+        }
+
         $user = Eu\Rmmt\UserFactory::createUnregisteredUser($currentUser, $_POST['name']);
         $user->sendInvitation($_POST['email']);
         $em->persist($user);

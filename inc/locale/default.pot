@@ -134,6 +134,11 @@ msgstr ""
 msgid "Email"
 msgstr ""
 
+msgid "Email %s is already registered."
+msgid_plural "Emails %s are already registered."
+msgstr[0] ""
+msgstr[1] ""
+
 msgid "Email %s is already registered, pleasse choose another email."
 msgstr ""
 
