@@ -334,6 +334,9 @@ msgstr "Plus récent"
 msgid "Newest"
 msgstr "Dernier en date"
 
+msgid "No debt, good job !"
+msgstr "Aucune dette, bien joué !"
+
 msgid "No expenditure"
 msgstr "Aucune dépense"
 

@@ -102,16 +102,20 @@
 {/if}
 
 <h3>{getText id='Balancing'}</h3>
-<h4 class="repayer"></h4>
-<h4 class="repayment">{getText id="owes"}</h4>
-<h4 class="repaid"></h4>
-<div class="clear"></div>
-    {foreach from=$debts item="debt"}
-        <div class="repayment">
-            <div class="repayer">{$debt->getFrom()->getName()|htmlProtect}</div>
-            <div class="amount-owes">{$debt->getAmount()} €</div>
-            <div class="repaid">{$debt->getTo()->getName()|htmlProtect}</div>
-            <div class="clear"></div>
-        </div>
-    {/foreach}
+{if !$debts->isEmpty()}
+    <h4 class="repayer"></h4>
+    <h4 class="repayment">{getText id="owes"}</h4>
+    <h4 class="repaid"></h4>
+    <div class="clear"></div>
+        {foreach from=$debts item="debt"}
+            <div class="repayment">
+                <div class="repayer">{$debt->getFrom()->getName()|htmlProtect}</div>
+                <div class="amount-owes">{$debt->getAmount()} €</div>
+                <div class="repaid">{$debt->getTo()->getName()|htmlProtect}</div>
+                <div class="clear"></div>
+            </div>
+        {/foreach}
+{else}
+    {getText id="No debt, good job !"}
+{/if}
 {include file='inc/footer.tpl'}

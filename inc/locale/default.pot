@@ -317,6 +317,9 @@ msgstr ""
 msgid "Newest"
 msgstr ""
 
+msgid "No debt, good job !"
+msgstr ""
+
 msgid "No expenditure"
 msgstr ""
 
