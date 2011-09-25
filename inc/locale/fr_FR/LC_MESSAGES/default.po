@@ -26,6 +26,15 @@ msgstr "%1$s vous suggère une fusion"
 msgid "%s gives %.2f€ to %s"
 msgstr "%s doit %.2f€ à %s"
 
+msgid ""
+"%s is already on Rendsmoimatune so we proposed him to merged his account "
+"with your user."
+msgid_plural ""
+"%s are already on Rendsmoimatune so we proposed them to merged their account "
+"with your users."
+msgstr[0] "%s est déjà sur Rendsmoimatune. Nous lui avons donc proposé de fusionner son compte avec votre utilisateur."
+msgstr[1] "%s sont déjà sur Rendsmoimatune. Nous leur avons donc proposé de fusionner leur compte avec vos utilisateurs."
+
 msgid "About us"
 msgstr "A propos de nous"
 
@@ -135,11 +144,14 @@ msgstr "Modification de la dépense"
 msgid "Email"
 msgstr "e-mail"
 
-msgid "Email %s is already registered."
-msgstr "L'email « %s » est déjà enregistré."
-
 msgid "Email %s is already registered, pleasse choose another email."
 msgstr "L'email « %s » est déjà enregistré. Veuillez en choisir un autre."
+
+#, fuzzy
+msgid "Email %s is already registered."
+msgid_plural "Emails %s are already registered."
+msgstr[0] "L'email « %s » est déjà enregistré."
+msgstr[1] "L'email « %s » est déjà enregistré."
 
 msgid "Email is required"
 msgstr "Email requis"

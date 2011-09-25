@@ -26,6 +26,15 @@ msgstr ""
 msgid "%s gives %.2f€ to %s"
 msgstr ""
 
+msgid ""
+"%s is already on Rendsmoimatune so we proposed him to merged his account "
+"with your user."
+msgid_plural ""
+"%s are already on Rendsmoimatune so we proposed them to merged their account "
+"with your users."
+msgstr[0] ""
+msgstr[1] ""
+
 msgid "About us"
 msgstr ""
 
@@ -134,13 +143,13 @@ msgstr ""
 msgid "Email"
 msgstr ""
 
+msgid "Email %s is already registered, pleasse choose another email."
+msgstr ""
+
 msgid "Email %s is already registered."
 msgid_plural "Emails %s are already registered."
 msgstr[0] ""
 msgstr[1] ""
-
-msgid "Email %s is already registered, pleasse choose another email."
-msgstr ""
 
 msgid "Email is required"
 msgstr ""
