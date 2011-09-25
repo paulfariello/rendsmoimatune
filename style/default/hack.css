@@ -687,3 +687,9 @@ span.tips-text {
 .slider {
     cursor: pointer;
 }
+
+p.signature {
+    float: right;
+    margin-top: 3em;
+    font-weight: bold;
+}
