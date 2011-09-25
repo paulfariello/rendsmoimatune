@@ -289,17 +289,17 @@ class Core
      */
     private function _i18nInitialization()
     {
-        putenv("LANG=".$this->_getLocale().".utf8"); // On modifie la variable d'environnement
-        setlocale(LC_ALL, $this->_getLocale());
-        setLocale(LC_TIME, $this->_getLocale());
-        setLocale(LC_MESSAGES, $this->_getLocale().".UTF-8");
-        setLocale(LC_MONETARY, $this->_getLocale());
+        putenv("LANG=".$this->getLocale().".utf8"); // On modifie la variable d'environnement
+        setlocale(LC_ALL, $this->getLocale());
+        setLocale(LC_TIME, $this->getLocale());
+        setLocale(LC_MESSAGES, $this->getLocale().".UTF-8");
+        setLocale(LC_MONETARY, $this->getLocale());
         bindtextdomain($this->getConfig("i18n", "main_domain"), ROOT.$this->getConfig("i18n","locales_dir"));
         bind_textdomain_codeset($this->getConfig("i18n", "main_domain"), 'UTF-8');
         textdomain($this->getConfig("i18n", "main_domain"));
     }
 
-    private function _getLocale()
+    public function getLocale()
     {
         return "fr_FR";
     }

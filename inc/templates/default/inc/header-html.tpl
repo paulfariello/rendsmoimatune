@@ -14,3 +14,4 @@
 <!-- JavaScripts-->
 <script type="text/javascript" src="{makeUrl url='js/lib/mootools/mootools-1.2.4-core-yc.js'}"></script>
 <script type="text/javascript" src="{makeUrl url='js/lib/mootools/mootools-1.2.4.4-more.js'}"></script>
+<script type="text/javascript">var currentLocale = "{$currentLocale}";</script>

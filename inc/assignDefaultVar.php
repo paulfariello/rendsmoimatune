@@ -18,5 +18,6 @@ along with Rendsmoimatune.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 \Bdf\Core::getInstance()->getTemplatesEngine()->assign('currentUser',\Eu\Rmmt\User::getCurrentUser());
+\Bdf\Core::getInstance()->getTemplatesEngine()->assign('currentLocale',\Bdf\Core::getInstance()->getLocale());
 
 ?>
