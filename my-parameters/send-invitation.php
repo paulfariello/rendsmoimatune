@@ -119,10 +119,10 @@ if (isset($_POST['send-invitation']) OR isset($_POST['resend-invitation'])) {
             $messages[] = array('type'=>'info', 'content'=>Bdf\Utils::nGetText('Invitation sended to %s.', 'Invitations sended to %s.', sizeof($sended), 'toto'));
         }
         if (!empty($merged)) {
-            $messages[] = array('type'=>'info', 'content'=>Bdf\Utils::nGetText('%s is already on Rendsmoimatune so we merged his account with your user.', '%s are already on Rendsmoimatune so we merged their account with your users.', sizeof($merged), 'toto'));
+            $messages[] = array('type'=>'info', 'content'=>Bdf\Utils::nGetText('%1$s is already on %2$s so we merged his account with your user.', '%1$s are already on %2$s so we merged their account with your users.', sizeof($merged), 'toto', Bdf\Core::getInstance()->getConfig("site","site_name")));
         }
         if (!empty($mergeRequested)) {
-            $messages[] = array('type'=>'info', 'content'=>Bdf\Utils::nGetText('%s is already on Rendsmoimatune so we proposed him to merged his account with your user.', '%s are already on Rendsmoimatune so we proposed them to merged their account with your users.', sizeof($mergeRequested), 'toto'));
+            $messages[] = array('type'=>'info', 'content'=>Bdf\Utils::nGetText('%1$s is already on %2$s so we proposed him to merged his account with your user.', '%1$s are already on %2$s so we proposed them to merged their account with your users.', sizeof($mergeRequested), 'toto', Bdf\Core::getInstance()->getConfig("site", "site_name")));
         }
 
         \Bdf\Session::getInstance()->add('messages',$messages);

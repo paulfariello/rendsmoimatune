@@ -56,7 +56,7 @@ if (null === $currentUser) {
         \Bdf\Session::getInstance()->remove('redirect');
         header("location: ".$redirect);
     } elseif ($currentUser->getConnectionCounter() < 2) {
-        $messages[] = array('type'=>'info','content'=>Bdf\Utils::getText('Thank you for registering in Rendsmoimatune. You can start with the creation of your first account. An account is a group of expenditures and repayments related by something relevant for you. That thing could be holidays, roommate or even your every day expenditures.'));
+        $messages[] = array('type'=>'info','content'=>Bdf\Utils::getText('Thank you for registering in %1$s. You can start with the creation of your first account. An account is a group of expenditures and repayments related by something relevant for you. That thing could be holidays, roommate or even your every day expenditures.', Bdf\Core::getInstance()->getConfig("site", "site_name")));
         \Bdf\Session::getInstance()->add('messages',$messages);
         header("location: ".\Bdf\Utils::makeUrl("my-accounts/create-new-account.html"));
 

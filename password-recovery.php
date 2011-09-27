@@ -43,9 +43,9 @@ if(isset ($_POST['recover-password'])) {
         $user->generatePasswordRecoveryToken();
         $em->flush();
 
-        $title = Bdf\Utils::getText('Password recovery').' - Rendsmoimatune';
-        $message = Bdf\Utils::getText("You asked to reset your Sync password. To do so, please click this link:\n%s\nThis will let you change your password to something new. If you didn't ask for this, don't worry, we'll keep your password safe.\nBest regards, Rendsmoimatune.", Bdf\Utils::makeUrl('password-recovery.html?id='.$user->getId().'&token='.$user->getPasswordRecoveryToken()));
-        $headers = 'From: Rendsmoimatune <no-reply@rendsmoimatune.eu>';
+        $title = Bdf\Utils::getText('Password recovery').' - '.Bdf\Core::getInstance()->getConfig("site", "site_map");
+        $message = Bdf\Utils::getText('You asked to reset your password. To do so, please click this link:\n%1$s\nThis will let you change your password to something new. If you didn\'t ask for this, don\'t worry, we\'ll keep your password safe.\nBest regards, %2$s.', Bdf\Utils::makeUrl('password-recovery.html?id='.$user->getId().'&token='.$user->getPasswordRecoveryToken()), Bdf\Core::getInstance()->getConfig("site", "site_name"));
+        $headers = 'From: '.Bdf\Core::getInstance()->getConfig("site", "site_map").' <no-reply@rendsmoimatune.eu>';
 
         mail($user->getEmail(), $title, $message, $headers); 
 

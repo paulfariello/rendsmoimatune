@@ -327,7 +327,7 @@ class User implements \Bdf\IUser
     {
         $currentUser = User::getCurrentUser();
 
-        $title = Utils::getText('Invition to join Rendsmoimatune');
+        $title = Utils::getText('Invitation to join %1$s', Core::getInstance()->getConfig("site", "site_name"));
         $message = "Bonjour %s, ".$currentUser->getName()." vous a invité à rejoindre rendsmoimatune.
 Rendsmoimatune vous permet de savoir en permanance qui vous doit de l'argent, blablabla.
 Pour nous rejoindre cliquez sur le lien suivant : %s";
