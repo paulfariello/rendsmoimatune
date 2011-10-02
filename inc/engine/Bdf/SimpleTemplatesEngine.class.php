@@ -80,6 +80,25 @@ class SimpleTemplatesEngine implements \Bdf\ITemplatesEngine
     }
 
     /**
+     * Inherited from {@link \Bdf\ITemplatesEngine::fetch()}
+     *
+     * @param string $fileName @see \Bdf\ITemplatesEngine::fetch()
+     *
+     * @return void
+     */
+    public function fetch($fileName)
+    {
+        foreach ($this->_vars as $name => $value) {
+            ${$name} = $value;
+        }
+        ob_start();
+        include ROOT.self::TEMPLATES_DIR.$this->_skin."/".$fileName.self::EXTENSION;
+        $return = ob_get_contents();
+        ob_end_clean();
+        return $return;
+    }
+
+    /**
      * Inherited from {@link \Bdf\ITemplatesEngine::initialization()}
      *
      * @return void

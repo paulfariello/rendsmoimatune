@@ -43,11 +43,10 @@ if(isset ($_POST['recover-password'])) {
         $user->generatePasswordRecoveryToken();
         $em->flush();
 
-        $title = Bdf\Utils::getText('Password recovery').' - '.Bdf\Core::getInstance()->getConfig("site", "site_map");
-        $message = Bdf\Utils::getText('You asked to reset your password. To do so, please click this link:\n%1$s\nThis will let you change your password to something new. If you didn\'t ask for this, don\'t worry, we\'ll keep your password safe.\nBest regards, %2$s.', Bdf\Utils::makeUrl('password-recovery.html?id='.$user->getId().'&token='.$user->getPasswordRecoveryToken()), Bdf\Core::getInstance()->getConfig("site", "site_name"));
-        $headers = 'From: '.Bdf\Core::getInstance()->getConfig("site", "site_map").' <no-reply@rendsmoimatune.eu>';
+        $recoveryUrl = Bdf\Utils::makeUrl('password-recovery.html?id='.$user->getId().'&token='.$user->getPasswordRecoveryToken());
 
-        mail($user->getEmail(), $title, $message, $headers); 
+        $mail = new Eu\Rmmt\Mail\PasswordRecoveryMail($user, $recoveryUrl);
+        $mail->send();
 
         $te->assign("messages", array(array("type"=>"done", "content"=>Bdf\Utils::getText('An email has been sent to you in order to reset your password.'))));
         $te->display('password-recovery');

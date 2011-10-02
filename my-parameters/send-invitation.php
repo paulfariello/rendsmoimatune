@@ -116,13 +116,13 @@ if (isset($_POST['send-invitation']) OR isset($_POST['resend-invitation'])) {
         $em->flush();
 
         if (!empty($sended)) {
-            $messages[] = array('type'=>'info', 'content'=>Bdf\Utils::nGetText('Invitation sended to %s.', 'Invitations sended to %s.', sizeof($sended), 'toto'));
+            $messages[] = array('type'=>'info', 'content'=>Bdf\Utils::nGetText('Invitation sended to %1$s.', 'Invitations sended to %1$s.', sizeof($sended), implode(', ', $sended)));
         }
         if (!empty($merged)) {
-            $messages[] = array('type'=>'info', 'content'=>Bdf\Utils::nGetText('%1$s is already on %2$s so we merged his account with your user.', '%1$s are already on %2$s so we merged their account with your users.', sizeof($merged), 'toto', Bdf\Core::getInstance()->getConfig("site","site_name")));
+            $messages[] = array('type'=>'info', 'content'=>Bdf\Utils::nGetText('%1$s is already on %2$s so we merged his account with your user.', '%1$s are already on %2$s so we merged their account with your users.', sizeof($merged), implode(', ', $merged), Bdf\Core::getInstance()->getConfig("site","site_name")));
         }
         if (!empty($mergeRequested)) {
-            $messages[] = array('type'=>'info', 'content'=>Bdf\Utils::nGetText('%1$s is already on %2$s so we proposed him to merged his account with your user.', '%1$s are already on %2$s so we proposed them to merged their account with your users.', sizeof($mergeRequested), 'toto', Bdf\Core::getInstance()->getConfig("site", "site_name")));
+            $messages[] = array('type'=>'info', 'content'=>Bdf\Utils::nGetText('%1$s is already on %2$s so we proposed him to merged his account with your user.', '%1$s are already on %2$s so we proposed them to merged their account with your users.', sizeof($mergeRequested), implode(', ', $mergeRequested), Bdf\Core::getInstance()->getConfig("site", "site_name")));
         }
 
         \Bdf\Session::getInstance()->add('messages',$messages);
@@ -135,6 +135,7 @@ if (isset($_POST['send-invitation']) OR isset($_POST['resend-invitation'])) {
         $te->display('my-parameters/send-invitation');
     } catch(Exception $e) {
         $te->assign('_POST',$_POST);
+        echo $e->getTraceAsString();
         $te->assign('messages', array(array('type'=>'error','content'=>Bdf\Utils::getText('Internal error').' : '.$e->getMessage())));
         $te->display('my-parameters/send-invitation');
     }

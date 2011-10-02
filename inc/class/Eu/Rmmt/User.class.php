@@ -31,6 +31,7 @@ namespace Eu\Rmmt;
 use Doctrine\Common\Collections\ArrayCollection;
 use Bdf\Core;
 use Bdf\Utils;
+use Eu\Rmmt\Mail\InvitationMail;
 use Eu\Rmmt\Exception\MergeException;
 use Eu\Rmmt\Exception\RightException;
 
@@ -327,13 +328,6 @@ class User implements \Bdf\IUser
     {
         $currentUser = User::getCurrentUser();
 
-        $title = Utils::getText('Invitation to join %1$s', Core::getInstance()->getConfig("site", "site_name"));
-        $message = "Bonjour %s, ".$currentUser->getName()." vous a invité à rejoindre rendsmoimatune.
-Rendsmoimatune vous permet de savoir en permanance qui vous doit de l'argent, blablabla.
-Pour nous rejoindre cliquez sur le lien suivant : %s";
-        $header = '';
-
-
         if ($this->getCreator()->equals($currentUser)) {
             if (null != $email) {
                 $this->setEmail($email);
@@ -341,8 +335,11 @@ Pour nous rejoindre cliquez sur le lien suivant : %s";
 
             $this->setInvited(true);
             $this->generateInvitationToken();
-            echo sprintf($message, $this->getName(), Utils::makeUrl('new-account-invitation.html?id='.$this->getId().'&token='.$this->getInvitationToken()));
-            mail($this->getEmail(), $title, sprintf($message, $this->getName(), Utils::makeUrl('new-account-invitation.html?id='.$this->getId().'&token='.$this->getInvitationToken()))); 
+
+            $invitationUrl = Utils::makeUrl('new-account-invitation.html?id='.$this->getId().'&token='.$this->getInvitationToken());
+
+            $mail = new InvitationMail($currentUser, $this, $invitationUrl);
+            $mail->send();
         } else {
            throw new RightException(Utils::getText("You can't send invitation to user you haven't created")); 
         }

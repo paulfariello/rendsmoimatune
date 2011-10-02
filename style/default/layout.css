@@ -126,9 +126,14 @@ h1 span { display: none; }
 	padding: 5px;
 }
 
-
 #container {
 	background: #fff url(../../px/default/content.gif) repeat-y left top;
+	border: 1px solid #ddd;
+	width: 918px;
+}
+
+#container-mail {
+	background: #fff;
 	border: 1px solid #ddd;
 	width: 918px;
 }
@@ -279,6 +284,10 @@ h2 a:hover { text-decoration: underline; }
 
 #full-main {
 	float: right;
+	padding: 1em;
+}
+
+#main-mail {
 	padding: 1em;
 }
 

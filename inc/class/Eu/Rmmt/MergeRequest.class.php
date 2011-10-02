@@ -30,6 +30,7 @@
 namespace Eu\Rmmt;
 use Bdf\Core;
 use Bdf\Utils;
+use Eu\Rmmt\Mail\MergeRequestMail;
 use Eu\Rmmt\Exception\MergeAuthorizationException;
 use Eu\Rmmt\Exception\InvalidMergeRequestTokenException;
 use Eu\Rmmt\Exception\UnknownUserException;
@@ -272,28 +273,8 @@ class MergeRequest extends Entity
 
     private function _sendRequest(User $user, $requestToken, User $other)
     {
-        if ($user->isRegistered()) {
-            $title = Utils::getText('%1$s suggest you merge your account', $this->_requester->getName());
-            $message = Utils::getText('Hi %1$s,'."\n"
-                .'%2$s suggest you merge your account with %3$s\'s account because he thinks they both are yours.'."\n"
-                .'If you think %2$s is right please go to %4$s.', $user->getName(), $this->_requester->getName(), $other->getName(), $this->_getUrlAcceptRequest($requestToken));
-
-            $email = $user->getEmail();
-
-        } else {
-            $title = Utils::getText('%1$s suggest you merge an account you have created', $this->_requester->getName());
-
-            $message = Utils::getText('Hi %1$s,'."\n"
-                .'%2$s suggest you merge %3$s\'s account with %4$s\'s account because he thinks they both are yours.'."\n"
-                .'If you think %2$s is right please go to %5$s.', $user->getCreator()->getName(), $this->_requester->getName(), $user->getName(), $other->getName(), $this->_getUrlAcceptRequest($requestToken));
-
-            $email = $user->getCreator()->getEmail();
-        }
-
-        $headers = "From: no-reply@rendsmoimatune.eu\r\n";
-
-        echo $message;
-        mail($email, $title, $message, $headers); 
+        $mail = new MergeRequestMail($this->_requester, $other, $user, $this->_getUrlAcceptRequest($requestToken));
+        $mail->send();
     }
 
     private function _getUrlAcceptRequest($token)

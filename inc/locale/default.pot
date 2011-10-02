@@ -629,12 +629,12 @@ msgid "You need to be logged in as the user who received the email."
 msgstr ""
 
 msgid ""
-"You steel need the agreement of %1$s and %2$s. For this purpose email have "
+"You still need the agreement of %1$s and %2$s. For this purpose email have "
 "been sent respectively to %3$s and %4$s."
 msgstr ""
 
 msgid ""
-"You steel need the agreement of %1$s. For this purpose an email has been "
+"You still need the agreement of %1$s. For this purpose an email has been "
 "sent to %2$s."
 msgstr ""
 

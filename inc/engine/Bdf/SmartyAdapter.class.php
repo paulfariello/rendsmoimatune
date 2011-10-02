@@ -89,6 +89,18 @@ class SmartyAdapter implements \Bdf\ITemplatesEngine
     }
 
     /**
+     * Inherited from {@link \Bdf\ITemplatesEngine::fetch()}
+     *
+     * @param string $fileName @see \Bdf\ITemplatesEngine::fetch()
+     *
+     * @return void
+     */
+    public function fetch($fileName)
+    {
+        return $this->_smartyInstance->fetch($fileName.self::EXTENSION);
+    }
+
+    /**
      * Inherited from {@link \Bdf\ITemplatesEngine::initialization()}
      *
      * @return void

@@ -693,3 +693,7 @@ p.signature {
     margin-top: 3em;
     font-weight: bold;
 }
+
+.mail {
+    font-size: 150%;
+}

@@ -399,4 +399,107 @@ class Utils
 
         return trim($str, '-');
     }
+
+    public static function replace_uri($subject, $replacement)
+    {
+        // Based on rfc2396
+        // URI-reference = [ absoluteURI | relativeURI ] [ "#" fragment ]
+        //      absoluteURI   = scheme ":" ( hier_part | opaque_part )
+        //      relativeURI   = ( net_path | abs_path | rel_path ) [ "?" query ]
+        //
+        //      hier_part     = ( net_path | abs_path ) [ "?" query ]
+        //      opaque_part   = uric_no_slash *uric
+        //
+        //      uric_no_slash = unreserved | escaped | ";" | "?" | ":" | "@" |
+        //                      "&" | "=" | "+" | "$" | ","
+        //
+        //      net_path      = "//" authority [ abs_path ]
+        //      abs_path      = "/"  path_segments
+        //      rel_path      = rel_segment [ abs_path ]
+        //
+        //      rel_segment   = 1*( unreserved | escaped |
+        //                          ";" | "@" | "&" | "=" | "+" | "$" | "," )
+        //
+        //      scheme        = alpha *( alpha | digit | "+" | "-" | "." )
+        //
+        //      authority     = server | reg_name
+        //
+        //      reg_name      = 1*( unreserved | escaped | "$" | "," |
+        //                          ";" | ":" | "@" | "&" | "=" | "+" )
+        //
+        //      server        = [ [ userinfo "@" ] hostport ]
+        //      userinfo      = *( unreserved | escaped |
+        //                         ";" | ":" | "&" | "=" | "+" | "$" | "," )
+        //
+        //      hostport      = host [ ":" port ]
+        //      host          = hostname | IPv4address
+        //      hostname      = *( domainlabel "." ) toplabel [ "." ]
+        //      domainlabel   = alphanum | alphanum *( alphanum | "-" ) alphanum
+        //      toplabel      = alpha | alpha *( alphanum | "-" ) alphanum
+        //      IPv4address   = 1*digit "." 1*digit "." 1*digit "." 1*digit
+        //      port          = *digit
+        //
+        //      path          = [ abs_path | opaque_part ]
+        //      path_segments = segment *( "/" segment )
+        //      segment       = *pchar *( ";" param )
+        //      param         = *pchar
+        //      pchar         = unreserved | escaped |
+        //                      ":" | "@" | "&" | "=" | "+" | "$" | ","
+        //
+        //      query         = *uric
+        //
+        //      fragment      = *uric
+        //
+        //      uric          = reserved | unreserved | escaped
+        //      reserved      = ";" | "/" | "?" | ":" | "@" | "&" | "=" | "+" |
+        //                      "$" | ","
+        //      unreserved    = alphanum | mark
+        //      mark          = "-" | "_" | "." | "!" | "~" | "*" | "'" |
+        //                      "(" | ")"
+        //
+        //      escaped       = "%" hex hex
+        //      hex           = digit | "A" | "B" | "C" | "D" | "E" | "F" |
+        //                              "a" | "b" | "c" | "d" | "e" | "f"
+        //
+        //      alphanum      = alpha | digit
+        //      alpha         = lowalpha | upalpha
+        //
+        //      lowalpha = "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" |
+        //                 "j" | "k" | "l" | "m" | "n" | "o" | "p" | "q" | "r" |
+        //                 "s" | "t" | "u" | "v" | "w" | "x" | "y" | "z"
+        //      upalpha  = "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "I" |
+        //                 "J" | "K" | "L" | "M" | "N" | "O" | "P" | "Q" | "R" |
+        //                 "S" | "T" | "U" | "V" | "W" | "X" | "Y" | "Z"
+        //      digit    = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" |
+        //                 "8" | "9"
+        //
+
+        $escaped       = '%[[:xdigit:]][[:xdigit:]]';
+        $mark          = '[-_.!~*\'()]';
+        $reserved      = '[;/?:@&=+$,]';
+        $unreserved    = '([[:alnum:]]|'.$mark.')';
+        $pchar         = '('.$unreserved.'|'.$escaped.'|[:@&=+$,])';
+        $param         = '('.$pchar.')*';
+        $segment       = '('.$pchar.')*'.'(;'.$param.')*';
+        $path_segments = $segment.'(/'.$segment.')*';
+        $abs_path      = '/'.$path_segments;
+        $port          = '[[:digit:]]*';
+        $toplabel      = '[[:alpha:]]|[[:alpha:]]([[:alnum:]]|-)*[[:alnum:]]';
+        $domainlabel   = '[[:alnum:]]|[[:alnum:]]([[:alnum:]]|-)*[[:alnum:]]';
+        $hostname      = '('.$domainlabel.'\.)*'.$toplabel.'\.?';
+        $host          = '('.$hostname.'|'.$IPv4address.')';
+        $hostport      = $host.'(:'.$port.')?';
+        $userinfo      = 'todo';
+        $server        = '(('.$userinfo.'@)?'.$hostport.')?';
+        $authority     = $server;
+        $net_path      = '//'.$authority.'('.$abs_path.')?';
+        $uric          = '('.$reserved.'|'.$unreserved.'|'.$escaped.')';
+        $query         = '('.$uric.')*';
+        $hier_part     = $net_path.'(\?'.$query.')?';
+        $scheme        = '[[:alpha:]]([[:alnum:]+-.])*';
+        $absoluteURI   = $scheme.':'.$hier_part;
+        $pattern       = '#('.$absoluteURI.')#i';
+
+        return preg_replace($pattern, $replacement, $subject);
+    }
 }
