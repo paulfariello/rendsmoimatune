@@ -152,7 +152,7 @@ try {
 
                     $beneficiary = Eu\Rmmt\User::findByIdOrName($id, $name, $account, $currentUser);
 
-                    if ($null == $beneficiary) {
+                    if (null == $beneficiary) {
                         // Create new user
                         $beneficiary = Eu\Rmmt\UserFactory::createUnregisteredUser($currentUser, $name);
                     }
