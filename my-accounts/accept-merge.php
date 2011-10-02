@@ -75,9 +75,9 @@ try {
         $messages[] = array(
             'type'    => 'warning',
             'content' => Bdf\Utils::getText(
-                'You steel need the agreement of %1$s. For this purpose an email has been sent to %2$s.',
-                $requiredAgreement[0]->getName(),
-                $requiredAgreement[0]->getEmail()
+                'You still need the agreement of %1$s. For this purpose an email has been sent to %2$s.',
+                $requiredAgreement[0]->isRegistered()?$requiredAgreement[0]->getName():$requiredAgreement[0]->getCreator()->getName(),
+                $requiredAgreement[0]->isRegistered()?$requiredAgreement[0]->getEmail():$requiredAgreement[0]->getCreator()->getEmail()
             )
         );
     } elseif (sizeof($requiredAgreement) == 2) {
@@ -85,11 +85,11 @@ try {
         $messages[] = array(
             'type'    => 'warning',
             'content' => Bdf\Utils::getText(
-                'You steel need the agreement of %1$s and %2$s. For this purpose email have been sent respectively to %3$s and %4$s.',
-                $requiredAgreement[0]->getName(),
-                $requiredAgreement[1]->getName(),
-                $requiredAgreement[0]->getEmail(),
-                $requiredAgreement[1]->getEmail()
+                'You still need the agreement of %1$s and %2$s. For this purpose email have been sent respectively to %3$s and %4$s.',
+                $requiredAgreement[0]->isRegistered()?$requiredAgreement[0]->getName():$requiredAgreement[0]->getCreator()->getName(),
+                $requiredAgreement[1]->isRegistered()?$requiredAgreement[1]->getName():$requiredAgreement[1]->getCreator()->getName(),
+                $requiredAgreement[0]->isRegistered()?$requiredAgreement[0]->getEmail():$requiredAgreement[0]->getCreator()->getEmail(),
+                $requiredAgreement[1]->isRegistered()?$requiredAgreement[1]->getEmail():$requiredAgreement[1]->getCreator()->getEmail()
             )
         );
     } else {

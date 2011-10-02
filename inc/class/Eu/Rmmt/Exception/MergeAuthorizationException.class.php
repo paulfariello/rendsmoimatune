@@ -65,18 +65,18 @@ class MergeAuthorizationException extends \Exception {
                 'You can\'t merge user %1$s with user %2$s on your own. You need the agreement of %3$s. For this purpose an email has been sent to %4$s.',
                 $this->_mergeRequest->getFirstUser()->getName(),
                 $this->_mergeRequest->getSecondUser()->getName(),
-                $this->_requiredAgreement[0]->getName(),
-                $this->_requiredAgreement[0]->getEmail()
+                $this->_requiredAgreement[0]->isRegistered()?$this->_requiredAgreement[0]->getName():$this->_requiredAgreement[0]->getCreator()->getName(),
+                $this->_requiredAgreement[0]->isRegistered()?$this->_requiredAgreement[0]->getEmail():$this->_requiredAgreement[0]->getCreator()->getEmail()
             );
         } elseif (sizeof($this->_requiredAgreement) == 2) {
             $this->message = Utils::getText(
                 'You can\'t merge user %1$s with user %2$s on your own. You need the agreement of %3$s and %4$s. For this purpose email have been sent respectively to %5$s and %6$s.',
                 $this->_mergeRequest->getFirstUser()->getName(),
                 $this->_mergeRequest->getSecondUser()->getName(),
-                $this->_requiredAgreement[0]->getName(),
-                $this->_requiredAgreement[1]->getName(),
-                $this->_requiredAgreement[0]->getEmail(),
-                $this->_requiredAgreement[1]->getEmail()
+                $this->_requiredAgreement[0]->isRegistered()?$this->_requiredAgreement[0]->getName():$this->_requiredAgreement[0]->getCreator()->getName(),
+                $this->_requiredAgreement[1]->isRegistered()?$this->_requiredAgreement[1]->getName():$this->_requiredAgreement[1]->getCreator()->getName(),
+                $this->_requiredAgreement[0]->isRegistered()?$this->_requiredAgreement[0]->getEmail():$this->_requiredAgreement[0]->getCreator()->getEmail(),
+                $this->_requiredAgreement[1]->isRegistered()?$this->_requiredAgreement[1]->getEmail():$this->_requiredAgreement[1]->getCreator()->getEmail()
             );
         } else {
             // Should never happen
