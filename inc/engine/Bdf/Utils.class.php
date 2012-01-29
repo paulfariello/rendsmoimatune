@@ -484,9 +484,10 @@ class Utils
         $path_segments = $segment.'(/'.$segment.')*';
         $abs_path      = '/'.$path_segments;
         $port          = '[[:digit:]]*';
-        $toplabel      = '[[:alpha:]]|[[:alpha:]]([[:alnum:]]|-)*[[:alnum:]]';
-        $domainlabel   = '[[:alnum:]]|[[:alnum:]]([[:alnum:]]|-)*[[:alnum:]]';
-        $hostname      = '('.$domainlabel.'\.)*'.$toplabel.'\.?';
+        $toplabel      = '([[:alpha:]]([[:alnum:]]|-)*[[:alnum:]])|([[:alpha:]])';
+        $domainlabel   = '([[:alnum:]]([[:alnum:]]|-)*[[:alnum:]])|([[:alnum:]])';
+        $hostname      = '(('.$domainlabel.'\.)*'.$toplabel.'\.?)';
+        $IPv4address   = '(todo)';
         $host          = '('.$hostname.'|'.$IPv4address.')';
         $hostport      = $host.'(:'.$port.')?';
         $userinfo      = 'todo';
