@@ -49,14 +49,14 @@ class MergeRequestMail extends Mail
             $subject = Utils::getText('%1$s suggest you merge your account', $requester->getName());
             $message = Utils::getText('Hi %1$s,'."\n"
                 .'%2$s suggest you merge your account with %3$s\'s account because he thinks they both are yours.'."\n"
-                .'If you think %2$s is right please go to %4$s.', $requestedUser->getName(), $requester->getName(), $userToMerge->getName(), $acceptRequestUrl);
+                .'If you think %2$s is right please go to %4$s .', $requestedUser->getName(), $requester->getName(), $userToMerge->getName(), $acceptRequestUrl);
 
             $to = $requestedUser;
         } else {
             $subject = Utils::getText('%1$s suggest you merge an account you have created', $requester->getName());
             $message = Utils::getText('Hi %1$s,'."\n"
                 .'%2$s suggest you merge %3$s\'s account with %4$s\'s account because he thinks they both are yours.'."\n"
-                .'If you think %2$s is right please go to %5$s.', $requestedUser->getCreator()->getName(), $requester->getName(), $userToMerge->getName(), $requestedUser->getName(), $acceptRequestUrl);
+                .'If you think %2$s is right please go to %5$s .', $requestedUser->getCreator()->getName(), $requester->getName(), $userToMerge->getName(), $requestedUser->getName(), $acceptRequestUrl);
 
             $to = $requestedUser->getCreator();
         }
