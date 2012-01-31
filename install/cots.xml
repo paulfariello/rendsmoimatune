@@ -1,7 +1,9 @@
 <xml>
     <doctrine>
-        <release name="2.0.1" url="http://www.doctrine-project.org/downloads/DoctrineORM-2.0.1-full.tar.gz" md5sum="078ab54e6a4d04910a2f3850ffa7208a" extractPath="doctrine-orm" />
-        <release name="2.0.0-BETA4" url="http://www.doctrine-project.org/downloads/DoctrineORM-2.0.0BETA4-full.tar.gz" md5sum="30f1bab35480e54161f56e03196bdfab" extractPath="doctrine-orm" />
+        <release name="2.2.0" url="http://www.doctrine-project.org/downloads/DoctrineORM-2.2.0-full.tar.gz" md5sum="18ea452323e2d9f9cbc38bcb8517bc3b" extractPath="doctrine-orm" />
+        <release name="2.0.7" url="http://www.doctrine-project.org/downloads/DoctrineORM-2.0.7-full.tar.gz" md5sum="e5187d30926920cb09b9ea1326051e06" extractPath="doctrine-orm" />
+        <release name="2.0.1 (deprecated)" url="http://www.doctrine-project.org/downloads/DoctrineORM-2.0.1-full.tar.gz" md5sum="078ab54e6a4d04910a2f3850ffa7208a" extractPath="doctrine-orm" />
+        <release name="2.0.0-BETA4 (deprecated)" url="http://www.doctrine-project.org/downloads/DoctrineORM-2.0.0BETA4-full.tar.gz" md5sum="30f1bab35480e54161f56e03196bdfab" extractPath="doctrine-orm" />
     </doctrine>
     <templates>
         <engine name="smarty">
