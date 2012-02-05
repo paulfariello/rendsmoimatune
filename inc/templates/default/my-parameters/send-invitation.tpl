@@ -10,7 +10,7 @@
     <form action="{makeUrl url='my-parameters/send-invitation.html'}" class="jNice" method="post">
         <fieldset>
             {foreach from=$users item='user'}
-                <p><label for="email[{$user->getId()}]">{$user->getName()}</label><input type="text" class="text-long {if isset({$_POST.send-invitation}) && isset($alreadyRegistered[$user->getId()])}user-input-exception{/if}" name="email[{$user->getId()}]" value="{if isset({$_POST.send-invitation}) && isset($_POST.email[$user->getId()])}{$_POST.email[$user->getId()]}{/if}" /></p>
+                <p><label for="email[{$user->getId()}]">{$user->getName()|htmlProtect}</label><input type="text" class="text-long {if isset({$_POST.send-invitation}) && isset($alreadyRegistered[$user->getId()])}user-input-exception{/if}" name="email[{$user->getId()}]" value="{if isset({$_POST.send-invitation}) && isset($_POST.email[$user->getId()])}{$_POST.email[$user->getId()]}{/if}" /></p>
             {/foreach}
             <input type="submit" name="send-invitation" value="{getText id='Send'}" />
         </fieldset>
@@ -34,7 +34,7 @@
 <form action="{makeUrl url='my-parameters/send-invitation.html'}" class="jNice" method="post">
     <fieldset>
         {foreach from=$invitedUsers item='user'}
-            <p><label for="email[{$user->getId()}]">{$user->getName()}</label><input type='checkbox' name="invite[]" value="{$user->getId()}" class="checkbox"/><input type="text" class="text-long" name="email[{$user->getId()}]" value="{$user->getEmail()}" /><span class="invited-user"></span></p>
+            <p><label for="email[{$user->getId()}]">{$user->getName()|htmlProtect}</label><input type='checkbox' name="invite[]" value="{$user->getId()}" class="checkbox"/><input type="text" class="text-long" name="email[{$user->getId()}]" value="{$user->getEmail()|htmlProtect}" /><span class="invited-user"></span></p>
         {/foreach}
         <input type="submit" name="resend-invitation" value="{getText id='Send again'}" />
     </fieldset>
