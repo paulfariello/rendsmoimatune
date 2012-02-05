@@ -49,7 +49,10 @@ class Session
     const FIELD_USER_ID = "bdf-user-id";
     const FIELD_CRASH = "bdf-crash";
     const FIELD_CHALLENGE = "bdf-challenge-id";
+    const FIELD_CSRF_TOKENS = "bdf-csrf-tokens";
     const COOKIE_LIFETIME = 604800;
+
+    private $_protectedFields = array(self::FIELD_CRASH, self::FIELD_USER_ID, self::FIELD_CHALLENGE, self::FIELD_CSRF_TOKENS);
 
     /**
      * Constructeur
@@ -151,7 +154,7 @@ class Session
     public function add($name,$value)
     {
 
-        if ($name != self::FIELD_USER_ID AND $name != self::FIELD_CRASH) {
+        if (!in_array($name, $this->_protectedFields)) {
             $this->_values[$name] = $value;
             $_SESSION[self::FIELD_CRASH][$name] = $value;
         } else {
@@ -290,6 +293,43 @@ class Session
     public function removeCurrentUser()
     {
         $this->setCurrentUserId(null);
+    }
+
+    /**
+     * Enregistre un jeton de protection contre les CSRF
+     *
+     * @param string $id    l'identifiant du jeton
+     * @param string $token le jeton
+     *
+     * @return void
+     */
+    public function storeCSRFToken($id, $token)
+    {
+        $this->_values[self::FIELD_CSRF_TOKENS][$id] = $token;
+    }
+
+    /**
+     * Retourne un jeton de protection contre les CSRF
+     *
+     * @param string $id l'identifiant du jeton demandé
+     *
+     * @return string
+     */
+    public function getCSRFToken($id)
+    {
+        return $this->_values[self::FIELD_CSRF_TOKENS][$id];
+    }
+
+    /**
+     * Efface un jeton de protection contre les CSRF
+     *
+     * @param string $id l'identifiant du jeton demandé
+     *
+     * @return void
+     */
+    public function revokeCSRFToken($id)
+    {
+        unset($this->_values[self::FIELD_CSRF_TOKENS][$id]);
     }
 
     /**

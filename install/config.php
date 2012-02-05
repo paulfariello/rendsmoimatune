@@ -127,7 +127,8 @@ if (isset($_POST['create-config-file'])) {
             mkdir('../'.$_POST['site-style-dir'].$_POST['site-skin'].'/',0770,true);
         }
         if (!file_exists('../'.$_POST['site-javascript-dir'])) {
-            mkdir('../'.$_POST['site-javascript-dir'],0770,true);
+            mkdir('../'.$_POST['site-javascript-dir'].$_POST['site-skin'].'/',0770,true);
+            mkdir('../'.$_POST['site-javascript-dir'].$_POST['javascript-framework-dir'].'/',0770,true);
         }
     }
 
@@ -205,17 +206,30 @@ if (isset($_POST['create-config-file'])) {
             </optgroup>
             <?php endforeach; ?>
         </select><br />
+<<<<<<< HEAD
         <label for="templates-dir">Templates directory</label><input name="templates-dir" type="text" value="templates/" /><br />
         <label for="templates-compiled-dir">Templates compiled directory</label><input name="templates-compiled-dir" type="text" value="templates_c/" /><br />
     </fieldset>
     <fieldset>
         <legend>Site</legend>
         <label for="site-url">Url</label><input name="site-url" type="text" value="http://" /><br />
+=======
+        <label for="templates-dir">Templates directory</label><input name="templates-dir" type="text" value="inc/templates/" /><br />
+        <label for="templates-compiled-dir">Templates compiled directory</label><input name="templates-compiled-dir" type="text" value="inc/templates_c/" /><br />
+    </fieldset>
+    <fieldset>
+        <legend>Site</legend>
+<label for="site-url">Url</label><input name="site-url" type="text" value="http://<?php echo $_SERVER['HTTP_HOST'].substr($_SERVER['REQUEST_URI'], 0, -strlen('install/config.php')); ?>" /><br />
+>>>>>>> BotteDeFoin/master
         <label for="site-image-dir">Image directory</label><input name="site-image-dir" type="text" value="px/" /><br />
         <label for="site-style-dir">Css directory</label><input name="site-style-dir" type="text" value="style/" /><br />
         <label for="site-javascript-dir">Js directory</label><input name="site-javascript-dir" type="text" value="js/" /><br />
         <label for="site-skin">Skin</label><input name="site-skin" type="text" value="default" /><br />
+<<<<<<< HEAD
         <label for="site-namespace">Namespace</label><input name="site-namespace" type="text" value="" /><br />
+=======
+        <label for="site-namespace">Namespace (do not start with \)</label><input name="site-namespace" type="text" value="" /><br />
+>>>>>>> BotteDeFoin/master
     </fieldset>
     <fieldset>
         <legend>Javascript</legend>

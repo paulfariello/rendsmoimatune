@@ -1,0 +1,42 @@
+;Configuration file automaticaly created by BotteDeFoin on Tue, 31 Aug 2010 13:11:29 +0200
+[logger]
+;See possible values in Bdf\Logger class
+level = "DEBUG"
+
+[sgbd]
+;See supported drivers by DBAL from Doctrine project
+driver = "pdo_mysql"
+host = "localhost"
+user = ""
+password = ""
+database_name= ""
+;Hash method is used for encrypted password stored in database
+;See possible values with hash_algos() php function
+hash = "sha512"
+
+[doctrine]
+release = "2.0.0-BETA3"
+proxy_dir = "inc/proxy/"
+;Namespace should not start with \
+proxy_namespace = "Bdf\Model\Proxy"
+mapping_dir = "inc/mapping/"
+;See cache engine supported by your version of Doctrine
+;cache = ""
+[templates]
+engine = "smarty"
+release = "3.0-RC1"
+dir = "templates/"
+;Line can be commented if your templates engine doesn't need special directory for compiled templates files
+compiled_dir = "templates_c/"
+
+[site]
+;Root url of your site. Used when you create link
+url = ""
+;You should store images that are used with css here.
+;That means not user uploaded images, and more generaly not images that represents site contents. My 2 cents...
+image_dir = "px/"
+style_dir = "style/"
+javascript_dir = "js/"
+skin = "default"
+;Namespace should not start with \
+namespace = ""

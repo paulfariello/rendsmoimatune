@@ -49,7 +49,8 @@ class SmartyAdapter implements \Bdf\ITemplatesEngine
     private $_smartyInstance = null;
     private $_functions      = array(
         'makeUrl',
-        'getText'
+        'getText',
+        'generateCSRFToken'
     );
     private $_modifiers      = array(
         'intToByteQuantity',
@@ -138,19 +139,6 @@ class SmartyAdapter implements \Bdf\ITemplatesEngine
     }
 
     /**
-     * Encapsulation de {@link \Bdf\Utils::isCurrentPage()}
-     *
-     * @param array  $params @see \Bdf\Utils::isCurrentPage()
-     * @param Smarty $smarty instance de Smarty
-     *
-     * @return @see \Bdf\Utils::isCurrentPage()
-     */
-    public function utilsIsCurrentPage($param)
-    {
-        return \Bdf\Utils::isCurrentPage($param);
-    }
-
-    /**
      * Encapsulation de {@link \Bdf\Utils::moneyFormat()}
      *
      * @param array  $params @see \Bdf\Utils::moneyFormat()
@@ -161,6 +149,32 @@ class SmartyAdapter implements \Bdf\ITemplatesEngine
     public function utilsMoneyFormat($param)
     {
         return \Bdf\Utils::moneyFormat($param);
+    }
+
+    /**
+     * Encapsulation de {@link \Bdf\Utils::CSRFToken()}
+     *
+     * @param array  $params @see \Bdf\Utils::CSRFToken()
+     * @param Smarty $smarty instance de Smarty
+     *
+     * @return @see \Bdf\Utils::htmlProtect()
+     */
+    public function utilsGenerateCSRFToken($params, $smarty)
+    {
+        return \Bdf\Utils::generateCSRFToken($params['id']);
+    }
+
+    /**
+     * Encapsulation de {@link \Bdf\Utils::isCurrentPage()}
+     *
+     * @param array  $params @see \Bdf\Utils::isCurrentPage()
+     * @param Smarty $smarty instance de Smarty
+     *
+     * @return @see \Bdf\Utils::isCurrentPage()
+     */
+    public function utilsIsCurrentPage($param)
+    {
+        return \Bdf\Utils::isCurrentPage($param);
     }
 
     /**
@@ -291,5 +305,15 @@ class SmartyAdapter implements \Bdf\ITemplatesEngine
     public function getSmartyInstance()
     {
         return $this->smartyInstance();
+    }
+
+    /**
+     * Enable or disable debugging console
+     *
+     * @param boolean $debugging
+     */
+    public function setDebugging($debugging)
+    {
+        $this->_smartyInstance->debugging = (bool)$debugging;
     }
 }

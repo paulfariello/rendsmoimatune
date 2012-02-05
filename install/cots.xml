@@ -1,9 +1,11 @@
 <xml>
     <doctrine>
+        <release name="2.0.1" url="http://www.doctrine-project.org/downloads/DoctrineORM-2.0.1-full.tar.gz" md5sum="078ab54e6a4d04910a2f3850ffa7208a" extractPath="doctrine-orm" />
         <release name="2.0.0-BETA4" url="http://www.doctrine-project.org/downloads/DoctrineORM-2.0.0BETA4-full.tar.gz" md5sum="30f1bab35480e54161f56e03196bdfab" extractPath="doctrine-orm" />
     </doctrine>
     <templates>
         <engine name="smarty">
+            <release name="3.0.7" url="http://www.smarty.net/files/Smarty-3.0.7.tar.gz" md5sum="95a95b6d86e21281438209ecfc5afab7" extractPath="Smarty-3.0.7/libs" />
             <release name="3.0-RC1" url="http://www.smarty.net/do_download.php?download_file=Smarty-3.0rc1.tar.gz" md5sum="bc1c8d4e91acd2242a40225bccf11994" extractPath="Smarty-3.0rc1/libs" />
         </engine>
         <engine name="simpleTemplatesEngine">
