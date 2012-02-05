@@ -51,6 +51,15 @@ interface ITemplatesEngine
     public function display($fileName);
 
     /**
+     * Lance la génération d'une page via un templates et retourne le résultat au lieux de l'afficher sur la sortie standard
+     *
+     * @param string $fileName Le nom du templates à afficher
+     *
+     * @return void
+     */
+    public function fetch($fileName);
+
+    /**
      * Change le skin à utiliser pour la génération des templates
      *
      * @param string $skinName L'identifiant du skin
