@@ -263,6 +263,7 @@ class Session
      */
     public function setCurrentUserId($userId)
     {
+        session_regenerate_id(true);
         $_SESSION[self::FIELD_CRASH][self::FIELD_USER_ID] = $userId;
         $this->_userId = $userId;
     }
