@@ -156,6 +156,40 @@ class Utils
     }
 
     /**
+     * Generate a token for csrf protection
+     *
+     * @param string $id an identifier for the token
+     *
+     * @return string
+     */
+    public static function generateCSRFToken($id)
+    {
+        $token = hash_hmac('SHA512', mt_rand(), $id);
+        Session::getInstance()->storeCSRFToken($id, $token);
+        return $token;
+    }
+
+    /**
+     * Check validity of CSRFToken
+     *
+     * @param string $id    token identifier
+     * @param string $token token
+     *
+     * @return boolean
+     */
+    public static function checkCSRFToken($id, $token)
+    {
+        $session = Session::getInstance();
+        if ($session->getCSRFToken($id) == $token) {
+            $session->revokeCSRFToken($id);
+            return true;
+        } else {
+            throw new \Exception("Invalid CSRF token");
+            return false;
+        }
+    }
+
+    /**
      * Transforme un entier en taille d'octet
      */
     public static function intToByteQuantity($int)

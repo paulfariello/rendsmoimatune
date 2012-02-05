@@ -49,7 +49,8 @@ class SmartyAdapter implements \Bdf\ITemplatesEngine
     private $_smartyInstance = null;
     private $_functions      = array(
         'makeUrl',
-        'getText'
+        'getText',
+        'generateCSRFToken'
     );
     private $_modifiers      = array(
         'intToByteQuantity',
@@ -135,6 +136,19 @@ class SmartyAdapter implements \Bdf\ITemplatesEngine
         } else {
             return \Bdf\Utils::makeUrl($params['url']);
         }
+    }
+
+    /**
+     * Encapsulation de {@link \Bdf\Utils::CSRFToken()}
+     *
+     * @param array  $params @see \Bdf\Utils::CSRFToken()
+     * @param Smarty $smarty instance de Smarty
+     *
+     * @return @see \Bdf\Utils::htmlProtect()
+     */
+    public function utilsGenerateCSRFToken($params, $smarty)
+    {
+        return \Bdf\Utils::generateCSRFToken($params['id']);
     }
 
     /**
@@ -279,5 +293,15 @@ class SmartyAdapter implements \Bdf\ITemplatesEngine
     public function getSmartyInstance()
     {
         return $this->smartyInstance();
+    }
+
+    /**
+     * Enable or disable debugging console
+     *
+     * @param boolean $debugging
+     */
+    public function setDebugging($debugging)
+    {
+        $this->_smartyInstance->debugging = (bool)$debugging;
     }
 }
