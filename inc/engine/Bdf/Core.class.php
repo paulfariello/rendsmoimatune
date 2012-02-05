@@ -150,6 +150,7 @@ class Core
             $this->_doctrineInitialization();
             $this->_sessionInitialization();
             $this->_templatesEngineInitialization();
+            $this->_i18nInitialization();
             $this->_initialized = true;
         }
     }
@@ -281,6 +282,27 @@ class Core
         $this->_session->initialization();
     }
 
+    /**
+     * Initialisation de l'internationalisation
+     *
+     * @return void
+     */
+    private function _i18nInitialization()
+    {
+        putenv("LANG=".$this->getLocale().".utf8"); // On modifie la variable d'environnement
+        setlocale(LC_ALL, $this->getLocale());
+        setLocale(LC_TIME, $this->getLocale());
+        setLocale(LC_MESSAGES, $this->getLocale().".UTF-8");
+        setLocale(LC_MONETARY, $this->getLocale());
+        bindtextdomain($this->getConfig("i18n", "main_domain"), ROOT.$this->getConfig("i18n","locales_dir"));
+        bind_textdomain_codeset($this->getConfig("i18n", "main_domain"), 'UTF-8');
+        textdomain($this->getConfig("i18n", "main_domain"));
+    }
+
+    public function getLocale()
+    {
+        return "fr_FR";
+    }
 
     /**
      * Accesseur à l'instance du moteur de templates
