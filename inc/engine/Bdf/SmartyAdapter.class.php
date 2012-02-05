@@ -48,11 +48,14 @@ class SmartyAdapter implements \Bdf\ITemplatesEngine
     private $_skin           = null;
     private $_smartyInstance = null;
     private $_functions      = array(
-        'makeUrl'
+        'makeUrl',
+        'getText'
     );
     private $_modifiers      = array(
         'intToByteQuantity',
-        'isCurrentPage'
+        'isCurrentPage',
+        'htmlProtect',
+        'moneyFormat'
     );
 
     /**
@@ -83,6 +86,18 @@ class SmartyAdapter implements \Bdf\ITemplatesEngine
     public function display($fileName)
     {
         $this->_smartyInstance->display($fileName.self::EXTENSION);
+    }
+
+    /**
+     * Inherited from {@link \Bdf\ITemplatesEngine::fetch()}
+     *
+     * @param string $fileName @see \Bdf\ITemplatesEngine::fetch()
+     *
+     * @return void
+     */
+    public function fetch($fileName)
+    {
+        return $this->_smartyInstance->fetch($fileName.self::EXTENSION);
     }
 
     /**
@@ -133,6 +148,44 @@ class SmartyAdapter implements \Bdf\ITemplatesEngine
     public function utilsIsCurrentPage($param)
     {
         return \Bdf\Utils::isCurrentPage($param);
+    }
+
+    /**
+    /**
+     * Encapsulation de {@link \Bdf\Utils::htmlProtect()}
+     *
+     * @param array  $params @see \Bdf\Utils::htmlProtect()
+     * @param Smarty $smarty instance de Smarty
+     *
+     * @return @see \Bdf\Utils::htmlProtect()
+     */
+    public function utilsHtmlProtect($param)
+    {
+        return \Bdf\Utils::htmlProtect($param);
+    }
+
+    /**
+     * Encapsulation de {@link \Bdf\Utils::isCurrentPage()}
+     * Must have a param named id wich corresponds to the text id
+     * and may have params named argN wich will be replaced in the text
+     *
+     * @param array  $params @see \Bdf\Utils::isCurrentPage()
+     * @param Smarty $smarty instance de Smarty
+     *
+     * @return @see \Bdf\Utils::isCurrentPage()
+     */
+    public function utilsGetText($params, $smarty)
+    {
+        $id = $params['id'];
+        $args = array();
+        foreach($params as $index => $value) {
+            $matches = array();
+            if (preg_match_all("#^arg([0-9]+)$#", $index, $matches, PREG_PATTERN_ORDER)) {
+                $args[(int)$matches[1][0]] = $value;
+            }
+        }
+        ksort($args);
+        return \Bdf\Utils::getText($id, $args);
     }
 
     /**
