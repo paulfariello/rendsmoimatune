@@ -151,4 +151,37 @@ class Utils
         }
         return round($int,2)." ".$suffix[$i];
     }
+
+    /**
+     * Get translation of the string
+     */
+    public static function getText($str)
+    {
+        if (func_num_args() > 1) {
+            if (is_array(func_get_arg(1))) {
+                return vsprintf(getText($str), func_get_arg(1));
+            } else {
+                return vsprintf(getText($str), array_slice(func_get_args(), 1));
+            }
+        } else {
+            return getText($str);
+        }
+        
+    }
+
+    /**
+     * Get plural translation of the string
+     */
+    public static function nGetText($str1, $str2, $n)
+    {
+        if (func_num_args() > 3) {
+            if (is_array(func_get_arg(3))) {
+                return vsprintf(ngetText($str1, $str2, $n), func_get_arg(3));
+            } else {
+                return vsprintf(ngetText($str1, $str2, $n), array_slice(func_get_args(), 3));
+            }
+        } else {
+            return ngetText($str);
+        }
+    }
 }
