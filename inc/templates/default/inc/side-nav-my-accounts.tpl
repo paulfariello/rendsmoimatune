@@ -4,7 +4,7 @@
             {foreach from=$currentUser->getAccounts() item='account'}
                 {if isset($currentAccount) and $currentAccount->getId() == $account->getId()}
                     <li class="active">
-                        <a class="account" href="{$account->getUrlDetail()}">{$account->getName()}</a>
+                        <a class="account" href="{$account->getUrlDetail()}">{$account->getName()|htmlProtect}</a>
                         <ul class="subNav">
                             <li>
                                 <a href="{$currentAccount->getUrlExpendituresList()}" class="expenditure">{getText id="Expenditures"}</a>
