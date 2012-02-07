@@ -209,7 +209,7 @@ class Core
         $this->_doctrineConfig->setMetadataDriverImpl($driver);
         $this->_doctrineConfig->setSqlLogger($this->logger);
 
-        if ($this->getConfig('doctrine', 'cache') == 'apc') {
+        if ($this->getConfig('doctrine', 'cache', false) == 'apc') {
             $cache = new \Doctrine\Common\Cache\ApcCache();
             $this->_doctrineConfig->setMetadataCacheImpl($cache);
             $this->_doctrineConfig->setQueryCacheImpl($cache);
