@@ -318,15 +318,19 @@ class Core
     /**
      * Accesseur à un élément de la configuration
      *
-     * @param string $section La section de configuration
-     * @param string $var     La variable de configuration
+     * @param string  $section La section de configuration
+     * @param string  $var     La variable de configuration
+     * @param boolean $strict  Est-ce qu'on génère une erreur si la configuration n'existe pas ?
      * 
      * @return string
      */
-    public function getConfig($section,$var)
+    public function getConfig($section, $var, $strict = true)
     {
         if (isset($this->_config[$section][$var])) {
             return $this->_config[$section][$var];
+        }
+        if ($strict) {
+            trigger_error("Cannot find configuration ".$var." in section : ".$section, E_USER_WARNING);
         }
         return null;
     }
