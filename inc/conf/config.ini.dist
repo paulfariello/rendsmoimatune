@@ -41,3 +41,4 @@ javascript_dir = "js/"
 skin = "default"
 ;Namespace should not start with \
 namespace = ""
+breadcrumb_separator = " — "
