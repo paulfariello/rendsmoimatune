@@ -537,4 +537,15 @@ class Utils
 
         return preg_replace($pattern, $replacement, $subject);
     }
+
+    public static function getBreadcrumb()
+    {
+        $numArgs = func_num_args();
+        $breadcrumb = \Bdf\Core::getInstance()->getConfig('site', 'title');
+        for ($i = 0; $i < $numArgs; $i++) {
+            $breadcrumb .= " – ".func_get_arg($i); 
+        }
+
+        return $breadcrumb;
+    }
 }

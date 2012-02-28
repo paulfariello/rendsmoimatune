@@ -95,6 +95,7 @@ if (isset($_POST['create-config-file'])) {
     fwrite($f,EOL);
 
     fwrite($f,'[site]'.EOL);
+    fwrite($f,'title = "'.$_POST['site-title'].'"'.EOL);
     fwrite($f,";Root url of your site. Used when you create link".EOL);
     fwrite($f,'url = "'.$_POST['site-url'].'"'.EOL);
     fwrite($f,";You should store images that are used with css here.".EOL.";That means no user uploaded images, and more generaly no images that represents site contents. My 2 cents...".EOL);
@@ -206,30 +207,18 @@ if (isset($_POST['create-config-file'])) {
             </optgroup>
             <?php endforeach; ?>
         </select><br />
-<<<<<<< HEAD
-        <label for="templates-dir">Templates directory</label><input name="templates-dir" type="text" value="templates/" /><br />
-        <label for="templates-compiled-dir">Templates compiled directory</label><input name="templates-compiled-dir" type="text" value="templates_c/" /><br />
-    </fieldset>
-    <fieldset>
-        <legend>Site</legend>
-        <label for="site-url">Url</label><input name="site-url" type="text" value="http://" /><br />
-=======
         <label for="templates-dir">Templates directory</label><input name="templates-dir" type="text" value="inc/templates/" /><br />
         <label for="templates-compiled-dir">Templates compiled directory</label><input name="templates-compiled-dir" type="text" value="inc/templates_c/" /><br />
     </fieldset>
     <fieldset>
         <legend>Site</legend>
-<label for="site-url">Url</label><input name="site-url" type="text" value="http://<?php echo $_SERVER['HTTP_HOST'].substr($_SERVER['REQUEST_URI'], 0, -strlen('install/config.php')); ?>" /><br />
->>>>>>> BotteDeFoin/master
+        <label for="site-title">Url</label><input name="site-title" type="text" value="" /><br />
+        <label for="site-url">Url</label><input name="site-url" type="text" value="http://<?php echo $_SERVER['HTTP_HOST'].substr($_SERVER['REQUEST_URI'], 0, -strlen('install/config.php')); ?>" /><br />
         <label for="site-image-dir">Image directory</label><input name="site-image-dir" type="text" value="px/" /><br />
         <label for="site-style-dir">Css directory</label><input name="site-style-dir" type="text" value="style/" /><br />
         <label for="site-javascript-dir">Js directory</label><input name="site-javascript-dir" type="text" value="js/" /><br />
         <label for="site-skin">Skin</label><input name="site-skin" type="text" value="default" /><br />
-<<<<<<< HEAD
-        <label for="site-namespace">Namespace</label><input name="site-namespace" type="text" value="" /><br />
-=======
         <label for="site-namespace">Namespace (do not start with \)</label><input name="site-namespace" type="text" value="" /><br />
->>>>>>> BotteDeFoin/master
     </fieldset>
     <fieldset>
         <legend>Javascript</legend>
