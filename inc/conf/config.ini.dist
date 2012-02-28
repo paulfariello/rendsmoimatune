@@ -31,6 +31,7 @@ compiled_dir = "templates_c/"
 
 [site]
 ;Root url of your site. Used when you create link
+title = ""
 url = ""
 ;You should store images that are used with css here.
 ;That means not user uploaded images, and more generaly not images that represents site contents. My 2 cents...

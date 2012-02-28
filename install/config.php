@@ -95,6 +95,7 @@ if (isset($_POST['create-config-file'])) {
     fwrite($f,EOL);
 
     fwrite($f,'[site]'.EOL);
+    fwrite($f,'title = "'.$_POST['site-title'].'"'.EOL);
     fwrite($f,";Root url of your site. Used when you create link".EOL);
     fwrite($f,'url = "'.$_POST['site-url'].'"'.EOL);
     fwrite($f,";You should store images that are used with css here.".EOL.";That means no user uploaded images, and more generaly no images that represents site contents. My 2 cents...".EOL);
@@ -211,7 +212,8 @@ if (isset($_POST['create-config-file'])) {
     </fieldset>
     <fieldset>
         <legend>Site</legend>
-<label for="site-url">Url</label><input name="site-url" type="text" value="http://<?php echo $_SERVER['HTTP_HOST'].substr($_SERVER['REQUEST_URI'], 0, -strlen('install/config.php')); ?>" /><br />
+        <label for="site-title">Url</label><input name="site-title" type="text" value="" /><br />
+        <label for="site-url">Url</label><input name="site-url" type="text" value="http://<?php echo $_SERVER['HTTP_HOST'].substr($_SERVER['REQUEST_URI'], 0, -strlen('install/config.php')); ?>" /><br />
         <label for="site-image-dir">Image directory</label><input name="site-image-dir" type="text" value="px/" /><br />
         <label for="site-style-dir">Css directory</label><input name="site-style-dir" type="text" value="style/" /><br />
         <label for="site-javascript-dir">Js directory</label><input name="site-javascript-dir" type="text" value="js/" /><br />
