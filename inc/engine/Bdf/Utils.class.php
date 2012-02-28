@@ -538,8 +538,9 @@ class Utils
     {
         $numArgs = func_num_args();
         $breadcrumb = \Bdf\Core::getInstance()->getConfig('site', 'title');
+        $sep = \Bdf\Core::getInstance()->getConfig('site', 'breadcrumb_separator');
         for ($i = 0; $i < $numArgs; $i++) {
-            $breadcrumb .= " – ".func_get_arg($i); 
+            $breadcrumb .= $sep.func_get_arg($i); 
         }
 
         return $breadcrumb;

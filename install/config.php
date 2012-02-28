@@ -105,6 +105,7 @@ if (isset($_POST['create-config-file'])) {
     fwrite($f,'skin = "'.$_POST['site-skin'].'"'.EOL);
     fwrite($f,";Namespace should not start with \\".EOL);
     fwrite($f,'namespace = "'.$_POST['site-namespace'].'"'.EOL);
+    fwrite($f,'breadcrumb_separator = "'.$_POST['site-breadcrumb-separator'].'"'.EOL);
 
     fclose($f);
 
@@ -219,6 +220,8 @@ if (isset($_POST['create-config-file'])) {
         <label for="site-javascript-dir">Js directory</label><input name="site-javascript-dir" type="text" value="js/" /><br />
         <label for="site-skin">Skin</label><input name="site-skin" type="text" value="default" /><br />
         <label for="site-namespace">Namespace (do not start with \)</label><input name="site-namespace" type="text" value="" /><br />
+        <label for="site-breadcrumb-separator">Breadcrumb separator</label><input name="site-breadcrumb-separator" type="text" value=" — " /><br />
+
     </fieldset>
     <fieldset>
         <legend>Javascript</legend>
