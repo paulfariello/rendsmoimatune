@@ -164,7 +164,7 @@ class Utils
      */
     public static function generateCSRFToken($id)
     {
-        $token = hash_hmac('SHA512', mt_rand(), $id);
+        $token = base_convert(hash_hmac('SHA512', mt_rand(), $id), 16, 36);
         Session::getInstance()->storeCSRFToken($id, $token);
         return $token;
     }
