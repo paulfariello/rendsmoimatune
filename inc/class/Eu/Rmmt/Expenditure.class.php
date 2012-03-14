@@ -251,6 +251,17 @@ class Expenditure
         }
     }
 
+    public function getBeneficiary(User $user)
+    {
+        foreach($this->_beneficiaries as $beneficiary) {
+            if ($beneficiary->getUser()->getId() == $user->getId()) {
+                return $beneficiary;
+            }
+        }
+
+        return null;
+    }
+
     public function getTags()
     {
         return $this->_tags;

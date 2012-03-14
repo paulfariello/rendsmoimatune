@@ -150,14 +150,15 @@ try {
             $amountOwed = $expenditure->getAmount();
             foreach($beneficiaries as $beneficiary) {
                 $amountOwed = round($amountOwed - $amountPerBeneficiary, 2);
-                if ($amountOwed < $amountPerBeneficiary) {
-                    #We let the last guy take the remaining amount owed it for its own. It happens when total amount isn't divisible by number of beneficiaries.
-                    #Note that remaining amount can be negative.
-                    $expenditure->addBeneficiary($beneficiary, $amountPerBeneficiary + $amountOwed);
-                } else {
-                    $expenditure->addBeneficiary($beneficiary, $amountPerBeneficiary);
-                }
+                $expenditure->addBeneficiary($beneficiary, $amountPerBeneficiary);
                 $account->addUser($beneficiary);
+            }
+
+            #We let the last guy take the remaining amount owed it for its own. It happens when total amount isn't divisible by number of beneficiaries.
+            #Note that remaining amount can be negative.
+            $lastBeneficiary = $expenditure->getBeneficiary($beneficiary);
+            if ($lastBeneficiary != null) {
+                $lastBeneficiary->setAmount($amountPerBeneficiary + $amountOwed);
             }
 
             $em->persist($expenditure);
