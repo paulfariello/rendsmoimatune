@@ -89,9 +89,9 @@ class Expenditure
     public function getRelativeDate()
     {
         $interval = $this->_date->diff(new DateTime());
-        if ($interval->d < 1) {
+        if ($interval->d < 1 && $interval->m == 0 && $interval->y == 0) {
             return Utils::getText("Today");
-        } elseif ($interval->d < 2) {
+        } elseif ($interval->d < 2 && $interval->m == 0 && $interval->y == 0) {
             return Utils::getText("Yesterday");
         } else {
             return $this->_date->format("d-m-Y");
