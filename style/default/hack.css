@@ -43,7 +43,7 @@
     display: none;
 }
 
-#main #add-new-payer, #main #add-new-beneficiary {
+#main #add-new-payer, #main #add-new-beneficiary, #main #add-all-participants {
     background: url("../../px/default/snowish/24x24/actions/gtk-add.png") transparent no-repeat center left;
     padding-left: 28px;
 }
@@ -696,4 +696,13 @@ p.signature {
 
 .mail {
     font-size: 150%;
+}
+
+.ajax-loader {
+    background: url(../../px/default/ajax-loader.gif) no-repeat;
+}
+
+#load-participants {
+    height: 32px;
+    clear: both;
 }

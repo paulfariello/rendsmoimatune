@@ -417,6 +417,11 @@ class Account
         return Utils::makeUrl('my-accounts/'.Utils::urlize($this->_name).'-'.$this->_id.'/accept-merge-'.$mergeRequest->getId().'-'.$token.'.html');
     }
 
+    public function getUrlLoadAllParticipants()
+    {
+        return Utils::makeUrl('ajax/account-participants.php?aid='.$this->_id);
+    }
+
     /**
      * Access control
      */

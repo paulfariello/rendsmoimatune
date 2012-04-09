@@ -115,11 +115,17 @@ function convertAmount(amount, from, to, expenditureAmount)
     return null;
 }
 
-function addBeneficiary(event)
+function addBeneficiaryEvent(event)
 {
     if (typeof(event) != "undefined") {
         event.stop();
     }
+
+    addBeneficiary(null);
+}
+
+function addBeneficiary(user)
+{
 
     var beneficiary = $('clonable-beneficiary').clone();
     beneficiary.getElements('.remove-beneficiary').each(function(button)
@@ -134,9 +140,52 @@ function addBeneficiary(event)
     {
         autoCompleteBeneficiary(input);
     });
-    beneficiary.inject($('add-new-beneficiary').getParent(), 'before');
 
-    return beneficiary;
+    if (user != null) {
+        beneficiary.getElements('input.beneficiary-name').each(function(beneficiaryName)
+        {
+            beneficiaryName.set('value', user.name);
+        });
+        beneficiary.getElements('input[name^=beneficiariesId]').each(function(beneficiaryId)
+        {
+            beneficiaryId.set('value', user.id);
+        });
+    }
+
+    beneficiary.inject($('add-new-beneficiary').getParent(), 'before');
+}
+
+function addAllParticipants(event)
+{
+    if (typeof(event) != "undefined") {
+        event.stop();
+    }
+
+    var loadParticipants = new Element('div', {
+        id: 'load-participants',
+        class: 'ajax-loader'
+    });
+
+    loadParticipants.inject($('add-new-beneficiary').getParent(), 'before');
+
+    var request = new Request.JSON({
+        url: event.target.get('rel'),
+        onSuccess: function(users) {
+            var loadParticipants = $('load-participants');
+            loadParticipants.destroy();
+            users.each(function(user) {
+                addBeneficiary(user);
+            });
+        },
+        onFailure: function() {
+            var loadParticipants = $('load-participants');
+            loadParticipants.destroy();
+        },
+        onException: function() {
+            var loadParticipants = $('load-participants');
+            loadParticipants.destroy();
+        },
+    }).get(); 
 }
 
 function autoCompleteBeneficiary(input)
@@ -193,15 +242,11 @@ function autoAddBeneficiary(input)
         });
 
         if (!cloned) {
-            beneficiary = addBeneficiary();            
-            beneficiary.getElements('input.beneficiary-name').each(function(beneficiaryName)
-            {
-                beneficiaryName.set('value', payerName.get('value'));
-            });
-            beneficiary.getElements('input[name^=beneficiariesId]').each(function(beneficiaryId)
-            {
-                beneficiaryId.set('value', payerId.get('value'));
-            });
+            user = { 
+                id: payerId.get('value'),
+                name: payerName.get('value'),
+            };
+            addBeneficiary(user);            
         }
     });
 }
@@ -218,7 +263,8 @@ window.addEvent("domready", function()
     });
 
     // ADD BENEFICIARY
-    $('add-new-beneficiary').addEvent("click", addBeneficiary);
+    $('add-new-beneficiary').addEvent("click", addBeneficiaryEvent);
+    $('add-all-participants').addEvent("click", addAllParticipants);
 
     // REMOVE BENEFICIARY
     $$('.remove-beneficiary').each(function(button)

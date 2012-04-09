@@ -94,6 +94,7 @@
                 {/foreach}
             {/if}
             <p><a href="#" id="add-new-beneficiary" class="button">{getText id="Another beneficiary"}</a></p>
+            <p><a href="#" id="add-all-participants" class="button" rel="{$currentAccount->getUrlLoadAllParticipants()}">{getText id="Add all participants"}</a></p>
         </div>
         <input type="submit" name="edit-expenditure" value="{getText id='Save'}" />
         <input type="reset" name="edit-expenditure" value="{getText id='Reset'}" />
