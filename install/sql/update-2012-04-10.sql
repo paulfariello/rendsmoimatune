@@ -8,7 +8,7 @@ ALTER TABLE expenditure ALTER COLUMN amount TYPE integer USING floattoint(amount
 ALTER TABLE payer       ALTER COLUMN amount TYPE integer USING floattoint(amount);
 ALTER TABLE repayment   ALTER COLUMN amount TYPE integer USING floattoint(amount);
 ALTER TABLE beneficiary ALTER COLUMN amount TYPE float;
-UPDATE TABLE beneficiary SET amount = amount * 100;
+UPDATE beneficiary SET amount = amount * 100;
 
 DROP FUNCTION floattoint(float);
 
