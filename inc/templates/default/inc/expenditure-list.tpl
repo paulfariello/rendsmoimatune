@@ -8,7 +8,7 @@
                 {$expenditure->getTitle()|htmlProtect|truncate:40}
             </td> 
             <td>
-                <span class="money">{$expenditure->getAmount()|moneyFormat}</span>
+                <span class="money">{$expenditure->getAmount()|moneyFormat|strip:'&nbsp;'}</span>
             </td> 
             <td>
                 {if $expenditure->getPayers()->count() > 0}
