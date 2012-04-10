@@ -407,7 +407,9 @@ class Utils
      */
     public static function moneyFormat($amount)
     {
-        return money_format('%.2n', $amount/100);
+        $result = money_format('%.2n', $amount/100);
+        $result = str_replace(' ', '&nbsp;', $result);
+        return $result;
     }
 
     /**
