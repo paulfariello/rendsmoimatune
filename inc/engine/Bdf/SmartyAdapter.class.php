@@ -56,7 +56,8 @@ class SmartyAdapter implements \Bdf\ITemplatesEngine
         'intToByteQuantity',
         'isCurrentPage',
         'htmlProtect',
-        'moneyFormat'
+        'moneyFormat',
+        'formatMoneyInput'
     );
 
     /**
@@ -149,6 +150,19 @@ class SmartyAdapter implements \Bdf\ITemplatesEngine
     public function utilsMoneyFormat($param)
     {
         return \Bdf\Utils::moneyFormat($param);
+    }
+
+    /**
+     * Encapsulation de {@link \Bdf\Utils::formatMoneyInput()}
+     *
+     * @param array  $params @see \Bdf\Utils::formatMoneyInput()
+     * @param Smarty $smarty instance de Smarty
+     *
+     * @return @see \Bdf\Utils::formatMoneyInput()
+     */
+    public function utilsFormatMoneyInput($param)
+    {
+        return \Bdf\Utils::formatMoneyInput($param);
     }
 
     /**

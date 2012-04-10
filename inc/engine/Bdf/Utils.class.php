@@ -402,9 +402,29 @@ class Utils
         return $string;
     }
 
+    /**
+     * Convert a money amount expressed in cents into a real money account
+     */
     public static function moneyFormat($amount)
     {
-        return money_format('%#5.2n&nbsp;€', $amount);
+        return money_format('%.2n', $amount/100);
+    }
+
+    /**
+     * Convert a money amount expressend in cents into a real money amount but without the currency symbol
+     */
+    public static function formatMoneyInput($amount)
+    {
+        return money_format('%!.2n', $amount/100);
+    }
+
+    /**
+     * Parse a money amount into cents
+     */
+    public static function parseMoneyInput($amount)
+    {
+        $amount = (float)strtr($amount, ',', '.');
+        return (int)($amount * 100);
     }
 
     /**

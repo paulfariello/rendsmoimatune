@@ -84,9 +84,9 @@ try {
             if (!isset($_POST['amount']) OR empty($_POST['amount'])) {
                 throw new Eu\Rmmt\Exception\UserInputException(\Bdf\Utils::getText('Amount is required'), $_POST['amount'], 'amount');
             }
-            $_POST['amount'] = strtr($_POST['amount'], ',', '.');
+            $repaymentAmount = \Bdf\Utils::parseMoneyInput($_POST['amount']);
 
-            $repayment = new Eu\Rmmt\Repayment($account, $payer, $beneficiary, $_POST['amount'], $currentUser);
+            $repayment = new Eu\Rmmt\Repayment($account, $payer, $beneficiary, $repaymentAmount, $currentUser);
 
             $date = null;
             if (isset($_POST['date']) AND !empty($_POST['date'])) {

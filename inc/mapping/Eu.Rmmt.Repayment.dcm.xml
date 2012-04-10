@@ -8,7 +8,7 @@
         </id>
 
         <field name="_date"   column="date"   type="date"   />
-        <field name="_amount" column="amount" type="decimal"  />
+        <field name="_amount" column="amount" type="integer"  />
 
         <many-to-one target-entity="User" field="_payer" mapped-by="_repaymentsFromMe" >
             <join-column name="payer_fk" referenced-column-name="user_pk" />

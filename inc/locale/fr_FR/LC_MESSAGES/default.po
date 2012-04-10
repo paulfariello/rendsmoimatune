@@ -27,8 +27,8 @@ msgstr[1] ""
 "%1$s sont déjà sur %2$s. Nous leur avons donc proposé de fusionner leur "
 "compte avec vos utilisateurs."
 
-msgid "%1$s repaid %2$.2f€ to %3$s"
-msgstr "%1$s a payé %2$.2f€ à %3$s"
+msgid "%1$s repaid %2$s to %3$s"
+msgstr "%1$s a payé %2$s à %3$s"
 
 msgid "%1$s suggest you merge an account you have created"
 msgstr "%1$s vous suggère une fusion"

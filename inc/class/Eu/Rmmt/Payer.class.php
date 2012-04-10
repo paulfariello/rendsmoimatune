@@ -49,7 +49,7 @@ class Payer
     {
         $this->_expenditure = $expenditure;
         $this->_user        = $user;
-        $this->_amount      = $amount;
+        $this->_amount      = (int)$amount;
     }
 
     public function getId()
@@ -69,7 +69,7 @@ class Payer
 
     public function setAmount($amount)
     {
-        $this->_amount = $amount;
+        $this->_amount = (int)$amount;
     }
 
     public function getExpenditure()

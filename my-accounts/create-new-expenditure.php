@@ -66,9 +66,10 @@ try {
             if (!isset($_POST['amount']) OR empty($_POST['amount'])) {
                 throw new Eu\Rmmt\Exception\UserInputException(\Bdf\Utils::getText('Amount is required'), $_POST['amount'], 'amount');
             }
-            $_POST['amount'] = strtr($_POST['amount'], ',', '.');
 
-            $expenditure = new Eu\Rmmt\Expenditure($account, $_POST['title'], $_POST['amount'], $currentUser);
+            $expenditureAmount = \Bdf\Utils::parseMoneyInput($_POST['amount']);
+
+            $expenditure = new Eu\Rmmt\Expenditure($account, $_POST['title'], $expenditureAmount, $currentUser);
 
             $date = null;
             if (isset($_POST['date']) AND !empty($_POST['date'])) {
@@ -87,7 +88,8 @@ try {
             foreach( array_keys ($_POST['payersId']) as $index ) {
                 $id     = $_POST['payersId'][$index];
                 $name   = trim ($_POST['payersName'][$index]);
-                $amount = (float) strtr ($_POST['payersAmount'][$index], ',', '.');
+                $amount = (float) strtr($_POST['payersAmount'][$index], ',', '.');
+
                 $metric = $_POST['payersMetric'][$index];
 
                 if (!empty($name)) {
@@ -107,7 +109,7 @@ try {
                             $amount = round($expenditure->getAmount() * $amount / 100, 2);
                             break;
                         case '€':
-                            $amount = $amount;
+                            $amount = \Bdf\Utils::parseMoneyInput($amount);
                             break;
                     }
 
@@ -145,20 +147,11 @@ try {
             }
 
             // Calculate amount due per user
-            $amountPerBeneficiary = round($expenditure->getAmount() / count($beneficiaries), 2);
+            $amountPerBeneficiary = $expenditure->getAmount() / count($beneficiaries);
 
-            $amountOwed = $expenditure->getAmount();
             foreach($beneficiaries as $beneficiary) {
-                $amountOwed = round($amountOwed - $amountPerBeneficiary, 2);
                 $expenditure->addBeneficiary($beneficiary, $amountPerBeneficiary);
                 $account->addUser($beneficiary);
-            }
-
-            #We let the last guy take the remaining amount owed it for its own. It happens when total amount isn't divisible by number of beneficiaries.
-            #Note that remaining amount can be negative.
-            $lastBeneficiary = $expenditure->getBeneficiary($beneficiary);
-            if ($lastBeneficiary != null) {
-                $lastBeneficiary->setAmount($amountPerBeneficiary + $amountOwed);
             }
 
             $em->persist($expenditure);

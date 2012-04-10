@@ -7,7 +7,7 @@
             <sequence-generator sequence-name="payer_payer_pk_seq" initial-value="1" allocation-size="1" />
         </id>
 
-        <field name="_amount" column="amount" type="decimal" />
+        <field name="_amount" column="amount" type="integer" />
 
         <many-to-one target-entity="Expenditure" field="_expenditure" inversed-by="_payers">
             <join-column name="expenditure_pcfk" referenced-column-name="expenditure_pk" />

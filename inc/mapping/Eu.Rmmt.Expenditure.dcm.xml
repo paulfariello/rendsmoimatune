@@ -8,7 +8,7 @@
 
         <field name="_title"  column="title"  type="string" />
         <field name="_date"   column="date"   type="date"   />
-        <field name="_amount" column="amount" type="decimal"  />
+        <field name="_amount" column="amount" type="integer"  />
 
         <many-to-many target-entity="Tag"  field="_tags" inversed-by="_expenditures" >
             <join-table name="expenditure_tag">

@@ -80,10 +80,11 @@ try {
             if (!isset($_POST['amount']) OR empty($_POST['amount'])) {
                 throw new Eu\Rmmt\Exception\UserInputException(\Bdf\Utils::getText('Amount is required'), $_POST['amount'], 'amount');
             }
-            $_POST['amount'] = strtr($_POST['amount'], ',', '.');
+
+            $expenditureAmount = \Bdf\Utils::parseMoneyInput($_POST['amount']);
 
             $expenditure->setTitle($_POST['title']);
-            $expenditure->setAmount($_POST['amount']);
+            $expenditure->setAmount($expenditureAmount);
 
             $date = null;
             if (isset($_POST['date']) AND !empty($_POST['date'])) {
@@ -123,7 +124,7 @@ try {
                             $amount = round($expenditure->getAmount() * $amount / 100, 2);
                             break;
                         case '€':
-                            $amount = $amount;
+                            $amount = \Bdf\Utils::parseMoneyInput($amount);
                             break;
                     }
 
@@ -162,17 +163,11 @@ try {
             }
 
             // Calculate amount due per user
-            $amountPerBeneficiary = round($expenditure->getAmount() / count($beneficiaries), 2);
+            $amountPerBeneficiary = $expenditure->getAmount() / count($beneficiaries);
 
-            $amountOwed = $expenditure->getAmount();
             foreach($beneficiaries as $beneficiary) {
-                $amountOwed = round($amountOwed - $amountPerBeneficiary, 2);
                 $beneficiary->setAmount($amountPerBeneficiary);
             }
-
-            #We let the last guy take the remaining amount owed it for its own. It happens when total amount isn't divisible by number of beneficiaries.
-            #Note that remaining amount can be negative.
-            $beneficiary->setAmount($amountPerBeneficiary + $amountOwed);
 
             $expenditure->updateBeneficiaries($beneficiaries);
 

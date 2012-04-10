@@ -22,12 +22,12 @@
             {assign var="owesAmount" value=$currentAccount->getOwesAmount($user)}
             <div class="summary-payed-amount">
                 <div class="balance-bar gradient-{round($payedAmount / $totalExpenditure * 100, -1)}" style="width: {round($payedAmount / $totalExpenditure * 100)}%; min-width: {strlen($payedAmount)+1}em;">
-                    {$payedAmount}&nbsp;€
+                    {$payedAmount|moneyFormat}
                 </div>
             </div>
             <div class="summary-owes-amount">
                 <div class="balance-bar gradient-{100 - round($owesAmount / $totalExpenditure * 100, -1)}" style="width: {round($owesAmount / $totalExpenditure * 100)}%; min-width: {strlen($owesAmount)+1}em;">
-                    {$owesAmount}&nbsp;€
+                    {$owesAmount|moneyFormat}
                 </div>
             </div>
             <div class="summary-name">{$user->getName()|htmlProtect}</div>
@@ -53,12 +53,12 @@
             {assign var="receivedAmount" value=$currentAccount->getRepaymentReceivedAmount($user)}
             <div class="summary-payed-amount">
                 <div class="balance-bar gradient-{round($payedAmount / $totalRepayment * 100, -1)}" style="width: {round($payedAmount / $totalRepayment * 100)}%; min-width: {strlen($payedAmount)+1}em;">
-                    {$payedAmount}&nbsp;€
+                    {$payedAmount|moneyFormat}
                 </div>
             </div>
             <div class="summary-owes-amount">
                 <div class="balance-bar gradient-{round($receivedAmount / $totalRepayment * 100, -1)}" style="width: {round($receivedAmount / $totalRepayment * 100)}%; min-width: {strlen($receivedAmount)+1}em;">
-                    {$receivedAmount}&nbsp;€
+                    {$receivedAmount|moneyFormat}
                 </div>
             </div>
             <div class="summary-name">{$user->getName()|htmlProtect}</div>
@@ -85,7 +85,7 @@
         <div class="balance-due">
             {if $balance < 0}
             <div class="balance-bar" style="width: {round(- $balance / $totalExpenditure * 100)}%; min-width: {strlen($balance)+1}em;">
-                {$balance}&nbsp;€
+                {$balance|moneyFormat}
             </div>
 
             {/if}
@@ -93,7 +93,7 @@
         <div class="balance-payed">
             {if $balance > 0}
                 <div class="balance-bar" style="width: {round($balance / $totalExpenditure * 100)}%; min-width: {strlen($balance)+1}em;">
-                    {$balance}&nbsp;€
+                    {$balance|moneyFormat}
                 </div>
             {/if}
         </div>
@@ -110,7 +110,7 @@
         {foreach from=$debts item="debt"}
             <div class="repayment">
                 <div class="repayer">{$debt->getFrom()->getName()|htmlProtect}</div>
-                <div class="amount-owes">{$debt->getAmount()} €</div>
+                <div class="amount-owes">{$debt->getAmount()|moneyFormat}</div>
                 <div class="repaid">{$debt->getTo()->getName()|htmlProtect}</div>
                 <div class="clear"></div>
             </div>

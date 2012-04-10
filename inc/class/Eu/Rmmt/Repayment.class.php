@@ -121,7 +121,7 @@ class Repayment
 
     public function getDescription()
     {
-        return Utils::getText('%1$s repaid %2$.2f€ to %3$s', $this->_payer->getName(), $this->_amount, $this->_beneficiary->getName());
+        return Utils::getText('%1$s repaid %2$s to %3$s', $this->_payer->getName(), \Bdf\Utils::moneyFormat($this->_amount), $this->_beneficiary->getName());
     }
 
     /**

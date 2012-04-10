@@ -23,7 +23,7 @@ msgid_plural ""
 msgstr[0] ""
 msgstr[1] ""
 
-msgid "%1$s repaid %2$.2f€ to %3$s"
+msgid "%1$s repaid %2$s to %3$s"
 msgstr ""
 
 msgid "%1$s suggest you merge an account you have created"

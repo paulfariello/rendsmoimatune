@@ -114,22 +114,33 @@ class DebtFactory
         usort($debitors, array($this, "_sortUsers"));
         usort($creditors, array($this, "_sortUsers"));
 
+        $lost = 0;
+
         while (!empty($debitors) AND !empty($creditors)) {
-            $amount = min($creditors[0]['balance'], $debitors[0]['balance']);
-            $debt = new Debt($debitors[0]['user'], $creditors[0]['user'], $amount);
+            $realAmount = min($creditors[0]['balance'], $debitors[0]['balance']);
+
+            $sensibleAmount = (int)floor($realAmount);
+            $lost += $realAmount - $sensibleAmount;
+
+            if ($lost > 1) {
+                $sensibleAmount += 1;
+                $lost -= 1;
+            }
+
+            $debt = new Debt($debitors[0]['user'], $creditors[0]['user'], $sensibleAmount);
             $debts->add($debt);
 
-            $creditors[0]['balance'] -= $amount;
-            $debitors[0]['balance'] -= $amount;
+            $creditors[0]['balance'] -= $sensibleAmount;
+            $debitors[0]['balance'] -= $sensibleAmount;
 
             // On met a jour les tableaux
-            if ($creditors[0]['balance'] == 0) {
+            if ($creditors[0]['balance'] < 1) {
                 array_shift($creditors);                    
             } else {
                 $creditors = $this->_resortFirstUser($creditors);
             }
 
-            if ($debitors[0]['balance'] == 0) {
+            if ($debitors[0]['balance'] < 1) {
                 array_shift($debitors);                    
             } else {
                 $debitors = $this->_resortFirstUser($debitors);

@@ -49,7 +49,7 @@ class Debt
     private $_amount;
 
     public function __construct(User $from, User $to, $amount) {
-        $amount = (float)$amount;
+        $amount = (int)$amount;
 
         if ($amount > 0) {
             $this->_from   = $from;
@@ -91,7 +91,7 @@ class Debt
 
     public function setAmount($amount)
     {
-        $amount = (float)$amount;
+        $amount = (int)$amount;
         if ($amount > 0) {
             $this->_amount = $amount;
         } elseif ($amount < 0) {

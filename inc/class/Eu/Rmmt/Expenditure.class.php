@@ -59,7 +59,7 @@ class Expenditure
     {
         $this->_account        = $account;
         $this->_title          = $title;
-        $this->_amount         = $amount;
+        $this->_amount         = (int)$amount;
         $this->_payers         = new ArrayCollection();
         $this->_beneficiaries  = new ArrayCollection();
         $this->_tags           = new ArrayCollection();
@@ -110,7 +110,7 @@ class Expenditure
 
     public function setAmount($amount)
     {
-        $this->_amount = $amount;
+        $this->_amount = (int)$amount;
     }
 
     public function getPayers()
