@@ -182,88 +182,118 @@ class MergeRequest extends Entity
         $keptUser = null;
         $deletedUser = null;
 
-        // Choosing wich user to keep
-        if ($this->_keepEmail == null) {
-            if ($this->getFirstUser()->isRegistered() AND $this->getSecondUser()->isRegistered()) {
-                throw new Eu\Rmmt\Exception\MergeException(Utils::getText("Cannot choose which account to keep"));
-            } elseif ($this->getSecondUser()->isRegistered()) {
-                $keptUser = $this->getSecondUser();
-                $deletedUser = $this->getFirstUser();
-            } else { // Weither first user is registered or none of them is.
-                $keptUser = $this->getFirstUser();
-                $deletedUser = $this->getSecondUser();
-            }
-        }  else {
-            if ($this->_keepEmail == 1) {
-                $keptUser = $this->getFirstUser();
-                $deletedUser = $this->getSecondUser();
-            } elseif($this->_keepEmail == 2) {
-                $keptUser = $this->getSecondUser();
-                $deletedUser = $this->getFirstUser();
-            } else {
-                throw new Eu\Rmmt\Exception\MergeException(Utils::getText("Cannot choose which account to keep"));
-            }
-        }
+        $em->getConnection()->beginTransaction();
 
-        // Setting name
-        if ($this->_keepName == 1) {
-            $keptUser->setName($this->getFirstUser()->getName());
-        } elseif ($this->_keepName == 2) {
-            $keptUser->setName($this->getSecondUser()->getName());
-        }
+        try {
 
-
-        // Merging collections 
-        foreach($deletedUser->getRepaymentsToMe() as $repayment) {
-            $repayment->setBeneficiary($keptUser);
-        }
-
-        foreach($deletedUser->getRepaymentsFromMe() as $repayment) {
-            $repayment->setPayer($keptUser);
-        }
-
-        foreach($deletedUser->getPayers() as $payer) {
-            $alreadyPayer = false;
-            foreach ($payer->getExpenditure()->getPayers() as $keptPayer) {
-                if ($keptPayer->getUser()->equals($keptUser)) {
-                    $alreadyPayer = true;
-                    break; // Can only be payer once
+            // Choosing wich user to keep
+            if ($this->_keepEmail == null) {
+                if ($this->getFirstUser()->isRegistered() AND $this->getSecondUser()->isRegistered()) {
+                    throw new \Eu\Rmmt\Exception\MergeException(Utils::getText("Cannot choose which account to keep"));
+                } elseif ($this->getSecondUser()->isRegistered()) {
+                    $keptUser = $this->getSecondUser();
+                    $deletedUser = $this->getFirstUser();
+                } else { // Weither first user is registered or none of them is.
+                    $keptUser = $this->getFirstUser();
+                    $deletedUser = $this->getSecondUser();
+                }
+            }  else {
+                if ($this->_keepEmail == 1) {
+                    $keptUser = $this->getFirstUser();
+                    $deletedUser = $this->getSecondUser();
+                } elseif($this->_keepEmail == 2) {
+                    $keptUser = $this->getSecondUser();
+                    $deletedUser = $this->getFirstUser();
+                } else {
+                    throw new \Eu\Rmmt\Exception\MergeException(Utils::getText("Cannot choose which account to keep"));
                 }
             }
 
-            if ($alreadyPayer) {
-                $keptPayer->setAmount($keptPayer->getAmount() + $payer->getAmount());
-                $em->remove($payer);
-            } else {
-                $payer->setUser($keptUser);
+            // Setting name
+            if ($this->_keepName == 1) {
+                $keptUser->setName($this->getFirstUser()->getName());
+            } elseif ($this->_keepName == 2) {
+                $keptUser->setName($this->getSecondUser()->getName());
             }
-        }
 
-        foreach($deletedUser->getBeneficiaries() as $beneficiary) {
-            $alreadyBeneficiary = false;
-            foreach ($beneficiary->getExpenditure()->getBeneficiaries() as $keptBeneficiary) {
-                if ($keptBeneficiary->getUser()->equals($keptUser)) {
-                    $alreadyBeneficiary = true;
-                    break; // Can only be beneficiary once
+            // Reowning expenditure and repayment
+            $query = $em->createQuery('UPDATE Eu\Rmmt\Repayment r SET r._creator = :kept WHERE r._creator = :deleted');
+            $query->setParameter('kept', $keptUser);
+            $query->setParameter('deleted', $deletedUser);
+            $query->execute();
+
+            $query = $em->createQuery('UPDATE Eu\Rmmt\Expenditure e SET e._creator = :kept WHERE e._creator = :deleted');
+            $query->setParameter('kept', $keptUser);
+            $query->setParameter('deleted', $deletedUser);
+            $query->execute();
+
+            // Reowning repayment
+            // Clean useless repayment
+            $query = $em->createQuery('DELETE Eu\Rmmt\Repayment r WHERE (r._payer = :kept AND r._beneficiary = :deleted) OR (r._payer = :deleted1 AND r._beneficiary = :kept1)');
+            $query->setParameter('kept', $keptUser);
+            $query->setParameter('deleted', $deletedUser);
+            $query->setParameter('kept1', $keptUser);
+            $query->setParameter('deleted1', $deletedUser);
+            $query->execute();
+
+            $query = $em->createQuery('UPDATE Eu\Rmmt\Repayment r SET r._payer = :kept WHERE r._payer = :deleted');
+            $query->setParameter('kept', $keptUser);
+            $query->setParameter('deleted', $deletedUser);
+            $query->execute();
+
+            $query = $em->createQuery('UPDATE Eu\Rmmt\Repayment r SET r._beneficiary = :kept WHERE r._beneficiary = :deleted');
+            $query->setParameter('kept', $keptUser);
+            $query->setParameter('deleted', $deletedUser);
+            $query->execute();
+
+            // Merging collections 
+            foreach($deletedUser->getPayers() as $payer) {
+                $alreadyPayer = false;
+                foreach ($payer->getExpenditure()->getPayers() as $keptPayer) {
+                    if ($keptPayer->getUser()->equals($keptUser)) {
+                        $alreadyPayer = true;
+                        break; // Can only be payer once
+                    }
+                }
+
+                if ($alreadyPayer) {
+                    $keptPayer->setAmount($keptPayer->getAmount() + $payer->getAmount());
+                    $em->remove($payer);
+                } else {
+                    $payer->setUser($keptUser);
                 }
             }
 
-            if ($alreadyBeneficiary) {
-                $keptBeneficiary->setAmount($keptBeneficiary->getAmount() + $beneficiary->getAmount());
-                $em->remove($beneficiary);
-            } else {
-                $beneficiary->setUser($keptUser);
+            foreach($deletedUser->getBeneficiaries() as $beneficiary) {
+                $alreadyBeneficiary = false;
+                foreach ($beneficiary->getExpenditure()->getBeneficiaries() as $keptBeneficiary) {
+                    if ($keptBeneficiary->getUser()->equals($keptUser)) {
+                        $alreadyBeneficiary = true;
+                        break; // Can only be beneficiary once
+                    }
+                }
+
+                if ($alreadyBeneficiary) {
+                    $keptBeneficiary->setAmount($keptBeneficiary->getAmount() + $beneficiary->getAmount());
+                    $em->remove($beneficiary);
+                } else {
+                    $beneficiary->setUser($keptUser);
+                }
             }
-        }
 
-        foreach($deletedUser->getAccounts() as $account) {
-            $account->removeUser($deletedUser);
-            if (!$account->getUsers()->contains($keptUser))
-                $account->addUser($keptUser);
-        }
+            foreach($deletedUser->getAccounts() as $account) {
+                $account->removeUser($deletedUser);
+                if (!$account->getUsers()->contains($keptUser))
+                    $account->addUser($keptUser);
+            }
 
-        $em->remove($deletedUser); 
-        $em->flush();
+            $em->remove($deletedUser); 
+            $em->flush();
+            $em->getConnection()->commit();
+        } catch (Exception $e) {
+            $em->getConnection()->rollback();
+            throw $e;
+        }
     }
 
     private function _generateRequestToken(User $user)
