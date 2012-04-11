@@ -57,7 +57,7 @@ class MergeRequest extends Entity
     private $_firstUserRequestToken     = null;
     private $_secondUserRequestToken    = null;
     private $_requester                 = null;
-    private $_keepName                  = 1;
+    private $_keepName                  = null;
     private $_keepEmail                 = null;
 
     public function  __construct(Account $account, User $firstUser, User $secondUser, User $requester)
@@ -208,7 +208,7 @@ class MergeRequest extends Entity
         // Setting name
         if ($this->_keepName == 1) {
             $keptUser->setName($this->getFirstUser()->getName());
-        } else {
+        } elseif ($this->_keepName == 2) {
             $keptUser->setName($this->getSecondUser()->getName());
         }
 
