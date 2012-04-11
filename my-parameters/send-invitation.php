@@ -103,6 +103,7 @@ if (isset($_POST['send-invitation']) OR isset($_POST['resend-invitation'])) {
                     } catch(Eu\Rmmt\Exception\MergeAuthorizationException $e) {
                         $mergeRequest->requestAgreements();
                         $mergeRequested[$userId] = $email;
+                        $em->flush();
                     }
 
 
@@ -113,7 +114,6 @@ if (isset($_POST['send-invitation']) OR isset($_POST['resend-invitation'])) {
             }
         }
 
-        $em->flush();
 
         if (!empty($sended)) {
             $messages[] = array('type'=>'info', 'content'=>Bdf\Utils::nGetText('Invitation sended to %1$s.', 'Invitations sended to %1$s.', sizeof($sended), implode(', ', $sended)));
