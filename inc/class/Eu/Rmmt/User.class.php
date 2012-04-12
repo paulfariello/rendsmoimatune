@@ -91,8 +91,12 @@ class User implements \Bdf\IUser
     {
         $em = \Bdf\Core::getInstance()->getEntityManager();
         $idUser = \Bdf\Session::getInstance()->getCurrentUserId();
-        $user = $em->getRepository(__CLASS__)->find($idUser);
-        return $user;
+        if ($idUser != NULL) {
+            $user = $em->getRepository(__CLASS__)->find($idUser);
+            return $user;
+        } else {
+            return null;
+        }
     }
 
     /**
