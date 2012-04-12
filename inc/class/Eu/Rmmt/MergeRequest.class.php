@@ -216,13 +216,18 @@ class MergeRequest extends Entity
                 $keptUser->setName($this->getSecondUser()->getName());
             }
 
-            // Reowning expenditure and repayment
+            // Reowning expenditures, repayments and accounts
             $query = $em->createQuery('UPDATE Eu\Rmmt\Repayment r SET r._creator = :kept WHERE r._creator = :deleted');
             $query->setParameter('kept', $keptUser);
             $query->setParameter('deleted', $deletedUser);
             $query->execute();
 
             $query = $em->createQuery('UPDATE Eu\Rmmt\Expenditure e SET e._creator = :kept WHERE e._creator = :deleted');
+            $query->setParameter('kept', $keptUser);
+            $query->setParameter('deleted', $deletedUser);
+            $query->execute();
+
+            $query = $em->createQuery('UPDATE Eu\Rmmt\Account a SET a._creator = :kept WHERE a._creator = :deleted');
             $query->setParameter('kept', $keptUser);
             $query->setParameter('deleted', $deletedUser);
             $query->execute();
