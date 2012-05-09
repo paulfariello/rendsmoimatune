@@ -16,7 +16,7 @@ along with Rendsmoimatune.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 var days = {
-    "fr_FR": [
+    "fr_FR.UTF-8": [
         "Dimanche",
         "Lundi",
         "Mardi",
@@ -28,7 +28,7 @@ var days = {
 };
 
 var months = {
-    "fr_FR": [
+    "fr_FR.UTF-8": [
         "Janvier",
         "Février",
         "Mars",
