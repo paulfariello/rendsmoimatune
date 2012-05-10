@@ -134,6 +134,9 @@ msgstr ""
 msgid "Deletion"
 msgstr ""
 
+msgid "Designed by the late Perspectived."
+msgstr ""
+
 msgid "Do merge"
 msgstr ""
 
@@ -182,6 +185,9 @@ msgid "Expenditure title"
 msgstr ""
 
 msgid "Expenditures"
+msgstr ""
+
+msgid "Feel free to use and customize it."
 msgstr ""
 
 msgid "First Name"
@@ -427,6 +433,9 @@ msgstr ""
 msgid "Rename"
 msgstr ""
 
+msgid "Rendsmoimatune is an open source software."
+msgstr ""
+
 msgid "Repayment created"
 msgstr ""
 
@@ -476,6 +485,9 @@ msgid "Sign in easily"
 msgstr ""
 
 msgid "Sign in in old school way"
+msgstr ""
+
+msgid "Sources can be found here."
 msgstr ""
 
 msgid "Summary"

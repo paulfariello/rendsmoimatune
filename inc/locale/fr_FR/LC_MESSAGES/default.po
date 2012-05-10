@@ -139,6 +139,9 @@ msgstr "Supprimer le compte"
 msgid "Deletion"
 msgstr "Suppression"
 
+msgid "Designed by the late Perspectived."
+msgstr "Design conçu par feu Perspectived."
+
 msgid "Do merge"
 msgstr "Fusionner"
 
@@ -189,6 +192,9 @@ msgstr "Intitulé de la dépense"
 
 msgid "Expenditures"
 msgstr "Dépenses"
+
+msgid "Feel free to use and customize it."
+msgstr "N'hésitez pas à l'utiliser et à le modifier."
 
 msgid "First Name"
 msgstr "Prénom"
@@ -469,6 +475,9 @@ msgstr "S'inscrire simplement"
 msgid "Rename"
 msgstr "Renomer"
 
+msgid "Rendsmoimatune is an open source software."
+msgstr "Rendsmoimatune est un logiciel libre."
+
 msgid "Repayment created"
 msgstr "Remboursement créé"
 
@@ -519,6 +528,9 @@ msgstr "Se connecter simplement"
 
 msgid "Sign in in old school way"
 msgstr "Se connecter à l'ancienne"
+
+msgid "Sources can be found here."
+msgstr "Le code source est disponible ici."
 
 msgid "Summary"
 msgstr "Résumé"
