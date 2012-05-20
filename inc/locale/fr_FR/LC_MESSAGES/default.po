@@ -70,6 +70,10 @@ msgid "An email has been sent to you in order to reset your password."
 msgstr ""
 "Un email vient de vous être envoyé afin de réinitialiser votre mot de passe."
 
+msgid "An email has been sent to you. Please read it to get your api key."
+msgstr ""
+"Un email vient de vous être envoyé. Lisez le pour obtenir votre clé."
+
 msgid "Another beneficiary"
 msgstr "Autre consommateur"
 
@@ -108,6 +112,11 @@ msgstr "Faire les comptes"
 
 msgid "Cash-up"
 msgstr "Faire les comptes"
+
+msgid ""
+"Congratulations ! You are now able to use our fantastic API with the "
+"following key."
+msgstr ""
 
 msgid "Create"
 msgstr "Créer"
@@ -493,6 +502,9 @@ msgstr "Résumé des remboursements"
 msgid "Repayments"
 msgstr "Remboursements"
 
+msgid "Request API key"
+msgstr "Demande de clé API"
+
 msgid "Reset"
 msgstr "Réinitialiser"
 
@@ -563,6 +575,9 @@ msgstr "Aujourd'hui"
 
 msgid "Total"
 msgstr "Total"
+
+msgid "Unknown API client or token."
+msgstr "Client ou jeton inconnu."
 
 msgid "Unknown email %s"
 msgstr "Adresse email « %s » inconnue"

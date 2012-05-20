@@ -65,6 +65,9 @@ msgstr ""
 msgid "An email has been sent to you in order to reset your password."
 msgstr ""
 
+msgid "An email has been sent to you. Please read it to get your api key."
+msgstr ""
+
 msgid "Another beneficiary"
 msgstr ""
 
@@ -102,6 +105,11 @@ msgid "Cash up"
 msgstr ""
 
 msgid "Cash-up"
+msgstr ""
+
+msgid ""
+"Congratulations ! You are now able to use our fantastic API with the "
+"following key."
 msgstr ""
 
 msgid "Create"
@@ -451,6 +459,9 @@ msgstr ""
 msgid "Repayments"
 msgstr ""
 
+msgid "Request API key"
+msgstr ""
+
 msgid "Reset"
 msgstr ""
 
@@ -516,6 +527,9 @@ msgid "Today"
 msgstr ""
 
 msgid "Total"
+msgstr ""
+
+msgid "Unknown API client or token."
 msgstr ""
 
 msgid "Unknown email %s"
