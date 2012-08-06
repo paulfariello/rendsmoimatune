@@ -31,6 +31,9 @@ define('CONFIG_FILE', ROOT.'inc/conf/config.ini');
 define('COTS_FILE', ROOT.'install/cots.xml');
 define('COTS_DIR', ROOT.'inc/cots/');
 
+header("Cache-Control: no-cache, must-revalidate");
+header("Expires: Mon, 28 Nov 1988 05:00:00 GMT");
+
 error_reporting(E_WARNING);
 require_once "pclerror.lib.php";
 require_once "pcltrace.lib.php";

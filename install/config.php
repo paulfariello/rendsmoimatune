@@ -39,6 +39,9 @@ define('COTS_DIR', ROOT.'inc/cots/');
 define('TEMPLATES_COMPILED_DIR', ROOT.'templates_c/');
 define('TEMPLATES_COMPILED_DIR_MOD', 0770);
 
+header("Cache-Control: no-cache, must-revalidate");
+header("Expires: Mon, 28 Nov 1988 05:00:00 GMT");
+
 $config = array();
 $cots = new SimpleXMLElement(COTS_FILE, null, true);
 
