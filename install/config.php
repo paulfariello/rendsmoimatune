@@ -213,7 +213,7 @@ if (isset($_POST['create-config-file'])) {
     </fieldset>
     <fieldset>
         <legend>Site</legend>
-        <label for="site-title">Url</label><input name="site-title" type="text" value="" /><br />
+        <label for="site-title">Title</label><input name="site-title" type="text" value="" /><br />
         <label for="site-url">Url</label><input name="site-url" type="text" value="http://<?php echo $_SERVER['HTTP_HOST'].substr($_SERVER['REQUEST_URI'], 0, -strlen('install/config.php')); ?>" /><br />
         <label for="site-image-dir">Image directory</label><input name="site-image-dir" type="text" value="px/" /><br />
         <label for="site-style-dir">Css directory</label><input name="site-style-dir" type="text" value="style/" /><br />
