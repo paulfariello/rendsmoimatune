@@ -23,7 +23,6 @@
  * @package  BotteDeFoin
  * @author   Paul Fariello <paul.fariello@gmail.com>
  * @license  http://www.gnu.org/copyleft/gpl.html  GPL License 3.0
- * @version  SVN: 145
  * @link     http://www.bottedefoin.net
  */
 
@@ -65,7 +64,7 @@ if ($cots[0] instanceof SimpleXMLElement) {
     echo 'Downloading from '.$url.'<br />';
     
     // Trying to conforme filename to pclTar
-    $fileName = ROOT.'install/'.basename(parse_url($url,PHP_URL_PATH));
+    $fileName = '/tmp/'.basename(parse_url($url,PHP_URL_PATH));
     if (strrpos($fileName, '.tar.gz') !== strlen($fileName)-strlen('.tar.gz')) {
         $fileName = pathinfo($fileName,PATHINFO_FILENAME).'.tar.gz';
     }
