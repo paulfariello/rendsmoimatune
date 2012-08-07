@@ -1,6 +1,6 @@
 <?php
 /**
- * Fichier d'installation de botteDeFoin
+ * Cots download script
  *
  * PHP version 5.3
  *
@@ -19,7 +19,7 @@
  * You should have received a copy of the GNU General Public License
  * along with BotteDeFoin.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @category ScriptFile
+ * @category Install
  * @package  BotteDeFoin
  * @author   Paul Fariello <paul.fariello@gmail.com>
  * @license  http://www.gnu.org/copyleft/gpl.html  GPL License 3.0
