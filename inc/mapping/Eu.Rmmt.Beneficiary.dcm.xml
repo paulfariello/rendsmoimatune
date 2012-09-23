@@ -6,7 +6,7 @@
             <generator strategy="SEQUENCE" />
             <sequence-generator sequence-name="beneficiary_beneficiary_pk_seq" initial-value="1" allocation-size="1" />        </id>
 
-        <field name="_amount" column="amount" type="decimal" />
+        <field name="_amount" column="amount" type="integer" />
 
         <many-to-one target-entity="Expenditure" field="_expenditure" inversed-by="_beneficiaries">
             <join-column name="expenditure_pcfk" referenced-column-name="expenditure_pk" />
