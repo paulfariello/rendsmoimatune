@@ -56,6 +56,7 @@ class SmartyAdapter implements \Bdf\ITemplatesEngine
         'intToByteQuantity',
         'isCurrentPage',
         'htmlProtect',
+        'xmlProtect',
         'moneyFormat',
         'formatMoneyInput'
     );
@@ -171,7 +172,7 @@ class SmartyAdapter implements \Bdf\ITemplatesEngine
      * @param array  $params @see \Bdf\Utils::CSRFToken()
      * @param Smarty $smarty instance de Smarty
      *
-     * @return @see \Bdf\Utils::htmlProtect()
+     * @return @see \Bdf\Utils::CSRFToken()
      */
     public function utilsGenerateCSRFToken($params, $smarty)
     {
@@ -202,6 +203,19 @@ class SmartyAdapter implements \Bdf\ITemplatesEngine
     public function utilsHtmlProtect($param)
     {
         return \Bdf\Utils::htmlProtect($param);
+    }
+
+    /**
+     * Encapsulation de {@link \Bdf\Utils::xmlProtect()}
+     *
+     * @param array  $params @see \Bdf\Utils::xmlProtect()
+     * @param Smarty $smarty instance de Smarty
+     *
+     * @return @see \Bdf\Utils::xmlProtect()
+     */
+    public function utilsXmlProtect($param)
+    {
+        return \Bdf\Utils::xmlProtect($param);
     }
 
     /**

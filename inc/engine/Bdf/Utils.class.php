@@ -139,6 +139,18 @@ class Utils
     }
 
     /**
+     * Protect a string from XSS
+     *
+     * @param string $str string to protect
+     *
+     * @return string the protected string
+     */
+    public static function xmlProtect($str)
+    {
+        return xmlspecialchars($str,  ENT_COMPAT | ENT_XML1);
+    }
+
+    /**
      * Est-ce que l'url correspond à la page courante
      *
      * @param string $url L'url à tester

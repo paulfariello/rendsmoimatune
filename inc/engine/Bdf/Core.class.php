@@ -301,7 +301,7 @@ class Core
 
     public function getLocale()
     {
-        return $this->getConfig("i18n", "locale");
+        return $this->getConfig("site", "default_locale");
     }
 
     /**

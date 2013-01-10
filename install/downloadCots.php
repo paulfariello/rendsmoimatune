@@ -1,6 +1,6 @@
 <?php
 /**
- * Fichier d'installation de botteDeFoin
+ * Cots download script
  *
  * PHP version 5.3
  *
@@ -19,11 +19,10 @@
  * You should have received a copy of the GNU General Public License
  * along with BotteDeFoin.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @category ScriptFile
+ * @category Install
  * @package  BotteDeFoin
  * @author   Paul Fariello <paul.fariello@gmail.com>
  * @license  http://www.gnu.org/copyleft/gpl.html  GPL License 3.0
- * @version  SVN: 145
  * @link     http://www.bottedefoin.net
  */
 
@@ -31,6 +30,9 @@ define('ROOT', realpath(dirname(__FILE__).'/../').'/');
 define('CONFIG_FILE', ROOT.'inc/conf/config.ini');
 define('COTS_FILE', ROOT.'install/cots.xml');
 define('COTS_DIR', ROOT.'inc/cots/');
+
+header("Cache-Control: no-cache, must-revalidate");
+header("Expires: Mon, 28 Nov 1988 05:00:00 GMT");
 
 error_reporting(E_WARNING);
 require_once "pclerror.lib.php";
@@ -65,7 +67,7 @@ if ($cots[0] instanceof SimpleXMLElement) {
     echo 'Downloading from '.$url.'<br />';
     
     // Trying to conforme filename to pclTar
-    $fileName = ROOT.'install/'.basename(parse_url($url,PHP_URL_PATH));
+    $fileName = '/tmp/'.basename(parse_url($url,PHP_URL_PATH));
     if (strrpos($fileName, '.tar.gz') !== strlen($fileName)-strlen('.tar.gz')) {
         $fileName = pathinfo($fileName,PATHINFO_FILENAME).'.tar.gz';
     }

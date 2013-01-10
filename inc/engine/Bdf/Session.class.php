@@ -24,7 +24,6 @@
  * @package  BotteDeFoin
  * @author   Paul Fariello <paul.fariello@gmail.com>
  * @license  http://www.gnu.org/copyleft/gpl.html  GPL License 3.0
- * @version  SVN: 145
  * @link     http://www.bottedefoin.net
  */
 
@@ -50,9 +49,10 @@ class Session
     const FIELD_CRASH = "bdf-crash";
     const FIELD_CHALLENGE = "bdf-challenge-id";
     const FIELD_CSRF_TOKENS = "bdf-csrf-tokens";
+    const FIELD_COOKIE_THEFT_PROTECTION = "bdf-cookie-theft-protection";
     const COOKIE_LIFETIME = 604800;
 
-    private $_protectedFields = array(self::FIELD_CRASH, self::FIELD_USER_ID, self::FIELD_CHALLENGE, self::FIELD_CSRF_TOKENS);
+    private $_protectedFields = array(self::FIELD_CRASH, self::FIELD_USER_ID, self::FIELD_CHALLENGE, self::FIELD_CSRF_TOKENS, self::FIELD_COOKIE_THEFT_PROTECTION);
 
     /**
      * Constructeur
@@ -119,6 +119,13 @@ class Session
             $this->_values = $_SESSION;
         }
 
+        // check for cookie theft
+        if (!$this->_checkCookieTheft())
+            // Cookie may have been stolen. Erase all.
+            $this->_values = array();
+
+        $this->_values[self::FIELD_COOKIE_THEFT_PROTECTION] = $this->_getCookieTheftProtection();
+
         // On réinitialize la variable de session
         $_SESSION = array();
         $_SESSION[self::FIELD_CRASH] = $this->_values;
@@ -127,6 +134,109 @@ class Session
         $this->_getValidChallenges();
 
         $this->_userId = isset($this->_values[self::FIELD_USER_ID])?$this->_values[self::FIELD_USER_ID]:null;
+    }
+
+    /**
+     * Check for cookie theft
+     *
+     * If SSL_SESSION_ID is present use it, otherwise use ip/user-agent.
+     *
+     * @return false if cookie may have been stolen, true otherwise.
+     */
+    private function _checkCookieTheft()
+    {
+        if (!isset($this->_values[self::FIELD_COOKIE_THEFT_PROTECTION]) || empty($this->_values[self::FIELD_COOKIE_THEFT_PROTECTION]))
+            // No cookie theft protection, don't trust anything.
+            return false;
+
+        $protection = $this->_values[self::FIELD_COOKIE_THEFT_PROTECTION];
+        if (!isset($protection['type']) || empty($protection['type']))
+            return false;
+
+        switch($protection['type']) {
+            case 'SSL':
+                return $this->_checkSSLCookieProtection($protection);
+                break;
+            case 'IP':
+                return $this->_checkIPCookieProtection($protection);
+                break;
+            default:
+                return false;
+        }
+    }
+
+    /**
+     * Check that current SSL_SESSION_ID correspond to the one saved in session
+     *
+     * @param SESSION protection
+     *
+     * @return true is it correspond, false otherwise.
+     */
+    private function _checkSSLCookieProtection(array $protection)
+    {
+        if (!isset($protection['SSL_SESSION_ID']) || empty($protection['SSL_SESSION_ID']))
+            return false;
+
+        return $protection['SSL_SESSION_ID'] == getenv('SSL_SESSION_ID');
+    }
+
+    /**
+     * Check that current client ip address and user-agent correspond to the one saved in session
+     *
+     * @param SESSION protection
+     *
+     * @return true is it correspond, false otherwise.
+     */
+    private function _checkIPCookieProtection(array $protection)
+    {
+        if (!isset($protection['REMOTE_ADDR']) || empty($protection['REMOTE_ADDR']))
+            return false;
+
+        if (!isset($protection['HTTP_USER_AGENT']) || empty($protection['HTTP_USER_AGENT']))
+            return false;
+
+        return $protection['REMOTE_ADDR'] == $_SERVER['REMOTE_ADDR'] && $protection['HTTP_USER_AGENT'] == $_SERVER['HTTP_USER_AGENT'];
+    }
+
+    /**
+     * Save cookie protection depending on what is available.
+     *
+     * @return array the cookie theft protection
+     */
+    private function _getCookieTheftProtection()
+    {
+        $sslSessionId = getenv('SSL_SESSION_ID');
+        if (!empty($sslSessionId))
+            return $this->_getSSLCookieTheftProtection();
+        else
+            return $this->_getIPCookieTheftProtection();
+    }
+
+    /**
+     * Save cookie protection based on SSL_SESSION_ID
+     *
+     * @return array the cookie theft protection
+     */
+    private function _getSSLCookieTheftProtection()
+    {
+        return array(
+            'type'=>'SSL',
+            'SSL_SESSION_ID'=>getenv('SSL_SESSION_ID')
+        );
+    }
+
+    /**
+     * Save cookie protection based on client IP address and user-agent
+     *
+     * @return array the cookie theft protection
+     */
+    private function _getIPCookieTheftProtection()
+    {
+        return array(
+            'type'=>'IP',
+            'REMOTE_ADDR'=>$_SERVER['REMOTE_ADDR'],
+            'HTTP_USER_AGENT'=>$_SERVER['HTTP_USER_AGENT']
+        );
     }
 
     /**
@@ -159,7 +269,7 @@ class Session
             $_SESSION[self::FIELD_CRASH][$name] = $value;
         } else {
             // TODO throw exception
-            \Bdf\Core::getInstance()->logger->warn('Vous ne pouvez pas ecraser la variable de session : '.$name, 'Session add');
+            \Bdf\Core::getInstance()->logger->warn('Vous ne pouvez pas écraser la variable de session : '.$name, 'Session add');
         }
 
     }

@@ -1,5 +1,6 @@
 <xml>
     <doctrine>
+	<release name="2.2.3" url="http://www.doctrine-project.org/downloads/DoctrineORM-2.2.3-full.tar.gz" md5sum="711f24ed00989fa3497295a9f99cde30" extractPath="DoctrineORM-2.2.3" />
         <release name="2.2.0" url="http://www.doctrine-project.org/downloads/DoctrineORM-2.2.0-full.tar.gz" md5sum="18ea452323e2d9f9cbc38bcb8517bc3b" extractPath="doctrine-orm" />
         <release name="2.0.7" url="http://www.doctrine-project.org/downloads/DoctrineORM-2.0.7-full.tar.gz" md5sum="e5187d30926920cb09b9ea1326051e06" extractPath="doctrine-orm" />
         <release name="2.0.1 (deprecated)" url="http://www.doctrine-project.org/downloads/DoctrineORM-2.0.1-full.tar.gz" md5sum="078ab54e6a4d04910a2f3850ffa7208a" extractPath="doctrine-orm" />
@@ -7,6 +8,7 @@
     </doctrine>
     <templates>
         <engine name="smarty">
+		<release name="3.1.11" url="http://www.smarty.net/files/Smarty-3.1.11.tar.gz" md5sum="35c2bb7aef3a0f0a86b0d679ece8ea1c" extractPath="Smarty-3.1.11/libs" />
             <release name="3.0.7" url="http://www.smarty.net/files/Smarty-3.0.7.tar.gz" md5sum="95a95b6d86e21281438209ecfc5afab7" extractPath="Smarty-3.0.7/libs" />
             <release name="3.0-RC1" url="http://www.smarty.net/do_download.php?download_file=Smarty-3.0rc1.tar.gz" md5sum="bc1c8d4e91acd2242a40225bccf11994" extractPath="Smarty-3.0rc1/libs" />
         </engine>

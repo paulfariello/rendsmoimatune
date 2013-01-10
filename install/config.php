@@ -1,6 +1,6 @@
 <?php
 /**
- * Fichier de creation de la configuration de botteDeFoin
+ * Configuration creation script
  *
  * PHP version 5.3
  *
@@ -19,11 +19,10 @@
  * You should have received a copy of the GNU General Public License
  * along with BotteDeFoin.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @category ScriptFile
+ * @category Install
  * @package  BotteDeFoin
  * @author   Paul Fariello <paul.fariello@gmail.com>
  * @license  http://www.gnu.org/copyleft/gpl.html  GPL License 3.0
- * @version  SVN: 145
  * @link     http://www.bottedefoin.net
  */
 
@@ -38,6 +37,9 @@ define('COTS_FILE', ROOT.'install/cots.xml');
 define('COTS_DIR', ROOT.'inc/cots/');
 define('TEMPLATES_COMPILED_DIR', ROOT.'templates_c/');
 define('TEMPLATES_COMPILED_DIR_MOD', 0770);
+
+header("Cache-Control: no-cache, must-revalidate");
+header("Expires: Mon, 28 Nov 1988 05:00:00 GMT");
 
 $config = array();
 $cots = new SimpleXMLElement(COTS_FILE, null, true);
@@ -213,7 +215,7 @@ if (isset($_POST['create-config-file'])) {
     </fieldset>
     <fieldset>
         <legend>Site</legend>
-        <label for="site-title">Url</label><input name="site-title" type="text" value="" /><br />
+        <label for="site-title">Title</label><input name="site-title" type="text" value="" /><br />
         <label for="site-url">Url</label><input name="site-url" type="text" value="http://<?php echo $_SERVER['HTTP_HOST'].substr($_SERVER['REQUEST_URI'], 0, -strlen('install/config.php')); ?>" /><br />
         <label for="site-image-dir">Image directory</label><input name="site-image-dir" type="text" value="px/" /><br />
         <label for="site-style-dir">Css directory</label><input name="site-style-dir" type="text" value="style/" /><br />

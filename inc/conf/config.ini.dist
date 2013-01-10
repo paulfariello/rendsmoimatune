@@ -39,6 +39,7 @@ image_dir = "px/"
 style_dir = "style/"
 javascript_dir = "js/"
 skin = "default"
+default_locale = "fr_FR"
 ;Namespace should not start with \
 namespace = ""
 breadcrumb_separator = " — "
