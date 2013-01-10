@@ -147,7 +147,7 @@ class Utils
      */
     public static function xmlProtect($str)
     {
-        return xmlspecialchars($str,  ENT_COMPAT | ENT_XML1);
+        return htmlspecialchars($str,  ENT_COMPAT | ENT_XML1);
     }
 
     /**
