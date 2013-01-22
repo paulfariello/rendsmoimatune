@@ -33,7 +33,7 @@
             <div class="summary-name">{$user->getName()|htmlProtect}</div>
             <div class="clear"></div>
         {/foreach}
-        <h4>{getText id="Total"} : {$totalExpenditure} €</h4>
+        <h4>{getText id="Total"} : {$totalExpenditure|moneyFormat} €</h4>
     </div>
 {else}
     <h4>{getText id="No expenditure"}</h4>
@@ -64,7 +64,7 @@
             <div class="summary-name">{$user->getName()|htmlProtect}</div>
             <div class="clear"></div>
         {/foreach}
-        <h4>{getText id="Total"} : {$totalRepayment} €</h4>
+        <h4>{getText id="Total"} : {$totalRepayment|moneyFormat} €</h4>
     </div>
 {else}
     <h4>{getText id="No repayment"}</h4>
