@@ -21,25 +21,23 @@
  *
  * @category ClassFile
  * @package  Rendsmoimatune
- * @author   needle
+ * @author   Paul Fariello <paul.fariello@gmail.com>
  * @license  http://www.gnu.org/copyleft/gpl.html  GPL License 3.0
- * @version  SVN: $revision$
- * @link
+ * @link     http://www.rendsmoimatune.eu
  */
 
 namespace Eu\Rmmt;
 use DateTime;
 use Bdf\Utils;
 use Doctrine\Common\Collections\ArrayCollection;
+use Eu\Rmmt\Exception\RightException;
+use Eu\Rmmt\Exception\ExcludeConstrainedException;
 
 /**
  * Account
  *
  * @category Class
- * @package
- * @author   needle
- * @license  http://www.gnu.org/copyleft/gpl.html  GPL License 3.0
- * @link
+ * @author   Paul Fariello <paul.fariello@gmail.com>
  */
 class Account
 {
@@ -394,7 +392,7 @@ class Account
 
     public function getUrlExclusion(User $user)
     {
-        return Utils::makeUrl('my-accounts/'.Utils::urlize($this->_name).'-'.$this->_id.'/exlude-'.Utils::urlize($user->getName()).'-'.$user->getId().'.html');
+        return Utils::makeUrl('my-accounts/'.Utils::urlize($this->_name).'-'.$this->_id.'/exclude-'.Utils::urlize($user->getName()).'-'.$user->getId().'.html');
     }
 
     public function getUrlAutocompleteUser()
@@ -429,28 +427,54 @@ class Account
     public function checkViewRight(User $user)
     {
         if (!$this->grantAccess($user)) {
-            throw new \Eu\Rmmt\Exception\RightException(\Bdf\Utils::getText("You can't access this account."));
+            throw new RightException(\Bdf\Utils::getText("You can't access this account."));
         }
     }
 
     public function checkCreateRight(User $user)
     {
         if (!$this->grantAccess($user)) {
-            throw new \Eu\Rmmt\Exception\RightException(\Bdf\Utils::getText("You can't create expenditure neither repayment in this account."));
+            throw new RightException(\Bdf\Utils::getText("You can't create expenditure neither repayment in this account."));
         }
     }
 
     public function checkDeleteRight(User $user)
     {
         if (!$this->_creator->equals($user)) {
-            throw new \Eu\Rmmt\Exception\RightException(\Bdf\Utils::getText("You can't delete this account because you haven't created it."));
+            throw new RightException(\Bdf\Utils::getText("You can't delete this account because you haven't created it."));
         }
     }
 
     public function checkRenameRight(User $user)
     {
         if (!$this->_creator->equals($user)) {
-            throw new \Eu\Rmmt\Exception\RightException(\Bdf\Utils::getText("You can't rename this account because you haven't created it."));
+            throw new RightException(\Bdf\Utils::getText("You can't rename this account because you haven't created it."));
+        }
+    }
+
+    public function checkExcludeRight(User $currentUser, User $user)
+    {
+        if (!$this->grantAccess($currentUser)) {
+            throw new RightException(\Bdf\Utils::getText("You can't exclude an user from this account."));
+        }
+
+        if ($this->_creator->equals($user)) {
+            throw new RightException(\Bdf\Utils::getText("You can't exclude an user from his/her own account."));
+        }
+
+        $em = \Bdf\Core::getInstance()->getEntityManager();
+        $query = $em->createQuery("SELECT e FROM \Eu\Rmmt\Expenditure e INNER JOIN e._payers p INNER JOIN e._beneficiaries b INNER JOIN p._user pu INNER JOIN b._user bu INNER JOIN e._account a WHERE a._id = :aid AND (pu._id = :uid OR bu._id = :uid)");
+        $query->setParameter("uid", $user->getId());
+        $query->setParameter("aid", $this->getId());
+        $expenditures = $query->execute();
+
+        $query = $em->createQuery("SELECT r FROM \Eu\Rmmt\Repayment r INNER JOIN r._payer pu INNER JOIN r._beneficiary bu INNER JOIN r._account a WHERE a._id = :aid AND (pu._id = :uid OR bu._id = :uid)");
+        $query->setParameter("uid", $user->getId());
+        $query->setParameter("aid", $this->getId());
+        $repayments = $query->execute();
+
+        if (count($repayments) + count($expenditures) > 0) {
+            throw new ExcludeConstrainedException($expenditures, $repayments);
         }
     }
 }

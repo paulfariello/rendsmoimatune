@@ -71,8 +71,7 @@ msgstr ""
 "Un email vient de vous être envoyé afin de réinitialiser votre mot de passe."
 
 msgid "An email has been sent to you. Please read it to get your api key."
-msgstr ""
-"Un email vient de vous être envoyé. Lisez le pour obtenir votre clé."
+msgstr "Un email vient de vous être envoyé. Lisez le pour obtenir votre clé."
 
 msgid "Another beneficiary"
 msgstr "Autre consommateur"
@@ -112,11 +111,6 @@ msgstr "Faire les comptes"
 
 msgid "Cash-up"
 msgstr "Faire les comptes"
-
-msgid ""
-"Congratulations ! You are now able to use our fantastic API with the "
-"following key."
-msgstr ""
 
 msgid "Create"
 msgstr "Créer"
@@ -166,17 +160,19 @@ msgstr "e-mail"
 msgid "Email %s is already registered, pleasse choose another email."
 msgstr "L'email « %s » est déjà enregistré. Veuillez en choisir un autre."
 
-#, fuzzy
 msgid "Email %s is already registered."
 msgid_plural "Emails %s are already registered."
 msgstr[0] "L'email « %s » est déjà enregistré."
-msgstr[1] "L'email « %s » est déjà enregistré."
+msgstr[1] "Les emails « %s » sont déjà enregistrés."
 
 msgid "Email is required"
 msgstr "Email requis"
 
 msgid "Exclude"
 msgstr "Exclure"
+
+msgid "Exclude %1$s from %2$s"
+msgstr "Exclure « %1$s » du compte « %2$s »"
 
 msgid "Exclusion"
 msgstr "Exclusion"
@@ -427,6 +423,10 @@ msgstr ""
 "Gérer les dépenses faites à plusieurs c'est galère. Ne perdez plus de temps "
 "à calculer qui doit quoi à qui, Rends-moi ma tune le fait pour vous !"
 
+msgid "P_UserExclusionWarning"
+msgstr ""
+"Vous êtes sur le point d'exclure %1$s du compte %2$s. Êtes-vous sûr ?"
+
 msgid "Participants"
 msgstr "Participants"
 
@@ -600,6 +600,9 @@ msgstr[1] ""
 msgid "User %1$s merged with %1$s"
 msgstr "Fusion réussie de l'utilisateur « %1$s » avec l'utilisateur « %2$s »"
 
+msgid "User %1$s successfully excluded from %2$s"
+msgstr "L'utilisateur « %1$s » a été correctement exclus du compte « %2$s »"
+
 msgid "Users"
 msgstr "Utilisateurs"
 
@@ -635,6 +638,9 @@ msgstr "Le coût réel de la dépense."
 
 msgid "Yes, delete it"
 msgstr "Confirmer la suppression"
+
+msgid "Yes, exclude it"
+msgstr "Confirmer l'exclusion"
 
 msgid "Yesterday"
 msgstr "Hier"
@@ -690,6 +696,12 @@ msgid ""
 msgstr ""
 "Vous ne pouvez pas modifier cette dépense car vous n'en n'êtes pas l'auteur."
 
+msgid "You can't exclude an user from his/her own account."
+msgstr "Vous n'avez pas le droit d'exclure un utilisateur de son propre compte."
+
+msgid "You can't exclude an user from this account."
+msgstr "Vous n'avez pas le droit d'exclure cet utilisateur de ce compte."
+
 msgid "You can't merge user %1$s with user %2$s on your own."
 msgstr ""
 "Vous n'avez pas le droit de fusionner les utilisateurs « %1$s » et « %2$s »."
@@ -722,6 +734,12 @@ msgstr ""
 
 msgid "You can't view this expenditure"
 msgstr "Vous ne pouvez pas voir cette dépense."
+
+msgid ""
+"You cannot exclude %1$s from %2$s because he or she is involved in the "
+"following expenditures and repayments."
+msgstr "Vous ne pouvez pas exclure l'utilisateur « %1$s » du compte « %2$s » "
+"parcequ'il est concerné par les dépenses et remboursements suivant."
 
 msgid "You have successfully been authenticated through Facebook."
 msgstr "Vous avez été authentifié avec succès grâce à Facebook."

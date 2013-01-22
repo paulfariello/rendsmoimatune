@@ -107,11 +107,6 @@ msgstr ""
 msgid "Cash-up"
 msgstr ""
 
-msgid ""
-"Congratulations ! You are now able to use our fantastic API with the "
-"following key."
-msgstr ""
-
 msgid "Create"
 msgstr ""
 
@@ -169,6 +164,9 @@ msgid "Email is required"
 msgstr ""
 
 msgid "Exclude"
+msgstr ""
+
+msgid "Exclude %1$s from %2$s"
 msgstr ""
 
 msgid "Exclusion"
@@ -384,6 +382,9 @@ msgstr ""
 msgid "P_MainDesc"
 msgstr ""
 
+msgid "P_UserExclusionWarning"
+msgstr ""
+
 msgid "Participants"
 msgstr ""
 
@@ -552,6 +553,9 @@ msgstr[1] ""
 msgid "User %1$s merged with %1$s"
 msgstr ""
 
+msgid "User %1$s successfully excluded from %2$s"
+msgstr ""
+
 msgid "Users"
 msgstr ""
 
@@ -582,6 +586,9 @@ msgid "What the expenditure really cost."
 msgstr ""
 
 msgid "Yes, delete it"
+msgstr ""
+
+msgid "Yes, exclude it"
 msgstr ""
 
 msgid "Yesterday"
@@ -620,6 +627,12 @@ msgid ""
 "expenditure neither of this account"
 msgstr ""
 
+msgid "You can't exclude an user from his/her own account."
+msgstr ""
+
+msgid "You can't exclude an user from this account."
+msgstr ""
+
 msgid "You can't merge user %1$s with user %2$s on your own."
 msgstr ""
 
@@ -641,6 +654,11 @@ msgid "You can't send invitation to user you haven't created"
 msgstr ""
 
 msgid "You can't view this expenditure"
+msgstr ""
+
+msgid ""
+"You cannot exclude %1$s from %2$s because he or she is involved in the "
+"following expenditures and repayments."
 msgstr ""
 
 msgid "You have successfully been authenticated through Facebook."

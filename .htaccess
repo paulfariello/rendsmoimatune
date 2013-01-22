@@ -25,6 +25,7 @@ RewriteRule    ^my-accounts/[a-z0-9-]*-([0-9]+)/rename.html$                    
 RewriteRule    ^my-accounts/[a-z0-9-]*-([0-9]+)/participants.html$                              my-accounts/participants.php?account-id=$1 [L]
 RewriteRule    ^my-accounts/[a-z0-9-]*-([0-9]+)/merge-user-([0-9]+)-with-([0-9]+).html$         my-accounts/merge-users.php?account-id=$1&id1=$2&id2=$3 [L]
 RewriteRule    ^my-accounts/[a-z0-9-]*-([0-9]+)/accept-merge-([0-9]+)-([a-f0-9]+).html$         my-accounts/accept-merge.php?account-id=$1&request=$2&token=$3 [L]
+RewriteRule    ^my-accounts/[a-z0-9-]*-([0-9]+)/exclude-[a-z0-9-]*-([0-9]+).html$               my-accounts/exclude-user.php?account-id=$1&id=$2 [L]
 
 # Expenditure
 RewriteRule    ^my-accounts/[a-z0-9-]*-([0-9]+)/expenditures-list.html$                         my-accounts/expenditures-list.php?account-id=$1 [L]

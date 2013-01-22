@@ -70,7 +70,7 @@ try {
         $mergeRequest->checkMergeRight();
         $mergeRequest->doMerge(); 
 
-        $te->assign('messages', array(array('type'=>'done','content'=>sprintf(\Bdf\Utils::getText('User %1$s merged with %1$s'), $firstUserName, $secondUserName))));
+        $te->assign('messages', array(array('type'=>'done','content'=>sprintf(\Bdf\Utils::getText('User %1$s merged with %2$s'), $firstUserName, $secondUserName))));
         $te->display('merge-request');
 
     } else {

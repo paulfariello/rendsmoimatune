@@ -74,36 +74,15 @@ $te->assign('merges', $merges);
 if (isset($_POST['merge-users'])) {
     if (isset($_POST['merge']) and sizeof($_POST['merge']) == 2) {
         header('location: '.$account->getUrlMergeRequestFromIds($_POST['merge'][0], $_POST['merge'][1]));
+        die();
     }
 }
-//if (isset($_POST['delete-users'])) {
-//    try {
-//        foreach($_POST['delete'] as $userId => $delete) {
-//            try {
-//                $user = \Eu\Rmmt\User::getRepository()->find($userId);
-//                $user->checkDeleteRight($currentUser);
-//                if (null !== $user) {
-//                    $user->delete();
-//                }
-//            } catch(Eu\Rmmt\Exception\RightException $e) {
-//                $messages[] = array('type'=>'error','content'=>$e->getMessage());
-//            }
-//        }
-//    } catch (Exception $e) {
-//        $te->assign('messages', array(array('type'=>'error','content'=>Bdf\Utils::getText('Internal error').' : '.$e->getMessage())));
-//        $te->display("error.tpl");
-//    }
-//    $te->assign('messages', $messages);
-//} elseif(isset($_POST['update-users'])) {
-//    foreach($_POST['update'] as $userId => $name) {
-//        $user = \Eu\Rmmt\User::getRepository()->find($userId);
-//        if (null !== $user) {
-//            $user->setName($name);
-//        }
-//    }
-//}
 
-$em->flush();
+$storedMessages = \Bdf\Session::getInstance()->get('messages');
+if (null !== $storedMessages) {
+    $messages = array_merge($messages, $storedMessages);
+    \Bdf\Session::getInstance()->remove('messages');
+}
 
 $te->assign('messages', $messages);
 $te->display('my-accounts/participants');
