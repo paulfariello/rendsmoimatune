@@ -706,3 +706,12 @@ p.signature {
     height: 32px;
     clear: both;
 }
+
+#main code {
+	border: 1px solid #ddd;
+	background: #fbfbfb;
+    font-family: monospace;
+    margin: 0.5em;
+    padding: 0.5em;
+    display: block;
+}

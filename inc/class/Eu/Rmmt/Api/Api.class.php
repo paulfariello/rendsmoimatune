@@ -23,23 +23,23 @@
  * @package  Rendsmoimatune
  * @author   Paul Fariello <paul.fariello@gmail.com>
  * @license  http://www.gnu.org/copyleft/gpl.html  GPL License 3.0
- * @version  SVN: 145
- * @link     http://www.Rendsmoimatune.fr
+ * @link     http://www.rendsmoimatune.eu
  */
 
 namespace Eu\Rmmt\Api;
-use Exception;
 use Bdf\Core;
+use Bdf\Utils;
+use Exception;
+use Eu\Rmmt\Api\Api;
+use Eu\Rmmt\Exception\OAuthException;
+use Eu\Rmmt\Exception\ApiException;
 use Eu\Rmmt\User;
 
 /**
  * Api
  *
  * @category Class
- * @package  Fr\Rendsmoimatune\User
  * @author   Paul Fariello <paul.fariello@gmail.com>
- * @license  http://www.gnu.org/copyleft/gpl.html  GPL License 3.0
- * @link     http://www.Rendsmoimatune.fr
  */
 class Api
 {
@@ -48,101 +48,96 @@ class Api
      */
     const ERROR_INTERNAL            = 0x8000;
     const ERROR_INVALID_REQUEST     = 0x0001;
-    const ERROR_INVALID_API_KEY     = 0x0002;
-    const ERROR_INVALID_AUTH_TOKEN  = 0x0003;
+    const ERROR_AUTH_REQUIRED       = 0x0002;
+    const ERROR_ACCESS_FORBIDDEN    = 0x0003;
 
-    /**
-     * List of query key
-     */
-    const QUERY_KEY_API_KEY     = "api-key";
-    const QUERY_KEY_AUTH_TOKEN  = "auth-token";
+    private static $ERROR_MESSAGES  = null;
+    private static $HTTP_STATUS     = null;
 
     private $_em;
     private $_te;
-    private $_method;
-    private $_client = null;
-    private $_user;
+    private $_oauth;
 
-    public function __construct($method)
+    public function __construct(OAuth $oauth)
     {
-        $this->_method = $method;
+        $this->_oauth = $oauth;
 
         $this->_em = Core::getInstance()->getEntityManager();
 
         $this->_te = Core::getInstance()->getTemplatesEngine();
         $this->_te->setSkin("xml");
-        $this->_te->assign("method", $this->_method);
-
-        $this->_checkApiKey();
-    }
-
-    private function _checkApiKey()
-    {
-        if (isset($_REQUEST[self::QUERY_KEY_API_KEY])) {
-            $apiClient = Client::getRepository()->findOneBy(array("_apiKey"=>$_REQUEST[self::QUERY_KEY_API_KEY]));
-            if ($apiClient != null) {
-                $this->_client = $apiClient;
-                return;
-            }
-        }
-
-        $this->displayError(self::ERROR_INVALID_API_KEY);
-    }
-
-    public function checkAuthToken()
-    {
-        if (isset($_REQUEST[self::QUERY_KEY_AUTH_TOKEN])) {
-            $query = $em->createQuery('SELECT u FROM Eu\Rmmt\User u INNER JOIN u._apiClient c WHERE u._apiAuthToken = :apiAuthToken AND c._apiKey = :apiKey;');
-            $query->setParameters(array("apiAuthToken"=>$_REQUEST[self::QUERY_KEY_AUTH_TOKEN], "apiKey"=>$this->_client->getApiKey()));
-            $query->execute();
-            $user = User::getRepository()->findOneBy(array("_apiKey"=>$this->_client->getApiKey(), "_apiAuthToken"=>$_REQUEST[self::QUERY_KEY_AUTH_TOKEN]));
-            if ($user != null) {
-                $this->_user = $user;
-                $this->_renewAuthToken();
-                return;
-            }
-        }
-
-        $this->displayError(self::ERROR_INVALID_AUTH_TOKEN);
-    }
-
-    private function _generateToken()
-    {
-        return hash_hmac('SHA512', mt_rand(), $this->_user->getId());
-    }
-
-    private function _renewAuthToken()
-    {
-        $this->_user->setApiAuthToken($this->_generateToken(), $this->_client);
-        // TODO be sure to only flush user authToken update
-        $this->_em->flush();
-
-        $this->_te->assign("authToken", $this->_user->getApiAuthToken());
-    }
-
-    public function setCurrentUser(User $user)
-    {
-        $this->_user = $user;
-        $this->_renewAuthToken();
+        $this->_te->setDebugging(false);
     }
 
     public function getCurrentUser()
     {
-        return $this->_user;
-    }
-    
-    public function displayInternalError(\Exception $e)
-    {
-        $this->displayError(self::ERROR_INTERNAL);
+        try {
+            return $this->_oauth->getCurrentUser();
+        } catch (OAuthException $e) {
+            throw new ApiException(Api::ERROR_AUTH_REQUIRED, $e);
+        }
     }
 
-    public function displayError($code, $desc = null)
+    /**
+     * Init error messages
+     */
+    private static function initErrorMessages()
     {
-        $this->_te->assign("errorCode", $code);
-        if ($desc != null) {
-            $this->_te->assign("errorDesc", $desc);
-        }
-        $this->_te->display("error");
-        die();
+        self::$ERROR_MESSAGES = array(
+            self::ERROR_INTERNAL            => 'Internal error',
+            self::ERROR_INVALID_REQUEST     => 'Invalid request',
+            self::ERROR_AUTH_REQUIRED       => 'Authentication required',
+            self::ERROR_ACCESS_FORBIDDEN    => 'Access forbidden',
+        );
+    }
+
+    /**
+     * Translate error code into corresponding string
+     *
+     * @param integer $errorCode error code
+     * @param Exception $errorCode error code
+     *
+     * @return error message
+     */
+    public static function getErrorMessage($errorCode)
+    {
+        if (self::$ERROR_MESSAGES == null)
+            self::initErrorMessages();
+
+        if (isset(self::$ERROR_MESSAGES[$errorCode]))
+            return self::$ERROR_MESSAGES[$errorCode];
+        else
+            return 'Unknown error code : '.(int)$errorCode;
+    }
+
+    /**
+     * Init http error code
+     */
+    private static function initHTTPStatus()
+    {
+        self::$HTTP_STATUS = array(
+            self::ERROR_INTERNAL            => 500,
+            self::ERROR_INVALID_REQUEST     => 400,
+            self::ERROR_AUTH_REQUIRED       => 401,
+            self::ERROR_ACCESS_FORBIDDEN    => 401,
+        );
+    }
+
+    /**
+     * Translate error code into corresponding http status
+     *
+     * @param integer $errorCode error code
+     *
+     * @return integer http status as defined in rfc2616 10. Status Code Definitions
+     */
+    public static function getHTTPStatus($errorCode)
+    {
+        if (self::$HTTP_STATUS == null)
+            self::initHTTPStatus();
+
+        if (isset(self::$HTTP_STATUS[$errorCode]))
+            return self::$HTTP_STATUS[$errorCode];
+        else
+            return 500;
     }
 }

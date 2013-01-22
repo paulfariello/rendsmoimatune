@@ -1,6 +1,6 @@
 <?php
 /**
- * Fichier de connexion au site
+ * Get an account
  *
  * PHP version 5.3
  *
@@ -19,12 +19,11 @@
  * You should have received a copy of the GNU General Public License
  * along with Rendsmoimatune.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @category ClassFile
+ * @category ScriptFile
  * @package  Rendsmoimatune
  * @author   Paul Fariello <paul.fariello@gmail.com>
  * @license  http://www.gnu.org/copyleft/gpl.html  GPL License 3.0
- * @version  SVN: 145
- * @link     http://www.rendsmoimatune.net
+ * @link     http://www.rendsmoimatune.eu
  */
 
 require_once '../inc/init.php';
@@ -32,33 +31,30 @@ require_once '../inc/init.php';
 $em = \Bdf\Core::getInstance()->getEntityManager();
 $te = \Bdf\Core::getInstance()->getTemplatesEngine();
 
-$api = new Eu\Rmmt\Api\Api("api.auth");
+$api = new Eu\Rmmt\Api\Api(new Eu\Rmmt\Api\OAuth($em));
 
-if (!isset($_REQUEST['type'])) {
-    $api->displayError(Eu\Rmmt\Api\Api::ERROR_INVALID_REQUEST, "Missing type argument");
-}
+try {
+    $currentUser = $api->getCurrentUser();
 
-switch($_REQUEST['type']) {
-case 'plain':
-    try {
-        $authentication = new \Eu\Rmmt\Authentication\BasicAuthentication();
-        $authentication->setState(\Eu\Rmmt\Authentication\BasicAuthentication::CHECK_CREDENTIALS_STATE);
-        $authentication->setEmail($_REQUEST['email']);
-        $authentication->setPassword($_REQUEST['password']);
-        $user = $authentication->authenticate();
-    } catch (Exception $e) {
-        $api->displayInternalError($e);
-        die();
+    $account = Eu\Rmmt\Account::getRepository()->find($_GET['id']);
+    if (NULL == $account) {
+        throw new Eu\Rmmt\Exception\ApiException(Eu\Rmmt\Api\Api::UNKNOW_ACCOUNT);
     }
-    $currentUser = Eu\Rmmt\User::getCurrentUser();
-    if (null === $currentUser) {
-        $api->displayError(Eu\Rmmt\Api::ERROR_AUTH_FAIL);
-    } else {
-        $api->setCurrentUser($currentUser);
-        $te->display("token");
-    }
-    break;
-default:
+
+    $account->checkViewRight($currentUser);
+
+    $te->assign("account", $account);
+    $te->display("account");
+} catch(Eu\Rmmt\Exception\ApiException $e) {
+    $te->assign("apiException", $e);
+    $te->display("error");
+} catch(Eu\Rmmt\Exception\RightException $e) {
+    $apiException = new Eu\Rmmt\Exception\ApiException(Eu\Rmmt\Api\Api::ERROR_ACCESS_FORBIDDEN, $e);
+    $te->assign("apiException", $apiException);
+    $te->display("error");
+} catch(Exception $e) {
+    $apiException = new Eu\Rmmt\Exception\ApiException(Eu\Rmmt\Api\Api::ERROR_INTERNAL, $e);
+    $te->assign("apiException", $apiException);
     $te->display("error");
 }
 ?>

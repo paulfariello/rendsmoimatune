@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping http://doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+
+    <entity name="Eu\Rmmt\Api\OAuthToken" table="api_oauth_token">
+        <id name="_id" type="integer" column="api_oauth_token_pk">
+            <generator strategy="AUTO" />
+        </id>
+
+        <field name="_callback"                 column="callback"                   type="string" />
+        <field name="_token"                    column="token"                      type="string" />
+        <field name="_secret"              column="secret"               type="string" />
+        <field name="_verifier"                 column="verifier"                   type="string" />
+        <field name="_creationDate"             column="creation_date"              type="datetime" />
+        <field name="_duration"                 column="duration"                   type="integer" />
+        <field name="_isAccessToken"            column="is_access_token"            type="boolean" />
+
+        <many-to-one target-entity="OAuthConsumer" field="_consumer" inversed-by="_tokens" >
+            <join-column name="consumer_fk" referenced-column-name="api_oauth_consumer_pk" />
+        </many-to-one>
+
+        <many-to-one target-entity="\Eu\Rmmt\User" field="_user" inversed-by="_apiTokens" >
+            <join-column name="user_fk" referenced-column-name="user_pk" />
+        </many-to-one>
+    </entity>
+</doctrine-mapping>

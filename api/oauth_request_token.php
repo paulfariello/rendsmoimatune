@@ -1,6 +1,6 @@
 <?php
 /**
- * List current user's accounts
+ * OAuth request token end-point as defined in RFC 5849 2.1. Temporary Credentials
  *
  * PHP version 5.3
  *
@@ -19,32 +19,25 @@
  * You should have received a copy of the GNU General Public License
  * along with Rendsmoimatune.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @category ClassFile
+ * @category ScriptFile
  * @package  Rendsmoimatune
  * @author   Paul Fariello <paul.fariello@gmail.com>
  * @license  http://www.gnu.org/copyleft/gpl.html  GPL License 3.0
- * @version  SVN: 145
- * @link     http://www.rendsmoimatune.net
+ * @link     http://www.rendsmoimatune.eu
  */
 
 require_once '../inc/init.php';
 
 $em = \Bdf\Core::getInstance()->getEntityManager();
-$te = \Bdf\Core::getInstance()->getTemplatesEngine();
-
-$api = new Eu\Rmmt\Api\Api(new Eu\Rmmt\Api\OAuth($em));
-
 
 try {
-    $currentUser = $api->getCurrentUser();
-    $te->assign("accounts", $currentUser->getAccounts());
-    $te->display("accounts");
-} catch(Eu\Rmmt\Exception\ApiException $e) {
-    $te->assign("apiException", $e);
-    $te->display("error");
-} catch(Exception $e) {
-    $apiException = new Eu\Rmmt\Exception\ApiException(Eu\Rmmt\Api\Api::ERROR_INTERNAL, $e);
-    $te->assign("apiException", $apiException);
-    $te->display("error");
+    $oauth = new Eu\Rmmt\Api\OAuth($em, Eu\Rmmt\Api\OAuth::AUTHORIZATION_HEADER);
+    $requestToken = $oauth->generateRequestToken();
+    header("Content-Type: application/x-www-form-urlencoded");
+    echo "oauth_token=".$requestToken->getToken()."&oauth_token_secret=".$requestToken->getSecret()."&oauth_callback_confirmed=true";
+} catch (Eu\Rmmt\Exception\OAuthException $e) {
+    http_response_code($e->getHttpErrorCode());
+    echo $e->getMessage();
 }
+
 ?>

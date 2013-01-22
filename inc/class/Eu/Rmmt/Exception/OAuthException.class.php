@@ -1,6 +1,7 @@
 <?php
+
 /**
- * Fichier de connexion au site
+ * Fichier de classe
  *
  * PHP version 5.3
  *
@@ -23,31 +24,38 @@
  * @package  Rendsmoimatune
  * @author   Paul Fariello <paul.fariello@gmail.com>
  * @license  http://www.gnu.org/copyleft/gpl.html  GPL License 3.0
- * @version  SVN: 145
- * @link     http://www.rendsmoimatune.net
+ * @link     http://www.rendsmoimatune.eu
  */
 
-require_once '../inc/init.php';
+namespace Eu\Rmmt\Exception;
 
-$em = \Bdf\Core::getInstance()->getEntityManager();
-$te = \Bdf\Core::getInstance()->getTemplatesEngine();
+/**
+ * OAuthException
+ *
+ * @category Class
+ * @package  Eu\Rmmt\Exception
+ * @author   Paul Fariello <paul.fariello@gmail.com>
+ * @license  http://www.gnu.org/copyleft/gpl.html  GPL License 3.0
+ * @link     http://www.rendsmoimatune.eu
+ */
+class OAuthException extends \Exception {
+    private $_httpErrorCode;
 
-if (isset($_POST['register-client'])) {
-    $client = new \Eu\Rmmt\Api\Client($_POST['email']);
-    $em->persist($client);
-    $em->flush();
-    $te->assign('client', $client);
-} elseif (isset($_GET['token'])) {
-    $client = \Eu\Rmmt\Api\Client::getRepository()->find($_GET['id']);
-    if ($client != null AND $client->checkToken($_GET["token"])) {
-        $client->deleteToken();
-        $client->generateApiKey();
-        $em->flush();
-        $te->assign('client', $client);
-    } else {
-        $te->assign("messages", array(array("type"=>"error", "content"=>\Bdf\Utils::getText("Unknown API client or token."))));
+    /**
+     * Constructeur
+     *
+     * @return UserInputException
+     */
+    public function __construct($httpErrorCode, $message) {
+      $this->_httpErrorCode = (int)$httpErrorCode;
+      parent::__construct($message);
+    }
+
+    /**
+     * Getter
+     * @return int httpErrorCode
+     */
+    public function getHttpErrorCode() {
+      return $this->_httpErrorCode;
     }
 }
-
-$te->display('api/register-client');
-?>

@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<rmmt-api xmlns="http://dev.rendsmoimatune.eu/api"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://dev.rendsmoimatune.eu/api/rmmt.xsd"
+	version="1.0"
+	encoding="UTF-8">
+
+	<repayment id="3" from="1" to="2" amount="12345" date="2013-01-10"/>
+
+</rmmt-api>

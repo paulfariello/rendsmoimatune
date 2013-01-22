@@ -17,21 +17,22 @@
         <field name="_invitationToken"          column="invitation_token"           type="string" />
         <field name="_passwordRecoveryToken"    column="password_recovery_token"    type="string" />
         <field name="_connectionCounter"        column="connection_counter"         type="integer" />
-        <field name="_apiAuthToken"             column="api_auth_token"             type="string" />
-
 
         <one-to-many target-entity="Repayment"    mapped-by="_payer"        field="_repaymentsFromMe" />
         <one-to-many target-entity="Repayment"    mapped-by="_beneficiary"  field="_repaymentsToMe"   />
         <one-to-many target-entity="Payer"        mapped-by="_user"         field="_payers"           />
         <one-to-many target-entity="Beneficiary"  mapped-by="_user"         field="_beneficiaries"    />
 
-        <many-to-one target-entity="Eu\Rmmt\Api\Client" field="_apiClient">
-            <join-column name="api_client_fk" referenced-column-name="client_pk" />
-        </many-to-one>
         <many-to-one target-entity="User" mapped-by="_createdUsers" field="_creator">
             <join-column name="creator_fk" referenced-column-name="user_pk" />
         </many-to-one>
 
         <many-to-many target-entity="Account" field="_accounts" mapped-by="_users"/>
+
+        <one-to-many target-entity="Eu\Rmmt\Api\OAuthToken" mapped-by="_user" field="_apiTokens">
+            <cascade>
+                <cascade-persist />
+            </cascade>
+        </one-to-many>
     </entity>
 </doctrine-mapping>

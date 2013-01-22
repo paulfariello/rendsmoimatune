@@ -28,23 +28,31 @@
  */
 
 namespace Eu\Rmmt;
-use Doctrine\Common\Collections\ArrayCollection;
 use Bdf\Core;
+use Doctrine\ORM\EntityManager;
+use Doctrine\Common\Collections\ArrayCollection;
 
 /**
  * Entity
  *
  * @category Class
  * @package  Eu\Rmmt
- * @author   needle
+ * @author   Paul Fariello <paul.fariello@gmail.com>
  * @license  http://www.gnu.org/copyleft/gpl.html  GPL License 3.0
- * @link     
  */
 abstract class Entity
 {
-    public static function getRepository()
+    /**
+     * Get Doctrine repository for current entity
+     *
+     * @param EntityManager $em Doctrine EntityManager to use. Use default one if none provided.
+     *
+     * @return Doctrine repository
+     */
+    public static function getRepository(EntityManager $em = NULL)
     {
-        $em = Core::getInstance()->getEntityManager();
+        if ($em == NULL)
+            $em = Core::getInstance()->getEntityManager();
         return $em->getRepository(get_called_class());
     }
 }

@@ -1,6 +1,6 @@
 <?php
 /**
- * List current user's accounts
+ * Get an expenditure
  *
  * PHP version 5.3
  *
@@ -19,12 +19,11 @@
  * You should have received a copy of the GNU General Public License
  * along with Rendsmoimatune.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @category ClassFile
+ * @category ScriptFile
  * @package  Rendsmoimatune
  * @author   Paul Fariello <paul.fariello@gmail.com>
  * @license  http://www.gnu.org/copyleft/gpl.html  GPL License 3.0
- * @version  SVN: 145
- * @link     http://www.rendsmoimatune.net
+ * @link     http://www.rendsmoimatune.eu
  */
 
 require_once '../inc/init.php';
@@ -34,13 +33,24 @@ $te = \Bdf\Core::getInstance()->getTemplatesEngine();
 
 $api = new Eu\Rmmt\Api\Api(new Eu\Rmmt\Api\OAuth($em));
 
-
 try {
     $currentUser = $api->getCurrentUser();
-    $te->assign("accounts", $currentUser->getAccounts());
-    $te->display("accounts");
+
+    $expenditure = Eu\Rmmt\Expenditure::getRepository()->find($_GET['id']);
+    if (NULL == $expenditure) {
+        throw new Eu\Rmmt\Exception\ApiException(Eu\Rmmt\Api\Api::UNKNOW_ACCOUNT);
+    }
+
+    $expenditure->checkViewRight($currentUser);
+
+    $te->assign("expenditure", $expenditure);
+    $te->display("expenditure");
 } catch(Eu\Rmmt\Exception\ApiException $e) {
     $te->assign("apiException", $e);
+    $te->display("error");
+} catch(Eu\Rmmt\Exception\RightException $e) {
+    $apiException = new Eu\Rmmt\Exception\ApiException(Eu\Rmmt\Api\Api::ERROR_ACCESS_FORBIDDEN, $e);
+    $te->assign("apiException", $apiException);
     $te->display("error");
 } catch(Exception $e) {
     $apiException = new Eu\Rmmt\Exception\ApiException(Eu\Rmmt\Api\Api::ERROR_INTERNAL, $e);

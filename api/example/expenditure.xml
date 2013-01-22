@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<rmmt-api xmlns="http://dev.rendsmoimatune.eu/api"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://dev.rendsmoimatune.eu/api/rmmt.xsd"
+	version="1.0"
+	encoding="UTF-8">
+
+	<expenditure id="3" amount="12345" title="Golden kahuna burger">
+		<payers>
+			<payer id="1" user="1" amount="10000"/>
+			<payer id="2" user="2" amount="2345"/>
+		</payers>
+		<beneficiaries>
+			<beneficiary id="1" user="1" amount="4115"/>
+			<beneficiary id="2" user="2" amount="4115"/>
+			<beneficiary id="3" user="3" amount="4115"/>
+		</beneficiaries>
+	</expenditure>
+
+</rmmt-api>

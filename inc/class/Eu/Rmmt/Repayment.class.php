@@ -28,8 +28,9 @@
  */
 
 namespace Eu\Rmmt;
-use \DateTime;
 use \Bdf\Utils;
+use Eu\Rmmt\Exception\RightException;
+use \DateTime;
 
 /**
  * Repayment

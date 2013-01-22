@@ -1,0 +1,174 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<xs:schema
+	xmlns:xs='http://www.w3.org/2001/XMLSchema'
+	targetNamespace='http://dev.rendsmoimatune.eu/api'
+	xmlns='http://dev.rendsmoimatune.eu/api'
+	elementFormDefault='qualified'>
+	<xs:annotation>
+		<xs:documentation>
+			This document define rendsmoimatune API
+		</xs:documentation>
+	</xs:annotation>
+
+	<xs:simpleType name='id'>
+		<xs:restriction base='xs:positiveInteger'/>
+	</xs:simpleType>
+
+	<xs:simpleType name='amount'>
+		<xs:restriction base='xs:positiveInteger'/>
+	</xs:simpleType>
+
+	<xs:element name='rmmt-api'>
+		<xs:complexType>
+			<xs:choice>
+				<xs:element ref='error' minOccurs='1' maxOccurs='1'/>
+				<xs:element ref='accounts' minOccurs='1' maxOccurs='1'/>
+				<xs:element ref='account' minOccurs='1' maxOccurs='unbounded'/>
+				<xs:element ref='user' minOccurs='1' maxOccurs='unbounded'/>
+				<xs:element ref='expenditure' minOccurs='1' maxOccurs='unbounded'/>
+				<xs:element ref='repayment' minOccurs='1' maxOccurs='unbounded'/>
+				<xs:element ref='cash-up' minOccurs='1' maxOccurs='1'/>
+			</xs:choice>
+			<xs:attribute name='version' type='xs:string' use='required'/>
+			<xs:attribute name='encoding' type='xs:string' use='required'/>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name='error'>
+		<xs:complexType>
+			<xs:all minOccurs='0'>
+				<xs:element ref='description'/>
+				<xs:element ref='trace' minOccurs='0'/>
+			</xs:all>
+			<xs:attribute name='code' type='xs:integer' use='required'/>
+			<xs:attribute name='message' type='xs:string' use='required'/>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name='description'>
+		<xs:complexType>
+			<xs:simpleContent>
+				<xs:extension base='xs:string'/>
+			</xs:simpleContent>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name='trace'>
+		<xs:complexType>
+			<xs:simpleContent>
+				<xs:extension base='xs:string'/>
+			</xs:simpleContent>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name='accounts'>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref='account' minOccurs='0' maxOccurs='unbounded'/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name='account'>
+		<xs:complexType>
+			<xs:all minOccurs='0'>
+				<xs:element ref='users'/>
+				<xs:element ref='expenditures'/>
+				<xs:element ref='repayments'/>
+			</xs:all>
+			<xs:attribute name='id' type='id' use='required'/>
+			<xs:attribute name='title' type='xs:string' use='optional'/>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name='users'>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref='user' minOccurs='0' maxOccurs='unbounded'/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name='user'>
+		<xs:complexType>
+			<xs:attribute name='id' type='id' use='required'/>
+			<xs:attribute name='name' type='xs:string' use='optional'/>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name='expenditures'>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref='expenditure' minOccurs='0' maxOccurs='unbounded'/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name='expenditure'>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref='payers' minOccurs='0' maxOccurs='1'/>
+				<xs:element ref='beneficiaries' minOccurs='0' maxOccurs='1'/>
+			</xs:sequence>
+			<xs:attribute name='id' type='id' use='required'/>
+			<xs:attribute name='title' type='xs:string' use='optional'/>
+			<xs:attribute name='amount' type='xs:string' use='optional'/>
+			<xs:attribute name='date' type='xs:date' use='optional'/>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name='payers'>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref='payer' minOccurs='0' maxOccurs='unbounded'/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name='payer'>
+		<xs:complexType>
+			<xs:attribute name='id' type='id' use='required'/>
+			<xs:attribute name='user' type='id' use='optional'/>
+			<xs:attribute name='amount' type='amount' use='optional'/>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name='beneficiaries'>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref='beneficiary' minOccurs='0' maxOccurs='unbounded'/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name='beneficiary'>
+		<xs:complexType>
+			<xs:attribute name='id' type='id' use='required'/>
+			<xs:attribute name='user' type='id' use='optional'/>
+			<xs:attribute name='amount' type='amount' use='optional'/>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name='repayments'>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref='repayment' minOccurs='0' maxOccurs='unbounded'/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name='repayment'>
+		<xs:complexType>
+			<xs:attribute name='id' type='id' use='required'/>
+			<xs:attribute name='from' type='id' use='optional'/>
+			<xs:attribute name='to' type='id' use='optional'/>
+			<xs:attribute name='amount' type='amount' use='optional'/>
+			<xs:attribute name='date' type='xs:date' use='optional'/>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name='cash-up'>
+		<xs:complexType>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

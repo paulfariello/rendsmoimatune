@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<rmmt-api xmlns="http://dev.rendsmoimatune.eu/api"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://dev.rendsmoimatune.eu/api/rmmt.xsd"
+	version="1.0"
+	encoding="UTF-8">
+
+	<error code="1" message="Unavailable account">
+		<description>Vous n'avez pas le droit d'acceder à ce compte</description>
+		<trace>
+			#0 /Rendsmoimatune/api/account.php(46): Eu\Rmmt\Account->checkViewRight(Object(Bdf\Model\Proxy\__CG__\Eu\Rmmt\User))
+			#1 {main}
+		</trace>
+	</error>
+
+</rmmt-api>

@@ -63,8 +63,7 @@ class User implements \Bdf\IUser
     private $_invitationToken       = null;
     private $_passwordRecoveryToken = null;
     private $_connectionCounter     = 0;
-    private $_apiClient;
-    private $_apiAuthToken;
+    private $_apiTokens;
 
     /**
      * Constructeur
@@ -247,28 +246,6 @@ class User implements \Bdf\IUser
     public function getConnectionCounter()
     {
         return $this->_connectionCounter;
-    }
-
-    /**
-     * Get last known api auth token
-     *
-     * @return api auth token
-     */
-    public function getApiAuthToken()
-    {
-        return $this->_apiAuthToken;
-    }
-
-    /**
-     * Set api auth token
-     *
-     * @param string $apiAuthToken a random token
-     * @param \Eu\Rmmt\Api\Client $apiClient the api key used to connect
-     */
-    public function setApiAuthToken($apiAuthToken, \Eu\Rmmt\Api\Client $apiClient)
-    {
-        $this->_apiAuthToken = $apiAuthToken;
-        $this->_apiClient = $apiClient;
     }
 
     public static function getRepository()
