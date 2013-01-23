@@ -68,7 +68,7 @@ try {
         $username = $user->getName();
 
         $account->removeUser($user);
-        if ($user->isRegistered())
+        if (!$user->isRegistered())
             $em->remove($user);
 
         $em->flush();
