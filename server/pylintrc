@@ -1,0 +1,11 @@
+[MASTER]
+ignore=tests
+
+[MESSAGES CONTROL]
+disable=too-few-public-methods
+
+[BASIC]
+no-docstring-rgx=Meta
+
+[FORMAT]
+max-line-length=120
