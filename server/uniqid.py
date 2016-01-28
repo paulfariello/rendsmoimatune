@@ -33,7 +33,7 @@ def decode(encoded):
     for c in encoded[::-1]:
         n = n * BASE + ALPHABET.index(c)
 
-    return uuid.UUID(int=int(n))
+    return uuid.UUID(int=n)
 
 def generate():
     return uuid.uuid4()

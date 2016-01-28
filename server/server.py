@@ -13,45 +13,102 @@
 # WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-"""A rest API providing access to Rendsmoimatune multiuser account management"""
+"""A rest API providing access to Rendsmoimatune multiuser account management
+
+Request to this REST API must be done with Content-Type: application/json as
+all sent data is expected to be well formed json.
+"""
 
 import argparse
 import bottle
 import json
+import datetime
 
 import uniqid
 import rmmt
 
+ISO8601_FMT = "%Y-%m-%d"
+
+
+def strpdate(date):
+    return datetime.datetime.strptime(date, ISO8601_FMT).date()
+
+
 @bottle.post(r"/api/account/")
 def create_account():
-    """Create a new account"""
+    """Create a new account
+
+    Exemple:
+    curl -X POST -H "Content-Type:application/json" -d '{"name": "my new account"}' http://localhost:8080/api/account/
+    """
     uid = uniqid.generate()
-    name = bottle.request.POST.get('name')
+    name = bottle.request.json['name']
     account = rmmt.Account.create(uid=uid, name=name)
     return json.dumps(account.json)
 
 @bottle.get(r"/api/account/<account_id:re:[a-zA-Z0-9_=-]+>")
 def get_account(account_id):
-    """Get account description"""
+    """Get account description
+
+    Exemple:
+    curl -X POST -H "Content-Type:application/json" http://localhost:8080/api/account/PoP93u9ktzqIP5-cJx1D9D/
+    """
     uid = uniqid.decode(account_id)
     account = rmmt.Account.get(rmmt.Account.uid == uid)
     return json.dumps(account.json)
 
 @bottle.post(r"/api/account/<account_id:re:[a-zA-Z0-9_=-]+>/user/")
 def create_user(account_id):
-    """Create user for an account"""
+    """Create user for an account
+
+    Exemple:
+    curl -X POST -H "Content-Type:application/json" -d '{"name": "paul"}' http://localhost:8080/api/account/PoP93u9ktzqIP5-cJx1D9D/user/
+    """
     uid = uniqid.decode(account_id)
     account = rmmt.Account.get(rmmt.Account.uid == uid)
-    name = bottle.request.POST.get('name')
+    name = bottle.request.json['name']
     user = rmmt.User.create(account=account, name=name)
     return json.dumps(user.json)
 
 @bottle.get(r"/api/account/<account_id:re:[a-zA-Z0-9_=-]+>/user/<name>")
 def get_user(account_id, name):
-    """Get user description"""
+    """Get user description
+
+    Exemple:
+    curl -X POST -H "Content-Type:application/json" http://localhost:8080/api/account/PoP93u9ktzqIP5-cJx1D9D/user/paul
+    """
     uid = uniqid.decode(account_id)
-    user = rmmt.User.select().join(rmmt.Account).where(rmmt.User.name == name, rmmt.Account.uid == uid).get()
+    user = rmmt.User.select().join(rmmt.Account).where(rmmt.User.name == name,
+                                                       rmmt.Account.uid == uid).get()
     return json.dumps(user.json)
+
+@bottle.post(r"/api/account/<account_id:re:[a-zA-Z0-9_=-]+>/expenditure/")
+def create_expenditure(account_id):
+    """Create expenditure
+
+    Exemple:
+    curl -X POST -H "Content-Type:application/json" -d '{"name": "patate", "date": "2016-01-28", "amount": 1200, "payer": "paul", "debts": [{"debtor": "paul", "share": 1}, {"debtor": "test", "share": 1}]}' http://localhost:8080/api/account/PoP93u9ktzqIP5-cJx1D9D/expenditure/
+    """
+    uid = uniqid.decode(account_id)
+    account = rmmt.Account.get(rmmt.Account.uid == uid)
+    name = bottle.request.json['name']
+    date = strpdate(bottle.request.json['date'])
+    amount = int(bottle.request.json['amount'])
+    payer_name = bottle.request.json['payer']
+    debts = bottle.request.json['debts']
+
+    payer = rmmt.User.select().join(rmmt.Account).where(rmmt.User.name == payer_name,
+                                                        rmmt.Account.uid == uid).get()
+
+    expenditure = rmmt.Expenditure.create(account=account, name=name, date=date,
+                                          amount=amount, payer=payer)
+
+    for debt in debts:
+        debtor = rmmt.User.select().join(rmmt.Account).where(rmmt.User.name == debt['debtor'],
+                                                             rmmt.Account.uid == uid).get()
+        rmmt.Debt.create(debtor=debtor, expenditure=expenditure, share=debt['share'])
+
+    return json.dumps(expenditure.json)
 
 def main():
     """Start server"""

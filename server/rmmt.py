@@ -33,7 +33,15 @@ def connect(scheme):
 
 def create_tables():
     """Create required table if necessary"""
-    DB.create_tables([Account, User])
+    DB.create_tables([Account, User, Expenditure, Debt, Repayment])
+
+
+class JSONObject():
+    """JSON object that can be dumped into raw json"""
+    @property
+    def json(self):
+        """simple representation of the object that can feed json.dumps"""
+        raise NotImplementedError
 
 
 class RmmtModel(peewee.Model):
@@ -41,13 +49,8 @@ class RmmtModel(peewee.Model):
     class Meta:
         database = DB
 
-    @property
-    def json(self):
-        """simple representation of the object that can feed json.dumps"""
-        raise NotImplementedError
 
-
-class Account(RmmtModel):
+class Account(RmmtModel, JSONObject):
     """Account is the main document"""
     _id = peewee.PrimaryKeyField()
     uid = peewee.UUIDField()
@@ -55,21 +58,89 @@ class Account(RmmtModel):
 
     @property
     def json(self):
-        users = []
-        for user in self.users:
-            users.append(user.json)
         return {"uid": uniqid.encode(self.uid),
                 "name": self.name,
-                "users": users}
+                "users": [user.name for user in self.users],
+                # TODO remove account from expenditure and repayment
+                "expenditures": [expenditure.json for expenditure in self.expenditures],
+                "repayments": [repayment.json for repayment in self.repayments]}
 
 
-class User(RmmtModel):
+class User(RmmtModel, JSONObject):
     """User participating in an account"""
     _id = peewee.PrimaryKeyField()
+    account = peewee.ForeignKeyField(Account, related_name="users")
     name = peewee.CharField()
-    account = peewee.ForeignKeyField(Account, related_name='users')
 
     @property
     def json(self):
-        return {"name": self.name,
-                "account": uniqid.encode(self.account.uid)}
+        return {"account": uniqid.encode(self.account.uid),
+                "name": self.name,
+                "expenditures": [{"name": expenditure.name,
+                                  "date": expenditure.date.isoformat(),
+                                  "amount": expenditure.amount} for expenditure in self.expenditures],
+                "debts": [{"expenditure": debt.expenditure.name,
+                           "date": debt.expenditure.date.isoformat(),
+                           "amount": debt.expenditure.amount,
+                           "shares": dept.expenditure.shares,
+                           "share": debt.share} for debt in self.debts],
+                "repayments_from_me": [{"date": repayment.date.isoformat(),
+                                        "amount": repayment.amount,
+                                        "to_user": repayment.to_user} for repayment in self.repayments_from_me],
+                "repayments_to_me": [{"date": repayment.date.isoformat(),
+                                        "amount": repayment.amount,
+                                        "from_user": repayment.from_user} for repayment in self.repayments_to_me]}
+
+
+class Expenditure(RmmtModel, JSONObject):
+    """Expenditure set for a given account"""
+    _id = peewee.PrimaryKeyField()
+    account = peewee.ForeignKeyField(Account, related_name="expenditures")
+    name = peewee.CharField()
+    date = peewee.DateField()
+    amount = peewee.IntegerField()
+    payer = peewee.ForeignKeyField(User, related_name="expenditures")
+
+    @property
+    def shares(self):
+        shares = 0
+        for debt in self.debts:
+            shares += debt.share
+        return shares
+
+    @property
+    def json(self):
+        return {"account": uniqid.encode(self.account.uid),
+                "name": self.name,
+                "date": self.date.isoformat(),
+                "amount": self.amount,
+                "payer": self.payer.name,
+                "shares": self.shares,
+                "debts": [{"debtor": debt.debtor.name,
+                           "share": debt.share} for debt in self.debts]}
+
+
+class Debt(RmmtModel):
+    """Association between an expenditure and user that are concerned by it"""
+    _id = peewee.PrimaryKeyField()
+    debtor = peewee.ForeignKeyField(User, related_name='debts')
+    expenditure = peewee.ForeignKeyField(Expenditure, related_name='debts')
+    share = peewee.IntegerField()
+
+
+class Repayment(RmmtModel, JSONObject):
+    """One user directly give monney to another one"""
+    _id = peewee.PrimaryKeyField()
+    account = peewee.ForeignKeyField(Account, related_name="repayments")
+    date = peewee.DateField()
+    amount = peewee.IntegerField()
+    from_user = peewee.ForeignKeyField(User, related_name="repayments_from_me")
+    to_user = peewee.ForeignKeyField(User, related_name="repayments_to_me")
+
+    @property
+    def json(self):
+        return {"account": uniqid.encode(self.account.uid),
+                "date": self.date.isoformat(),
+                "amount": self.amount,
+                "from_user": self.from_user.name,
+                "to_user": self.to_user.name}
