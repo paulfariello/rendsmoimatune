@@ -14,7 +14,8 @@ var paths = {
 		'node_modules/motion-ui/src/'
 	],
 	app_js: [
-		'js/app.js'
+		'js/app.component.js',
+		'js/main.js',
 	],
 	foundation_js: [
 		'node_modules/foundation-sites/js/foundation.abide.js',
@@ -44,13 +45,19 @@ var paths = {
 		'node_modules/foundation-sites/js/foundation.util.nest.js',
 		'node_modules/foundation-sites/js/foundation.util.timerAndImageLoader.js',
 		'node_modules/foundation-sites/js/foundation.util.touch.js',
-		'node_modules/foundation-sites/js/foundation.util.triggers.js',
+		'node_modules/foundation-sites/js/foundation.util.triggers.js'
+	],
+	angular_js: [
+		'node_modules/es6-shim/es6-shim.min.js',
+		'node_modules/angular2/bundles/angular2-polyfills.js',
+		'node_modules/rxjs/bundles/Rx.umd.js',
+		'node_modules/angular2/bundles/angular2-all.umd.js'
 	],
 	templates: [
-		'templates/*.html',
+		'templates/*.html'
 	],
 	jquery: [
-		'node_modules/jquery/dist/jquery.min.js',
+		'node_modules/jquery/dist/jquery.min.js'
 	],
 };
 
@@ -80,12 +87,19 @@ gulp.task('sass', function() {
 		.pipe(gulp.dest('./build/css/'));
 });
 
-gulp.task('uglify', ['uglify:foundation', 'uglify:app']);
+gulp.task('uglify', ['uglify:foundation', 'uglify:angular', 'uglify:app']);
 
 gulp.task('uglify:foundation', function() {
 	return gulp.src(paths.foundation_js)
 		.pipe($.uglify())
 		.pipe($.concat('foundation.min.js'))
+		.pipe(gulp.dest('./build/js'));
+});
+
+gulp.task('uglify:angular', function() {
+	return gulp.src(paths.angular_js)
+		.pipe($.uglify())
+		.pipe($.concat('angular.min.js'))
 		.pipe(gulp.dest('./build/js'));
 });
 

@@ -55,7 +55,7 @@ def get_account(account_id):
     """
     uid = uniqid.decode(account_id)
     account = rmmt.Account.get(rmmt.Account.uid == uid)
-    return json.dumps(account.json)
+    return json.dumps(account.json, indent="  ")
 
 @bottle.post(r"/api/account/<account_id:re:[a-zA-Z0-9_=-]+>/user/")
 def create_user(account_id):
