@@ -57,13 +57,50 @@ class Account(RmmtModel, JSONObject):
     name = peewee.CharField()
 
     @property
+    def balance(self):
+        creditors = []
+        debitors = []
+        for user in self.users:
+            snapshot = {"user": user.name, "balance": user.balance}
+            if user.balance > 0:
+                creditors.append(snapshot)
+            if user.balance < 0:
+                debitors.append(snapshot)
+
+        repayments = []
+        while len(creditors) or len(debitors):
+            creditors.sort(key=lambda user: user["balance"], reverse=True)
+            debitors.sort(key=lambda user: user["balance"])
+
+            creditor = creditors.pop()
+            debitor = debitors.pop()
+            amount = min(abs(creditor["balance"]), abs(debitor["balance"]))
+            repayments.append({"from": debitor["user"], "to": creditor["user"],
+                               "amount": amount})
+            debitor["balance"] += amount
+            creditor["balance"] -= amount
+
+            assert(debitor["balance"] <= 0)
+            assert(creditor["balance"] >= 0)
+
+            if debitor["balance"] != 0:
+                debitors.append(debitor)
+
+            if creditor["balance"] != 0:
+                creditors.append(creditor)
+
+        return repayments
+
+
+    @property
     def json(self):
         return {"uid": uniqid.encode(self.uid),
                 "name": self.name,
                 "users": [{"name": user.name, "balance": user.balance} for user in self.users],
                 # TODO remove account from expenditure and repayment
                 "expenditures": [expenditure.json for expenditure in self.expenditures],
-                "repayments": [repayment.json for repayment in self.repayments]}
+                "repayments": [repayment.json for repayment in self.repayments],
+                "balance": self.balance}
 
 
 class User(RmmtModel, JSONObject):
