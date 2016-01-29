@@ -60,7 +60,7 @@ class Account(RmmtModel, JSONObject):
     def json(self):
         return {"uid": uniqid.encode(self.uid),
                 "name": self.name,
-                "users": [user.name for user in self.users],
+                "users": [{"name": user.name, "balance": user.balance} for user in self.users],
                 # TODO remove account from expenditure and repayment
                 "expenditures": [expenditure.json for expenditure in self.expenditures],
                 "repayments": [repayment.json for repayment in self.repayments]}
@@ -73,6 +73,22 @@ class User(RmmtModel, JSONObject):
     name = peewee.CharField()
 
     @property
+    def balance(self):
+        total_payed = 0
+        for expenditure in self.expenditures:
+            total_payed += expenditure.amount
+        for repayment in self.repayments_from_me:
+            total_payed += repayment.amount
+
+        total_debt = 0
+        for debt in self.debts:
+            total_debt += debt.expenditure.amount * debt.share / debt.expenditure.shares
+        for repayment in self.repayments_to_me:
+            total_debt += repayment.amount
+
+        return total_payed - total_debt
+
+    @property
     def json(self):
         return {"account": uniqid.encode(self.account.uid),
                 "name": self.name,
@@ -82,14 +98,15 @@ class User(RmmtModel, JSONObject):
                 "debts": [{"expenditure": debt.expenditure.name,
                            "date": debt.expenditure.date.isoformat(),
                            "amount": debt.expenditure.amount,
-                           "shares": dept.expenditure.shares,
+                           "shares": debt.expenditure.shares,
                            "share": debt.share} for debt in self.debts],
                 "repayments_from_me": [{"date": repayment.date.isoformat(),
                                         "amount": repayment.amount,
                                         "to_user": repayment.to_user} for repayment in self.repayments_from_me],
                 "repayments_to_me": [{"date": repayment.date.isoformat(),
                                         "amount": repayment.amount,
-                                        "from_user": repayment.from_user} for repayment in self.repayments_to_me]}
+                                        "from_user": repayment.from_user} for repayment in self.repayments_to_me],
+                "balance": self.balance}
 
 
 class Expenditure(RmmtModel, JSONObject):
