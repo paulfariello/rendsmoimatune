@@ -51,7 +51,7 @@ def get_account(account_id):
     """Get account description
 
     Exemple:
-    curl -X POST -H "Content-Type:application/json" http://localhost:8080/api/account/PoP93u9ktzqIP5-cJx1D9D/
+    curl -X GET -H "Content-Type:application/json" http://localhost:8080/api/account/PoP93u9ktzqIP5-cJx1D9D/
     """
     uid = uniqid.decode(account_id)
     account = rmmt.Account.get(rmmt.Account.uid == uid)
@@ -75,7 +75,7 @@ def get_user(account_id, name):
     """Get user description
 
     Exemple:
-    curl -X POST -H "Content-Type:application/json" http://localhost:8080/api/account/PoP93u9ktzqIP5-cJx1D9D/user/paul
+    curl -X GET -H "Content-Type:application/json" http://localhost:8080/api/account/PoP93u9ktzqIP5-cJx1D9D/user/paul
     """
     uid = uniqid.decode(account_id)
     user = rmmt.User.select().join(rmmt.Account).where(rmmt.User.name == name,
