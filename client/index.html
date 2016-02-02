@@ -1,0 +1,27 @@
+<!doctype html>
+<html class="no-js" lang="en" ng-app="rmmt">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="x-ua-compatible" content="ie=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Rendsmoimatune</title>
+		<link rel="stylesheet" href="css/main.css">
+
+		<script src="js/angular.min.js"></script>
+		<script src="js/app.min.js"></script>
+	</head>
+	<body>
+		<div class="top-bar">
+			<div class="top-bar-left">
+				<ul class="menu">
+					<li class="menu-text">Rendsmoimatune</li>
+					<li><a ui-sref="expenditures">Dépenses</a></li>
+					<li><a ui-sref="repayments">Rempoursements</a></li>
+					<li><a ui-sref="balancing">Balance</a></li>
+				</ul>
+			</div>
+		</div>
+		<div ui-view>
+		</div>
+	</body>
+</html>

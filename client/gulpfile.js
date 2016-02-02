@@ -14,14 +14,13 @@ var paths = {
 		'node_modules/motion-ui/src/'
 	],
 	app_js: [
-		'js/app.component.js',
 		'js/main.js',
 	],
 	foundation_js: [
+		'node_modules/foundation-sites/js/foundation.core.js',
 		'node_modules/foundation-sites/js/foundation.abide.js',
 		'node_modules/foundation-sites/js/foundation.accordion.js',
 		'node_modules/foundation-sites/js/foundation.accordionMenu.js',
-		'node_modules/foundation-sites/js/foundation.core.js',
 		'node_modules/foundation-sites/js/foundation.drilldown.js',
 		'node_modules/foundation-sites/js/foundation.dropdown.js',
 		'node_modules/foundation-sites/js/foundation.dropdownMenu.js',
@@ -48,10 +47,12 @@ var paths = {
 		'node_modules/foundation-sites/js/foundation.util.triggers.js'
 	],
 	angular_js: [
-		'node_modules/es6-shim/es6-shim.min.js',
-		'node_modules/angular2/bundles/angular2-polyfills.js',
-		'node_modules/rxjs/bundles/Rx.umd.js',
-		'node_modules/angular2/bundles/angular2-all.umd.js'
+		'node_modules/angular/angular.js',
+		'node_modules/fastclick/lib/fastclick.js',
+		'node_modules/angular-ui-router/release/angular-ui-router.js',
+	],
+	html: [
+		'*.html'
 	],
 	templates: [
 		'templates/*.html'
@@ -65,11 +66,18 @@ gulp.task('clean', function(cb) {
 	rimraf('./build', cb);
 });
 
-gulp.task('copy', ['copy:templates', 'copy:jquery']);
+gulp.task('copy', function() {
+	sequence(['copy:html', 'copy:jquery'], 'copy:templates');
+});
+
+gulp.task('copy:html', function() {
+	return gulp.src(paths.html)
+		.pipe(gulp.dest('./build'));
+});
 
 gulp.task('copy:templates', function() {
 	return gulp.src(paths.templates, { base: 'templates/' })
-		.pipe(gulp.dest('./build'));
+		.pipe(gulp.dest('./build/templates/'));
 });
 
 gulp.task('copy:jquery', function() {
@@ -87,7 +95,7 @@ gulp.task('sass', function() {
 		.pipe(gulp.dest('./build/css/'));
 });
 
-gulp.task('uglify', ['uglify:foundation', 'uglify:angular', 'uglify:app']);
+gulp.task('uglify', ['uglify:angular', 'uglify:foundation', 'uglify:app']);
 
 gulp.task('uglify:foundation', function() {
 	return gulp.src(paths.foundation_js)
@@ -115,11 +123,24 @@ gulp.task('uglify:app', function() {
 gulp.task('watch', function() {
 	gulp.watch(paths.app_js, ['uglify:app']);
 	gulp.watch(paths.scss, ['sass']);
+	gulp.watch(paths.html, ['copy:html']);
 	gulp.watch(paths.templates, ['copy:templates']);
 });
 
 gulp.task('build', function(cb) {
 	sequence('clean', ['copy', 'sass', 'uglify'], cb);
+});
+
+gulp.task('server', ['build'], function() {
+  gulp.src('./build')
+    .pipe($.webserver({
+      port: 8079,
+      host: 'localhost',
+      fallback: 'index.html',
+      livereload: true,
+      open: true
+    }))
+  ;
 });
 
 gulp.task('default', ['build', 'watch']);
