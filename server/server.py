@@ -28,11 +28,19 @@ import uniqid
 import rmmt
 
 ISO8601_FMT = "%Y-%m-%d"
+STATIC_ROOT = None
 
 
 def strpdate(date):
     return datetime.datetime.strptime(date, ISO8601_FMT).date()
 
+@bottle.get("/")
+@bottle.get(r"/<path:re:.*\.(html|js|css)>")
+def static(path=None):
+    """Unsafe method used only for dev"""
+    if path is None:
+        path = "index.html"
+    return bottle.static_file(path, root=STATIC_ROOT)
 
 @bottle.post(r"/api/account/")
 def create_account():
@@ -116,12 +124,16 @@ def main():
     parser.add_argument("-l", "--listen", dest="host", default="0.0.0.0", help="IP address to bind to")
     parser.add_argument("-p", "--port", dest="port", default=8080, type=int, help="Port to listen to")
     parser.add_argument("--db", dest="db", default="sqlite:///rmmt.db", help="Database scheme to connect to")
+    parser.add_argument("--static", dest="static", default=None, type=str, help="Path to static files")
     parser.add_argument("--init", dest="init", type=bool, help="Initialize database")
     args = parser.parse_args()
 
     rmmt.connect(args.db)
     if args.init:
         rmmt.create_tables()
+
+    global STATIC_ROOT
+    STATIC_ROOT = args.static
 
     bottle.run(host=args.host, port=args.port)
 
