@@ -42,3 +42,18 @@
 
 @include motion-ui-transitions;
 @include motion-ui-animations;
+
+.debt, .credit {
+    border-radius: 2px;
+    border: 1px, black;
+    color: white;
+    font: bold;
+}
+
+.debt {
+    background: red;
+}
+
+.credit {
+    background: green;
+}
