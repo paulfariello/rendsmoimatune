@@ -2,72 +2,100 @@
 	<div class="small-12 columns">
 		<h2>{{ account.name }}</h2>
 	</div>
-	<div class="small-12 columns">
-		<h3>Balance</h3>
-		<div class="row text-center" ng-repeat="user in account.users">
-			<div class="small-5 columns">
-				<div class="debt" ng-if="user.balance < 0" style="width: {{ -user.balance/account.max_debt*100 }}%">
-					{{ user.balance | amount }}
+</div>
+<div ui-view="">
+	<div class="row">
+		<div class="small-12 columns">
+			<h3>Balance</h3>
+			<div class="row text-center" ng-repeat="user in account.users">
+				<div class="small-5 columns">
+					<div class="debt" ng-if="user.balance < 0" style="width: {{ -user.balance/account.max_debt*100 }}%">
+						{{ user.balance | amount }}
+					</div>
 				</div>
-			</div>
-			<div ng-class="{'small-offset-5': user.balance >= 0}" class="small-2 columns">
-				{{ user.name }}
-			</div>
-			<div class="small-5 columns">
-				<div class="credit" ng-if="user.balance > 0" style="width: {{ user.balance/account.max_debt*100 }}%">
-					{{ user.balance | amount }}
+				<div ng-class="{'small-offset-5': user.balance >= 0}" class="small-2 columns">
+					{{ user.name }}
+				</div>
+				<div class="small-5 columns">
+					<div class="credit" ng-if="user.balance > 0" style="width: {{ user.balance/account.max_debt*100 }}%">
+						{{ user.balance | amount }}
+					</div>
 				</div>
 			</div>
 		</div>
 	</div>
-	<div class="small-12 columns">
-		<h3>Dépenses</h3>
-		<table>
-			<thead>
-				<tr>
-					<th>Date</th>
-					<th>Nom</th>
-					<th>Montant</th>
-					<th>Payeur</th>
-					<th>Participants</th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr ng-repeat="expenditure in account.expenditures | orderBy: date | limitTo: 5">
-					<td>{{ expenditure.date }}</td>
-					<td>{{ expenditure.name }}</td>
-					<td>{{ expenditure.amount | amount }}</td>
-					<td>{{ expenditure.payer }}</td>
-					<td>
-						<span ng-repeat="debt in expenditure.debts">
-							{{ debt.debtor }}{{$last?'':', '}}
-						</span>
-					</td>
-				</tr>
-			</tbody>
-		</table>
-		<a class="button">Nouvelle dépense</a>
+	<div class="row">
+		<form ng-submit="add_user()">
+			<div class="small-12 columns">
+				<h4>Nouveau participant</h4>
+				<div class="input-group">
+					<input type="text" class="input-group-field" ng-model="account.new_user" required />
+					<a class="input-group-button button">Ajouter</a>
+				</div>
+			</div>
+		</form>
 	</div>
-	<div class="small-12 columns">
-		<h3>Remboursements</h3>
-		<table>
-			<thead>
-				<tr>
-					<th>Date</th>
-					<th>De</th>
-					<th>Montant</th>
-					<th>À</th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr ng-repeat="repayment in account.repayments | orderBy: date | limitTo: 5">
-					<td>{{ repayment.date }}</td>
-					<td>{{ repayment.from }}</td>
-					<td>{{ repayment.amount | amount }}</td>
-					<td>{{ repayment.to }}</td>
-				</tr>
-			</tbody>
-		</table>
-		<a class="button">Nouveau remboursement</a>
+	<div class="row">
+		<div class="small-12 columns">
+			<h3><a ui-sref="account.expenditures">Dépenses</a></h3>
+			<table>
+				<thead>
+					<tr>
+						<th>Date</th>
+						<th>Nom</th>
+						<th>Montant</th>
+						<th>Payeur</th>
+						<th>Participants</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr ng-repeat="expenditure in account.expenditures | orderBy: date | limitTo: 5">
+						<td>{{ expenditure.date }}</td>
+						<td>{{ expenditure.name }}</td>
+						<td>{{ expenditure.amount | amount }}</td>
+						<td>{{ expenditure.payer }}</td>
+						<td ng-if="expenditure.debts.length <= account.users.length / 2">
+							<span ng-repeat="debt in expenditure.debts">
+								{{ debt.debtor }}{{$last?'':', '}}
+							</span>
+						</td>
+						<td ng-if="expenditure.debts.length > account.users.length / 2">
+							Tous
+							<span ng-if="expenditure.debts.length < account.users.length">
+								sauf
+							</span>
+							<span ng-repeat="user in account.users | notIn:expenditure.debts:'name':'debtor'">
+								{{ user.name }}{{$last?'':', '}}
+							</span>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			<a class="button" ui-sref="account.add-expenditure">Nouvelle dépense</a>
+		</div>
+	</div>
+	<div class="row">
+		<div class="small-12 columns">
+			<h3>Remboursements</h3>
+			<table>
+				<thead>
+					<tr>
+						<th>Date</th>
+						<th>De</th>
+						<th>Montant</th>
+						<th>À</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr ng-repeat="repayment in account.repayments | orderBy: date | limitTo: 5">
+						<td>{{ repayment.date }}</td>
+						<td>{{ repayment.from }}</td>
+						<td>{{ repayment.amount | amount }}</td>
+						<td>{{ repayment.to }}</td>
+					</tr>
+				</tbody>
+			</table>
+			<a class="button" ui-sref="account.add-repayment">Nouveau remboursement</a>
+		</div>
 	</div>
 </div>

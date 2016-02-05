@@ -1,5 +1,13 @@
 <div class="row">
 	<div class="small-12 columns">
-		<button class="button">Créer un nouveau compte</button>
+		<h2>Créer un nouveau compte</h2>
+		<form ng-submit="create_account()">
+			<label>Nom
+				<div class="input-group">
+					<input type="text" class="input-group-field" ng-model="account_name" required />
+					<a class="input-group-button button">Créer</a>
+				</div>
+			</label>
+		</form>
 	</div>
 </div>

@@ -3,6 +3,8 @@
 @import 'settings';
 @import 'foundation';
 @import 'motion-ui';
+@import 'foundation-datepicker.scss';
+@import 'font-awesome';
 
 @include foundation-global-styles;
 @include foundation-grid;
@@ -44,16 +46,23 @@
 @include motion-ui-animations;
 
 .debt, .credit {
-    border-radius: 2px;
-    border: 1px, black;
-    color: white;
-    font: bold;
+	border-radius: 2px;
+	border: 1px, black;
+	color: $white;
+	margin: 0;
+	font-size: 0.75rem;
+	font-weight: bold;
 }
 
 .debt {
-    background: red;
+	background: $alert-color;
+	float: right;
 }
 
 .credit {
-    background: green;
+	background: $success-color;
+}
+
+input:invalid {
+	border-color: $alert-color;
 }

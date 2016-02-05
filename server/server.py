@@ -32,10 +32,10 @@ STATIC_ROOT = None
 
 
 def strpdate(date):
-    return datetime.datetime.strptime(date, ISO8601_FMT).date()
+    return datetime.datetime.strptime(date[:10], ISO8601_FMT).date()
 
 @bottle.get("/")
-@bottle.get(r"/<path:re:.*\.(html|js|css)>")
+@bottle.get(r"/<path:re:.*\.(html|js|css|woff2|woff|ttf)>")
 def static(path=None):
     """Unsafe method used only for dev"""
     if path is None:
@@ -65,12 +65,12 @@ def get_account(account_id):
     account = rmmt.Account.get(rmmt.Account.uid == uid)
     return json.dumps(account.json, indent="  ")
 
-@bottle.post(r"/api/account/<account_id:re:[a-zA-Z0-9_=-]+>/user/")
+@bottle.post(r"/api/account/<account_id:re:[a-zA-Z0-9_=-]+>/users/")
 def create_user(account_id):
     """Create user for an account
 
     Exemple:
-    curl -X POST -H "Content-Type:application/json" -d '{"name": "paul"}' http://localhost:8080/api/account/PoP93u9ktzqIP5-cJx1D9D/user/
+    curl -X POST -H "Content-Type:application/json" -d '{"name": "paul"}' http://localhost:8080/api/account/PoP93u9ktzqIP5-cJx1D9D/users/
     """
     uid = uniqid.decode(account_id)
     account = rmmt.Account.get(rmmt.Account.uid == uid)
@@ -90,12 +90,12 @@ def get_user(account_id, name):
                                                        rmmt.Account.uid == uid).get()
     return json.dumps(user.json)
 
-@bottle.post(r"/api/account/<account_id:re:[a-zA-Z0-9_=-]+>/expenditure/")
+@bottle.post(r"/api/account/<account_id:re:[a-zA-Z0-9_=-]+>/expenditures/")
 def create_expenditure(account_id):
     """Create expenditure
 
     Exemple:
-    curl -X POST -H "Content-Type:application/json" -d '{"name": "patate", "date": "2016-01-28", "amount": 1200, "payer": "paul", "debts": [{"debtor": "paul", "share": 1}, {"debtor": "test", "share": 1}]}' http://localhost:8080/api/account/PoP93u9ktzqIP5-cJx1D9D/expenditure/
+    curl -X POST -H "Content-Type:application/json" -d '{"name": "patate", "date": "2016-01-28", "amount": 1200, "payer": "paul", "debts": [{"debtor": "paul", "share": 1}, {"debtor": "test", "share": 1}]}' http://localhost:8080/api/account/PoP93u9ktzqIP5-cJx1D9D/expenditures/
     """
     uid = uniqid.decode(account_id)
     account = rmmt.Account.get(rmmt.Account.uid == uid)
@@ -104,6 +104,9 @@ def create_expenditure(account_id):
     amount = int(bottle.request.json['amount'])
     payer_name = bottle.request.json['payer']
     debts = bottle.request.json['debts']
+
+    if len(debts) == 0:
+        raise ValueError("Expenditure without debt")
 
     payer = rmmt.User.select().join(rmmt.Account).where(rmmt.User.name == payer_name,
                                                         rmmt.Account.uid == uid).get()

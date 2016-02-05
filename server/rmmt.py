@@ -68,7 +68,7 @@ class Account(RmmtModel, JSONObject):
                 debitors.append(snapshot)
 
         repayments = []
-        while len(creditors) or len(debitors):
+        while len(creditors) and len(debitors):
             creditors.sort(key=lambda user: user["balance"], reverse=True)
             debitors.sort(key=lambda user: user["balance"])
 

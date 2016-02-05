@@ -11,7 +11,9 @@ var paths = {
 	scss_inc: [
 		'scss/main.scss',
 		'node_modules/foundation-sites/scss/',
-		'node_modules/motion-ui/src/'
+		'node_modules/motion-ui/src/',
+		'node_modules/foundation-datepicker/css/',
+		'node_modules/font-awesome/scss/'
 	],
 	app_js: [
 		'js/main.js',
@@ -44,7 +46,9 @@ var paths = {
 		'node_modules/foundation-sites/js/foundation.util.nest.js',
 		'node_modules/foundation-sites/js/foundation.util.timerAndImageLoader.js',
 		'node_modules/foundation-sites/js/foundation.util.touch.js',
-		'node_modules/foundation-sites/js/foundation.util.triggers.js'
+		'node_modules/foundation-sites/js/foundation.util.triggers.js',
+		'node_modules/foundation-datepicker/js/foundation-datepicker.js',
+		'node_modules/foundation-datepicker/js/locales/foundation-datepicker.fr.js'
 	],
 	angular_js: [
 		'node_modules/angular/angular.js',
@@ -60,6 +64,9 @@ var paths = {
 	jquery: [
 		'node_modules/jquery/dist/jquery.min.js'
 	],
+	fonts: [
+		'node_modules/font-awesome/fonts/fontawesome-webfont.*'
+	]
 };
 
 gulp.task('clean', function(cb) {
@@ -67,7 +74,7 @@ gulp.task('clean', function(cb) {
 });
 
 gulp.task('copy', function() {
-	sequence(['copy:html', 'copy:jquery'], 'copy:templates');
+	sequence(['copy:html', 'copy:jquery', 'copy:fonts'], 'copy:templates');
 });
 
 gulp.task('copy:html', function() {
@@ -83,6 +90,11 @@ gulp.task('copy:templates', function() {
 gulp.task('copy:jquery', function() {
 	return gulp.src(paths.jquery, { base: 'node_modules/jquery/dist/' })
 		.pipe(gulp.dest('./build/js'));
+});
+
+gulp.task('copy:fonts', function() {
+	return gulp.src(paths.fonts, { base: 'node_modules/font-awesome/fonts/' })
+		.pipe(gulp.dest('./build/fonts'));
 });
 
 gulp.task('sass', function() {

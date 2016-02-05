@@ -1,0 +1,30 @@
+<div class="row">
+	<div class="small-12 columns">
+		<h3>Dépenses</h3>
+		<table>
+			<thead>
+				<tr>
+					<th>Date</th>
+					<th>Nom</th>
+					<th>Montant</th>
+					<th>Payeur</th>
+					<th>Participants</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr ng-repeat="expenditure in account.expenditures | orderBy: date">
+					<td>{{ expenditure.date }}</td>
+					<td>{{ expenditure.name }}</td>
+					<td>{{ expenditure.amount | amount }}</td>
+					<td>{{ expenditure.payer }}</td>
+					<td>
+						<span ng-repeat="debt in expenditure.debts">
+							{{ debt.debtor }}{{$last?'':', '}}
+						</span>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+		<a class="button" ui-sref="account.expenditures.add">Nouvelle dépense</a>
+	</div>
+</div>
