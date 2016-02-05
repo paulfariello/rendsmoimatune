@@ -94,7 +94,8 @@
 					</tr>
 				</tbody>
 			</table>
-			<a class="button" ui-sref="account.add-expenditure">Nouvelle dépense</a>
+			<a ng-if="account.expenditures.length > 5" ui-sref="account.expenditures">Et {{ account.expenditures.length - 5 }} <span ng-if="account.expenditures.length > 6">autres…</span><span ng-if="account.expenditures.length == 6">autre.</span></a>
+			<a class="button float-right fa fa-plus-circle" ui-sref="account.add-expenditure">Nouvelle dépense</a>
 		</div>
 	</div>
 	<div class="row">
@@ -118,7 +119,8 @@
 					</tr>
 				</tbody>
 			</table>
-			<a class="button" ui-sref="account.add-repayment">Nouveau remboursement</a>
+			<a ng-if="account.repayments.length > 5" ui-sref="account.repayments">Et {{ account.repayments.length - 5 }} <span ng-if="account.repayments.length > 6">autres…</span><span ng-if="account.repayments.length == 6">autre.</span></a>
+			<a class="button float-right fa fa-plus-circle" ui-sref="account.add-repayment">Nouveau remboursement</a>
 		</div>
 	</div>
 </div>
