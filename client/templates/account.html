@@ -30,10 +30,33 @@
 				<h4>Nouveau participant</h4>
 				<div class="input-group">
 					<input type="text" class="input-group-field" ng-model="account.new_user" required />
-					<a class="input-group-button button">Ajouter</a>
+					<a class="input-group-button button fa fa-plus-circle">Ajouter</a>
 				</div>
 			</div>
 		</form>
+	</div>
+	<div class="row">
+		<div class="small-12 columns">
+			<h3>Équilibrage</h3>
+			<table>
+				<thead>
+					<tr>
+						<th>De</th>
+						<th>Montant</th>
+						<th>À</th>
+						<th>Action</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr ng-repeat="repayment in account.balance | orderBy: name">
+						<td>{{ repayment.from }}</td>
+						<td>{{ repayment.amount | amount }}</td>
+						<td>{{ repayment.to }}</td>
+						<td><a ui-sref="add-repayment({from: repayment.from, to: repayment.to, amount: repayment.amount})" class="fa fa-plus-circle button">Ajouter</a></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
 	</div>
 	<div class="row">
 		<div class="small-12 columns">
