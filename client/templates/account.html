@@ -49,9 +49,9 @@
 					</tr>
 				</thead>
 				<tbody>
-					<tr ng-repeat="expenditure in account.expenditures | orderBy: date | limitTo: 5">
+					<tr ng-repeat="expenditure in account.expenditures | orderBy: date:true | limitTo: 5">
 						<td>{{ expenditure.date }}</td>
-						<td>{{ expenditure.name }}</td>
+						<td><a ui-sref="edit-expenditure({name: expenditure.name})" class="edit">{{ expenditure.name }}</a></td>
 						<td>{{ expenditure.amount | amount }}</td>
 						<td>{{ expenditure.payer }}</td>
 						<td ng-if="expenditure.debts.length <= account.users.length / 2">
@@ -87,7 +87,7 @@
 					</tr>
 				</thead>
 				<tbody>
-					<tr ng-repeat="repayment in account.repayments | orderBy: date | limitTo: 5">
+					<tr ng-repeat="repayment in account.repayments | orderBy: date:true | limitTo: 5">
 						<td>{{ repayment.date }}</td>
 						<td>{{ repayment.from }}</td>
 						<td>{{ repayment.amount | amount }}</td>

@@ -66,3 +66,24 @@
 input:invalid {
 	border-color: $alert-color;
 }
+
+.button.fa:before {
+	margin-right: 1em;
+}
+
+td .button {
+	margin-bottom: 0;
+}
+
+a.edit:hover:before {
+	@extend .#{$fa-css-prefix};
+	content: $fa-var-pencil-square-o;
+}
+
+a.edit:hover {
+	margin-left: 0;
+}
+
+a.edit {
+	margin-left: 1em;
+}
