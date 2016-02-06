@@ -81,6 +81,42 @@
 			}
 		});
 
+		$stateProvider.state('account.edit-expenditure', {
+			url: "/expenditures/{expenditure_id:[0-9]+}/edit",
+			views: {
+				'': {
+					templateUrl: "templates/expenditures-edit.html",
+					controller: ['$state', '$scope', '$http', '$stateParams',
+						function($state, $scope, $http, $stateParams) {
+							for (var expenditure in $scope.account.expenditures) {
+								if ($scope.account.expenditures[expenditure].id == $stateParams.expenditure_id) {
+									$scope.expenditure = $scope.account.expenditures[expenditure];
+								}
+							}
+
+							$scope.save_expenditure = function() {
+								var expenditure = {};
+								expenditure.date = $scope.date;
+								expenditure.name = $scope.name;
+								expenditure.payer = $scope.payer;
+								expenditure.amount = parseInt(parseFloat($scope.amount) * 100);
+								expenditure.debts = [];
+								for (var debtor in $scope.debtors) {
+									if ($scope.debtors[debtor].debt) {
+										expenditure.debts.push({debtor: debtor, share: $scope.debtors[debtor].share});
+									}
+								}
+								$http.post("/api/account/"+$scope.account.uid+"/expenditures/", expenditure).success(function(data) {
+									$scope.account.expenditures.push(data);
+									$state.go("account", {}, {reload: true});
+								});
+							};
+						}
+					]
+				},
+			}
+		});
+
 		$stateProvider.state('account.add-expenditure', {
 			url: "/expenditures/add",
 			views: {
