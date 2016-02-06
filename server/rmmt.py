@@ -164,7 +164,8 @@ class Expenditure(RmmtModel, JSONObject):
 
     @property
     def json(self):
-        return {"account": uniqid.encode(self.account.uid),
+        return {"id": self._id,
+                "account": uniqid.encode(self.account.uid),
                 "name": self.name,
                 "date": self.date.isoformat(),
                 "amount": self.amount,

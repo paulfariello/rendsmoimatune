@@ -87,3 +87,7 @@ a.edit:hover {
 a.edit {
 	margin-left: 1em;
 }
+
+td .switch, td input[type="number"] {
+	margin-bottom: 0;
+}

@@ -74,7 +74,7 @@
 				<tbody>
 					<tr ng-repeat="expenditure in account.expenditures | orderBy: date:true | limitTo: 5">
 						<td>{{ expenditure.date }}</td>
-						<td><a ui-sref="edit-expenditure({name: expenditure.name})" class="edit">{{ expenditure.name }}</a></td>
+						<td><a ui-sref="account.edit-expenditure({expenditure_id: expenditure.id})" class="edit">{{ expenditure.name }}</a></td>
 						<td>{{ expenditure.amount | amount }}</td>
 						<td>{{ expenditure.payer }}</td>
 						<td ng-if="expenditure.debts.length <= account.users.length / 2">

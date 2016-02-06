@@ -28,7 +28,6 @@
 			params: { error: null },
 			controller: ['$state', '$scope', '$stateParams',
 				function($state, $scope, $stateParams) {
-					console.log($stateParams);
 					$scope.error = $stateParams.error;
 				}
 			]
@@ -57,7 +56,6 @@
 			controller: ['$state', '$scope', '$http', 'request',
 				function($state, $scope, $http, request) {
 					if (request.status != 200) {
-						console.log(request);
 						$state.go("error", {error: request.data.error});
 					}
 
@@ -84,27 +82,40 @@
 		});
 
 		$stateProvider.state('account.add-expenditure', {
-			url: "/add",
+			url: "/expenditures/add",
 			views: {
 				'': {
-					templateUrl: "templates/expenditures-add.html",
+					templateUrl: "templates/expenditures-edit.html",
 					controller: ['$state', '$scope', '$http', function($state, $scope, $http) {
-						$scope.date = new Date();
-						$scope.payer = $scope.account.users[0].name;
-						$scope.debtors = {};
+						/* Init expenditure with some default values */
+						var expenditure = {};
+						expenditure.date = new Date();
+						expenditure.payer = $scope.account.users[0].name;
+						expenditure.debts = [];
 						for (var user in $scope.account.users) {
-							$scope.debtors[$scope.account.users[user].name] = true;
+							var debt = {
+								debt: true,
+								debtor: $scope.account.users[user].name,
+								share: 1
+							};
+							expenditure.debts.push(debt);
 						}
-						$scope.add_expenditure = function() {
+						$scope.expenditure = expenditure;
+
+						$scope.save_expenditure = function() {
 							var expenditure = {};
-							expenditure.date = $scope.date;
-							expenditure.name = $scope.name;
-							expenditure.payer = $scope.payer;
-							expenditure.amount = parseInt(parseFloat($scope.amount) * 100);
+							expenditure.date = $scope.expenditure.date;
+							expenditure.name = $scope.expenditure.name;
+							expenditure.payer = $scope.expenditure.payer;
+							expenditure.amount = parseInt(parseFloat($scope.expenditure.amount) * 100);
 							expenditure.debts = [];
-							for (var debtor in $scope.debtors) {
-								if ($scope.debtors[debtor]) {
-									expenditure.debts.push({debtor: debtor, share: 1});
+							for (var debtor in $scope.expenditure.debts) {
+								if ($scope.expenditure.debts[debtor].debt) {
+									var debt ={
+										debtor: $scope.expenditure.debts[debtor].debtor,
+										share: $scope.expenditure.debts[debtor].share
+									};
+									expenditure.debts.push(debt);
 								}
 							}
 							$http.post("/api/account/"+$scope.account.uid+"/expenditures/", expenditure).success(function(data) {
