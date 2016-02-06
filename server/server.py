@@ -61,8 +61,12 @@ def get_account(account_id):
     Exemple:
     curl -X GET -H "Content-Type:application/json" http://localhost:8080/api/account/PoP93u9ktzqIP5-cJx1D9D/
     """
-    uid = uniqid.decode(account_id)
-    account = rmmt.Account.get(rmmt.Account.uid == uid)
+    try:
+        uid = uniqid.decode(account_id)
+        account = rmmt.Account.get(rmmt.Account.uid == uid)
+    except rmmt.Account.DoesNotExist as e:
+        bottle.response.status = 404
+        return {"error": "Account %s not found" % account_id}
     return json.dumps(account.json, indent="  ")
 
 @bottle.post(r"/api/account/<account_id:re:[a-zA-Z0-9_=-]+>/users/")
@@ -72,10 +76,14 @@ def create_user(account_id):
     Exemple:
     curl -X POST -H "Content-Type:application/json" -d '{"name": "paul"}' http://localhost:8080/api/account/PoP93u9ktzqIP5-cJx1D9D/users/
     """
-    uid = uniqid.decode(account_id)
-    account = rmmt.Account.get(rmmt.Account.uid == uid)
-    name = bottle.request.json['name']
-    user = rmmt.User.create(account=account, name=name)
+    try:
+        uid = uniqid.decode(account_id)
+        account = rmmt.Account.get(rmmt.Account.uid == uid)
+        name = bottle.request.json['name']
+        user = rmmt.User.create(account=account, name=name)
+    except rmmt.Account.DoesNotExist as e:
+        bottle.response.status = 404
+        return {"error": "Account %s not found" % account_id}
     return json.dumps(user.json)
 
 @bottle.get(r"/api/account/<account_id:re:[a-zA-Z0-9_=-]+>/user/<name>")
@@ -85,9 +93,13 @@ def get_user(account_id, name):
     Exemple:
     curl -X GET -H "Content-Type:application/json" http://localhost:8080/api/account/PoP93u9ktzqIP5-cJx1D9D/user/paul
     """
-    uid = uniqid.decode(account_id)
-    user = rmmt.User.select().join(rmmt.Account).where(rmmt.User.name == name,
-                                                       rmmt.Account.uid == uid).get()
+    try:
+        uid = uniqid.decode(account_id)
+        user = rmmt.User.select().join(rmmt.Account).where(rmmt.User.name == name,
+                                                           rmmt.Account.uid == uid).get()
+    except rmmt.Account.DoesNotExist as e:
+        bottle.response.status = 404
+        return {"error": "Account %s not found" % account_id}
     return json.dumps(user.json)
 
 @bottle.post(r"/api/account/<account_id:re:[a-zA-Z0-9_=-]+>/expenditures/")
@@ -97,27 +109,31 @@ def create_expenditure(account_id):
     Exemple:
     curl -X POST -H "Content-Type:application/json" -d '{"name": "patate", "date": "2016-01-28", "amount": 1200, "payer": "paul", "debts": [{"debtor": "paul", "share": 1}, {"debtor": "test", "share": 1}]}' http://localhost:8080/api/account/PoP93u9ktzqIP5-cJx1D9D/expenditures/
     """
-    uid = uniqid.decode(account_id)
-    account = rmmt.Account.get(rmmt.Account.uid == uid)
-    name = bottle.request.json['name']
-    date = strpdate(bottle.request.json['date'])
-    amount = int(bottle.request.json['amount'])
-    payer_name = bottle.request.json['payer']
-    debts = bottle.request.json['debts']
+    try:
+        uid = uniqid.decode(account_id)
+        account = rmmt.Account.get(rmmt.Account.uid == uid)
+        name = bottle.request.json['name']
+        date = strpdate(bottle.request.json['date'])
+        amount = int(bottle.request.json['amount'])
+        payer_name = bottle.request.json['payer']
+        debts = bottle.request.json['debts']
 
-    if len(debts) == 0:
-        raise ValueError("Expenditure without debt")
+        if len(debts) == 0:
+            raise ValueError("Expenditure without debt")
 
-    payer = rmmt.User.select().join(rmmt.Account).where(rmmt.User.name == payer_name,
-                                                        rmmt.Account.uid == uid).get()
+        payer = rmmt.User.select().join(rmmt.Account).where(rmmt.User.name == payer_name,
+                                                            rmmt.Account.uid == uid).get()
 
-    expenditure = rmmt.Expenditure.create(account=account, name=name, date=date,
-                                          amount=amount, payer=payer)
+        expenditure = rmmt.Expenditure.create(account=account, name=name, date=date,
+                                              amount=amount, payer=payer)
 
-    for debt in debts:
-        debtor = rmmt.User.select().join(rmmt.Account).where(rmmt.User.name == debt['debtor'],
-                                                             rmmt.Account.uid == uid).get()
-        rmmt.Debt.create(debtor=debtor, expenditure=expenditure, share=debt['share'])
+        for debt in debts:
+            debtor = rmmt.User.select().join(rmmt.Account).where(rmmt.User.name == debt['debtor'],
+                                                                 rmmt.Account.uid == uid).get()
+            rmmt.Debt.create(debtor=debtor, expenditure=expenditure, share=debt['share'])
+    except rmmt.Account.DoesNotExist as e:
+        bottle.response.status = 404
+        return {"error": "Account %s not found" % account_id}
 
     return json.dumps(expenditure.json)
 

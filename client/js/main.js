@@ -22,35 +22,56 @@
 			}]
 		});
 
+		$stateProvider.state('error', {
+			url: "/error",
+			templateUrl: "templates/error.html",
+			params: { error: null },
+			controller: ['$state', '$scope', '$stateParams',
+				function($state, $scope, $stateParams) {
+					console.log($stateParams);
+					$scope.error = $stateParams.error;
+				}
+			]
+		});
+
 		$stateProvider.state('account', {
 			url: "/{account_id:[a-zA-Z0-9-_]+}",
 			templateUrl: "templates/account.html",
 			resolve: {
-				'account': function($http, $stateParams) {
+				'request': function($http, $stateParams) {
 					return $http.get("/api/account/"+$stateParams.account_id).then(function(request) {
-							var data = request.data;
-							data.max_debt = 0;
-							for (var user in data.users) {
-								var balance = Math.abs(data.users[user].balance);
-								if (data.max_debt < balance) {
-									data.max_debt = balance;
-								}
+						var data = request.data;
+						data.max_debt = 0;
+						for (var user in data.users) {
+							var balance = Math.abs(data.users[user].balance);
+							if (data.max_debt < balance) {
+								data.max_debt = balance;
 							}
-							return data;
-						});
-				}
-			},
-			controller: ['$scope', '$http', 'account', function($scope, $http, account) {
-				$scope.account = account;
-				$scope.add_user = function() {
-					var user = {}
-					user.name = $scope.account.new_user;
-					$http.post("/api/account/"+$scope.account.uid+"/users/", user).success(function(data) {
-						$scope.account.users.push({name: data.name, balance: data.balance});
-						$scope.account.new_user = "";
+						}
+						return request;
+					}, function(request) {
+						return request;
 					});
 				}
-			}]
+			},
+			controller: ['$state', '$scope', '$http', 'request',
+				function($state, $scope, $http, request) {
+					if (request.status != 200) {
+						console.log(request);
+						$state.go("error", {error: request.data.error});
+					}
+
+					$scope.account = request.data;
+					$scope.add_user = function() {
+						var user = {}
+						user.name = $scope.account.new_user;
+						$http.post("/api/account/"+$scope.account.uid+"/users/", user).success(function(data) {
+							$scope.account.users.push({name: data.name, balance: data.balance});
+							$scope.account.new_user = "";
+						});
+					}
+				}
+			]
 		});
 
 		$stateProvider.state('account.expenditures', {
