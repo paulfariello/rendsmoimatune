@@ -99,7 +99,7 @@
 								expenditure.date = $scope.date;
 								expenditure.name = $scope.name;
 								expenditure.payer = $scope.payer;
-								expenditure.amount = parseInt(parseFloat($scope.amount) * 100);
+								expenditure.amount = $scope.amount;
 								expenditure.debts = [];
 								for (var debtor in $scope.debtors) {
 									if ($scope.debtors[debtor].debt) {
@@ -143,7 +143,7 @@
 							expenditure.date = $scope.expenditure.date;
 							expenditure.name = $scope.expenditure.name;
 							expenditure.payer = $scope.expenditure.payer;
-							expenditure.amount = parseInt(parseFloat($scope.expenditure.amount) * 100);
+							expenditure.amount = $scope.expenditure.amount;
 							expenditure.debts = [];
 							for (var debtor in $scope.expenditure.debts) {
 								if ($scope.expenditure.debts[debtor].debt) {
@@ -211,15 +211,37 @@
 				format: "@",
 				language: "@"
 			},
-			link: function($scope, element, attrs, ngModel){
+			link: function($scope, element, attrs, ngModel) {
 				$(element).fdatepicker({
 					format: $scope.format,
 					language: $scope.language
 				});
 
-				ngModel.$formatters.push(function (modelValue) {
-					return $.fn.fdatepicker.DPGlobal.formatDate(modelValue, $.fn.fdatepicker.DPGlobal.parseFormat($scope.format), $scope.language);
-				});
+				function toUser(date) {
+					date = new Date(date);
+					return $.fn.fdatepicker.DPGlobal.formatDate(date, $.fn.fdatepicker.DPGlobal.parseFormat($scope.format), $scope.language);
+				}
+
+				ngModel.$formatters.push(toUser);
+			}
+		}
+	});
+
+	rmmt.directive('amount', function() {
+		return {
+			require: 'ngModel',
+			restrict: 'A',
+			link: function(scope, element, attr, ngModel) {
+				function fromUser(text) {
+					    return parseInt(parseFloat(text) * 100);
+				}
+
+				function toUser(amount) {
+					    return amount / 100;
+				}
+
+				ngModel.$parsers.push(fromUser);
+				ngModel.$formatters.push(toUser);
 			}
 		}
 	});
