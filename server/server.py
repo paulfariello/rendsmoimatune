@@ -59,7 +59,7 @@ def get_account(account_id):
     """Get account description
 
     Exemple:
-    curl -X GET -H "Content-Type:application/json" http://localhost:8080/api/account/PoP93u9ktzqIP5-cJx1D9D/
+    curl -X GET -H "Content-Type:application/json" http://localhost:8080/api/account/PoP93u9ktzqIP5-cJx1D9D
     """
     try:
         uid = uniqid.decode(account_id)
