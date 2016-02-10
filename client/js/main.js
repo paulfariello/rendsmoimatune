@@ -94,19 +94,20 @@
 								}
 							}
 
+							for (var i in $scope.expenditure.debts) {
+								var debt = $scope.expenditure.debts[i];
+								debt.debt = debt.share > 0;
+							}
+
 							$scope.save_expenditure = function() {
-								var expenditure = {};
-								expenditure.date = $scope.date;
-								expenditure.name = $scope.name;
-								expenditure.payer = $scope.payer;
-								expenditure.amount = $scope.amount;
-								expenditure.debts = [];
-								for (var debtor in $scope.debtors) {
-									if ($scope.debtors[debtor].debt) {
-										expenditure.debts.push({debtor: debtor, share: $scope.debtors[debtor].share});
+								for (var i in $scope.expenditure.debts) {
+									var debt = $scope.expenditure.debts[i];
+									if (!debt.debt) {
+										debt.share = 0;
 									}
 								}
-								$http.post("/api/account/"+$scope.account.uid+"/expenditures/", expenditure).success(function(data) {
+
+								$http.put("/api/account/"+$scope.account.uid+"/expenditures/"+$scope.expenditure.id, $scope.expenditure).success(function(data) {
 									$scope.account.expenditures.push(data);
 									$state.go("account", {}, {reload: true});
 								});
@@ -122,44 +123,38 @@
 			views: {
 				'': {
 					templateUrl: "templates/expenditures-edit.html",
-					controller: ['$state', '$scope', '$http', function($state, $scope, $http) {
-						/* Init expenditure with some default values */
-						var expenditure = {};
-						expenditure.date = new Date();
-						expenditure.payer = $scope.account.users[0].name;
-						expenditure.debts = [];
-						for (var user in $scope.account.users) {
-							var debt = {
-								debt: true,
-								debtor: $scope.account.users[user].name,
-								share: 1
-							};
-							expenditure.debts.push(debt);
-						}
-						$scope.expenditure = expenditure;
-
-						$scope.save_expenditure = function() {
+					controller: ['$state', '$scope', '$http',
+						function($state, $scope, $http) {
+							/* Init expenditure with some default values */
 							var expenditure = {};
-							expenditure.date = $scope.expenditure.date;
-							expenditure.name = $scope.expenditure.name;
-							expenditure.payer = $scope.expenditure.payer;
-							expenditure.amount = $scope.expenditure.amount;
+							expenditure.date = new Date();
+							expenditure.payer = $scope.account.users[0].name;
 							expenditure.debts = [];
-							for (var debtor in $scope.expenditure.debts) {
-								if ($scope.expenditure.debts[debtor].debt) {
-									var debt ={
-										debtor: $scope.expenditure.debts[debtor].debtor,
-										share: $scope.expenditure.debts[debtor].share
-									};
-									expenditure.debts.push(debt);
-								}
+							for (var user in $scope.account.users) {
+								var debt = {
+									debt: true,
+									debtor: $scope.account.users[user].name,
+									share: 1
+								};
+								expenditure.debts.push(debt);
 							}
-							$http.post("/api/account/"+$scope.account.uid+"/expenditures/", expenditure).success(function(data) {
-								$scope.account.expenditures.push(data);
-								$state.go("account", {}, {reload: true});
-							});
-						};
-					}]
+							$scope.expenditure = expenditure;
+
+							$scope.save_expenditure = function() {
+								for (var i in $scope.expenditure.debts) {
+									var debt = $scope.expenditure.debts[i];
+									if (!debt.debt) {
+										debt.share = 0;
+									}
+								}
+
+								$http.post("/api/account/"+$scope.account.uid+"/expenditures/", $scope.expenditure).success(function(data) {
+									$scope.account.expenditures.push(data);
+									$state.go("account", {}, {reload: true});
+								});
+							};
+						}
+					]
 				},
 			}
 		});

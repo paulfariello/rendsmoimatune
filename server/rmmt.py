@@ -164,6 +164,16 @@ class Expenditure(RmmtModel, JSONObject):
 
     @property
     def json(self):
+        # rebuild debts for *all* users
+        # this way it's easier to handler client side
+        debts = []
+        for user in self.account.users:
+            debts.append({"debtor": user.name,
+                          "share": 0})
+            for debt in self.debts:
+                if debt.debtor == user:
+                    debts[-1]["share"] = debt.share
+
         return {"id": self._id,
                 "account": uniqid.encode(self.account.uid),
                 "name": self.name,
@@ -171,8 +181,7 @@ class Expenditure(RmmtModel, JSONObject):
                 "amount": self.amount,
                 "payer": self.payer.name,
                 "shares": self.shares,
-                "debts": [{"debtor": debt.debtor.name,
-                           "share": debt.share} for debt in self.debts]}
+                "debts": debts}
 
 
 class Debt(RmmtModel):

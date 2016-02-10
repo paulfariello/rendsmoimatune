@@ -128,9 +128,10 @@ def create_expenditure(account_id):
                                               amount=amount, payer=payer)
 
         for debt in debts:
-            debtor = rmmt.User.select().join(rmmt.Account).where(rmmt.User.name == debt['debtor'],
-                                                                 rmmt.Account.uid == uid).get()
-            rmmt.Debt.create(debtor=debtor, expenditure=expenditure, share=debt['share'])
+            if debt['share'] > 0:
+                debtor = rmmt.User.select().join(rmmt.Account).where(rmmt.User.name == debt['debtor'],
+                                                                     rmmt.Account.uid == uid).get()
+                rmmt.Debt.create(debtor=debtor, expenditure=expenditure, share=debt['share'])
     except rmmt.Account.DoesNotExist as e:
         bottle.response.status = 404
         return {"error": "Account %s not found" % account_id}

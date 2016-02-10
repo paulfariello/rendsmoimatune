@@ -17,18 +17,18 @@
 					<td>{{ expenditure.name }}</td>
 					<td>{{ expenditure.amount | amount }}</td>
 					<td>{{ expenditure.payer }}</td>
-					<td ng-if="expenditure.debts.length <= account.users.length / 2">
-						<span ng-repeat="debt in expenditure.debts">
+					<td ng-if="(expenditure.debts | filter:{'share': 0}:true).length > account.users.length / 2">
+						<span ng-repeat="debt in expenditure.debts | filter:{'share': '!0'}">
 							{{ debt.debtor }}{{$last?'':', '}}
 						</span>
 					</td>
-					<td ng-if="expenditure.debts.length > account.users.length / 2">
+					<td ng-if="(expenditure.debts | filter:{'share': 0}:true).length <= account.users.length / 2">
 						Tous
-						<span ng-if="expenditure.debts.length < account.users.length">
+						<span ng-if="(expenditure.debts | filter:{'share': 0}:true).length > 0">
 							sauf
 						</span>
-						<span ng-repeat="user in account.users | notIn:expenditure.debts:'name':'debtor'">
-							{{ user.name }}{{$last?'':', '}}
+						<span ng-repeat="debt in expenditure.debts | filter:{'share': 0}:false">
+							{{ debt.debtor }}{{$last?'':', '}}
 						</span>
 					</td>
 				</tr>
