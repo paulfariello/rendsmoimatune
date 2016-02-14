@@ -42,7 +42,9 @@
 				<thead>
 					<tr>
 						<th>De</th>
+						<th></th>
 						<th>Montant</th>
+						<th></th>
 						<th>À</th>
 						<th>Action</th>
 					</tr>
@@ -50,7 +52,9 @@
 				<tbody>
 					<tr ng-repeat="repayment in account.balance | orderBy: name">
 						<td>{{ repayment.from }}</td>
+						<td>doit</td>
 						<td>{{ repayment.amount | amount }}</td>
+						<td>à</td>
 						<td>{{ repayment.to }}</td>
 						<td><a ui-sref="add-repayment({from: repayment.from, to: repayment.to, amount: repayment.amount})" class="fa fa-plus-circle button">Ajouter</a></td>
 					</tr>
