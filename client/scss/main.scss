@@ -45,6 +45,24 @@
 @include motion-ui-transitions;
 @include motion-ui-animations;
 
+@font-face {
+	font-family: alfphabet;
+	src: url(../fonts/Alfphabet-IV.ttf);
+}
+
+.top-bar-title h1 {
+	font-family: alfphabet;
+	text-transform: uppercase;
+}
+
+.top-bar-title h1 > .rm {
+	color: $rmmt-blue;
+}
+
+.top-bar-title h1 > .mt {
+	color: $rmmt-red;
+}
+
 .debt, .credit {
 	border-radius: 2px;
 	border: 1px, black;

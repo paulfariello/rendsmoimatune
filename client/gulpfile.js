@@ -65,6 +65,9 @@ var paths = {
 		'node_modules/jquery/dist/jquery.min.js'
 	],
 	fonts: [
+		'fonts/Alfphabet-IV.*'
+	],
+	fontawesome: [
 		'node_modules/font-awesome/fonts/fontawesome-webfont.*'
 	]
 };
@@ -74,7 +77,7 @@ gulp.task('clean', function(cb) {
 });
 
 gulp.task('copy', function() {
-	sequence(['copy:html', 'copy:jquery', 'copy:fonts'], 'copy:templates');
+	sequence(['copy:html', 'copy:jquery', 'copy:fontawesome', 'copy:fonts'], 'copy:templates');
 });
 
 gulp.task('copy:html', function() {
@@ -92,8 +95,13 @@ gulp.task('copy:jquery', function() {
 		.pipe(gulp.dest('./build/js'));
 });
 
+gulp.task('copy:fontawesome', function() {
+	return gulp.src(paths.fontawesome, { base: 'node_modules/font-awesome/fonts/' })
+		.pipe(gulp.dest('./build/fonts'));
+});
+
 gulp.task('copy:fonts', function() {
-	return gulp.src(paths.fonts, { base: 'node_modules/font-awesome/fonts/' })
+	return gulp.src(paths.fonts, { base: 'fonts/' })
 		.pipe(gulp.dest('./build/fonts'));
 });
 
