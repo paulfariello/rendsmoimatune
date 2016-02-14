@@ -240,4 +240,16 @@
 			}
 		}
 	});
+
+	rmmt.directive('expenditures', function() {
+		return {
+			require: 'ngModel',
+			restrict: 'E',
+			templateUrl: 'templates/expenditures-list.html',
+			scope: {
+				expenditures: '=src',
+				limit: '=limit'
+			}
+		}
+	});
 })();
