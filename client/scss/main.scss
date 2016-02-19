@@ -109,3 +109,12 @@ a.edit {
 td .switch, td input[type="number"], th .switch {
 	margin-bottom: 0;
 }
+
+.cover {
+	width: 100%;
+	margin: 0;
+	padding: 10em 0;
+	background: url(../px/7153621661_2c0e057402_o_blurred.jpg) no-repeat center fixed;
+	background-size: cover;
+	color: white;
+}

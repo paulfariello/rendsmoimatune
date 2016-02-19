@@ -35,7 +35,7 @@ def strpdate(date):
     return datetime.datetime.strptime(date[:10], ISO8601_FMT).date()
 
 @bottle.get("/")
-@bottle.get(r"/<path:re:.*\.(html|js|css|woff2|woff|ttf)>")
+@bottle.get(r"/<path:re:.*\.(html|js|css|woff2|woff|ttf|jpg)>")
 def static(path=None):
     """Unsafe method used only for dev"""
     if path is None:
