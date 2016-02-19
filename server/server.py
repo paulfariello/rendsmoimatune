@@ -145,7 +145,7 @@ def main():
     parser.add_argument("-p", "--port", dest="port", default=8080, type=int, help="Port to listen to")
     parser.add_argument("--db", dest="db", default="sqlite:///rmmt.db", help="Database scheme to connect to")
     parser.add_argument("--static", dest="static", default=None, type=str, help="Path to static files")
-    parser.add_argument("--init", dest="init", type=bool, help="Initialize database")
+    parser.add_argument("--init", dest="init", action="store_true", help="Initialize database")
     args = parser.parse_args()
 
     rmmt.connect(args.db)
