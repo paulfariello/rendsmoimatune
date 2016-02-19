@@ -58,6 +58,9 @@ var paths = {
 	html: [
 		'*.html'
 	],
+	px: [
+		'px/*.jpg'
+	],
 	templates: [
 		'templates/*.html'
 	],
@@ -77,12 +80,17 @@ gulp.task('clean', function(cb) {
 });
 
 gulp.task('copy', function() {
-	sequence(['copy:html', 'copy:jquery', 'copy:fontawesome', 'copy:fonts'], 'copy:templates');
+	sequence(['copy:html', 'copy:px', 'copy:jquery', 'copy:fontawesome', 'copy:fonts'], 'copy:templates');
 });
 
 gulp.task('copy:html', function() {
 	return gulp.src(paths.html)
 		.pipe(gulp.dest('./build'));
+});
+
+gulp.task('copy:px', function() {
+	return gulp.src(paths.px)
+		.pipe(gulp.dest('./build/px'));
 });
 
 gulp.task('copy:templates', function() {
