@@ -59,13 +59,12 @@
 
 .top-bar-title h1 {
 	font-family: alfphabet;
+	font-size: 1rem;
+	margin: 0;
+	color: $white;
 }
 
-.top-bar-title h1 > .rm {
-	color: $rmmt-blue;
-}
-
-.top-bar-title h1 > .mt {
+.top-bar-title h1 > small {
 	color: $rmmt-red;
 }
 
@@ -123,4 +122,8 @@ td .switch, td input[type="number"], th .switch {
 	background: url(../px/7153621661_2c0e057402_o_blurred.jpg) no-repeat center fixed;
 	background-size: cover;
 	color: white;
+}
+
+.cover > .row {
+	background: rgba(27, 27, 27, 0.75) none repeat scroll 0 0;
 }

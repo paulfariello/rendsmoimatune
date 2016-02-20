@@ -44,10 +44,12 @@
 // 1. Global
 // ---------
 
+$rmmt-blue: #5494af;
+$rmmt-red: #c66653;
 $global-font-size: 100%;
 $global-width: rem-calc(1200);
 $global-lineheight: 1.5;
-$primary-color: #2199e8;
+$primary-color: $rmmt-blue;
 $secondary-color: #777;
 $success-color: #3adb76;
 $warning-color: #ffae00;
@@ -67,8 +69,6 @@ $global-weight-normal: normal;
 $global-weight-bold: bold;
 $global-radius: 0;
 $global-text-direction: ltr;
-$rmmt-blue: #5494af;
-$rmmt-red: #c66653;
 
 // 2. Breakpoints
 // --------------
@@ -545,6 +545,6 @@ $tooltip-radius: $global-radius;
 // -----------
 
 $topbar-padding: 0.5rem;
-$topbar-background: $light-gray;
+$topbar-background: $rmmt-blue;
 $topbar-title-spacing: 1rem;
 $topbar-input-width: 200px;
