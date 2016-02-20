@@ -68,7 +68,8 @@ var paths = {
 		'node_modules/jquery/dist/jquery.min.js'
 	],
 	fonts: [
-		'fonts/Alfphabet-IV.*'
+		'fonts/Alfphabet-IV.*',
+		'fonts/OpenSans*'
 	],
 	fontawesome: [
 		'node_modules/font-awesome/fonts/fontawesome-webfont.*'

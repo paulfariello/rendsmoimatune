@@ -50,9 +50,15 @@
 	src: url(../fonts/Alfphabet-IV.ttf);
 }
 
+@font-face {
+	font-family: 'Open Sans';
+	font-style: normal;
+	font-weight: 400;
+	src: url(../fonts/OpenSans-Regular.ttf);
+}
+
 .top-bar-title h1 {
 	font-family: alfphabet;
-	text-transform: uppercase;
 }
 
 .top-bar-title h1 > .rm {
