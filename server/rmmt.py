@@ -111,7 +111,7 @@ class Account(RmmtModel, JSONObject):
 class User(RmmtModel, JSONObject):
     """User participating in an account"""
     _id = peewee.PrimaryKeyField()
-    account = peewee.ForeignKeyField(Account, related_name="users")
+    account = peewee.ForeignKeyField(Account, related_name="users", on_delete="CASCADE")
     name = peewee.CharField()
 
     @property
@@ -154,11 +154,11 @@ class User(RmmtModel, JSONObject):
 class Expenditure(RmmtModel, JSONObject):
     """Expenditure set for a given account"""
     _id = peewee.PrimaryKeyField()
-    account = peewee.ForeignKeyField(Account, related_name="expenditures")
+    account = peewee.ForeignKeyField(Account, related_name="expenditures", on_delete="CASCADE")
     name = peewee.CharField()
     date = peewee.DateField()
     amount = peewee.IntegerField()
-    payer = peewee.ForeignKeyField(User, related_name="expenditures")
+    payer = peewee.ForeignKeyField(User, related_name="expenditures", on_delete="RESTRICT")
 
     @property
     def shares(self):
@@ -192,19 +192,19 @@ class Expenditure(RmmtModel, JSONObject):
 class Debt(RmmtModel):
     """Association between an expenditure and user that are concerned by it"""
     _id = peewee.PrimaryKeyField()
-    debtor = peewee.ForeignKeyField(User, related_name='debts')
-    expenditure = peewee.ForeignKeyField(Expenditure, related_name='debts')
+    debtor = peewee.ForeignKeyField(User, related_name='debts', on_delete="RESTRICT")
+    expenditure = peewee.ForeignKeyField(Expenditure, related_name='debts', on_delete="CASCADE")
     share = peewee.IntegerField()
 
 
 class Repayment(RmmtModel, JSONObject):
     """One user directly give monney to another one"""
     _id = peewee.PrimaryKeyField()
-    account = peewee.ForeignKeyField(Account, related_name="repayments")
+    account = peewee.ForeignKeyField(Account, related_name="repayments", on_delete="CASCADE")
     date = peewee.DateField()
     amount = peewee.IntegerField()
-    from_user = peewee.ForeignKeyField(User, related_name="repayments_from_me")
-    to_user = peewee.ForeignKeyField(User, related_name="repayments_to_me")
+    from_user = peewee.ForeignKeyField(User, related_name="repayments_from_me", on_delete="RESTRICT")
+    to_user = peewee.ForeignKeyField(User, related_name="repayments_to_me", on_delete="RESTRICT")
 
     @property
     def json(self):
