@@ -102,8 +102,30 @@ def get_user(account_id, name):
         return {"error": "Account %s not found" % account_id}
     return json.dumps(user.json)
 
+def validate_expenditure():
+    debts = bottle.request.json['debts']
+    amount = int(bottle.request.json['amount'])
+
+    if len(debts) == 0:
+        raise ValueError("no debts")
+
+    share_sum = sum(debt['share'] for debt in debts)
+    if share_sum <= 0:
+        raise ValueError("invalid share sum %s" % share_sum)
+
+    for debt in debts:
+        if debt['share'] < 0:
+            raise ValueError("invalid share for user %s" % debt['debtor'])
+
+    if amount <= 0:
+        raise ValueError("invalid amount %s" % amount)
+
+
+
 @rmmt.atomic
 def create_expenditure(account_id):
+    validate_expenditure()
+
     uid = uniqid.decode(account_id)
     account = rmmt.Account.get(rmmt.Account.uid == uid)
     name = bottle.request.json['name']
@@ -111,9 +133,6 @@ def create_expenditure(account_id):
     amount = int(bottle.request.json['amount'])
     user_name = bottle.request.json['payer']
     debts = bottle.request.json['debts']
-
-    if len(debts) == 0:
-        raise ValueError("Expenditure without debt")
 
     payer = rmmt.User.select().where(rmmt.User.name == user_name,
                                      rmmt.User.account == account).get()
@@ -146,10 +165,15 @@ def rest_create_expenditure(account_id):
     except rmmt.User.DoesNotExist:
         bottle.response.status = 404
         return {"error": "User not found"}
+    except ValueError as e:
+        bottle.response.status = 403
+        return {"error": e.msg}
 
 
 @rmmt.atomic
 def update_expenditure(account_id, expenditure_id):
+    validate_expenditure()
+
     uid = uniqid.decode(account_id)
     account = rmmt.Account.get(rmmt.Account.uid == uid)
     expenditure = rmmt.Expenditure.select().where(rmmt.Expenditure._id == expenditure_id,
@@ -166,8 +190,6 @@ def update_expenditure(account_id, expenditure_id):
     expenditure.save()
 
     debts = bottle.request.json['debts']
-    if len(debts) == 0:
-        raise ValueError("Expenditure without debt")
 
     rmmt.Debt.delete().where(rmmt.Debt.expenditure == expenditure).execute()
     for debt in debts:
@@ -195,10 +217,15 @@ def rest_update_expenditure(account_id, expenditure_id):
         return {"error": "Account %s not found" % account_id}
     except rmmt.Expenditure.DoesNotExist as e:
         bottle.response.status = 404
+        import pprint; pp = pprint.PrettyPrinter()
+        pp.pprint(e.args)
         return {"error": "Expenditure %s not found" % expenditure_id}
     except rmmt.User.DoesNotExist as e:
         bottle.response.status = 404
         return {"error": "User not found"}
+    except ValueError as e:
+        bottle.response.status = 403
+        return {"error": e.args[0]}
 
 def main():
     """Start server"""
