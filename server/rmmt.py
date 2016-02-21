@@ -21,6 +21,11 @@ import uniqid
 
 DB = peewee.Proxy()
 
+def atomic(f):
+    def wrapper(*args):
+        with DB.atomic():
+            return f(*args)
+    return wrapper
 
 def connect(scheme):
     """Connect rmmt to the database
