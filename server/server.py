@@ -166,7 +166,7 @@ def rest_create_expenditure(account_id):
         bottle.response.status = 404
         return {"error": "User not found"}
     except ValueError as e:
-        bottle.response.status = 403
+        bottle.response.status = 400
         return {"error": e.msg}
 
 
@@ -224,7 +224,7 @@ def rest_update_expenditure(account_id, expenditure_id):
         bottle.response.status = 404
         return {"error": "User not found"}
     except ValueError as e:
-        bottle.response.status = 403
+        bottle.response.status = 400
         return {"error": e.args[0]}
 
 def main():
