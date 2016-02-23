@@ -64,6 +64,10 @@
 	color: $white;
 }
 
+.top-bar-title h1 > a {
+	color: $white;
+}
+
 .top-bar-title h1 > small {
 	color: $rmmt-red;
 }
@@ -130,4 +134,7 @@ td .switch, td input[type="number"], th .switch {
 
 h3 {
 	margin-top: 2em;
+	margin-bottom: 1em;
+	border-bottom: 3px solid $primary-color;
+	color: $primary-color;
 }
