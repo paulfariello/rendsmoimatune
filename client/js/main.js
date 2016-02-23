@@ -252,4 +252,16 @@
 			}
 		}
 	});
+
+	rmmt.directive('repayments', function() {
+		return {
+			require: 'ngModel',
+			restrict: 'E',
+			templateUrl: 'templates/repayments-list.html',
+			scope: {
+				repayments: '=src',
+				limit: '=limit'
+			}
+		}
+	});
 })();

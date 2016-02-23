@@ -72,25 +72,8 @@
 	</div>
 	<div class="row">
 		<div class="small-12 columns">
-			<h3>Remboursements</h3>
-			<table>
-				<thead>
-					<tr>
-						<th>Date</th>
-						<th>De</th>
-						<th>Montant</th>
-						<th>À</th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr ng-repeat="repayment in account.repayments | orderBy: date:true | limitTo: 5">
-						<td>{{ repayment.date }}</td>
-						<td>{{ repayment.from }}</td>
-						<td>{{ repayment.amount | amount }}</td>
-						<td>{{ repayment.to }}</td>
-					</tr>
-				</tbody>
-			</table>
+			<h3><a ui-sref="account.repayments">Remboursements</a></h3>
+			<repayments limit="5" src="account.repayments"></repayments>
 			<a ng-if="account.repayments.length > 5" ui-sref="account.repayments">Et {{ account.repayments.length - 5 }} <span ng-if="account.repayments.length > 6">autres…</span><span ng-if="account.repayments.length == 6">autre.</span></a>
 			<a class="button float-right fa fa-plus-circle" ui-sref="account.add-repayment">Nouveau remboursement</a>
 		</div>

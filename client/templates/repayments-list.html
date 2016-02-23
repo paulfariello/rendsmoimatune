@@ -1,0 +1,19 @@
+<table ng-if="repayments.length > 0">
+	<thead>
+		<tr>
+			<th>Date</th>
+			<th>De</th>
+			<th>Montant</th>
+			<th>À</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr ng-repeat="repayment in repayments | orderBy: date:true | limitTo: limit">
+			<td>{{ repayment.date }}</td>
+			<td>{{ repayment.from }}</td>
+			<td>{{ repayment.amount | amount }}</td>
+			<td>{{ repayment.to }}</td>
+		</tr>
+	</tbody>
+</table>
+
