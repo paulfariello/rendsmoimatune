@@ -4,9 +4,10 @@
 	</div>
 </div>
 <div ui-view="">
-	<div class="row">
+	<div class="row" ng-if="account.users.length > 0">
 		<div class="small-12 columns">
-			<h3>Balance</h3>
+			<h3 ng-if="account.balance.length > 0">Balance</h3>
+			<h3 ng-if="account.balance.length == 0">Utilisateurs</h3>
 			<div class="row text-center" ng-repeat="user in account.users">
 				<div class="small-5 columns">
 					<div class="debt" ng-if="user.balance < 0" style="width: {{ -user.balance/account.max_debt*100 }}%">
@@ -35,10 +36,10 @@
 			</div>
 		</form>
 	</div>
-	<div class="row">
+	<div class="row" ng-if="account.users.length > 0">
 		<div class="small-12 columns">
 			<h3>Équilibrage</h3>
-			<table>
+			<table ng-if="account.balance.length > 0">
 				<thead>
 					<tr>
 						<th>De</th>
@@ -60,9 +61,12 @@
 					</tr>
 				</tbody>
 			</table>
+			<p ng-if="account.balance.length == 0">
+				Rien à faire, vous êtes à l'équilibre !
+			</p>
 		</div>
 	</div>
-	<div class="row">
+	<div class="row" ng-if="account.users.length > 0">
 		<div class="small-12 columns">
 			<h3><a ui-sref="account.expenditures">Dépenses</a></h3>
 			<expenditures limit="5" src="account.expenditures"></expenditures>
@@ -70,7 +74,7 @@
 			<a class="button float-right fa fa-plus-circle" ui-sref="account.add-expenditure">Nouvelle dépense</a>
 		</div>
 	</div>
-	<div class="row">
+	<div class="row" ng-if="account.users.length > 0">
 		<div class="small-12 columns">
 			<h3><a ui-sref="account.repayments">Remboursements</a></h3>
 			<repayments limit="5" src="account.repayments"></repayments>
