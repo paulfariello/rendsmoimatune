@@ -8,18 +8,20 @@
 		<div class="small-12 columns">
 			<h3 ng-if="account.balance.length > 0">Balance</h3>
 			<h3 ng-if="account.balance.length == 0">Utilisateurs</h3>
-			<div class="row text-center" ng-repeat="user in account.users">
-				<div class="small-5 columns">
-					<div class="debt" ng-if="user.balance < 0" style="width: {{ -user.balance/account.max_debt*100 }}%">
-						{{ user.balance | amount }}
+			<div class="balance">
+				<div class="row text-center" ng-repeat="user in account.users">
+					<div class="small-5 columns">
+						<div class="debt" ng-if="user.balance < 0" style="width: {{ -user.balance/account.max_debt*100 }}%">
+							{{ user.balance | amount }}
+						</div>
 					</div>
-				</div>
-				<div ng-class="{'small-offset-5': user.balance >= 0}" class="small-2 columns">
-					{{ user.name }}
-				</div>
-				<div class="small-5 columns">
-					<div class="credit" ng-if="user.balance > 0" style="width: {{ user.balance/account.max_debt*100 }}%">
-						{{ user.balance | amount }}
+					<div ng-class="{'small-offset-5': user.balance >= 0}" class="small-2 columns">
+						{{ user.name }}
+					</div>
+					<div class="small-5 columns">
+						<div class="credit" ng-if="user.balance > 0" style="width: {{ user.balance/account.max_debt*100 }}%">
+							{{ user.balance | amount }}
+						</div>
 					</div>
 				</div>
 			</div>
