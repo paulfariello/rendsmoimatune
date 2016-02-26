@@ -72,21 +72,31 @@
 	color: $rmmt-red;
 }
 
+.balance .column {
+	padding: 0;
+}
+
+.balance > div:nth-child(even) {
+	background-color: $table-striped-background;
+}
+
 .debt, .credit {
 	border-radius: 2px;
 	border: 1px, black;
 	color: $white;
 	margin: 0;
-	font-size: 0.75rem;
 	font-weight: bold;
+	padding: 0.2em;
+	min-width: -moz-min-content;
+	min-width: -webkit-min-content;
 }
 
-.debt {
+.debt, .debt > div {
 	background: $alert-color;
 	float: right;
 }
 
-.credit {
+.credit, .credit > div {
 	background: $success-color;
 }
 
