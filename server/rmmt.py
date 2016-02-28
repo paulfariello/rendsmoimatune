@@ -203,13 +203,13 @@ class Repayment(RmmtModel, JSONObject):
     account = peewee.ForeignKeyField(Account, related_name="repayments", on_delete="CASCADE")
     date = peewee.DateField()
     amount = peewee.IntegerField()
-    from_user = peewee.ForeignKeyField(User, related_name="repayments_from_me", on_delete="RESTRICT")
-    to_user = peewee.ForeignKeyField(User, related_name="repayments_to_me", on_delete="RESTRICT")
+    payer = peewee.ForeignKeyField(User, related_name="repayments_from_me", on_delete="RESTRICT")
+    beneficiary = peewee.ForeignKeyField(User, related_name="repayments_to_me", on_delete="RESTRICT")
 
     @property
     def json(self):
         return {"account": uniqid.encode(self.account.uid),
                 "date": self.date.isoformat(),
                 "amount": self.amount,
-                "from_user": self.from_user.name,
-                "to_user": self.to_user.name}
+                "payer": self.payer.name,
+                "beneficiary": self.beneficiary.name}

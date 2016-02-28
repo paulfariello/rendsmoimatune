@@ -3,16 +3,20 @@
 		<tr>
 			<th>Date</th>
 			<th>De</th>
+            <th></th>
 			<th>Montant</th>
+            <th></th>
 			<th>À</th>
 		</tr>
 	</thead>
 	<tbody>
 		<tr ng-repeat="repayment in repayments | orderBy: date:true | limitTo: limit">
 			<td>{{ repayment.date }}</td>
-			<td>{{ repayment.from }}</td>
+			<td>{{ repayment.payer }}</td>
+            <td>a remboursé</td>
 			<td>{{ repayment.amount | amount }}</td>
-			<td>{{ repayment.to }}</td>
+            <td>à</td>
+			<td>{{ repayment.beneficiary }}</td>
 		</tr>
 	</tbody>
 </table>

@@ -121,7 +121,6 @@ def validate_expenditure():
         raise ValueError("invalid amount %s" % amount)
 
 
-
 @rmmt.atomic
 def create_expenditure(account_id):
     validate_expenditure()
@@ -220,6 +219,109 @@ def rest_update_expenditure(account_id, expenditure_id):
         import pprint; pp = pprint.PrettyPrinter()
         pp.pprint(e.args)
         return {"error": "Expenditure %s not found" % expenditure_id}
+    except rmmt.User.DoesNotExist as e:
+        bottle.response.status = 404
+        return {"error": "User not found"}
+    except ValueError as e:
+        bottle.response.status = 400
+        return {"error": e.args[0]}
+
+
+def validate_repayment():
+    amount = int(bottle.request.json['amount'])
+
+    if amount <= 0:
+        raise ValueError("invalid amount %s" % amount)
+
+
+@rmmt.atomic
+def create_repayment(account_id):
+    validate_repayment()
+
+    uid = uniqid.decode(account_id)
+    account = rmmt.Account.get(rmmt.Account.uid == uid)
+    date = strpdate(bottle.request.json['date'])
+    amount = int(bottle.request.json['amount'])
+    payer_name = bottle.request.json['payer']
+    beneficiary_name = bottle.request.json['beneficiary']
+
+    payer = rmmt.User.select().where(rmmt.User.name == payer_name,
+                                     rmmt.User.account == account).get()
+
+    beneficiary = rmmt.User.select().where(rmmt.User.name == beneficiary_name,
+                                     rmmt.User.account == account).get()
+
+    repayment = rmmt.Repayment.create(account=account, date=date,
+                                      amount=amount, payer=payer,
+                                      beneficiary=beneficiary)
+
+    return repayment
+
+@bottle.post(r"/api/account/<account_id:re:[a-zA-Z0-9_=-]+>/repayments/")
+def rest_create_repayment(account_id):
+    """Create repayment
+
+    Exemple:
+    curl -X POST -H "Content-Type:application/json" -d '{"date": "2016-01-28", "amount": 1200, "payer": "paul", "beneficiary": "emilie"}' http://localhost:8080/api/account/PoP93u9ktzqIP5-cJx1D9D/repayments/
+    """
+    try:
+        repayment = create_repayment(account_id)
+        return json.dumps(repayment.json)
+    except rmmt.Account.DoesNotExist:
+        bottle.response.status = 404
+        return {"error": "Account %s not found" % account_id}
+    except rmmt.User.DoesNotExist:
+        bottle.response.status = 404
+        return {"error": "User not found"}
+    except ValueError as e:
+        bottle.response.status = 400
+        return {"error": e.msg}
+
+
+@rmmt.atomic
+def update_repayment(account_id, repayment_id):
+    validate_repayment()
+
+    uid = uniqid.decode(account_id)
+    account = rmmt.Account.get(rmmt.Account.uid == uid)
+    repayment = rmmt.Repayment.select().where(rmmt.Repayment._id == repayment_id,
+                                         rmmt.Repayment.account == account).get()
+
+    payer_name = bottle.request.json['payer']
+    payer = rmmt.User.select().where(rmmt.User.name == payer_name,
+                                     rmmt.User.account == account).get()
+
+    beneficiary_name = bottle.request.json['beneficiary']
+    beneficiary = rmmt.User.select().where(rmmt.User.name == beneficiary_name,
+                                     rmmt.User.account == account).get()
+
+    repayment.date = strpdate(bottle.request.json['date'])
+    repayment.amount = int(bottle.request.json['amount'])
+    repayment.payer = payer
+    repayment.beneficiary = beneficiary
+    repayment.save()
+
+    return repayment
+
+
+@bottle.put(r"/api/account/<account_id:re:[a-zA-Z0-9_=-]+>/repayments/<repayment_id:re:[0-9]+>")
+def rest_update_repayment(account_id, repayment_id):
+    """Update repayment
+
+    Exemple:
+    curl -X PUT -H "Content-Type:application/json" -d '{"date": "2016-01-28", "amount": 1200, "payer": "paul", "beneficiary": "test"}' http://localhost:8080/api/account/PoP93u9ktzqIP5-cJx1D9D/repayments/11
+    """
+    try:
+        repayment = update_repayment(account_id, repayment_id)
+        return json.dumps(repayment.json)
+    except rmmt.Account.DoesNotExist as e:
+        bottle.response.status = 404
+        return {"error": "Account %s not found" % account_id}
+    except rmmt.Repayment.DoesNotExist as e:
+        bottle.response.status = 404
+        import pprint; pp = pprint.PrettyPrinter()
+        pp.pprint(e.args)
+        return {"error": "Repayment %s not found" % repayment_id}
     except rmmt.User.DoesNotExist as e:
         bottle.response.status = 404
         return {"error": "User not found"}
