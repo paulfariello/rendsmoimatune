@@ -233,6 +233,12 @@ def validate_repayment():
     if amount <= 0:
         raise ValueError("invalid amount %s" % amount)
 
+    payer_name = bottle.request.json['payer']
+    beneficiary_name = bottle.request.json['beneficiary']
+
+    if payer_name == beneficiary_name:
+        raise ValueError("cannot create a repayment to yourself")
+
 
 @rmmt.atomic
 def create_repayment(account_id):

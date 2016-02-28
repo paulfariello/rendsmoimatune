@@ -164,9 +164,31 @@
 			templateUrl: "templates/repayments.html"
 		});
 
-		$stateProvider.state('account.repayments.add', {
-			url: "/add",
-			templateUrl: "templates/repayments-add.html"
+		$stateProvider.state('account.add-repayment', {
+			url: "/repayments/add",
+			views: {
+				'': {
+					templateUrl: "templates/repayments-edit.html",
+					controller: ['$state', '$scope', '$http',
+						function($state, $scope, $http) {
+							/* Init repayment with some default values */
+							var repayment = {};
+							repayment.date = new Date();
+							repayment.payer = $scope.account.users[0].name;
+							repayment.beneficiary = $scope.account.users[1].name;
+
+							$scope.repayment = repayment;
+
+							$scope.save_repayment = function() {
+								$http.post("/api/account/"+$scope.account.uid+"/repayments/", $scope.repayment).success(function(data) {
+									$scope.account.repayments.push(data);
+									$state.go("account", {}, {reload: true});
+								});
+							};
+						}
+					]
+				},
+			}
 		});
 
 		$stateProvider.state('account.balance', {

@@ -59,7 +59,7 @@
 						<td>{{ repayment.amount | amount }}</td>
 						<td>à</td>
 						<td>{{ repayment.to }}</td>
-						<td><a ui-sref="add-repayment({from: repayment.from, to: repayment.to, amount: repayment.amount})" class="fa fa-plus-circle button">Ajouter</a></td>
+						<td><a ui-sref="add-repayment({payer: repayment.from, beneficiary: repayment.to, amount: repayment.amount})" class="fa fa-plus-circle button">Ajouter</a></td>
 					</tr>
 				</tbody>
 			</table>
