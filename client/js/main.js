@@ -166,16 +166,35 @@
 
 		$stateProvider.state('account.add-repayment', {
 			url: "/repayments/add",
+			params: {
+				payer: '',
+				beneficiary: '',
+				amount: 0.0,
+			},
 			views: {
 				'': {
 					templateUrl: "templates/repayments-edit.html",
-					controller: ['$state', '$scope', '$http',
-						function($state, $scope, $http) {
+					controller: ['$state', '$stateParams', '$scope', '$http',
+						function($state, $stateParams, $scope, $http) {
 							/* Init repayment with some default values */
+							console.log($stateParams);
 							var repayment = {};
 							repayment.date = new Date();
-							repayment.payer = $scope.account.users[0].name;
-							repayment.beneficiary = $scope.account.users[1].name;
+							if ($stateParams.payer) {
+								repayment.payer = $stateParams.payer;
+							} else {
+								repayment.payer = $scope.account.users[0].name;
+							}
+
+							if ($stateParams.beneficiary) {
+								repayment.beneficiary = $stateParams.beneficiary;
+							} else {
+								repayment.beneficiary = $scope.account.users[1].name;
+							}
+
+							if ($stateParams.amount) {
+								repayment.amount = $stateParams.amount;
+							}
 
 							$scope.repayment = repayment;
 
