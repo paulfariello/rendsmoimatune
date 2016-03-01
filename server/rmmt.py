@@ -16,6 +16,7 @@
 
 import peewee
 import playhouse.db_url
+from urllib.parse import urlparse
 
 import uniqid
 
@@ -27,13 +28,17 @@ def atomic(f):
             return f(*args)
     return wrapper
 
-def connect(scheme):
+def connect(url):
     """Connect rmmt to the database
 
-    :param scheme: the database scheme
-    :type scheme: str
+    :param url: the database scheme
+    :type url: str
     """
-    DB.initialize(playhouse.db_url.connect(scheme))
+    args = {}
+    parsed = urlparse(url)
+    if 'sqlite' in parsed.scheme:
+        args['pragmas'] = (('foreign_keys', 'ON'),)
+    DB.initialize(playhouse.db_url.connect(url, **args))
 
 
 def create_tables():
