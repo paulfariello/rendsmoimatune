@@ -216,8 +216,6 @@ def rest_update_expenditure(account_id, expenditure_id):
         return {"error": "Account %s not found" % account_id}
     except rmmt.Expenditure.DoesNotExist as e:
         bottle.response.status = 404
-        import pprint; pp = pprint.PrettyPrinter()
-        pp.pprint(e.args)
         return {"error": "Expenditure %s not found" % expenditure_id}
     except rmmt.User.DoesNotExist as e:
         bottle.response.status = 404
@@ -252,8 +250,6 @@ def rest_delete_expenditure(account_id, expenditure_id):
         return {"error": "Account %s not found" % account_id}
     except rmmt.Expenditure.DoesNotExist as e:
         bottle.response.status = 404
-        import pprint; pp = pprint.PrettyPrinter()
-        pp.pprint(e.args)
         return {"error": "Expenditure %s not found" % expenditure_id}
     except ValueError as e:
         bottle.response.status = 400
@@ -358,8 +354,6 @@ def rest_update_repayment(account_id, repayment_id):
         return {"error": "Account %s not found" % account_id}
     except rmmt.Repayment.DoesNotExist as e:
         bottle.response.status = 404
-        import pprint; pp = pprint.PrettyPrinter()
-        pp.pprint(e.args)
         return {"error": "Repayment %s not found" % repayment_id}
     except rmmt.User.DoesNotExist as e:
         bottle.response.status = 404
