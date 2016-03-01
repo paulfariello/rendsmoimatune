@@ -42,6 +42,7 @@ def static(path=None):
         path = "index.html"
     return bottle.static_file(path, root=STATIC_ROOT)
 
+
 @bottle.post(r"/api/account/")
 def create_account():
     """Create a new account
@@ -53,6 +54,7 @@ def create_account():
     name = bottle.request.json['name']
     account = rmmt.Account.create(uid=uid, name=name)
     return json.dumps(account.json)
+
 
 @bottle.get(r"/api/account/<account_id:re:[a-zA-Z0-9_=-]+>")
 def get_account(account_id):
@@ -68,6 +70,7 @@ def get_account(account_id):
         bottle.response.status = 404
         return {"error": "Account %s not found" % account_id}
     return json.dumps(account.json, indent="  ")
+
 
 @bottle.post(r"/api/account/<account_id:re:[a-zA-Z0-9_=-]+>/users/")
 def create_user(account_id):
@@ -86,6 +89,7 @@ def create_user(account_id):
         return {"error": "Account %s not found" % account_id}
     return json.dumps(user.json)
 
+
 @bottle.get(r"/api/account/<account_id:re:[a-zA-Z0-9_=-]+>/user/<name>")
 def get_user(account_id, name):
     """Get user description
@@ -101,6 +105,7 @@ def get_user(account_id, name):
         bottle.response.status = 404
         return {"error": "Account %s not found" % account_id}
     return json.dumps(user.json)
+
 
 def validate_expenditure():
     debts = bottle.request.json['debts']
