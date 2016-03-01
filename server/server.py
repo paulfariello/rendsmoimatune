@@ -237,7 +237,7 @@ def delete_expenditure(account_id, expenditure_id):
     expenditure = rmmt.Expenditure.select().where(rmmt.Expenditure._id == expenditure_id,
                                          rmmt.Expenditure.account == account).get()
 
-    expenditure.delete().execute()
+    expenditure.delete_instance()
 
 
 @bottle.delete(r"/api/account/<account_id:re:[a-zA-Z0-9_=-]+>/expenditures/<expenditure_id:re:[0-9]+>")
@@ -375,7 +375,7 @@ def delete_repayment(account_id, repayment_id):
     repayment = rmmt.Repayment.select().where(rmmt.Repayment._id == repayment_id,
                                          rmmt.Repayment.account == account).get()
 
-    repayment.delete().execute()
+    repayment.delete_instance()
 
 
 @bottle.delete(r"/api/account/<account_id:re:[a-zA-Z0-9_=-]+>/repayments/<repayment_id:re:[0-9]+>")
