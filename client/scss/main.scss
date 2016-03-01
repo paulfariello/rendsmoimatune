@@ -101,7 +101,7 @@
 }
 
 input:invalid {
-	border-color: $alert-color;
+	border-left: 3px solid $alert-color;
 }
 
 .button.fa:before {
@@ -151,4 +151,8 @@ h3 {
 
 div.balance {
 	padding: 0.5em;
+}
+
+input.ng-untouched {
+	border: 1px solid $medium-gray;
 }
