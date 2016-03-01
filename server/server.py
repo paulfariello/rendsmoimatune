@@ -227,6 +227,39 @@ def rest_update_expenditure(account_id, expenditure_id):
         return {"error": e.args[0]}
 
 
+@rmmt.atomic
+def delete_expenditure(account_id, expenditure_id):
+    uid = uniqid.decode(account_id)
+    account = rmmt.Account.get(rmmt.Account.uid == uid)
+    expenditure = rmmt.Expenditure.select().where(rmmt.Expenditure._id == expenditure_id,
+                                         rmmt.Expenditure.account == account).get()
+
+    expenditure.delete().execute()
+
+
+@bottle.delete(r"/api/account/<account_id:re:[a-zA-Z0-9_=-]+>/expenditures/<expenditure_id:re:[0-9]+>")
+def rest_delete_expenditure(account_id, expenditure_id):
+    """Delete expenditure
+
+    Exemple:
+    curl -X DELETE -H "Content-Type:application/json" http://localhost:8080/api/account/PoP93u9ktzqIP5-cJx1D9D/expenditures/11
+    """
+    try:
+        expenditure = delete_expenditure(account_id, expenditure_id)
+        return
+    except rmmt.Account.DoesNotExist as e:
+        bottle.response.status = 404
+        return {"error": "Account %s not found" % account_id}
+    except rmmt.Expenditure.DoesNotExist as e:
+        bottle.response.status = 404
+        import pprint; pp = pprint.PrettyPrinter()
+        pp.pprint(e.args)
+        return {"error": "Expenditure %s not found" % expenditure_id}
+    except ValueError as e:
+        bottle.response.status = 400
+        return {"error": e.args[0]}
+
+
 def validate_repayment():
     amount = int(bottle.request.json['amount'])
 
