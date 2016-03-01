@@ -428,6 +428,7 @@ def main():
     parser.add_argument("-p", "--port", dest="port", default=8080, type=int, help="Port to listen to")
     parser.add_argument("--db", dest="db", default="sqlite:///rmmt.db", help="Database scheme to connect to")
     parser.add_argument("--static", dest="static", default=None, type=str, help="Path to static files")
+    parser.add_argument("--server", dest="server", default='auto', type=str, help="Bottle server type")
     parser.add_argument("--init", dest="init", action="store_true", help="Initialize database")
     args = parser.parse_args()
 
@@ -438,7 +439,7 @@ def main():
     global STATIC_ROOT
     STATIC_ROOT = args.static
 
-    bottle.run(host=args.host, port=args.port)
+    bottle.run(server=args.server, host=args.host, port=args.port)
 
 if __name__ == "__main__":
     main()
