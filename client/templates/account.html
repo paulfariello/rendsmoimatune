@@ -76,7 +76,7 @@
 			<a class="button float-right fa fa-plus-circle" ui-sref="account.add-expenditure">Nouvelle dépense</a>
 		</div>
 	</div>
-	<div class="row" ng-if="account.users.length > 0">
+	<div class="row" ng-if="account.users.length > 1">
 		<div class="small-12 columns">
 			<h3><a ui-sref="account.repayments"><i class="fa fa-exchange fa-fw"></i>Remboursements</a></h3>
 			<repayments limit="5" src="account.repayments"></repayments>
