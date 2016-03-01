@@ -6,12 +6,13 @@
 			<th>Montant</th>
 			<th>Payeur</th>
 			<th>Participants</th>
+			<th>Actions</th>
 		</tr>
 	</thead>
 	<tbody>
 		<tr ng-repeat="expenditure in expenditures | orderBy: date:true | limitTo: limit">
 			<td>{{ expenditure.date }}</td>
-			<td><a ui-sref="account.edit-expenditure({expenditure_id: expenditure.id})" class="edit">{{ expenditure.name }}</a></td>
+			<td>{{ expenditure.name }}</td>
 			<td>{{ expenditure.amount | amount }}</td>
 			<td>{{ expenditure.payer }}</td>
 			<td ng-if="(expenditure.debts | filter:{'share': 0}:true).length > expenditure.debts.length / 2">
@@ -27,6 +28,10 @@
 				<span ng-repeat="debt in expenditure.debts | filter:{'share': 0}:false">
 					{{ debt.debtor }}{{$last?'':', '}}
 				</span>
+			</td>
+			<td>
+				<a ui-sref="account.edit-expenditure({expenditure_id: expenditure.id})" aria-label="Éditer" class="button"><i class="fa fa-pencil fa-lg"></i></a>
+				<button aria-label="Supprimer" class="button alert"><i class="fa fa-trash-o fa-lg"></i></button>
 			</td>
 		</tr>
 	</tbody>
