@@ -362,6 +362,37 @@ def rest_update_repayment(account_id, repayment_id):
         bottle.response.status = 400
         return {"error": e.args[0]}
 
+
+@rmmt.atomic
+def delete_repayment(account_id, repayment_id):
+    uid = uniqid.decode(account_id)
+    account = rmmt.Account.get(rmmt.Account.uid == uid)
+    repayment = rmmt.Repayment.select().where(rmmt.Repayment._id == repayment_id,
+                                         rmmt.Repayment.account == account).get()
+
+    repayment.delete().execute()
+
+
+@bottle.delete(r"/api/account/<account_id:re:[a-zA-Z0-9_=-]+>/repayments/<repayment_id:re:[0-9]+>")
+def rest_delete_repayment(account_id, repayment_id):
+    """Delete repayment
+
+    Exemple:
+    curl -X DELETE -H "Content-Type:application/json" http://localhost:8080/api/account/PoP93u9ktzqIP5-cJx1D9D/repayments/11
+    """
+    try:
+        repayment = delete_repayment(account_id, repayment_id)
+        return
+    except rmmt.Account.DoesNotExist as e:
+        bottle.response.status = 404
+        return {"error": "Account %s not found" % account_id}
+    except rmmt.Repayment.DoesNotExist as e:
+        bottle.response.status = 404
+        return {"error": "Repayment %s not found" % repayment_id}
+    except ValueError as e:
+        bottle.response.status = 400
+        return {"error": e.args[0]}
+
 def main():
     """Start server"""
     parser = argparse.ArgumentParser(description="Rendsmoimatune")
