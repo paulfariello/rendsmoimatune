@@ -84,27 +84,50 @@ def create_user(account_id):
         account = rmmt.Account.get(rmmt.Account.uid == uid)
         name = bottle.request.json['name']
         user = rmmt.User.create(account=account, name=name)
+        return json.dumps(user.json)
     except rmmt.Account.DoesNotExist as e:
         bottle.response.status = 404
         return {"error": "Account %s not found" % account_id}
-    return json.dumps(user.json)
 
 
-@bottle.get(r"/api/account/<account_id:re:[a-zA-Z0-9_=-]+>/user/<name>")
+@bottle.get(r"/api/account/<account_id:re:[a-zA-Z0-9_=-]+>/users/<name>")
 def get_user(account_id, name):
     """Get user description
 
     Exemple:
-    curl -X GET -H "Content-Type:application/json" http://localhost:8080/api/account/PoP93u9ktzqIP5-cJx1D9D/user/paul
+    curl -X GET -H "Content-Type:application/json" http://localhost:8080/api/account/PoP93u9ktzqIP5-cJx1D9D/users/paul
     """
     try:
         uid = uniqid.decode(account_id)
         user = rmmt.User.select().join(rmmt.Account).where(rmmt.User.name == name,
                                                            rmmt.Account.uid == uid).get()
+        return json.dumps(user.json)
+    except rmmt.User.DoesNotExist as e:
+        bottle.response.status = 404
+        return {"error": "User %s not found" % name}
     except rmmt.Account.DoesNotExist as e:
         bottle.response.status = 404
         return {"error": "Account %s not found" % account_id}
-    return json.dumps(user.json)
+
+
+@bottle.delete(r"/api/account/<account_id:re:[a-zA-Z0-9_=-]+>/users/<name>")
+def delete_user(account_id, name):
+    """Delete user
+
+    Exemple:
+    curl -X DELETE -H "Content-Type:application/json" http://localhost:8080/api/account/PoP93u9ktzqIP5-cJx1D9D/users/paul
+    """
+    try:
+        uid = uniqid.decode(account_id)
+        user = rmmt.User.select().join(rmmt.Account).where(rmmt.User.name == name,
+                                                           rmmt.Account.uid == uid).get()
+        user.delete_instance()
+    except rmmt.User.DoesNotExist as e:
+        bottle.response.status = 404
+        return {"error": "User %s not found" % name}
+    except rmmt.Account.DoesNotExist as e:
+        bottle.response.status = 404
+        return {"error": "Account %s not found" % account_id}
 
 
 def validate_expenditure():
