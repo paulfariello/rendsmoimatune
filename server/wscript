@@ -1,0 +1,10 @@
+from waflib import Utils
+
+def configure(ctx):
+    pass
+
+
+def build(ctx):
+    ctx.install_files('${SERVER_PATH}', 'uniqid.py')
+    ctx.install_files('${SERVER_PATH}', 'rmmt.py')
+    ctx.install_files('${SERVER_PATH}', 'server.py', chmod=Utils.O755)

@@ -129,14 +129,14 @@ gulp.task('uglify', ['uglify:angular', 'uglify:foundation', 'uglify:app']);
 gulp.task('uglify:foundation', function() {
 	return gulp.src(paths.foundation_js)
 		.pipe($.uglify())
-		.pipe($.concat('foundation.min.js'))
+		.pipe($.concat('foundation.pack.js'))
 		.pipe(gulp.dest('./build/js'));
 });
 
 gulp.task('uglify:angular', function() {
 	return gulp.src(paths.angular_js)
 		.pipe($.uglify())
-		.pipe($.concat('angular.min.js'))
+		.pipe($.concat('angular.pack.js'))
 		.pipe(gulp.dest('./build/js'));
 });
 
@@ -145,7 +145,7 @@ gulp.task('uglify:app', function() {
 
 	return gulp.src(paths.app_js)
 		.pipe(uglify)
-		.pipe($.concat('app.min.js'))
+		.pipe($.concat('app.pack.js'))
 		.pipe(gulp.dest('./build/js'));
 });
 
