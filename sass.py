@@ -11,12 +11,13 @@ class sass(Task.Task):
     "Compile Sass files into css files"
     vars = ['SASSC']
     ext_out = ['.css']
-    run_str = '${SASSC} ${SASSPATH_ST:INCPATHS} ${SRC} ${TGT}'
+    run_str = '${SASSC} ${SASS_FLAGS} ${SASSPATH_ST:INCPATHS} ${SRC} ${TGT}'
 
 
 @Configure.conf
 def sass_common_flags(cfg):
     cfg.env['SASSPATH_ST'] = '-I%s'
+    cfg.env['SASS_FLAGS'] = '-Eutf-8'
 
 
 @Configure.conf
