@@ -19,6 +19,7 @@ Request to this REST API must be done with Content-Type: application/json as
 all sent data is expected to be well formed json.
 """
 
+import sys
 import argparse
 import bottle
 import json
@@ -430,7 +431,8 @@ def main():
     parser.add_argument("--static", dest="static", default=None, type=str, help="Path to static files")
     parser.add_argument("--server", dest="server", default='auto', type=str, help="Bottle server type")
     parser.add_argument("--init", dest="init", action="store_true", help="Initialize database")
-    args = parser.parse_args()
+    args, remaining = parser.parse_known_args()
+    sys.argv = [sys.executable] + remaining
 
     rmmt.connect(args.db)
     if args.init:
