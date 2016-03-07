@@ -156,3 +156,8 @@ div.balance {
 input.ng-untouched {
 	border: 1px solid $medium-gray;
 }
+
+.ng-reveal-overlay {
+	@extend .reveal-overlay;
+	display: block;
+}

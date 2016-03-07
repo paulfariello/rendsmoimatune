@@ -31,8 +31,16 @@
 			</td>
 			<td>
 				<a ui-sref="account.edit-expenditure({expenditure_id: expenditure.id})" aria-label="Éditer" class="button"><i class="fa fa-pencil fa-lg"></i></a>
-				<button aria-label="Supprimer" class="button alert"><i class="fa fa-trash-o fa-lg"></i></button>
+				<button aria-label="Supprimer" class="button alert" reveal="deleteExpenditure"><i class="fa fa-trash-o fa-lg"></i></button>
 			</td>
 		</tr>
 	</tbody>
 </table>
+<reveal show="deleteExpenditure">
+	<h1>Awesome. I Have It.</h1>
+	<p class="lead">Your couch. It is mine.</p>
+	<p>I'm a cool paragraph that lives inside of an even cooler modal. Wins!</p>
+	<button class="close-button" data-close aria-label="Close modal" type="button">
+		<span aria-hidden="true">&times;</span>
+	</button>
+</reveal>

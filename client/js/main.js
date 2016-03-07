@@ -177,7 +177,6 @@
 					controller: ['$state', '$stateParams', '$scope', '$http',
 						function($state, $stateParams, $scope, $http) {
 							/* Init repayment with some default values */
-							console.log($stateParams);
 							var repayment = {};
 							repayment.date = new Date();
 							if ($stateParams.payer) {
@@ -284,24 +283,56 @@
 
 	rmmt.directive('expenditures', function() {
 		return {
-			require: 'ngModel',
 			restrict: 'E',
 			templateUrl: 'templates/expenditures-list.html',
 			scope: {
 				expenditures: '=src',
-				limit: '=limit'
+				limit: '=',
+			},
+			link: function(scope) {
+				scope.deleteExpenditure = false;
+				scope.reveal = function(reveal) {
+					scope[reveal] = true;
+				}
 			}
 		}
 	});
 
 	rmmt.directive('repayments', function() {
 		return {
-			require: 'ngModel',
 			restrict: 'E',
 			templateUrl: 'templates/repayments-list.html',
 			scope: {
 				repayments: '=src',
-				limit: '=limit'
+				limit: '='
+			}
+		}
+	});
+
+	rmmt.directive('reveal', function($compile) {
+		return {
+			restrict: 'A',
+			link: function(scope, element, attrs) {
+				element.attr('ng-click', 'reveal(\''+attrs.reveal+'\')');
+				element.removeAttr('reveal');
+				$compile(element)(scope);
+			}
+		}
+	});
+
+	rmmt.directive('reveal', function() {
+		return {
+			restrict: 'E',
+			transclude: true,
+			template: '<div class="ng-reveal-overlay" ng-show="show">'+
+				'<div class="reveal" ng-transclude>' +
+				'</div>' +
+				'</div>',
+			scope: {
+				show: "="
+			},
+			link: function(scope, element, attrs) {
+				scope[attrs.show] = false;
 			}
 		}
 	});
