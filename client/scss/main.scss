@@ -160,4 +160,11 @@ input.ng-untouched {
 .ng-reveal-overlay {
 	@extend .reveal-overlay;
 	display: block;
+	/* TODO add overflow: hidden to body */
+}
+
+.ng-reveal {
+	@extend .reveal;
+	display: block;
+	position: relative;
 }

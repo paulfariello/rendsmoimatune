@@ -294,6 +294,9 @@
 				scope.reveal = function(reveal) {
 					scope[reveal] = true;
 				}
+				scope.hide = function(reveal) {
+					scope[reveal] = false;
+				}
 			}
 		}
 	});
@@ -324,15 +327,21 @@
 		return {
 			restrict: 'E',
 			transclude: true,
-			template: '<div class="ng-reveal-overlay" ng-show="show">'+
-				'<div class="reveal" ng-transclude>' +
+			template: '<div class="ng-reveal-overlay" ng-show="show" ng-click="hide()">'+
+				'<div class="ng-reveal">' +
+				'<div ng-transclude></div>' +
+				'<button class="close-button" data-close aria-label="Close modal" type="button" ng-click="hide()">' +
+				'<span aria-hidden="true">&times;</span>' +
+				'</button>' +
 				'</div>' +
 				'</div>',
 			scope: {
 				show: "="
 			},
 			link: function(scope, element, attrs) {
-				scope[attrs.show] = false;
+				scope.hide = function() {
+					scope.show = false;
+				}
 			}
 		}
 	});
