@@ -21,3 +21,11 @@ Under the following terms:
 
     No additional restrictions — You may not apply legal terms or technological measures that legally restrict others from doing anything the license permits.
 
+weight.svg
+==========
+
+Icon made by [Freepik](http://www.flaticon.com/free-icon/balance_89973) from
+[flaticon](www.flaticon.com).
+
+Path cleaned by Paul Fariello.
+Animation added by Paul Fariello.
