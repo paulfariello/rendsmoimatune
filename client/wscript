@@ -1,6 +1,7 @@
 def configure(ctx):
     ctx.load('sass')
     ctx.load('uglify')
+    ctx.load('vue')
 
 
 def build(ctx):
@@ -9,7 +10,8 @@ def build(ctx):
                                     'node_modules/foundation-datepicker/css/',
                                     'node_modules/font-awesome/scss/'])
 
-    ctx.uglify(source=['js/main.js'], target='js/app.pack.js')
+    ctx.vue(source=['js/home.vue'])
+    ctx.uglify(source=['js/home.js', 'js/main.js'], target='js/app.pack.js')
 
     ctx.uglify(source=['node_modules/foundation-sites/js/foundation.core.js',
                        'node_modules/foundation-sites/js/foundation.abide.js',
@@ -47,7 +49,6 @@ def build(ctx):
                        'node_modules/fastclick/lib/fastclick.js',
                        'node_modules/angular-ui-router/release/angular-ui-router.js'],
                target='js/angular.pack.js')
-
 
     ctx.install_files('${STATIC_PATH}/css', 'scss/main.css')
     ctx.install_files('${STATIC_PATH}/js', 'node_modules/jquery/dist/jquery.min.js')

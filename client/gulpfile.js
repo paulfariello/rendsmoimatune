@@ -50,10 +50,10 @@ var paths = {
 		'node_modules/foundation-datepicker/js/foundation-datepicker.js',
 		'node_modules/foundation-datepicker/js/locales/foundation-datepicker.fr.js'
 	],
-	angular_js: [
-		'node_modules/angular/angular.js',
-		'node_modules/fastclick/lib/fastclick.js',
-		'node_modules/angular-ui-router/release/angular-ui-router.js',
+	vue_js: [
+		'node_modules/vue/dist/vue.js',
+		'node_modules/vue-router/dist/vue-router.js',
+		'node_modules/vue-resource/dist/vue-resource.js',
 	],
 	html: [
 		'*.html'
@@ -124,7 +124,7 @@ gulp.task('sass', function() {
 		.pipe(gulp.dest('./build/css/'));
 });
 
-gulp.task('uglify', ['uglify:angular', 'uglify:foundation', 'uglify:app']);
+gulp.task('uglify', ['uglify:vue', 'uglify:foundation', 'uglify:app']);
 
 gulp.task('uglify:foundation', function() {
 	return gulp.src(paths.foundation_js)
@@ -133,10 +133,10 @@ gulp.task('uglify:foundation', function() {
 		.pipe(gulp.dest('./build/js'));
 });
 
-gulp.task('uglify:angular', function() {
-	return gulp.src(paths.angular_js)
+gulp.task('uglify:vue', function() {
+	return gulp.src(paths.vue_js)
 		.pipe($.uglify())
-		.pipe($.concat('angular.pack.js'))
+		.pipe($.concat('vue.pack.js'))
 		.pipe(gulp.dest('./build/js'));
 });
 
