@@ -1,9 +1,24 @@
 import 'src/css/main.scss'
 import Vue from 'vue'
-import App from './App'
+import VueRouter from 'vue-router'
+import App from './app'
+import Landing from './landing'
+import Account from './account'
 
-/* eslint-disable no-new */
-new Vue({
-  el: '#app',
-  components: { App }
+Vue.use(VueRouter)
+
+const router = new VueRouter({
+	history: false,
+	saveScrollPosition: true
 })
+
+router.map({
+	'/account': {
+		component: Account
+	},
+	'/': {
+		component: Landing
+	}
+})
+
+router.start(App, 'body')
