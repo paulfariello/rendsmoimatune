@@ -91,6 +91,29 @@
 </template>
 
 <script>
+export default {
+	data () {
+		return {
+			'account': {
+				'name': ''
+			}
+		}
+	},
+	methods: {
+		getAccount () {
+			var resource = this.$resource('account{/id}')
+
+			resource.get({id: 1}).then(function (response) {
+				this.$set('account', response.account)
+			}, function (response) {
+				// TODO error handling
+			})
+		}
+	},
+	ready () {
+		this.getAccount()
+	}
+}
 </script>
 
 <style>

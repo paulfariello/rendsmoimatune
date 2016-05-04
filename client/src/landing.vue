@@ -3,7 +3,7 @@
 	<div class="row">
 		<div class="small-12 columns">
 			<h2>Créer un nouveau compte</h2>
-			<form ng-submit="create_account()">
+			<form v-on:submit="createAccount">
 				<div class="input-group">
 					<input type="text" class="input-group-field" ng-model="account_name" placeholder="Nom" required />
 					<div class="input-group-button">
@@ -17,6 +17,19 @@
 </template>
 
 <script>
+export default {
+	methods: {
+		createAccount () {
+			var resource = this.$resource('account/{id}')
+
+			resource.save({name: 'toto'}).then(function (response) {
+				console.log(response)
+			}, function (response) {
+				// TODO error handling
+			})
+		}
+	}
+}
 </script>
 
 <style>
