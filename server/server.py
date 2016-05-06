@@ -49,7 +49,7 @@ def create_account():
     """Create a new account
 
     Exemple:
-    curl -X POST -H "Content-Type:application/json" -d '{"name": "my new account"}' http://localhost:8080/api/account/
+    curl -X POST -H "Content-Type:application/json" -d '{"name": "my new account"}' http://localhost:8001/api/account/
     """
     uid = uniqid.generate()
     name = bottle.request.json['name']
@@ -62,7 +62,7 @@ def get_account(account_id):
     """Get account description
 
     Exemple:
-    curl -X GET -H "Content-Type:application/json" http://localhost:8080/api/account/PoP93u9ktzqIP5-cJx1D9D
+    curl -X GET -H "Content-Type:application/json" http://localhost:8001/api/account/PoP93u9ktzqIP5-cJx1D9D
     """
     try:
         uid = uniqid.decode(account_id)
@@ -78,7 +78,7 @@ def create_user(account_id):
     """Create user for an account
 
     Exemple:
-    curl -X POST -H "Content-Type:application/json" -d '{"name": "paul"}' http://localhost:8080/api/account/PoP93u9ktzqIP5-cJx1D9D/users/
+    curl -X POST -H "Content-Type:application/json" -d '{"name": "paul"}' http://localhost:8001/api/account/PoP93u9ktzqIP5-cJx1D9D/users/
     """
     try:
         uid = uniqid.decode(account_id)
@@ -96,7 +96,7 @@ def get_user(account_id, name):
     """Get user description
 
     Exemple:
-    curl -X GET -H "Content-Type:application/json" http://localhost:8080/api/account/PoP93u9ktzqIP5-cJx1D9D/users/paul
+    curl -X GET -H "Content-Type:application/json" http://localhost:8001/api/account/PoP93u9ktzqIP5-cJx1D9D/users/paul
     """
     try:
         uid = uniqid.decode(account_id)
@@ -116,7 +116,7 @@ def delete_user(account_id, name):
     """Delete user
 
     Exemple:
-    curl -X DELETE -H "Content-Type:application/json" http://localhost:8080/api/account/PoP93u9ktzqIP5-cJx1D9D/users/paul
+    curl -X DELETE -H "Content-Type:application/json" http://localhost:8001/api/account/PoP93u9ktzqIP5-cJx1D9D/users/paul
     """
     try:
         uid = uniqid.decode(account_id)
@@ -182,7 +182,7 @@ def rest_create_expenditure(account_id):
     """Create expenditure
 
     Exemple:
-    curl -X POST -H "Content-Type:application/json" -d '{"name": "patate", "date": "2016-01-28", "amount": 1200, "payer": "paul", "debts": [{"debtor": "paul", "share": 1}, {"debtor": "test", "share": 1}]}' http://localhost:8080/api/account/PoP93u9ktzqIP5-cJx1D9D/expenditures/
+    curl -X POST -H "Content-Type:application/json" -d '{"name": "patate", "date": "2016-01-28", "amount": 1200, "payer": "paul", "debts": [{"debtor": "paul", "share": 1}, {"debtor": "test", "share": 1}]}' http://localhost:8001/api/account/PoP93u9ktzqIP5-cJx1D9D/expenditures/
     """
     try:
         expenditure = create_expenditure(account_id)
@@ -235,7 +235,7 @@ def rest_update_expenditure(account_id, expenditure_id):
     """Update expenditure
 
     Exemple:
-    curl -X PUT -H "Content-Type:application/json" -d '{"name": "patate", "date": "2016-01-28", "amount": 1200, "payer": "paul", "debts": [{"debtor": "paul", "share": 1}, {"debtor": "test", "share": 1}]}' http://localhost:8080/api/account/PoP93u9ktzqIP5-cJx1D9D/expenditures/11
+    curl -X PUT -H "Content-Type:application/json" -d '{"name": "patate", "date": "2016-01-28", "amount": 1200, "payer": "paul", "debts": [{"debtor": "paul", "share": 1}, {"debtor": "test", "share": 1}]}' http://localhost:8001/api/account/PoP93u9ktzqIP5-cJx1D9D/expenditures/11
     """
     try:
         expenditure = update_expenditure(account_id, expenditure_id)
@@ -269,7 +269,7 @@ def rest_delete_expenditure(account_id, expenditure_id):
     """Delete expenditure
 
     Exemple:
-    curl -X DELETE -H "Content-Type:application/json" http://localhost:8080/api/account/PoP93u9ktzqIP5-cJx1D9D/expenditures/11
+    curl -X DELETE -H "Content-Type:application/json" http://localhost:8001/api/account/PoP93u9ktzqIP5-cJx1D9D/expenditures/11
     """
     try:
         expenditure = delete_expenditure(account_id, expenditure_id)
@@ -326,7 +326,7 @@ def rest_create_repayment(account_id):
     """Create repayment
 
     Exemple:
-    curl -X POST -H "Content-Type:application/json" -d '{"date": "2016-01-28", "amount": 1200, "payer": "paul", "beneficiary": "emilie"}' http://localhost:8080/api/account/PoP93u9ktzqIP5-cJx1D9D/repayments/
+    curl -X POST -H "Content-Type:application/json" -d '{"date": "2016-01-28", "amount": 1200, "payer": "paul", "beneficiary": "emilie"}' http://localhost:8001/api/account/PoP93u9ktzqIP5-cJx1D9D/repayments/
     """
     try:
         repayment = create_repayment(account_id)
@@ -373,7 +373,7 @@ def rest_update_repayment(account_id, repayment_id):
     """Update repayment
 
     Exemple:
-    curl -X PUT -H "Content-Type:application/json" -d '{"date": "2016-01-28", "amount": 1200, "payer": "paul", "beneficiary": "test"}' http://localhost:8080/api/account/PoP93u9ktzqIP5-cJx1D9D/repayments/11
+    curl -X PUT -H "Content-Type:application/json" -d '{"date": "2016-01-28", "amount": 1200, "payer": "paul", "beneficiary": "test"}' http://localhost:8001/api/account/PoP93u9ktzqIP5-cJx1D9D/repayments/11
     """
     try:
         repayment = update_repayment(account_id, repayment_id)
@@ -407,7 +407,7 @@ def rest_delete_repayment(account_id, repayment_id):
     """Delete repayment
 
     Exemple:
-    curl -X DELETE -H "Content-Type:application/json" http://localhost:8080/api/account/PoP93u9ktzqIP5-cJx1D9D/repayments/11
+    curl -X DELETE -H "Content-Type:application/json" http://localhost:8001/api/account/PoP93u9ktzqIP5-cJx1D9D/repayments/11
     """
     try:
         repayment = delete_repayment(account_id, repayment_id)
@@ -426,7 +426,7 @@ def main():
     """Start server"""
     parser = argparse.ArgumentParser(description="Rendsmoimatune")
     parser.add_argument("-l", "--listen", dest="host", default="0.0.0.0", help="IP address to bind to")
-    parser.add_argument("-p", "--port", dest="port", default=8080, type=int, help="Port to listen to")
+    parser.add_argument("-p", "--port", dest="port", default=8001, type=int, help="Port to listen to")
     parser.add_argument("--db", dest="db", default="sqlite:///rmmt.db", help="Database scheme to connect to")
     parser.add_argument("--static", dest="static", default=None, type=str, help="Path to static files")
     parser.add_argument("--server", dest="server", default='auto', type=str, help="Bottle server type")

@@ -10,9 +10,9 @@ module.exports = {
 		productionSourceMap: true
 	},
 	dev: {
-		port: 8080,
+		port: 8000,
 		proxyTable: {
-			'/api/*' : 'http://localhost:8181'
+			'/api/*' : 'http://localhost:8001'
 		}
 	}
 }
