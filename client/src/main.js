@@ -17,7 +17,8 @@ const router = new VueRouter({
 })
 
 router.map({
-	'/account': {
+	'/account/:accountId': {
+		name: 'account',
 		component: Account
 	},
 	'/': {

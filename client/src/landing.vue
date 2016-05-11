@@ -24,6 +24,7 @@ export default {
 
 			resource.save({name: 'toto'}).then(function (response) {
 				console.log(response)
+				this.$router.go({name: 'account', params: { accountId: response.data.uid }})
 			}, function (response) {
 				// TODO error handling
 			})
