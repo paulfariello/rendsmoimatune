@@ -28,11 +28,11 @@
 	</div>
 </div>
 <div class="row">
-	<form ng-submit="add_user()">
+	<form v-on:submit="addUser">
 		<div class="small-12 columns">
 			<h4>Nouveau participant</h4>
 			<div class="input-group">
-				<input type="text" class="input-group-field" ng-model="account.new_user" required />
+				<input type="text" class="input-group-field" v-model="new_user" required />
 				<div class="input-group-button">
 					<button type="submit" class="button fa fa-user-plus">Ajouter</button>
 				</div>
@@ -99,16 +99,27 @@ export default {
 				'repayments': [],
 				'uid': '',
 				'users': []
-			}
+			},
+			'new_user': ''
 		}
 	},
 	methods: {
 		getAccount () {
-			var resource = this.$resource('account{/id}')
+			var resource = this.$resource('account/{id}')
 
 			resource.get({id: this.$route.params.accountId}).then(function (response) {
 				console.log(response.data)
 				this.$set('account', response.data)
+			}, function (response) {
+				// TODO error handling
+			})
+		},
+		addUser () {
+			var resource = this.$resource('account/' + this.$route.params.accountId + '/users/{name}')
+
+			resource.save({name: this.new_user}).then(function (response) {
+				console.log(response)
+				this.account.users.push({name: response.data.name, balance: response.data.balance})
 			}, function (response) {
 				// TODO error handling
 			})
