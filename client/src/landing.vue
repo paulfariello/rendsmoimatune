@@ -5,7 +5,7 @@
 			<h2>Créer un nouveau compte</h2>
 			<form v-on:submit="createAccount">
 				<div class="input-group">
-					<input type="text" class="input-group-field" nv-model="account_name" placeholder="Nom" required />
+					<input type="text" class="input-group-field" v-model="account_name" placeholder="Nom" required />
 					<div class="input-group-button">
 						<button type="submit" class="button">Créer</button>
 					</div>
