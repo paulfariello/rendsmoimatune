@@ -73,7 +73,7 @@
 <div class="row" v-if="account.users.length > 0">
 	<div class="small-12 columns">
 		<h3><a ui-sref="account.expenditures"><i class="fa fa-credit-card fa-lg fa-fw"></i>Dépenses</a></h3>
-		<expenditures limit="5" src="account.expenditures"></expenditures>
+		<expenditures :limit="5" :src="account.expenditures"></expenditures>
 		<a v-if="account.expenditures.length > 5" ui-sref="account.expenditures">Et {{ account.expenditures.length - 5 }} <span v-if="account.expenditures.length > 6">autres…</span><span v-if="account.expenditures.length == 6">autre.</span></a>
 		<a class="button float-right fa fa-plus-circle" ui-sref="account.add-expenditure">Nouvelle dépense</a>
 	</div>
@@ -81,7 +81,7 @@
 <div class="row" v-if="account.users.length > 1">
 	<div class="small-12 columns">
 		<h3><a ui-sref="account.repayments"><i class="fa fa-exchange fa-lg fa-fw"></i>Remboursements</a></h3>
-		<repayments limit="5" src="account.repayments"></repayments>
+		<repayments :limit="5" :src="account.repayments"></repayments>
 		<a v-if="account.repayments.length > 5" ui-sref="account.repayments">Et {{ account.repayments.length - 5 }} <span v-if="account.repayments.length > 6">autres…</span><span v-if="account.repayments.length == 6">autre.</span></a>
 		<a class="button float-right fa fa-plus-circle" ui-sref="account.add-repayment">Nouveau remboursement</a>
 	</div>

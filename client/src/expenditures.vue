@@ -1,0 +1,55 @@
+<template>
+<table ng-if="src.length > 0">
+	<thead>
+		<tr>
+			<th>Date</th>
+			<th>Nom</th>
+			<th>Montant</th>
+			<th>Payeur</th>
+			<th>Participants</th>
+			<th>Actions</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr v-for="expenditure in src | orderBy 'date' | limitBy limit">
+			<td>{{ expenditure.date }}</td>
+			<td>{{ expenditure.name }}</td>
+			<td>{{ expenditure.amount | amount }}</td>
+			<td>{{ expenditure.payer }}</td>
+			<td ng-if="(expenditure.debts | filter:{'share': 0}:true).length > expenditure.debts.length / 2">
+				<span ng-repeat="debt in expenditure.debts | filter:{'share': '!0'}">
+					{{ debt.debtor }}{{$last?'':', '}}
+				</span>
+			</td>
+			<td ng-if="(expenditure.debts | filter:{'share': 0}:true).length <= expenditure.debts.length / 2">
+				Tous
+				<span ng-if="(expenditure.debts | filter:{'share': 0}:true).length > 0">
+					sauf
+				</span>
+				<span ng-repeat="debt in expenditure.debts | filter:{'share': 0}:false">
+					{{ debt.debtor }}{{$last?'':', '}}
+				</span>
+			</td>
+			<td>
+				<a ui-sref="account.edit-expenditure({expenditure_id: expenditure.id})" aria-label="Éditer" class="button"><i class="fa fa-pencil fa-lg"></i></a>
+				<button aria-label="Supprimer" class="button alert"><i class="fa fa-trash-o fa-lg"></i></button>
+			</td>
+		</tr>
+	</tbody>
+</table>
+</template>
+
+<script>
+export default {
+	props: {
+		limit: {
+			type: Number,
+			default: 5
+		},
+		src: {
+			type: Array,
+			required: true
+		}
+	}
+}
+</script>
