@@ -85,30 +85,13 @@
 
 <script>
 export default {
-	data () {
-		return {
-			'account': {
-				'balance': [],
-				'expenditures': [],
-				'name': '',
-				'repayments': [],
-				'uid': '',
-				'users': []
-			},
-			'new_user': ''
+	props: {
+		account: {
+			type: Object,
+			required: true
 		}
 	},
 	methods: {
-		getAccount () {
-			var resource = this.$resource('account/{id}')
-
-			resource.get({id: this.$route.params.accountId}).then(function (response) {
-				console.log(response.data)
-				this.$set('account', response.data)
-			}, function (response) {
-				// TODO error handling
-			})
-		},
 		addUser () {
 			var resource = this.$resource('account/' + this.$route.params.accountId + '/users/{name}')
 
@@ -119,9 +102,6 @@ export default {
 				// TODO error handling
 			})
 		}
-	},
-	ready () {
-		this.getAccount()
 	}
 }
 </script>

@@ -8,7 +8,7 @@
 			<h2><a ui-sref="account"><i class="fa fa-bank fa-lg fa-fw"></i>{{ account.name }}</a></h2>
 		</div>
 	</div>
-	<router-view></router-view>
+	<router-view :account="account"></router-view>
 </div>
 </template>
 
