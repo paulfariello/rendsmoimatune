@@ -5,7 +5,9 @@ import VueResource from 'vue-resource'
 import App from './app'
 import Landing from './landing'
 import Account from './account'
+import AccountDetail from './account-detail'
 import Expenditures from './expenditures'
+import EditExpenditure from './edit-expenditure'
 import Repayments from './repayments'
 
 Vue.use(VueRouter)
@@ -26,12 +28,21 @@ const router = new VueRouter({
 })
 
 router.map({
-	'/account/:accountId': {
-		name: 'account',
-		component: Account
-	},
 	'/': {
 		component: Landing
+	},
+	'/account/:accountId': {
+		name: 'account',
+		component: Account,
+		subRoutes: {
+			'/': {
+				component: AccountDetail
+			},
+			'/edit-expenditure': {
+				name: 'edit-expenditure',
+				component: EditExpenditure
+			}
+		}
 	}
 })
 
