@@ -1,8 +1,6 @@
 <template>
 <div v-if="$loadingRouteData">
-	<div class="row">
-		Loading ...
-	</div>
+	<loading></loading>
 </div>
 <div v-if="!$loadingRouteData">
 	<div class="row">

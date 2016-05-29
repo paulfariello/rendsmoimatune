@@ -4,6 +4,7 @@ import VueRouter from 'vue-router'
 import VueResource from 'vue-resource'
 import App from './app'
 import Landing from './landing'
+import Loading from './loading'
 import Account from './account'
 import AccountDetail from './account-detail'
 import Expenditures from './expenditures'
@@ -13,6 +14,7 @@ import Repayments from './repayments'
 Vue.use(VueRouter)
 Vue.use(VueResource)
 
+Vue.component('loading', Loading)
 Vue.component('expenditures', Expenditures)
 Vue.component('repayments', Repayments)
 
