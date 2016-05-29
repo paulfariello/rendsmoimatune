@@ -1,3 +1,80 @@
 <template>
-Hello expenditure edition
+<div class="row">
+	<div class="small-12 columns">
+		<form ng-submit="save_expenditure()">
+			<div class="row">
+				<div class="small-12 columns">
+					<label>Nom
+						<input type="text" ng-model="expenditure.name" required />
+					</label>
+				</div>
+			</div>
+			<div class="row">
+				<div class="small-6 columns">
+					<label>Montant
+						<div class="input-group">
+							<input type="text" amount ng-model="expenditure.amount" pattern="[0-9]+([.,][0-9]*)?" class="input-group-field" required />
+							<span class="input-group-label">€</span>
+						</div>
+					</label>
+					<p class="help-text">Montant en euro. Exemple: 12,5</p>
+				</div>
+				<div class="small-6 columns">
+					<label>Date
+						<input type="text" ng-model="expenditure.date" datepicker format="yyyy-mm-dd" language="fr" required />
+					</label>
+				</div>
+			</div>
+			<div class="row">
+				<div class="small-6 columns">
+					<label>Payeur
+						<select ng-model="expenditure.payer">
+							<option ng-repeat="user in account.users" value="{{ user.name }}">{{ user.name }}</option>
+						</select>
+					</label>
+				</div>
+				<div class="small-6 columns">
+					<table>
+						<thead>
+							<tr>
+								<th>
+									<div class="switch">
+										<input class="switch-input" type="checkbox" id="debt-all">
+										<label for="debt-all" class="switch-paddle">
+											<span class="show-for-sr">Selectionner tous les participants</span>
+										</label>
+									</div>
+								</th>
+								<th>Participant</th>
+								<th>Part</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr ng-repeat="user in account.users">
+								<input type="hidden" ng-model="expenditure.debts[$index].debtor" ng-value="user.name" />
+								<td>
+									<div class="switch">
+										<input class="switch-input" type="checkbox" ng-model="expenditure.debts[$index].debt" id="debt-{{$index}}">
+										<label for="debt-{{$index}}" class="switch-paddle">
+											<span class="show-for-sr">{{ user.name }}</span>
+										</label>
+									</div>
+								</td>
+								<td>{{ user.name }}</td>
+								<td>
+									<input ng-if="expenditure.debts[$index].debt" type="number" ng-model="expenditure.debts[$index].share">
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+			<div class="row">
+				<div class="small-12 columns">
+					<button type="submit" class="button fa fa-plus-circle">Ajouter</button>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>
 </template>
