@@ -1,11 +1,11 @@
 <template>
 <div class="row">
 	<div class="small-12 columns">
-		<form ng-submit="save_expenditure()">
+		<form v-on:submit="saveExpenditure">
 			<div class="row">
 				<div class="small-12 columns">
 					<label>Nom
-						<input type="text" ng-model="expenditure.name" required />
+						<input type="text" v-model="expenditure.name" required />
 					</label>
 				</div>
 			</div>
@@ -13,7 +13,7 @@
 				<div class="small-6 columns">
 					<label>Montant
 						<div class="input-group">
-							<input type="text" amount ng-model="expenditure.amount" pattern="[0-9]+([.,][0-9]*)?" class="input-group-field" required />
+							<input type="text" v-model="expenditure.amount" pattern="[0-9]+([.,][0-9]*)?" class="input-group-field" required />
 							<span class="input-group-label">€</span>
 						</div>
 					</label>
@@ -21,15 +21,15 @@
 				</div>
 				<div class="small-6 columns">
 					<label>Date
-						<input type="text" ng-model="expenditure.date" datepicker format="yyyy-mm-dd" language="fr" required />
+						<input type="text" v-date-picker v-model="expenditure.date" format="yyyy-mm-dd" language="fr" required />
 					</label>
 				</div>
 			</div>
 			<div class="row">
 				<div class="small-6 columns">
 					<label>Payeur
-						<select ng-model="expenditure.payer">
-							<option ng-repeat="user in account.users" value="{{ user.name }}">{{ user.name }}</option>
+						<select v-model="expenditure.payer">
+							<option v-for="user in account.users" value="{{ user.name }}">{{ user.name }}</option>
 						</select>
 					</label>
 				</div>
@@ -50,11 +50,11 @@
 							</tr>
 						</thead>
 						<tbody>
-							<tr ng-repeat="user in account.users">
-								<input type="hidden" ng-model="expenditure.debts[$index].debtor" ng-value="user.name" />
+							<tr v-for="user in account.users">
+								<input type="hidden" v-model="expenditure.debts[$index].debtor" :value="user.name" />
 								<td>
 									<div class="switch">
-										<input class="switch-input" type="checkbox" ng-model="expenditure.debts[$index].debt" id="debt-{{$index}}">
+										<input class="switch-input" type="checkbox" v-model="expenditure.debts[$index].debt" id="debt-{{$index}}">
 										<label for="debt-{{$index}}" class="switch-paddle">
 											<span class="show-for-sr">{{ user.name }}</span>
 										</label>
@@ -62,7 +62,7 @@
 								</td>
 								<td>{{ user.name }}</td>
 								<td>
-									<input ng-if="expenditure.debts[$index].debt" type="number" ng-model="expenditure.debts[$index].share">
+									<input v-if="expenditure.debts[$index].debt" type="number" v-model="expenditure.debts[$index].share">
 								</td>
 							</tr>
 						</tbody>
@@ -78,3 +78,37 @@
 	</div>
 </div>
 </template>
+
+<script>
+export default {
+	data () {
+		return {
+			'expenditure': {
+				'name': '',
+				'amount': 0,
+				'date': new Date(),
+				'payer': '',
+				'debts': []
+			}
+		}
+	},
+	props: {
+		account: {
+			type: Object,
+			required: true
+		}
+	},
+	methods: {
+		addUser () {
+			var resource = this.$resource('account/' + this.$route.params.accountId + '/users/{name}')
+
+			resource.save({name: this.new_user}).then(function (response) {
+				console.log(response)
+				this.account.users.push({name: response.data.name, balance: response.data.balance})
+			}, function (response) {
+				// TODO error handling
+			})
+		}
+	}
+}
+</script>
