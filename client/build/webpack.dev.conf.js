@@ -25,6 +25,11 @@ module.exports = merge(baseWebpackConfig, {
 			filename: 'index.html',
 			template: 'index.html',
 			inject: true
+		}),
+		new webpack.ProvidePlugin({
+			'$': "jquery",
+			'jQuery': "jquery",
+			'window.jQuery': "jquery"
 		})
 	]
 })

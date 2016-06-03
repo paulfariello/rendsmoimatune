@@ -1,4 +1,6 @@
 import 'src/css/main.scss'
+import $ from 'jquery'
+import 'imports?this=>window!foundation-datepicker/js/foundation-datepicker.js'
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import VueResource from 'vue-resource'
@@ -20,6 +22,16 @@ Vue.component('repayments', Repayments)
 
 Vue.filter('amount', function (amount) {
 	return Math.round(amount) * 1.0 / 100 + ' €'
+})
+
+Vue.directive('date-picker', {
+	params: ['format', 'language'],
+	bind: function () {
+		$(this.el).fdatepicker({
+			format: this.params.format,
+			language: this.params.language
+		})
+	}
 })
 
 Vue.http.options.root = '/api'
