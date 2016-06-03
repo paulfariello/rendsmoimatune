@@ -26,12 +26,20 @@ Vue.filter('amount', function (amount) {
 })
 
 Vue.directive('date-picker', {
+	twoWay: true,
 	params: ['format', 'language'],
 	bind: function () {
+		var self = this
 		$(this.el).fdatepicker({
+			initialDate: this.value,
 			format: this.params.format,
 			language: this.params.language
+		}).on('changeDate', function (ev) {
+			self.set(ev.date)
 		})
+	},
+	update: function (newValue) {
+		$(this.el).fdatepicker('update', newValue)
 	}
 })
 

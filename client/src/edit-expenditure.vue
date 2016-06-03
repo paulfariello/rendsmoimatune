@@ -21,7 +21,7 @@
 				</div>
 				<div class="small-6 columns">
 					<label>Date
-						<input type="text" v-date-picker v-model="expenditure.date" format="yyyy-mm-dd" language="fr" required />
+						<input type="text" v-date-picker="expenditure.date" format="yyyy-mm-dd" language="fr" required />
 					</label>
 				</div>
 			</div>
