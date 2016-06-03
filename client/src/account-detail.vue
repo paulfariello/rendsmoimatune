@@ -7,7 +7,7 @@
 			<div class="row text-center" v-for="user in account.users">
 				<div class="small-5 columns">
 					<div class="debt" v-if="user.balance < 0" style="width: {{ -user.balance/account.max_debt*100 }}%">
-						{{ user.balance | amount }}
+						{{ user.balance | currency }}
 					</div>
 				</div>
 				<div ng-class="{'small-offset-5': user.balance >= 0}" class="small-2 columns">
@@ -15,7 +15,7 @@
 				</div>
 				<div class="small-5 columns">
 					<div class="credit" v-if="user.balance > 0" style="width: {{ user.balance/account.max_debt*100 }}%">
-						{{ user.balance | amount }}
+						{{ user.balance | currency }}
 					</div>
 				</div>
 			</div>
@@ -53,7 +53,7 @@
 				<tr v-for="repayment in account.balance | orderBy: name">
 					<td>{{ repayment.from }}</td>
 					<td>doit</td>
-					<td>{{ repayment.amount | amount }}</td>
+					<td>{{ repayment.amount | currency }}</td>
 					<td>à</td>
 					<td>{{ repayment.to }}</td>
 					<td><a ui-sref="account.add-repayment({payer: repayment.from, beneficiary: repayment.to, amount: repayment.amount})" class="fa fa-plus-circle button">Ajouter</a></td>

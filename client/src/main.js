@@ -21,8 +21,18 @@ Vue.component('loading', Loading)
 Vue.component('expenditures', Expenditures)
 Vue.component('repayments', Repayments)
 
-Vue.filter('amount', function (amount) {
+Vue.filter('currency', function (amount) {
 	return Math.round(amount) * 1.0 / 100 + ' €'
+})
+
+Vue.filter('amount', {
+	read: function (amount) {
+		return Math.round(amount) * 1.0 / 100
+	},
+	write: function (amount) {
+		amount = amount.replace(/,/g, '.')
+		return isNaN(amount) ? 0 : parseFloat(amount)
+	}
 })
 
 Vue.directive('date-picker', {

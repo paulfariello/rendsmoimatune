@@ -13,7 +13,7 @@
 				<div class="small-6 columns">
 					<label>Montant
 						<div class="input-group">
-							<input type="text" v-model="expenditure.amount" pattern="[0-9]+([.,][0-9]*)?" class="input-group-field" required />
+							<input type="text" v-model="expenditure.amount | amount" pattern="[0-9]+([.,][0-9]*)?" class="input-group-field" required />
 							<span class="input-group-label">€</span>
 						</div>
 					</label>
