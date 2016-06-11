@@ -1,5 +1,5 @@
 <template>
-<table ng-if="src.length > 0">
+<table v-if="src.length > 0">
 	<thead>
 		<tr>
 			<th>Date</th>
@@ -11,23 +11,23 @@
 		</tr>
 	</thead>
 	<tbody>
-		<tr v-for="expenditure in src | orderBy 'date' | limitBy limit">
+		<tr v-for="expenditure in src | orderBy 'date' -1 | limitBy limit">
 			<td>{{ expenditure.date }}</td>
 			<td>{{ expenditure.name }}</td>
-			<td>{{ expenditure.amount | amount }}</td>
+			<td>{{ expenditure.amount | currency }}</td>
 			<td>{{ expenditure.payer }}</td>
-			<td ng-if="(expenditure.debts | filter:{'share': 0}:true).length > expenditure.debts.length / 2">
-				<span ng-repeat="debt in expenditure.debts | filter:{'share': '!0'}">
-					{{ debt.debtor }}{{$last?'':', '}}
+			<td v-if="debtors(expenditure.debts).length <= expenditure.debts.length / 2">
+				<span v-for="debt in debtors(expenditure.debts)">
+					{{ debt.debtor }}{{$index+1 == debtors(expenditure.debts).length?'':', '}}
 				</span>
 			</td>
-			<td ng-if="(expenditure.debts | filter:{'share': 0}:true).length <= expenditure.debts.length / 2">
+			<td v-if="debtors(expenditure.debts).length > expenditure.debts.length / 2">
 				Tous
-				<span ng-if="(expenditure.debts | filter:{'share': 0}:true).length > 0">
+				<span v-if="notDebtors(expenditure.debts).length > 0">
 					sauf
 				</span>
-				<span ng-repeat="debt in expenditure.debts | filter:{'share': 0}:false">
-					{{ debt.debtor }}{{$last?'':', '}}
+				<span v-for="debt in notDebtors(expenditure.debts)">
+					{{ debt.debtor }}{{$index+1 == notDebtors(expenditure.debts).length?'':', '}}
 				</span>
 			</td>
 			<td>
@@ -49,6 +49,26 @@ export default {
 		src: {
 			type: Array,
 			required: true
+		}
+	},
+	methods: {
+		debtors (debts) {
+			var debtors = []
+			for (var i in debts) {
+				if (debts[i].share > 0) {
+					debtors.push(debts[i])
+				}
+			}
+			return debtors
+		},
+		notDebtors (debts) {
+			var notDebtors = []
+			for (var i in debts) {
+				if (debts[i].share === 0) {
+					notDebtors.push(debts[i])
+				}
+			}
+			return notDebtors
 		}
 	}
 }

@@ -31,7 +31,7 @@ Vue.filter('amount', {
 	},
 	write: function (amount) {
 		amount = amount.replace(/,/g, '.')
-		return isNaN(amount) ? 0 : parseFloat(amount)
+		return isNaN(amount) ? 0 : Math.round(parseFloat(amount) * 100)
 	}
 })
 

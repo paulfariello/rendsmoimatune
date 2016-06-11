@@ -6,7 +6,7 @@
 		<div class="balance">
 			<div class="row text-center" v-for="user in account.users">
 				<div class="small-5 columns">
-					<div class="debt" v-if="user.balance < 0" style="width: {{ -user.balance/account.max_debt*100 }}%">
+					<div class="debt" v-if="user.balance < 0" v-bind:style="width: {{ -user.balance/account.max_debt*100 }}%">
 						{{ user.balance | currency }}
 					</div>
 				</div>
@@ -14,7 +14,7 @@
 					{{ user.name }}
 				</div>
 				<div class="small-5 columns">
-					<div class="credit" v-if="user.balance > 0" style="width: {{ user.balance/account.max_debt*100 }}%">
+					<div class="credit" v-if="user.balance > 0" v-bind:style="width: {{ user.balance/account.max_debt*100 }}%">
 						{{ user.balance | currency }}
 					</div>
 				</div>

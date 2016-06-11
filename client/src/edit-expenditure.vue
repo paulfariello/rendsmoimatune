@@ -39,7 +39,7 @@
 							<tr>
 								<th>
 									<div class="switch">
-										<input class="switch-input" type="checkbox" id="debt-all">
+										<input class="switch-input" type="checkbox" id="debt-all" v-model="allDebts">
 										<label for="debt-all" class="switch-paddle">
 											<span class="show-for-sr">Selectionner tous les participants</span>
 										</label>
@@ -62,7 +62,7 @@
 								</td>
 								<td>{{ user.name }}</td>
 								<td>
-									<input v-if="expenditure.debts[$index].debt" type="number" v-model="expenditure.debts[$index].share">
+									<input v-if="expenditure.debts[$index].debt" type="number" v-model="expenditure.debts[$index].share" number>
 								</td>
 							</tr>
 						</tbody>
@@ -82,13 +82,25 @@
 <script>
 export default {
 	data () {
+		var debts = []
+		for (var user in this.account.users) {
+			debts.push({'debt': true, 'share': 1, 'debtor': user.name})
+		}
 		return {
+			'allDebts': true,
 			'expenditure': {
 				'name': '',
 				'amount': 0,
 				'date': new Date(),
 				'payer': '',
-				'debts': []
+				'debts': debts
+			}
+		}
+	},
+	watch: {
+		'allDebts': function (val) {
+			for (var i in this.expenditure.debts) {
+				this.expenditure.debts[i].debt = val
 			}
 		}
 	},
@@ -99,12 +111,18 @@ export default {
 		}
 	},
 	methods: {
-		addUser () {
-			var resource = this.$resource('account/' + this.$route.params.accountId + '/users/{name}')
+		saveExpenditure () {
+			var resource = this.$resource('account/' + this.$route.params.accountId + '/expenditures/')
 
-			resource.save({name: this.new_user}).then(function (response) {
-				console.log(response)
-				this.account.users.push({name: response.data.name, balance: response.data.balance})
+			for (var i in this.expenditure.debts) {
+				var debt = this.expenditure.debts[i]
+				if (!debt.debt) {
+					debt.share = 0
+				}
+			}
+
+			resource.save(this.expenditure).then(function (response) {
+				this.$router.go({name: 'account', params: { accountId: this.$route.params.accountId }})
 			}, function (response) {
 				// TODO error handling
 			})
