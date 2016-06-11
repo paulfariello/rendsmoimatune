@@ -5,7 +5,7 @@
 <div v-if="!$loadingRouteData">
 	<div class="row">
 		<div class="small-12 columns">
-			<h2><a ui-sref="account"><i class="fa fa-bank fa-lg fa-fw"></i>{{ account.name }}</a></h2>
+			<h2><a v-link="{ name: 'account', params: { accountId: account.uid } }"><i class="fa fa-bank fa-lg fa-fw"></i>{{ account.name }}</a></h2>
 		</div>
 	</div>
 	<router-view :account="account"></router-view>
