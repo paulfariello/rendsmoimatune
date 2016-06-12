@@ -12,6 +12,7 @@ import Account from './account'
 import AccountDetail from './account-detail'
 import Expenditures from './expenditures'
 import EditExpenditure from './edit-expenditure'
+import EditRepayment from './edit-repayment'
 import Repayments from './repayments'
 
 Vue.use(VueRouter)
@@ -74,6 +75,10 @@ router.map({
 			'/edit-expenditure': {
 				name: 'edit-expenditure',
 				component: EditExpenditure
+			},
+			'/edit-repayment': {
+				name: 'edit-repayment',
+				component: EditRepayment
 			}
 		}
 	}
