@@ -17,7 +17,7 @@
 							<span class="input-group-label">€</span>
 						</div>
 					</label>
-					<p class="help-text">Montant en euro. Exemple: 12,5</p>
+					<p class="help-text">Montant en euro. Exemple: 42,5</p>
 				</div>
 				<div class="small-6 columns">
 					<label>Date
