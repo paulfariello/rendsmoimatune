@@ -44,7 +44,7 @@ export default {
 	props: {
 		limit: {
 			type: Number,
-			default: 5
+			default: Infinity
 		},
 		src: {
 			type: Array,

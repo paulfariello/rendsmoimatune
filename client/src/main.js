@@ -12,6 +12,7 @@ import Account from './account'
 import AccountDetail from './account-detail'
 import Expenditures from './expenditures'
 import EditExpenditure from './edit-expenditure'
+import ListExpenditures from './list-expenditures'
 import EditRepayment from './edit-repayment'
 import Repayments from './repayments'
 
@@ -75,6 +76,10 @@ router.map({
 			'/edit-expenditure': {
 				name: 'edit-expenditure',
 				component: EditExpenditure
+			},
+			'/expenditures': {
+				name: 'expenditures',
+				component: ListExpenditures
 			},
 			'/edit-repayment': {
 				name: 'edit-repayment',
