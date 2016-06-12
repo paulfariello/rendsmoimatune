@@ -77,7 +77,7 @@
 	<div class="small-12 columns">
 		<h3><a ui-sref="account.repayments"><i class="fa fa-exchange fa-lg fa-fw"></i>Remboursements</a></h3>
 		<repayments :limit="5" :src="account.repayments"></repayments>
-		<a v-if="account.repayments.length > 5" ui-sref="account.repayments">Et {{ account.repayments.length - 5 }} <span v-if="account.repayments.length > 6">autres…</span><span v-if="account.repayments.length == 6">autre.</span></a>
+		<a v-if="account.repayments.length > 5"  v-link="{ name: 'repayments', params: $route.params }">Et {{ account.repayments.length - 5 }} <span v-if="account.repayments.length > 6">autres…</span><span v-if="account.repayments.length == 6">autre.</span></a>
 		<a class="button float-right fa fa-plus-circle" v-link="{ name: 'edit-repayment', params: $route.params }">Nouveau remboursement</a>
 	</div>
 </div>

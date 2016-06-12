@@ -14,6 +14,7 @@ import Expenditures from './expenditures'
 import EditExpenditure from './edit-expenditure'
 import ListExpenditures from './list-expenditures'
 import EditRepayment from './edit-repayment'
+import ListRepayment from './list-repayments'
 import Repayments from './repayments'
 
 Vue.use(VueRouter)
@@ -84,6 +85,10 @@ router.map({
 			'/edit-repayment': {
 				name: 'edit-repayment',
 				component: EditRepayment
+			},
+			'/repayments': {
+				name: 'repayments',
+				component: ListRepayment
 			}
 		}
 	}
