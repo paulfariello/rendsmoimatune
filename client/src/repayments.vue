@@ -16,7 +16,7 @@
 			<td>{{ repayment.date }}</td>
 			<td>{{ repayment.payer }}</td>
 			<td>a remboursé</td>
-			<td>{{ repayment.amount | amount }}</td>
+			<td>{{ repayment.amount | currency }}</td>
 			<td>à</td>
 			<td>{{ repayment.beneficiary }}</td>
 			<td>
