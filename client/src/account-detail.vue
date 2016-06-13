@@ -4,13 +4,13 @@
 		<h3 v-if="account.balance.length > 0"><i class="fa fa-balance-scale fa-lg fa-fw"></i>Balance</h3>
 		<h3 v-if="account.balance.length == 0"><i class="fa fa-users fa-lg fa-fw"></i>Utilisateurs</h3>
 		<div class="balance">
-			<div class="row text-center" v-for="user in account.users">
+			<div class="row text-center" v-for="user in account.users | orderBy name">
 				<div class="small-5 columns">
 					<div class="debt" v-if="user.balance < 0" v-bind:style="width: {{ -user.balance/account.max_debt*100 }}%">
 						{{ user.balance | currency }}
 					</div>
 				</div>
-				<div ng-class="{'small-offset-5': user.balance >= 0}" class="small-2 columns">
+				<div class="small-2 columns">
 					{{ user.name }}
 				</div>
 				<div class="small-5 columns">
@@ -50,7 +50,7 @@
 				</tr>
 			</thead>
 			<tbody>
-				<tr v-for="repayment in account.balance | orderBy: name">
+				<tr v-for="repayment in account.balance | orderBy name">
 					<td>{{ repayment.from }}</td>
 					<td>doit</td>
 					<td>{{ repayment.amount | currency }}</td>
