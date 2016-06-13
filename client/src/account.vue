@@ -14,12 +14,15 @@
 
 <script>
 export default {
+	data () {
+		return {'account': {}}
+	},
 	route: {
 		data () {
 			var resource = this.$resource('account/{id}')
 
 			return resource.get({id: this.$route.params.accountId}).then(function (response) {
-				return {'account': response.data}
+				this.account = response.data
 			}).catch(function () {
 				// TODO handle error
 			})
