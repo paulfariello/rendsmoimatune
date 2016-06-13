@@ -6,15 +6,15 @@
 		<div class="balance">
 			<div class="row text-center" v-for="user in account.users | orderBy name">
 				<div class="small-5 columns">
-					<div class="debt" v-if="user.balance < 0" v-bind:style="width: {{ -user.balance/account.max_debt*100 }}%">
+					<div class="debt" v-if="user.balance < 0" v-bind:style="{width: (-user.balance) / maxBalance(account) * 100 + '%'}">
 						{{ user.balance | currency }}
 					</div>
 				</div>
-				<div class="small-2 columns">
+				<div v-bind:class="[user.balance >= 0 ? 'small-offset-5' : '']" class="small-2 columns">
 					{{ user.name }}
 				</div>
 				<div class="small-5 columns">
-					<div class="credit" v-if="user.balance > 0" v-bind:style="width: {{ user.balance/account.max_debt*100 }}%">
+					<div class="credit" v-if="user.balance > 0" v-bind:style="{width: user.balance / maxBalance(account) * 100 + '%'}">
 						{{ user.balance | currency }}
 					</div>
 				</div>
@@ -101,6 +101,16 @@ export default {
 			}, function (response) {
 				// TODO error handling
 			})
+		},
+		maxBalance (account) {
+			var max = 0
+			for (var i in account.users) {
+				var balance = Math.abs(account.users[i].balance)
+				if (balance > max) {
+					max = balance
+				}
+			}
+			return max
 		}
 	}
 }
