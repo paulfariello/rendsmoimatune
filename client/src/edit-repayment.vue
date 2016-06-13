@@ -36,7 +36,7 @@
 			</div>
 			<div class="row">
 				<div class="small-12 columns">
-					<button type="submit" class="button fa fa-plus-circle">Ajouter</button>
+					<button type="submit" class="button fa fa-plus-circle">Enregistrer</button>
 				</div>
 			</div>
 		</form>
@@ -53,6 +53,25 @@ export default {
 				'date': new Date(),
 				'payer': '',
 				'beneficiary': ''
+			}
+		}
+	},
+	route: {
+		data () {
+			if (typeof this.$route.params.repaymentId === 'undefined') {
+				this.repayment.amount = 0
+				this.repayment.date = new Date()
+				this.repayment.payer = ''
+				this.repayment.beneficiary = ''
+			} else {
+				var repaymentId = Number(this.$route.params.repaymentId)
+				for (var i in this.account.repayments) {
+					var repayment = this.account.repayments[i]
+					if (repayment.id === repaymentId) {
+						this.repayment = repayment
+						break
+					}
+				}
 			}
 		}
 	},

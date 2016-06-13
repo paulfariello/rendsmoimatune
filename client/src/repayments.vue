@@ -20,7 +20,7 @@
 			<td>à</td>
 			<td>{{ repayment.beneficiary }}</td>
 			<td>
-				<a ui-sref="account.edit-repayment({repayment_id: repayment.id})" aria-label="Éditer" class="button"><i class="fa fa-pencil fa-lg"></i></a>
+				<a v-link="{ name: 'edit-repayment', params: { repaymentId: repayment.id } }" aria-label="Éditer" class="button"><i class="fa fa-pencil fa-lg"></i></a>
 				<button aria-label="Supprimer" class="button alert"><i class="fa fa-trash-o fa-lg"></i></button>
 			</td>
 		</tr>

@@ -71,7 +71,7 @@
 			</div>
 			<div class="row">
 				<div class="small-12 columns">
-					<button type="submit" class="button fa fa-plus-circle">Ajouter</button>
+					<button type="submit" class="button fa fa-plus-circle">Enregistrer</button>
 				</div>
 			</div>
 		</form>
