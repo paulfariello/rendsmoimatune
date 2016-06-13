@@ -97,6 +97,35 @@ export default {
 			}
 		}
 	},
+	route: {
+		data () {
+			var debts = []
+			for (var user in this.account.users) {
+				debts.push({'debt': true, 'share': 1, 'debtor': user.name})
+			}
+			if (typeof this.$route.params.expenditureId === 'undefined') {
+				this.allDebts = true
+				this.expenditure.name = ''
+				this.expenditure.amount = 0
+				this.expenditure.date = new Date()
+				this.expenditure.payer = ''
+				this.expenditure.debts = debts
+			} else {
+				var expenditureId = Number(this.$route.params.expenditureId)
+				for (var i in this.account.expenditures) {
+					var expenditure = this.account.expenditures[i]
+					if (expenditure.id === expenditureId) {
+						for (var j in expenditure.debts) {
+							expenditure.debts[j].debt = expenditure.debts[j].share > 0
+						}
+						this.allDebts = true
+						this.expenditure = expenditure
+						break
+					}
+				}
+			}
+		}
+	},
 	watch: {
 		'allDebts': function (val) {
 			for (var i in this.expenditure.debts) {
@@ -112,8 +141,6 @@ export default {
 	},
 	methods: {
 		saveExpenditure () {
-			var resource = this.$resource('account/' + this.$route.params.accountId + '/expenditures/')
-
 			for (var i in this.expenditure.debts) {
 				var debt = this.expenditure.debts[i]
 				if (!debt.debt) {
@@ -121,11 +148,22 @@ export default {
 				}
 			}
 
-			resource.save(this.expenditure).then(function (response) {
+			function success (response) {
 				this.$router.go({name: 'account', params: { accountId: this.$route.params.accountId }})
-			}, function (response) {
+			}
+
+			function error (response) {
 				// TODO error handling
-			})
+			}
+
+			var resource
+			if (typeof this.$route.params.expenditureId === 'undefined') {
+				resource = this.$resource('account/' + this.$route.params.accountId + '/expenditures/')
+				resource.save(this.expenditure).then(success, error)
+			} else {
+				resource = this.$resource('account/' + this.$route.params.accountId + '/expenditures/' + this.$route.params.expenditureId)
+				resource.update(this.expenditure).then(success, error)
+			}
 		}
 	}
 }

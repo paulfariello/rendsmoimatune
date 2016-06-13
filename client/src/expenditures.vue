@@ -31,7 +31,7 @@
 				</span>
 			</td>
 			<td>
-				<a ui-sref="account.edit-expenditure({expenditure_id: expenditure.id})" aria-label="Éditer" class="button"><i class="fa fa-pencil fa-lg"></i></a>
+				<a v-link="{ name: 'edit-expenditure', params: { expenditureId: expenditure.id } }" aria-label="Éditer" class="button"><i class="fa fa-pencil fa-lg"></i></a>
 				<button aria-label="Supprimer" class="button alert"><i class="fa fa-trash-o fa-lg"></i></button>
 			</td>
 		</tr>

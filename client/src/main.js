@@ -74,7 +74,11 @@ router.map({
 			'/': {
 				component: AccountDetail
 			},
-			'/edit-expenditure': {
+			'/create-expenditure': {
+				name: 'create-expenditure',
+				component: EditExpenditure
+			},
+			'/edit-expenditure/:expenditureId': {
 				name: 'edit-expenditure',
 				component: EditExpenditure
 			},
