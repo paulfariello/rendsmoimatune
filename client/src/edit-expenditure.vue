@@ -83,8 +83,8 @@
 export default {
 	data () {
 		var debts = []
-		for (var user in this.account.users) {
-			debts.push({'debt': true, 'share': 1, 'debtor': user.name})
+		for (var i in this.account.users) {
+			debts.push({'debt': true, 'share': 1, 'debtor': this.account.users[i].name})
 		}
 		return {
 			'allDebts': true,
@@ -99,9 +99,10 @@ export default {
 	},
 	route: {
 		data () {
+			var i
 			var debts = []
-			for (var user in this.account.users) {
-				debts.push({'debt': true, 'share': 1, 'debtor': user.name})
+			for (i in this.account.users) {
+				debts.push({'debt': true, 'share': 1, 'debtor': this.account.users[i].name})
 			}
 			if (typeof this.$route.params.expenditureId === 'undefined') {
 				this.allDebts = true
@@ -112,7 +113,7 @@ export default {
 				this.expenditure.debts = debts
 			} else {
 				var expenditureId = Number(this.$route.params.expenditureId)
-				for (var i in this.account.expenditures) {
+				for (i in this.account.expenditures) {
 					var expenditure = this.account.expenditures[i]
 					if (expenditure.id === expenditureId) {
 						for (var j in expenditure.debts) {
