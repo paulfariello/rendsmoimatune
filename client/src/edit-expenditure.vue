@@ -50,19 +50,19 @@
 							</tr>
 						</thead>
 						<tbody>
-							<tr v-for="user in account.users">
-								<input type="hidden" v-model="expenditure.debts[$index].debtor" :value="user.name" />
+							<tr v-for="debt in expenditure.debts">
+								<input type="hidden" v-model="debt.debtor" />
 								<td>
 									<div class="switch">
-										<input class="switch-input" type="checkbox" v-model="expenditure.debts[$index].debt" id="debt-{{$index}}">
+										<input class="switch-input" type="checkbox" v-model="debt.debt" id="debt-{{$index}}">
 										<label for="debt-{{$index}}" class="switch-paddle">
-											<span class="show-for-sr">{{ user.name }}</span>
+											<span class="show-for-sr">{{ debt.debtor }}</span>
 										</label>
 									</div>
 								</td>
-								<td>{{ user.name }}</td>
+								<td>{{ debt.debtor }}</td>
 								<td>
-									<input v-if="expenditure.debts[$index].debt" type="number" v-model="expenditure.debts[$index].share" number>
+									<input v-if="debt.debt" type="number" v-model="debt.share" number>
 								</td>
 							</tr>
 						</tbody>
@@ -117,10 +117,15 @@ export default {
 					var expenditure = this.account.expenditures[i]
 					if (expenditure.id === expenditureId) {
 						for (var j in expenditure.debts) {
-							expenditure.debts[j].debt = expenditure.debts[j].share > 0
+							this.expenditure.debts[j].debtor = expenditure.debts[j].debtor
+							this.expenditure.debts[j].share = expenditure.debts[j].share
+							this.expenditure.debts[j].debt = expenditure.debts[j].share > 0
 						}
 						this.allDebts = true
-						this.expenditure = expenditure
+						this.expenditure.name = expenditure.name
+						this.expenditure.amount = expenditure.amount
+						this.expenditure.date = expenditure.date
+						this.expenditure.payer = expenditure.payer
 						break
 					}
 				}
