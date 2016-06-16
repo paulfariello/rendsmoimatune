@@ -22,10 +22,8 @@ cd client/ && npm install
 
 Build web app and install Rmmt:
 ```
-./waf-1.8.19 configure build install -v --destdir=$(pwd)
+./waf-1.8.21 configure build install --destdir=$(pwd)
 ```
-
-> `waf 1.8.19` seems to have a bug and requires `-v` option in order to build Rmmt
 
 Then go to built server directory and run Rmmt server:
 ```
@@ -45,7 +43,7 @@ Here the procedure to run Rmmt server behind nginx, with gunicorn and postgresql
 
 First you should build and install Rmmt to a standard directory:
 ```
-./waf-1.8.19 configure build install -v
+./waf-1.8.21 configure build install
 ```
 
 Ensure your database is configured to use UTF-8 encoding, either with initdb:
