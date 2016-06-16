@@ -213,7 +213,8 @@ class Repayment(RmmtModel, JSONObject):
 
     @property
     def json(self):
-        return {"account": uniqid.encode(self.account.uid),
+        return {"id": self._id,
+                "account": uniqid.encode(self.account.uid),
                 "date": self.date.isoformat(),
                 "amount": self.amount,
                 "payer": self.payer.name,
