@@ -6,6 +6,9 @@ module.exports = {
 	plugins: [
 		'html'
 	],
+	globals: {
+		Foundation: true,
+	},
 	env: {
 		jquery: true
 	},

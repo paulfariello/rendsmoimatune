@@ -1,4 +1,6 @@
 import 'src/css/main.scss'
+import 'foundation-sites/js/foundation.core.js'
+import 'foundation-sites/js/foundation.reveal.js'
 import 'foundation-datepicker/js/foundation-datepicker.js'
 import 'foundation-datepicker/css/foundation-datepicker.scss'
 import Vue from 'vue'

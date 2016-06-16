@@ -15,6 +15,11 @@ module.exports = merge(baseWebpackConfig, {
 	},
 	// eval-source-map is faster for development
 	devtool: '#eval-source-map',
+	resolve: {
+		alias: {
+			foundation: 'foundation-sites/js/foundation.core'
+		}
+	},
 	plugins: [
 		// https://github.com/glenjamin/webpack-hot-middleware#installation--usage
 		new webpack.optimize.OccurenceOrderPlugin(),
