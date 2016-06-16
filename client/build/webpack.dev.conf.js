@@ -11,7 +11,12 @@ Object.keys(baseWebpackConfig.entry).forEach(function (name) {
 
 module.exports = merge(baseWebpackConfig, {
 	module: {
-		loaders: utils.styleLoaders()
+		loaders: [
+			{
+				test: /(foundation\.core)/,
+				loader: 'exports?foundation=jQuery.fn.foundation'
+			}
+		].concat(utils.styleLoaders())
 	},
 	// eval-source-map is faster for development
 	devtool: '#eval-source-map',

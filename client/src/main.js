@@ -1,5 +1,11 @@
 import 'src/css/main.scss'
-import 'foundation-sites/js/foundation.core.js'
+import { foundation } from 'foundation-sites/js/foundation.core.js'
+$.fn.foundation = foundation
+import 'foundation-sites/js/foundation.util.keyboard.js'
+import 'foundation-sites/js/foundation.util.box.js'
+import 'foundation-sites/js/foundation.util.triggers.js'
+import 'foundation-sites/js/foundation.util.mediaQuery.js'
+import 'foundation-sites/js/foundation.util.motion.js'
 import 'foundation-sites/js/foundation.reveal.js'
 import 'foundation-datepicker/js/foundation-datepicker.js'
 import 'foundation-datepicker/css/foundation-datepicker.scss'
@@ -54,6 +60,57 @@ Vue.directive('date-picker', {
 	},
 	update: function (newValue) {
 		$(this.el).fdatepicker('update', newValue)
+	}
+})
+
+Vue.directive('reveal-open', {
+	update: function (value) {
+		if (typeof oldValue !== 'undefined') {
+			$(this.el).unbind('click', this.handler)
+		}
+
+		this.handler = function () {
+			var reveal = $('#' + value)
+			if (reveal.length === 0) {
+				console.error('unknown reveal element: ' + value)
+				return
+			}
+			reveal = reveal[0]
+			$(reveal).foundation('open')
+		}
+
+		$(this.el).click(this.handler)
+	}
+})
+
+Vue.directive('reveal-close', {
+	update: function (value, oldValue) {
+		if (typeof oldValue !== 'undefined') {
+			$(this.el).unbind('click', this.handler)
+		}
+		var self = this
+		this.handler = function () {
+			var reveal
+			if (typeof value !== 'undefined') {
+				reveal = $('#' + value)
+			} else {
+				reveal = $(self.el).parents('[data-reveal]')
+			}
+			if (reveal.length === 0) {
+				console.error('unknown reveal element: ' + value)
+				return
+			}
+			reveal = reveal[0]
+			$(reveal).foundation('close')
+		}
+
+		$(this.el).click(this.handler)
+	}
+})
+
+Vue.directive('reveal-data', {
+	bind: function () {
+		this.reveal = new Foundation.Reveal($(this.el))
 	}
 })
 
