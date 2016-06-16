@@ -114,6 +114,26 @@ optional arguments:
   --init                Initialize database
 ```
 
+Client developement
+-------------------
+
+Install dependencies
+``` bash
+npm install
+```
+
+Serve with hot reload at localhost:8000 and proxy server request to localhost:8001
+``` bash
+npm run dev
+```
+
+Build for production with minification
+``` bash
+npm run build
+```
+
+For detailed explanation on how things work, checkout the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
+
 License
 -------
 
