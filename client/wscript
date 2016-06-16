@@ -1,0 +1,9 @@
+def configure(ctx):
+    ctx.find_program('npm', var='NPM')
+
+def build(ctx):
+    ctx(source='package.json', target='node_modules/', rule='${NPM} install')
+    ctx(target='dist/', rule='${NPM} build')
+    ctx.install_files('${STATIC_PATH}', 'dist/index.html')
+    static = ctx.path.find_dir('dist/static')
+    ctx.install_files('${STATIC_PATH}', static.ant_glob('*'))
