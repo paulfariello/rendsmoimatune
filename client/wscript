@@ -2,8 +2,22 @@ def configure(ctx):
     ctx.find_program('npm', var='NPM')
 
 def build(ctx):
-    ctx(source='package.json', target='node_modules/', rule='${NPM} install')
-    ctx(target='dist/', rule='${NPM} build')
+    sources = ['build/*',
+               'static/*',
+               'config.js',
+               'index.html',
+               'package.json',
+               'px/*',
+               'src/*']
+    for src in ctx.path.ant_glob(sources):
+        path = src.path_from(ctx.path.get_src())
+        ctx(features='subst', source=path, target=path, is_copy=True, name="Prepare compilation")
+
+    ctx.add_group()
+    ctx(target='node_modules/', rule='${NPM} install', cwd=ctx.path.get_bld().abspath())
+
+    ctx.add_group()
+    ctx(target='dist/', rule='${NPM} run build', cwd=ctx.path.get_bld().abspath())
+
     ctx.install_files('${STATIC_PATH}', 'dist/index.html')
-    static = ctx.path.find_dir('dist/static')
-    ctx.install_files('${STATIC_PATH}', static.ant_glob('*'))
+    ctx.install_files('${STATIC_PATH}', ctx.path.ant_glob('dist/static/**'), relative_trick=True)
