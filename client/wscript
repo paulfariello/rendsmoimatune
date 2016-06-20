@@ -2,7 +2,8 @@ def configure(ctx):
     ctx.find_program('npm', var='NPM')
 
 def build(ctx):
-    sources = ['.eslintrc.js',
+    sources = ['.babelrc',
+               '.eslintrc.js',
                'build/*',
                'config/*',
                'index.html',
