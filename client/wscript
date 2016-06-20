@@ -6,10 +6,11 @@ def build(ctx):
                '.eslintrc.js',
                'build/*',
                'config/*',
+               'fonts/*',
                'index.html',
                'package.json',
                'px/*',
-               'src/*',
+               'src/**',
                'static/*']
     for src in ctx.path.ant_glob(sources):
         path = src.path_from(ctx.path.get_src())
