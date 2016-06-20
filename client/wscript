@@ -2,13 +2,14 @@ def configure(ctx):
     ctx.find_program('npm', var='NPM')
 
 def build(ctx):
-    sources = ['build/*',
-               'static/*',
+    sources = ['.eslintrc.js',
+               'build/*',
                'config.js',
                'index.html',
                'package.json',
                'px/*',
-               'src/*']
+               'src/*',
+               'static/*']
     for src in ctx.path.ant_glob(sources):
         path = src.path_from(ctx.path.get_src())
         ctx(features='subst', source=path, target=path, is_copy=True, name="Prepare compilation")
