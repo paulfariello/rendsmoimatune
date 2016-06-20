@@ -1,7 +1,6 @@
 var path = require('path')
 var config = require('../config')
 var utils = require('./utils')
-var autoprefixer = require('autoprefixer')
 var projectRoot = path.resolve(__dirname, '../')
 var nodeModules = path.join(projectRoot, 'node_modules')
 
@@ -75,7 +74,7 @@ module.exports = {
 				limit: 10000,
 				name: utils.assetsPath('fonts/[name].[hash:7].[ext]')
 			}
-		},
+		}
 		]
 	},
 	postcss: function(webpack) {
@@ -89,4 +88,7 @@ module.exports = {
 	eslint: {
 		formatter: require('eslint-friendly-formatter')
 	},
+	vue: {
+		loaders: utils.cssLoaders()
+	}
 }

@@ -4,7 +4,7 @@ def configure(ctx):
 def build(ctx):
     sources = ['.eslintrc.js',
                'build/*',
-               'config.js',
+               'config/*',
                'index.html',
                'package.json',
                'px/*',

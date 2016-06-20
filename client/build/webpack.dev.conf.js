@@ -1,3 +1,4 @@
+var config = require('../config')
 var webpack = require('webpack')
 var merge = require('webpack-merge')
 var utils = require('./utils')
@@ -26,6 +27,9 @@ module.exports = merge(baseWebpackConfig, {
 		}
 	},
 	plugins: [
+		new webpack.DefinePlugin({
+			'process.env': config.dev.env
+		}),
 		// https://github.com/glenjamin/webpack-hot-middleware#installation--usage
 		new webpack.optimize.OccurenceOrderPlugin(),
 		new webpack.HotModuleReplacementPlugin(),
