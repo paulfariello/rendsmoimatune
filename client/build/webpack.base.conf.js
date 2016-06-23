@@ -2,7 +2,6 @@ var path = require('path')
 var config = require('../config')
 var utils = require('./utils')
 var projectRoot = path.resolve(__dirname, '../')
-var nodeModules = path.join(projectRoot, 'node_modules')
 
 module.exports = {
 	entry: {
@@ -15,7 +14,7 @@ module.exports = {
 	},
 	resolve: {
 		extensions: ['', '.js', '.vue'],
-		fallback: [nodeModules],
+		fallback: [path.join(__dirname, '../node_modules')],
 		alias: {
 			'src': path.resolve(__dirname, '../src'),
 			'assets': path.resolve(__dirname, '../src/assets'),
@@ -23,7 +22,7 @@ module.exports = {
 		}
 	},
 	resolveLoader: {
-		fallback: [nodeModules]
+		fallback: [path.join(__dirname, '../node_modules')]
 	},
 	module: {
 		preLoaders: [
@@ -83,7 +82,7 @@ module.exports = {
 		]
 	},
 	sassLoader: {
-		includePaths: [nodeModules]
+		includePaths: [path.join(__dirname, '../node_modules')]
 	},
 	eslint: {
 		formatter: require('eslint-friendly-formatter')
