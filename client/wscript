@@ -36,10 +36,7 @@ def build(ctx):
     ctx.add_group()
     dist = ctx.path.get_bld().find_or_declare('dist')
     dist.mkdir()
-    static = dist.find_or_declare('static')
-    static.mkdir()
     ctx(rule=static_files_signature, always=True, name='static files signature')
 
     ctx.add_group()
-    ctx.install_files('${STATIC_PATH}', static.ant_glob('**/*'), cwd=static, relative_trick=True)
-    ctx.install_files('${STATIC_PATH}', dist.ant_glob('index.html'), cwd=dist, relative_trick=True)
+    ctx.install_files('${STATIC_PATH}', dist.ant_glob('**/*'), cwd=dist, relative_trick=True)
