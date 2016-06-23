@@ -1,9 +1,45 @@
+from waflib import Build, Utils
+
 def configure(ctx):
     ctx.find_program('npm', var='NPM')
 
+def static_files_signature(task):
+    # Force signature generation for static files
+    ctx = task.generator
+    path = ctx.path.get_bld().find_or_declare('dist')
+    for f in path.ant_glob('**/*', remove=False):
+        f.sig = Utils.h_file(f.abspath())
+
 def build(ctx):
-    ctx(source='package.json', target='node_modules/', rule='${NPM} install')
-    ctx(target='dist/', rule='${NPM} build')
-    ctx.install_files('${STATIC_PATH}', 'dist/index.html')
-    static = ctx.path.find_dir('dist/static')
-    ctx.install_files('${STATIC_PATH}', static.ant_glob('*'))
+    ctx.post_mode = Build.POST_LAZY
+
+    sources = ['.babelrc',
+               '.eslintrc.js',
+               'build/*',
+               'config/*',
+               'fonts/*',
+               'index.html',
+               'package.json',
+               'px/*',
+               'src/**',
+               'static/*']
+    for src in ctx.path.ant_glob(sources):
+        path = src.path_from(ctx.path.get_src())
+        ctx(features='subst', source=path, target=path, is_copy=True, name="Prepare compilation")
+
+    ctx.add_group()
+    ctx(rule='${NPM} install', source='package.json', cwd=ctx.path.get_bld().abspath())
+
+    ctx.add_group()
+    ctx(rule='${NPM} run build', always=True, cwd=ctx.path.get_bld().abspath())
+
+    ctx.add_group()
+    dist = ctx.path.get_bld().find_or_declare('dist')
+    dist.mkdir()
+    static = dist.find_or_declare('static')
+    static.mkdir()
+    ctx(rule=static_files_signature, always=True, name='static files signature')
+
+    ctx.add_group()
+    ctx.install_files('${STATIC_PATH}', static.ant_glob('**/*'), cwd=static, relative_trick=True)
+    ctx.install_files('${STATIC_PATH}', dist.ant_glob('index.html'), cwd=dist, relative_trick=True)
