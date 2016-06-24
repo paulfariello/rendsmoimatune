@@ -14,15 +14,16 @@ def build(ctx):
     ctx.post_mode = Build.POST_LAZY
 
     sources = ['.babelrc',
+               '.eslintignore',
                '.eslintrc.js',
-               'build/*',
-               'config/*',
-               'fonts/*',
+               'build/**',
+               'config/**',
+               'fonts/**',
                'index.html',
                'package.json',
-               'px/*',
+               'px/**',
                'src/**',
-               'static/*']
+               'static/**']
     for src in ctx.path.ant_glob(sources):
         path = src.path_from(ctx.path.get_src())
         ctx(features='subst', source=path, target=path, is_copy=True, name="Prepare compilation")
