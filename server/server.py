@@ -43,6 +43,15 @@ def static(path=None):
         path = "index.html"
     return bottle.static_file(path, root=STATIC_ROOT)
 
+@bottle.get(r"/api/status")
+def create_account():
+    """Get server status
+
+    Exemple:
+    curl -X GET -H "Content-Type:application/json" http://localhost:8001/api/status
+    """
+    return json.dumps({'status': 'OK'})
+
 
 @bottle.post(r"/api/account/")
 def create_account():
