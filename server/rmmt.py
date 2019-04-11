@@ -79,8 +79,8 @@ class Account(RmmtModel, JSONObject):
 
         repayments = []
         while len(creditors) and len(debitors):
-            creditors.sort(key=lambda user: user["balance"], reverse=True)
-            debitors.sort(key=lambda user: user["balance"])
+            creditors.sort(key=lambda creditor: creditor["user"])
+            debitors.sort(key=lambda creditor: creditor["user"])
 
             creditor = creditors.pop()
             debitor = debitors.pop()
