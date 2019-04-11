@@ -73,7 +73,7 @@ export default {
 					}
 				}
 			} else {
-				this.repayment.amount = this.$route.params.amount
+				this.repayment.amount = Math.round(this.$route.params.amount)
 				this.repayment.payer = this.$route.params.payer
 				this.repayment.beneficiary = this.$route.params.beneficiary
 			}
