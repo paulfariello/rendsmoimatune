@@ -27,7 +27,7 @@
 		<div class="small-12 columns">
 			<h4>Nouveau participant</h4>
 			<div class="input-group">
-				<input type="text" class="input-group-field" v-model="new_user" required />
+				<input type="text" class="input-group-field" v-model="new_user" required :disabled="adding_user"/>
 				<div class="input-group-button">
 					<button type="submit" class="button fa fa-user-plus">Ajouter</button>
 				</div>
@@ -89,15 +89,18 @@ export default {
 		account: {
 			type: Object,
 			required: true
-		}
+		},
+		adding_user: false
 	},
 	methods: {
 		addUser () {
 			var resource = this.$resource('account/' + this.$route.params.accountId + '/users/{name}')
+			this.adding_user = true
 
 			resource.save({name: this.new_user}).then(function (response) {
-				console.log(response)
 				this.account.users.push({name: response.data.name, balance: response.data.balance})
+				this.new_user = ''
+				this.adding_user = false
 			}, function (response) {
 				// TODO error handling
 			})
