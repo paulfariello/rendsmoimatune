@@ -406,7 +406,7 @@ def delete_repayment(account_id, repayment_id):
     uid = uniqid.decode(account_id)
     account = rmmt.Account.get(rmmt.Account.uid == uid)
     repayment = rmmt.Repayment.select().where(rmmt.Repayment._id == repayment_id,
-                                         rmmt.Repayment.account == account).get()
+                                              rmmt.Repayment.account == account).get()
 
     repayment.delete_instance()
 
