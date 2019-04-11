@@ -44,7 +44,7 @@ def static(path=None):
     return bottle.static_file(path, root=STATIC_ROOT)
 
 @bottle.get(r"/api/status")
-def create_account():
+def get_status():
     """Get server status
 
     Exemple:
