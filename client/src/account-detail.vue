@@ -56,7 +56,7 @@
 					<td>{{ repayment.amount | currency }}</td>
 					<td>à</td>
 					<td>{{ repayment.to }}</td>
-					<td><a ui-sref="account.add-repayment({payer: repayment.from, beneficiary: repayment.to, amount: repayment.amount})" class="fa fa-plus-circle button">Ajouter</a></td>
+					<td><a v-link="{ name: 'add-repayment', params: {payer: repayment.from, beneficiary: repayment.to, amount: repayment.amount}}" class="fa fa-plus-circle button">Ajouter</a></td>
 				</tr>
 			</tbody>
 		</table>

@@ -148,6 +148,10 @@ router.map({
 				name: 'create-repayment',
 				component: EditRepayment
 			},
+			'/create-repayment/:amount/from/:payer/to/:beneficiary': {
+				name: 'add-repayment',
+				component: EditRepayment
+			},
 			'/edit-repayment/:repaymentId': {
 				name: 'edit-repayment',
 				component: EditRepayment

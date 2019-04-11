@@ -58,12 +58,12 @@ export default {
 	},
 	route: {
 		data () {
-			if (typeof this.$route.params.repaymentId === 'undefined') {
+			if (typeof this.$route.params.repaymentId === 'undefined' && typeof this.$route.params.amount === 'undefined') {
 				this.repayment.amount = 0
 				this.repayment.date = new Date()
 				this.repayment.payer = ''
 				this.repayment.beneficiary = ''
-			} else {
+			} else if (typeof this.$route.params.amount === 'undefined') {
 				var repaymentId = Number(this.$route.params.repaymentId)
 				for (var i in this.account.repayments) {
 					var repayment = this.account.repayments[i]
@@ -72,6 +72,10 @@ export default {
 						break
 					}
 				}
+			} else {
+				this.repayment.amount = this.$route.params.amount
+				this.repayment.payer = this.$route.params.payer
+				this.repayment.beneficiary = this.$route.params.beneficiary
 			}
 		}
 	},
