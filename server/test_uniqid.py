@@ -14,7 +14,7 @@
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 from nose.tools import assert_equals, assert_not_equals
-from .. import uniqid
+import uniqid
 
 def test_uniqid_encode_decode():
     # Given
