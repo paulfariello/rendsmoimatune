@@ -10,17 +10,17 @@ Installation
 ------------
 
 Rmmt REST server being based on peewee it is supposed to support a wide range of database systems.
-Currently, only SQLite3 and Postegresql are eavily tested.
-You are more than welcome to test Rmmt with another database systems.
+Currently, only SQLite3 and Postegresql are heavily tested.
+You are more than welcome to test Rmmt with other database systems.
 
-Here is the 3 steps required to run Rmmt web app.
+Here are the 3 steps required to run Rmmt web app.
 
 Install web app dependencies:
 ```
 cd client/ && npm install
 ```
 
-Build web app and install Rmmt:
+Build the web app and install Rmmt:
 ```
 ./waf-1.8.21 configure build install --destdir=$(pwd)
 ```
@@ -39,7 +39,7 @@ Durable installation
 --------------------
 
 In order to have a more durable installation you should consider using another web server and database.
-Here the procedure to run Rmmt server behind nginx, with gunicorn and postgresql.
+Here is the procedure to run Rmmt server behind nginx, with gunicorn and postgresql.
 
 First you should build and install Rmmt to a standard directory:
 ```
@@ -87,12 +87,12 @@ We provide a default web client based on:
 API
 ---
 
-Up-to-date documentation of the API can be found in server/server.py.
+An up-to-date documentation of the API can be found in server/server.py.
 
 Server manual
 -------------
 
-Up-to-date server manual is available with:
+An up-to-date server manual is available with:
 ```
 ./server.py --help
 ```
@@ -132,7 +132,7 @@ Build for production with minification
 npm run build
 ```
 
-For detailed explanation on how things work, checkout the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
+For a detailed explanation on how things work, checkout the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
 
 License
 -------
