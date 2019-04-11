@@ -50,7 +50,7 @@
 				</tr>
 			</thead>
 			<tbody>
-				<tr v-for="repayment in account.balance | orderBy name">
+				<tr v-for="repayment in balance | orderBy name">
 					<td>{{ repayment.from }}</td>
 					<td>doit</td>
 					<td>{{ repayment.amount | currency }}</td>
@@ -91,6 +91,13 @@ export default {
 			required: true
 		},
 		adding_user: false
+	},
+	computed: {
+		balance: function () {
+			return this.account.balance.filter(function (repayment) {
+				return Math.round(repayment.amount) > 0
+			})
+		}
 	},
 	methods: {
 		addUser () {
