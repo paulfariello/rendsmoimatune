@@ -5,11 +5,12 @@ use rmmt::Account;
 use rocket::serde::json::Json;
 use uuid::Uuid;
 
-#[get("/account/<uuid>")]
+#[get("/api/account/<uuid>")]
 fn account(uuid: Uuid) -> Json<Account> {
     Json(Account {
         uuid,
         name: "Test account".to_string(),
+	expenditures: vec![],
     })
 }
 

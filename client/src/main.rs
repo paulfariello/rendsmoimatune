@@ -29,7 +29,7 @@ fn account() -> Html {
                 let account = account.clone();
                 wasm_bindgen_futures::spawn_local(async move {
                     let fetched_account: rmmt::Account =
-                        Request::get("/account/41EBA85C-9A0A-4BE6-884C-1B31AA379232")
+                        Request::get("/api/account/41EBA85C-9A0A-4BE6-884C-1B31AA379232")
                             .send()
                             .await
                             .unwrap()
