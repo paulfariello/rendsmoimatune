@@ -1,3 +1,20 @@
+Dependencies
+============
+
+```sh
+cargo install diesel_cli --no-default-features --features postgres
+cargo install --locked trunk
+```
+
+Installation
+============
+
+```sh
+echo DATABASE_URL=postgres://user:password@host/database > server/.env
+diesel migration generate init
+diesel migration run
+```
+
 Run
 ===
 
