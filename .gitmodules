@@ -1,0 +1,6 @@
+[submodule "client/css/bootstrap"]
+	path = client/css/bootstrap
+	url = https://github.com/twbs/bootstrap
+[submodule "client/css/font-awesome"]
+	path = client/css/font-awesome
+	url = https://github.com/FortAwesome/Font-Awesome/

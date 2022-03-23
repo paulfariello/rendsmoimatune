@@ -16,10 +16,22 @@ enum Route {
     NotFound,
 }
 
+#[function_component(TopBar)]
+fn top_bar() -> Html {
+    html! {
+        <div class="navbar">
+          <div class="container-fluid">
+            <h1>
+                <a class="navbar-brand" href="/">{ "Rendsmoimatune" }</a>
+                <small>{ "Beta" }</small>
+            </h1>
+          </div>
+        </div>
+    }
+}
+
 #[function_component(Account)]
 fn account() -> Html {
-    let history = use_history().unwrap();
-    let onclick = Callback::from(move |_| history.push(Route::Home));
 
     let account = use_state(|| None);
     {
@@ -44,21 +56,115 @@ fn account() -> Html {
         );
     }
 
+    let expenditures = use_state(|| None);
+    {
+        let expenditures = expenditures.clone();
+        use_effect_with_deps(
+            move |_| {
+                let expenditures = expenditures.clone();
+                wasm_bindgen_futures::spawn_local(async move {
+                    let fetched_expenditures: Vec<rmmt::Expenditure> =
+                        Request::get("/api/account/41EBA85C-9A0A-4BE6-884C-1B31AA379232/expenditures")
+                            .send()
+                            .await
+                            .unwrap()
+                            .json()
+                            .await
+                            .unwrap();
+                    expenditures.set(Some(fetched_expenditures));
+                });
+                || ()
+            },
+            (),
+        );
+    }
+
     let account = account.deref().clone();
+    let expenditures = expenditures.deref().clone();
     html! {
-        <div>
-            if let Some(account) = account {
-                <div>
-                    <h1>{ account.name }</h1>
-                    <button {onclick}>{ "Go Home" }</button>
+        <div class="container">
+            <div class="row">
+                <div class="col">
+                    <a href="/">
+                        <h2>
+                            <i class="fa fa-bank fa-lg fa-fw"/>
+                            if let Some(account) = account {
+                                { account.name }
+                            } else {
+                                { "Loading..." }
+                            }
+                        </h2>
+                    </a>
                 </div>
-                <div>
-                   <h3>{"Expenditures"}</h3>
-                   <ExpendituresList expenditures={account.expenditures} />
+            </div>
+
+            <div class="row">
+                <div class="col">
+                    <h3>
+                        <i class="fa fa-balance-scale fa-lg fa-fw"/>
+                        { "Balance" }
+                    </h3>
+                    <div class="balance">
+                    </div>
                 </div>
-            } else {
-                <div>{ "Loading..." }</div>
-            }
+            </div>
+
+            <div class="row">
+                <form>
+                    <div class="col">
+                        <h4>
+                            { "Nouveau participant" }
+                        </h4>
+                        <div class="input-group">
+                            <input type="text" class="input-group-field" required=true/>
+                            <div class="input-group-button">
+                                <button type="submit" class="button fa fa-user-plus">{ "Ajouter" }</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div class="row">
+                <div class="col">
+                    <h3><i class="fa fa-exchange fa-lg fa-fw"></i> { "Équilibrage" }</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th> { "De" }</th>
+                                <th></th>
+                                <th> { "Montant" }</th>
+                                <th></th>
+                                <th>{ "À" }</th>
+                                <th>{ "Action" }</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>{ "john" }</td>
+                                <td>{ "doit" }</td>
+                                <td>{ 2970.65 }{ " €" }</td>
+                                <td>{ "à" }</td>
+                                <td>{ "john" }</td>
+                                <td><a class="fa fa-plus-circle button" href="">{ "Ajouter" }</a></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col">
+                    <h3><a href=""><i class="fa fa-credit-card fa-lg fa-fw"></i>{ "Dépenses" }</a></h3>
+                    if let Some(expenditures) = expenditures {
+                        <ExpendituresList expenditures={expenditures} />
+                    } else {
+                        <Loading/>
+                    }
+                    <a href="">{ "Et 83 autres…" }</a>
+                    <a class="button float-right fa fa-plus-circle" href="">{ "Nouvelle dépense" }</a>
+                </div>
+            </div>
         </div>
     }
 }
@@ -80,21 +186,60 @@ struct ExpendituresListProps {
 
 #[function_component(ExpendituresList)]
 fn expenditures_list(ExpendituresListProps { expenditures }: &ExpendituresListProps) -> Html {
-    expenditures
-        .iter()
-        .map(|expenditure| {
-            html! {
-                <p>{format!("{}: {}", expenditure.name, expenditure.payer)}</p>
-            }
-        })
-        .collect()
+    html! {
+        <table>
+            <thead>
+                <tr>
+                    <th>{ "Date" }</th>
+                    <th>{ "Nom" }</th>
+                    <th>{ "Montant" }</th>
+                    <th>{ "Payeur" }</th>
+                    <th>{ "Participants" }</th>
+                    <th>{ "Actions" }</th>
+                </tr>
+            </thead>
+        <tbody>
+        {
+            expenditures
+                .iter()
+                .map(|expenditure| {
+                    html! {
+                        <tr>
+                            <td>{ &expenditure.date }</td>
+                            <td>{ &expenditure.name }</td>
+                            <td>{ &expenditure.amount }{ " €" }</td>
+                            <td>{ &expenditure.payer }</td>
+                            <td>{ "todo" }</td>
+                            <td>
+                                <a aria-label="Éditer" class="button" href="">
+                                    <i class="fa fa-pencil fa-lg"></i>
+                                </a>
+                                <button aria-label="Supprimer" class="button alert"><i class="fa fa-trash-o fa-lg"></i></button>
+                            </td>
+                        </tr>
+                    }
+                })
+                .collect::<Html>()
+        }
+        </tbody>
+        </table>
+    }
+}
+
+#[function_component(Loading)]
+fn loading() -> Html {
+    html! {
+        <div class="loading">
+            { "Loading..." }
+        </div>
+    }
 }
 
 #[function_component(App)]
 fn app() -> Html {
     html! {
         <body>
-            <h1>{ "Rendsmoimatune" }</h1>
+            <TopBar/>
             <BrowserRouter>
                 <Switch<Route> render={Switch::render(switch)} />
             </BrowserRouter>

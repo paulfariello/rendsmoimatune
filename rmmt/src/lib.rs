@@ -6,7 +6,6 @@ use uuid::Uuid;
 pub struct Account {
     pub uuid: Uuid,
     pub name: String,
-    pub expenditures: Vec<Expenditure>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
