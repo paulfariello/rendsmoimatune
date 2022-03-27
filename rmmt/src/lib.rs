@@ -2,7 +2,7 @@
 #[cfg(feature = "db")]
 extern crate diesel;
 
-use chrono::{DateTime, Utc};
+use chrono::NaiveDate;
 use serde::{Serialize, Deserialize};
 use uuid::Uuid;
 
@@ -10,20 +10,28 @@ use uuid::Uuid;
 mod schema;
 pub mod prelude;
 
+#[cfg(feature = "db")]
+use schema::{accounts, expenditures};
+
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
-#[cfg_attr(feature = "db", derive(Queryable))]
+#[cfg_attr(feature = "db", derive(Identifiable, Queryable))]
+#[cfg_attr(feature = "db", table_name = "accounts")]
 pub struct Account {
-    pub uuid: Uuid,
+    pub id: Uuid,
     pub name: String,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
-#[cfg_attr(feature = "db", derive(Queryable))]
+#[cfg_attr(feature = "db", derive(Identifiable, Queryable, Associations))]
+#[cfg_attr(feature = "db", belongs_to(Account))]
+#[cfg_attr(feature = "db", table_name = "expenditures")]
 pub struct Expenditure {
+    pub id: Uuid,
+    pub account_id: Uuid,
     pub name: String,
-    pub date: DateTime<Utc>,
-    pub amount: u64,
-    pub payer: String,
+    pub date: NaiveDate,
+    pub amount: i32,
+    pub payer_id: Uuid,
 }
 
 #[cfg(test)]

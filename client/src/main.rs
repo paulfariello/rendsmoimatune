@@ -215,7 +215,7 @@ fn expenditures_list(ExpendituresListProps { expenditures }: &ExpendituresListPr
                             <td>{ &expenditure.date }</td>
                             <td>{ &expenditure.name }</td>
                             <td>{ &expenditure.amount }{ " €" }</td>
-                            <td>{ &expenditure.payer }</td>
+                            <td>{ &expenditure.payer_id }</td>
                             <td>{ "todo" }</td>
                             <td>
                                 <a aria-label="Éditer" class="button" href="">

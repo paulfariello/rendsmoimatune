@@ -10,6 +10,6 @@ db = ["diesel"]
 
 [dependencies]
 chrono = { version = "*", features = ["serde"] }
-diesel = { version = "1.4.4", features = ["postgres", "uuid"], optional = true }
+diesel = { version = "1.4.4", features = ["postgres", "uuid", "chrono"], optional = true }
 serde = { version = "*", features = ["derive"] }
 uuid = { version = "0.6.5", features = ["serde"] }
