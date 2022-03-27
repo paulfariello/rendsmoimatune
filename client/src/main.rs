@@ -37,9 +37,9 @@ struct AccountProps {
 
 #[function_component(Account)]
 fn account(props: &AccountProps) -> Html {
-    let id = props.id.clone();
     let account = use_state(|| None);
     {
+        let id = props.id.clone();
         let account = account.clone();
         use_effect_with_deps(
             move |_| {
@@ -63,20 +63,20 @@ fn account(props: &AccountProps) -> Html {
 
     let expenditures = use_state(|| None);
     {
+        let id = props.id.clone();
         let expenditures = expenditures.clone();
         use_effect_with_deps(
             move |_| {
                 let expenditures = expenditures.clone();
                 wasm_bindgen_futures::spawn_local(async move {
-                    let fetched_expenditures: Vec<rmmt::Expenditure> = Request::get(
-                        "/api/account/41EBA85C-9A0A-4BE6-884C-1B31AA379232/expenditures",
-                    )
-                    .send()
-                    .await
-                    .unwrap()
-                    .json()
-                    .await
-                    .unwrap();
+                    let fetched_expenditures: Vec<rmmt::Expenditure> =
+                        Request::get(&format!("/api/account/{}/expenditures", id))
+                            .send()
+                            .await
+                            .unwrap()
+                            .json()
+                            .await
+                            .unwrap();
                     expenditures.set(Some(fetched_expenditures));
                 });
                 || ()
