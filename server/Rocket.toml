@@ -1,0 +1,2 @@
+[global.databases.main]
+url = "postgres://postgres:password@172.17.0.3/diesel_demo"

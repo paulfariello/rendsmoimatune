@@ -1,0 +1,35 @@
+CREATE TABLE accounts (
+	id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+	name VARCHAR NOT NULL
+);
+
+CREATE TABLE users (
+	id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+	account_id UUID NOT NULL REFERENCES accounts ON DELETE CASCADE,
+	name VARCHAR NOT NULL
+);
+
+CREATE TABLE repayments (
+	id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+	account_id UUID NOT NULL REFERENCES accounts ON DELETE CASCADE,
+	date DATE NOT NULL,
+	amount INTEGER NOT NULL,
+	payer_id UUID NOT NULL REFERENCES users ON DELETE CASCADE,
+	beneficiary_id UUID NOT NULL REFERENCES users ON DELETE CASCADE
+);
+
+CREATE TABLE expenditures (
+	id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+	account_id UUID NOT NULL REFERENCES accounts ON DELETE CASCADE,
+	name VARCHAR NOT NULL,
+	date DATE NOT NULL,
+	amount INTEGER NOT NULL,
+	payer_id UUID NOT NULL REFERENCES users ON DELETE CASCADE
+);
+
+CREATE TABLE debts (
+	id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+	debtor_id UUID NOT NULL REFERENCES users ON DELETE CASCADE,
+	expenditure_id UUID NOT NULL REFERENCES expenditures ON DELETE CASCADE,
+	share INTEGER NOT NULL
+);

@@ -3,9 +3,13 @@ name = "rmmt"
 version = "0.1.0"
 edition = "2021"
 
+[features]
+db = ["diesel"]
+
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 chrono = { version = "*", features = ["serde"] }
+diesel = { version = "1.4.4", features = ["postgres", "uuid"], optional = true }
 serde = { version = "*", features = ["derive"] }
-uuid = { version = "*", features = ["serde"] }
+uuid = { version = "0.6.5", features = ["serde"] }

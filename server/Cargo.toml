@@ -7,8 +7,9 @@ edition = "2021"
 
 [dependencies]
 chrono = "*"
-rmmt = { path = "../rmmt" }
-rocket = { version = "0.5.0-rc.1", features = ["json", "uuid"] }
-uuid = { version = "0.8", features = ["serde"] }
-diesel = { version = "1.4.4", features = ["postgres"] }
+diesel = { version = "1.4.4", features = ["postgres", "uuid"] }
 dotenv = "0.15.0"
+rmmt = { path = "../rmmt", features = ["db"] }
+rocket = { version = "0.5.0-rc.1", features = ["json", "uuid"] }
+rocket_sync_db_pools = { version = "0.1.0-rc.1", features = ["diesel_postgres_pool"] }
+uuid = { version = "0.6.5", features = ["serde", "u128"] }

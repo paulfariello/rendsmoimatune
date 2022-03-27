@@ -1,7 +1,7 @@
 use reqwasm::http::Request;
+use std::ops::Deref;
 use yew::prelude::*;
 use yew_router::prelude::*;
-use std::ops::Deref;
 
 use rmmt;
 
@@ -30,9 +30,14 @@ fn top_bar() -> Html {
     }
 }
 
-#[function_component(Account)]
-fn account() -> Html {
+#[derive(Properties, PartialEq)]
+struct AccountProps {
+    id: String,
+}
 
+#[function_component(Account)]
+fn account(props: &AccountProps) -> Html {
+    let id = props.id.clone();
     let account = use_state(|| None);
     {
         let account = account.clone();
@@ -41,7 +46,7 @@ fn account() -> Html {
                 let account = account.clone();
                 wasm_bindgen_futures::spawn_local(async move {
                     let fetched_account: rmmt::Account =
-                        Request::get("/api/account/41EBA85C-9A0A-4BE6-884C-1B31AA379232")
+                        Request::get(&format!("/api/account/{}", id))
                             .send()
                             .await
                             .unwrap()
@@ -63,14 +68,15 @@ fn account() -> Html {
             move |_| {
                 let expenditures = expenditures.clone();
                 wasm_bindgen_futures::spawn_local(async move {
-                    let fetched_expenditures: Vec<rmmt::Expenditure> =
-                        Request::get("/api/account/41EBA85C-9A0A-4BE6-884C-1B31AA379232/expenditures")
-                            .send()
-                            .await
-                            .unwrap()
-                            .json()
-                            .await
-                            .unwrap();
+                    let fetched_expenditures: Vec<rmmt::Expenditure> = Request::get(
+                        "/api/account/41EBA85C-9A0A-4BE6-884C-1B31AA379232/expenditures",
+                    )
+                    .send()
+                    .await
+                    .unwrap()
+                    .json()
+                    .await
+                    .unwrap();
                     expenditures.set(Some(fetched_expenditures));
                 });
                 || ()
@@ -88,10 +94,11 @@ fn account() -> Html {
                     <a href="/">
                         <h2>
                             <i class="fa fa-bank fa-lg fa-fw"/>
-                            if let Some(account) = account {
-                                { account.name }
-                            } else {
-                                { "Loading..." }
+                            {
+                                match account {
+                                    Some(account) => account.name,
+                                    None => "Loading...".to_string(),
+                                }
                             }
                         </h2>
                     </a>
@@ -173,7 +180,7 @@ fn switch(routes: &Route) -> Html {
     match routes {
         Route::Home => html! { <h1>{ "Home" }</h1> },
         Route::Account { id } => html! {
-            <Account />
+            <Account id={ id.clone() } />
         },
         Route::NotFound => html! { <h1>{ "404" }</h1> },
     }
