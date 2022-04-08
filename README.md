@@ -15,11 +15,16 @@ diesel migration generate init
 diesel migration run
 ```
 
+Configuration
+=============
+
+Server configuration is available in ``server/Rocket.toml``.
+
 Run
 ===
 
 ```sh
-cargo run --manifest-path server/Cargo.toml
+cd server/; cargo run
 cd client/; trunk serve --proxy-backend=http://127.0.0.1:8000/api/
 ```
 
