@@ -11,7 +11,7 @@ mod schema;
 pub mod prelude;
 
 #[cfg(feature = "db")]
-use schema::{accounts, expenditures};
+use schema::{accounts, expenditures, repayments};
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 #[cfg_attr(feature = "db", derive(Identifiable, Queryable))]
@@ -32,6 +32,19 @@ pub struct Expenditure {
     pub date: NaiveDate,
     pub amount: i32,
     pub payer_id: Uuid,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[cfg_attr(feature = "db", derive(Identifiable, Queryable, Associations))]
+#[cfg_attr(feature = "db", belongs_to(Account))]
+#[cfg_attr(feature = "db", table_name = "repayments")]
+pub struct Repayment {
+    pub id: Uuid,
+    pub account_id: Uuid,
+    pub date: NaiveDate,
+    pub amount: i32,
+    pub payer_id: Uuid,
+    pub beneficiary_id: Uuid,
 }
 
 #[cfg(test)]

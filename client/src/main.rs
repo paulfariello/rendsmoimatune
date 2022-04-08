@@ -85,8 +85,33 @@ fn account(props: &AccountProps) -> Html {
         );
     }
 
+    let repayments = use_state(|| None);
+    {
+        let id = props.id.clone();
+        let repayments = repayments.clone();
+        use_effect_with_deps(
+            move |_| {
+                let repayments = repayments.clone();
+                wasm_bindgen_futures::spawn_local(async move {
+                    let fetched_repayments: Vec<rmmt::Repayment> =
+                        Request::get(&format!("/api/account/{}/repayments", id))
+                            .send()
+                            .await
+                            .unwrap()
+                            .json()
+                            .await
+                            .unwrap();
+                    repayments.set(Some(fetched_repayments));
+                });
+                || ()
+            },
+            (),
+        );
+    }
+
     let account = account.deref().clone();
     let expenditures = expenditures.deref().clone();
+    let repayments = repayments.deref().clone();
     html! {
         <div class="container">
             <div class="row">
@@ -168,8 +193,21 @@ fn account(props: &AccountProps) -> Html {
                     } else {
                         <Loading/>
                     }
-                    <a href="">{ "Et 83 autres…" }</a>
+                    <a href="">{ "Et XX autres…" }</a>
                     <a class="button float-right fa fa-plus-circle" href="">{ "Nouvelle dépense" }</a>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col">
+                    <h3><a href=""><i class="fa fa-credit-card fa-lg fa-fw"></i>{ "Dépenses" }</a></h3>
+                    if let Some(repayments) = repayments {
+                        <RepaymentsList repayments={repayments} />
+                    } else {
+                        <Loading/>
+                    }
+                    <a href="">{ "Et XX autres…" }</a>
+                    <a class="button float-right fa fa-plus-circle" href="">{ "Nouveau remboursement" }</a>
                 </div>
             </div>
         </div>
@@ -217,6 +255,55 @@ fn expenditures_list(ExpendituresListProps { expenditures }: &ExpendituresListPr
                             <td>{ &expenditure.amount }{ " €" }</td>
                             <td>{ &expenditure.payer_id }</td>
                             <td>{ "todo" }</td>
+                            <td>
+                                <a aria-label="Éditer" class="button" href="">
+                                    <i class="fa fa-pencil fa-lg"></i>
+                                </a>
+                                <button aria-label="Supprimer" class="button alert"><i class="fa fa-trash-o fa-lg"></i></button>
+                            </td>
+                        </tr>
+                    }
+                })
+                .collect::<Html>()
+        }
+        </tbody>
+        </table>
+    }
+}
+
+#[derive(Properties, PartialEq)]
+struct RepaymentsListProps {
+    repayments: Vec<rmmt::Repayment>,
+}
+
+#[function_component(RepaymentsList)]
+fn repayments_list(RepaymentsListProps { repayments }: &RepaymentsListProps) -> Html {
+    html! {
+        <table>
+            <thead>
+                <tr>
+                    <th>{ "Date" }</th>
+                    <th>{ "De" }</th>
+                    <th></th>
+                    <th>{ "Montant" }</th>
+                    <th></th>
+                    <th>{ "Payeur" }</th>
+                    <th>{ "Actions" }</th>
+                </tr>
+            </thead>
+        <tbody>
+        {
+            repayments
+                .iter()
+                .map(|repayment| {
+                    html! {
+                        <tr>
+                            <td>{ &repayment.date }</td>
+                            <td>{ &repayment.payer_id }</td>
+                            <td>{ "a remboursé" }</td>
+                            <td>{ &repayment.amount }{ " €" }</td>
+                            <td>{ "à" }</td>
+                            <td>{ &repayment.beneficiary_id }</td>
                             <td>
                                 <a aria-label="Éditer" class="button" href="">
                                     <i class="fa fa-pencil fa-lg"></i>
