@@ -19,14 +19,23 @@ enum Route {
 #[function_component(TopBar)]
 fn top_bar() -> Html {
     html! {
-        <div class="navbar">
-          <div class="container-fluid">
-            <h1>
-                <a class="navbar-brand" href="/">{ "Rendsmoimatune" }</a>
-                <small>{ "Beta" }</small>
-            </h1>
-          </div>
-        </div>
+        <nav class="navbar" role="navigation" aria-label="main navigation">
+            <div class="navbar-brand">
+                <a class="navbar-item" href="/">{ "Rends-moi ma thune" }<small>{ "beta" }</small></a>
+
+                <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample" href="">
+                    <span aria-hidden="true"></span>
+                    <span aria-hidden="true"></span>
+                    <span aria-hidden="true"></span>
+                </a>
+            </div>
+
+            <div id="navbarBasicExample" class="navbar-menu">
+                <div class="navbar-start">
+                    <a class="navbar-item" href="/">{ "Home" }</a>
+                </div>
+            </div>
+        </nav>
     }
 }
 
@@ -114,10 +123,10 @@ fn account(props: &AccountProps) -> Html {
     let repayments = repayments.deref().clone();
     html! {
         <div class="container">
-            <div class="row">
-                <div class="col">
+            <div class="columns">
+                <div class="column">
                     <a href="/">
-                        <h2>
+                        <h2 class="title is-1">
                             <i class="fa fa-bank fa-lg fa-fw"/>
                             {
                                 match account {
@@ -130,86 +139,97 @@ fn account(props: &AccountProps) -> Html {
                 </div>
             </div>
 
-            <div class="row">
-                <div class="col">
-                    <h3>
-                        <i class="fa fa-balance-scale fa-lg fa-fw"/>
-                        { "Balance" }
-                    </h3>
-                    <div class="balance">
-                    </div>
-                </div>
-            </div>
-
-            <div class="row">
-                <form>
-                    <div class="col">
-                        <h4>
-                            { "Nouveau participant" }
-                        </h4>
-                        <div class="input-group">
-                            <input type="text" class="input-group-field" required=true/>
-                            <div class="input-group-button">
-                                <button type="submit" class="button fa fa-user-plus">{ "Ajouter" }</button>
-                            </div>
+            <section class="section">
+                <div class="columns">
+                    <div class="column">
+                        <h3 class="subtitle is-3">
+                            <i class="fa fa-balance-scale fa-lg fa-fw"/>
+                            { "Balance" }
+                        </h3>
+                        <div class="balance">
                         </div>
                     </div>
-                </form>
-            </div>
-
-            <div class="row">
-                <div class="col">
-                    <h3><i class="fa fa-exchange fa-lg fa-fw"></i> { "Équilibrage" }</h3>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th> { "De" }</th>
-                                <th></th>
-                                <th> { "Montant" }</th>
-                                <th></th>
-                                <th>{ "À" }</th>
-                                <th>{ "Action" }</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>{ "john" }</td>
-                                <td>{ "doit" }</td>
-                                <td>{ 2970.65 }{ " €" }</td>
-                                <td>{ "à" }</td>
-                                <td>{ "john" }</td>
-                                <td><a class="fa fa-plus-circle button" href="">{ "Ajouter" }</a></td>
-                            </tr>
-                        </tbody>
-                    </table>
                 </div>
-            </div>
+            </section>
 
-            <div class="row">
-                <div class="col">
-                    <h3><a href=""><i class="fa fa-credit-card fa-lg fa-fw"></i>{ "Dépenses" }</a></h3>
-                    if let Some(expenditures) = expenditures {
-                        <ExpendituresList expenditures={expenditures} />
-                    } else {
-                        <Loading/>
-                    }
-                    <a href="">{ "Et XX autres…" }</a>
-                    <a class="button float-right fa fa-plus-circle" href="">{ "Nouvelle dépense" }</a>
+            <section class="section">
+                <div class="columns">
+                    <form>
+                        <div class="column">
+                            <h4 class="subtitle is-3">
+                                <i class="fa fa-user fa-lg fa-fw"></i>
+                                { "Nouveau participant" }
+                            </h4>
+                            <div class="input-group">
+                                <input type="text" class="input-group-field" required=true/>
+                                <div class="input-group-button">
+                                    <button type="submit" class="button fa fa-user-plus">{ "Ajouter" }</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
                 </div>
-            </div>
+            </section>
 
-            <div class="row">
-                <div class="col">
-                    <h3><a href=""><i class="fa fa-credit-card fa-lg fa-fw"></i>{ "Dépenses" }</a></h3>
-                    if let Some(repayments) = repayments {
-                        <RepaymentsList repayments={repayments} />
-                    } else {
-                        <Loading/>
-                    }
-                    <a href="">{ "Et XX autres…" }</a>
-                    <a class="button float-right fa fa-plus-circle" href="">{ "Nouveau remboursement" }</a>
+            <section class="section">
+                <div class="columns">
+                    <div class="column">
+                        <h3 class="subtitle is-3"><i class="fa fa-exchange fa-lg fa-fw"></i> { "Équilibrage" }</h3>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th> { "De" }</th>
+                                    <th></th>
+                                    <th> { "Montant" }</th>
+                                    <th></th>
+                                    <th>{ "À" }</th>
+                                    <th>{ "Action" }</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>{ "john" }</td>
+                                    <td>{ "doit" }</td>
+                                    <td>{ 2970.65 }{ " €" }</td>
+                                    <td>{ "à" }</td>
+                                    <td>{ "john" }</td>
+                                    <td><a class="fa fa-plus-circle button" href="">{ "Ajouter" }</a></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-            </div>
+            </section>
+
+            <section class="section">
+                <div class="columns">
+                    <div class="column">
+                        <h3 class="subtitle is-3"><a href=""><i class="fa fa-credit-card fa-lg fa-fw"></i>{ "Dépenses" }</a></h3>
+                        if let Some(expenditures) = expenditures {
+                            <ExpendituresList expenditures={expenditures} />
+                        } else {
+                            <Loading/>
+                        }
+                        <a href="">{ "Et XX autres…" }</a>
+                        <a class="button is-info fa fa-plus-circle" href="">{ "Nouvelle dépense" }</a>
+                    </div>
+                </div>
+            </section>
+
+            <section class="section">
+                <div class="columns">
+                    <div class="column">
+                        <h3 class="subtitle is-3"><a href=""><i class="fa fa-credit-card fa-lg fa-fw"></i>{ "Dépenses" }</a></h3>
+                        if let Some(repayments) = repayments {
+                            <RepaymentsList repayments={repayments} />
+                        } else {
+                            <Loading/>
+                        }
+                        <a href="">{ "Et XX autres…" }</a>
+                        <a class="button is-info fa fa-plus-circle" href="">{ "Nouveau remboursement" }</a>
+                    </div>
+                </div>
+            </section>
         </div>
     }
 }
@@ -232,7 +252,7 @@ struct ExpendituresListProps {
 #[function_component(ExpendituresList)]
 fn expenditures_list(ExpendituresListProps { expenditures }: &ExpendituresListProps) -> Html {
     html! {
-        <table>
+        <table class="table is-fullwidth is-striped is-hoverable">
             <thead>
                 <tr>
                     <th>{ "Date" }</th>
@@ -256,10 +276,10 @@ fn expenditures_list(ExpendituresListProps { expenditures }: &ExpendituresListPr
                             <td>{ &expenditure.payer_id }</td>
                             <td>{ "todo" }</td>
                             <td>
-                                <a aria-label="Éditer" class="button" href="">
+                                <a aria-label="Éditer" class="button is-info" href="">
                                     <i class="fa fa-pencil fa-lg"></i>
                                 </a>
-                                <button aria-label="Supprimer" class="button alert"><i class="fa fa-trash-o fa-lg"></i></button>
+                                <button aria-label="Supprimer" class="button is-danger"><i class="fa fa-trash-o fa-lg"></i></button>
                             </td>
                         </tr>
                     }
@@ -279,7 +299,7 @@ struct RepaymentsListProps {
 #[function_component(RepaymentsList)]
 fn repayments_list(RepaymentsListProps { repayments }: &RepaymentsListProps) -> Html {
     html! {
-        <table>
+        <table class="table is-fullwidth is-striped is-hoverable">
             <thead>
                 <tr>
                     <th>{ "Date" }</th>
@@ -305,10 +325,10 @@ fn repayments_list(RepaymentsListProps { repayments }: &RepaymentsListProps) -> 
                             <td>{ "à" }</td>
                             <td>{ &repayment.beneficiary_id }</td>
                             <td>
-                                <a aria-label="Éditer" class="button" href="">
+                                <a aria-label="Éditer" class="button is-info" href="">
                                     <i class="fa fa-pencil fa-lg"></i>
                                 </a>
-                                <button aria-label="Supprimer" class="button alert"><i class="fa fa-trash-o fa-lg"></i></button>
+                                <button aria-label="Supprimer" class="button is-danger"><i class="fa fa-trash-o fa-lg"></i></button>
                             </td>
                         </tr>
                     }

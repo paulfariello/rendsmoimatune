@@ -1,108 +1,44 @@
 @charset 'utf-8';
 
 @import "font-awesome/scss/font-awesome";
+@import "bulma/bulma";
 
+$rmmt-blue: #5494af;
+$rmmt-red: #c66653;
+$rmmt-white: #ffffff;
+$font-family-base: 'Roboto';
+
+@font-face {
+	font-family: alfphabet;
+	src: url(fonts/Alfphabet-IV.ttf);
+}
 
 .navbar {
 	background-color: $rmmt-blue;
+
 }
 
-.navbar h1 {
-	font-family: alfphabet;
-	font-size: 1rem;
-	margin: 0;
-	color: $white;
+.navbar-brand {
+	.navbar-item {
+		font-family: alfphabet;
+		font-size: 1rem;
+		margin: 0;
+		color: $rmmt-white;
+		text-transform: uppercase;
+		small {
+			color: $rmmt-red;
+		}
+	}
 }
 
-.navbar h1 > a {
-	color: $white;
+.title {
+	margin-top: 1em;
+	color: $rmmt-blue;
 }
 
-.navbar h1 > small {
-	color: $rmmt-red;
-}
-
-.balance .column {
-	padding: 0;
-}
-
-.balance > div:nth-child(even) {
-	//background-color: $table-striped-background;
-}
-
-.debt, .credit {
-	border-radius: 2px;
-	border: 1px, black;
-	color: $white;
-	margin: 0;
-	font-weight: bold;
-	padding: 0.2em;
-	min-width: -moz-min-content;
-	min-width: -webkit-min-content;
-}
-
-.debt, .debt > div {
-	background: theme-color("danger");
-	float: right;
-}
-
-.credit, .credit > div {
-	background: theme-color("success");
-}
-
-input:invalid {
-	border-left: 3px solid theme-color("danger");
-}
-
-.button.fa:before {
-	margin-right: 1em;
-}
-
-td .button {
-	margin-bottom: 0;
-}
-
-a.edit:hover:before {
-	@extend .#{$fa-css-prefix};
-	content: $fa-var-pencil-square-o;
-}
-
-a.edit:hover {
-	margin-left: 0;
-}
-
-a.edit {
-	margin-left: 1em;
-}
-
-td .switch, td input[type="number"], th .switch {
-	margin-bottom: 0;
-}
-
-.cover {
-	width: 100%;
-	margin: 0;
-	padding: 10em 0;
-	background: url(../../px/7153621661_2c0e057402_o_blurred.jpg) no-repeat center fixed;
-	background-size: cover;
-	color: white;
-}
-
-.cover > .row {
-	background: rgba(27, 27, 27, 0.75) none repeat scroll 0 0;
-}
-
-h3 {
-	margin-top: 2em;
-	margin-bottom: 1em;
-	border-bottom: 3px solid theme-color("primary");
-	color: theme-color("primary");
-}
-
-div.balance {
-	padding: 0.5em;
-}
-
-input.ng-untouched {
-	border: 1px solid gray;
+.subtitle {
+	color: $rmmt-blue;
+	a {
+		color: $rmmt-blue;
+	}
 }
