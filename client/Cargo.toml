@@ -12,3 +12,4 @@ reqwasm = "0.2"
 serde = { version = "1.0", features = ["derive"] }
 wasm-bindgen-futures = "0.4"
 rmmt = { path = "../rmmt" }
+uuid = "0.6.5"

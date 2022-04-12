@@ -2,7 +2,7 @@
 extern crate rocket;
 
 use diesel::{prelude::*, PgConnection};
-use rmmt::{prelude::*, Account, Expenditure, Repayment};
+use rmmt::{prelude::*, Account, Expenditure, Repayment, User};
 use rocket::serde::json::Json;
 use rocket_sync_db_pools::database;
 use uuid;
@@ -39,9 +39,17 @@ async fn get_repayments(conn: MainDbConn, uniq_id: UniqId) -> Result<Json<Vec<Re
     Ok(Json(account_repayments))
 }
 
+#[get("/api/account/<uniq_id>/users")]
+async fn get_users(conn: MainDbConn, uniq_id: UniqId) -> Result<Json<Vec<User>>, Error> {
+    let uuid: uuid::Uuid = uniq_id.into();
+    let account_users: Vec<User> = conn.run(move |c| users.filter(users_account_id.eq(uuid)).load(c)).await?;
+
+    Ok(Json(account_users))
+}
+
 #[launch]
 fn rocket() -> _ {
     rocket::build()
         .attach(MainDbConn::fairing())
-        .mount("/", routes![get_account, get_expenditures, get_repayments])
+        .mount("/", routes![get_account, get_expenditures, get_repayments, get_users])
 }

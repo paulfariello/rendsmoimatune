@@ -1,7 +1,10 @@
 use reqwasm::http::Request;
 use std::ops::Deref;
+use std::collections::HashMap;
+use uuid::Uuid;
 use yew::prelude::*;
 use yew_router::prelude::*;
+use std::rc::Rc;
 
 use rmmt;
 
@@ -70,6 +73,31 @@ fn account(props: &AccountProps) -> Html {
         );
     }
 
+    let users = use_state(|| None);
+    {
+        let id = props.id.clone();
+        let users = users.clone();
+        use_effect_with_deps(
+            move |_| {
+                let users = users.clone();
+                wasm_bindgen_futures::spawn_local(async move {
+                    let fetched_users: Vec<rmmt::User> =
+                        Request::get(&format!("/api/account/{}/users", id))
+                            .send()
+                            .await
+                            .unwrap()
+                            .json()
+                            .await
+                            .unwrap();
+                    let users_map: HashMap<Uuid, rmmt::User> = fetched_users.into_iter().map(|u| (u.id.clone(), u)).collect();
+                    users.set(Some(Rc::new(users_map)));
+                });
+                || ()
+            },
+            (),
+        );
+    }
+
     let expenditures = use_state(|| None);
     {
         let id = props.id.clone();
@@ -119,6 +147,7 @@ fn account(props: &AccountProps) -> Html {
     }
 
     let account = account.deref().clone();
+    let users = users.deref().clone();
     let expenditures = expenditures.deref().clone();
     let repayments = repayments.deref().clone();
     html! {
@@ -205,8 +234,8 @@ fn account(props: &AccountProps) -> Html {
                 <div class="columns">
                     <div class="column">
                         <h3 class="subtitle is-3"><a href=""><i class="fa fa-credit-card fa-lg fa-fw"></i>{ "Dépenses" }</a></h3>
-                        if let Some(expenditures) = expenditures {
-                            <ExpendituresList expenditures={expenditures} />
+                        if let (Some(users), Some(expenditures)) = (users.clone(), expenditures) {
+                            <ExpendituresList expenditures={expenditures} users={users} limit=10 />
                         } else {
                             <Loading/>
                         }
@@ -220,8 +249,8 @@ fn account(props: &AccountProps) -> Html {
                 <div class="columns">
                     <div class="column">
                         <h3 class="subtitle is-3"><a href=""><i class="fa fa-credit-card fa-lg fa-fw"></i>{ "Dépenses" }</a></h3>
-                        if let Some(repayments) = repayments {
-                            <RepaymentsList repayments={repayments} />
+                        if let (Some(users), Some(repayments)) = (users.clone(), repayments) {
+                            <RepaymentsList repayments={repayments} users={users} limit=10 />
                         } else {
                             <Loading/>
                         }
@@ -247,10 +276,29 @@ fn switch(routes: &Route) -> Html {
 #[derive(Properties, PartialEq)]
 struct ExpendituresListProps {
     expenditures: Vec<rmmt::Expenditure>,
+    users: Rc<HashMap<Uuid, rmmt::User>>,
+    limit: Option<usize>,
 }
 
 #[function_component(ExpendituresList)]
-fn expenditures_list(ExpendituresListProps { expenditures }: &ExpendituresListProps) -> Html {
+fn expenditures_list(ExpendituresListProps { expenditures, users, limit }: &ExpendituresListProps) -> Html {
+    let map = |expenditure: &rmmt::Expenditure| {
+        html! {
+            <tr>
+                <td class="is-vcentered">{ &expenditure.date }</td>
+                <td class="is-vcentered">{ &expenditure.name }</td>
+                <td class="is-vcentered"><Amount amount={ expenditure.amount } /></td>
+                <td class="is-vcentered"><UserName users={ users.clone() } id={ expenditure.payer_id }/></td>
+                <td class="is-vcentered">{ "todo" }</td>
+                <td class="is-vcentered">
+                <a aria-label="Éditer" class="button is-info" href="">
+                <i class="fa fa-pencil fa-lg"></i>
+                </a>
+                <button aria-label="Supprimer" class="button is-danger"><i class="fa fa-trash-o fa-lg"></i></button>
+                </td>
+                </tr>
+        }
+    };
     html! {
         <table class="table is-fullwidth is-striped is-hoverable">
             <thead>
@@ -265,26 +313,10 @@ fn expenditures_list(ExpendituresListProps { expenditures }: &ExpendituresListPr
             </thead>
         <tbody>
         {
-            expenditures
-                .iter()
-                .map(|expenditure| {
-                    html! {
-                        <tr>
-                            <td>{ &expenditure.date }</td>
-                            <td>{ &expenditure.name }</td>
-                            <td>{ &expenditure.amount }{ " €" }</td>
-                            <td>{ &expenditure.payer_id }</td>
-                            <td>{ "todo" }</td>
-                            <td>
-                                <a aria-label="Éditer" class="button is-info" href="">
-                                    <i class="fa fa-pencil fa-lg"></i>
-                                </a>
-                                <button aria-label="Supprimer" class="button is-danger"><i class="fa fa-trash-o fa-lg"></i></button>
-                            </td>
-                        </tr>
-                    }
-                })
-                .collect::<Html>()
+            match limit {
+                None => expenditures.iter().map(map).collect::<Html>(),
+                Some(limit) => expenditures.iter().take(*limit).map(map).collect::<Html>(),
+            }
         }
         </tbody>
         </table>
@@ -294,10 +326,30 @@ fn expenditures_list(ExpendituresListProps { expenditures }: &ExpendituresListPr
 #[derive(Properties, PartialEq)]
 struct RepaymentsListProps {
     repayments: Vec<rmmt::Repayment>,
+    users: Rc<HashMap<Uuid, rmmt::User>>,
+    limit: Option<usize>,
 }
 
 #[function_component(RepaymentsList)]
-fn repayments_list(RepaymentsListProps { repayments }: &RepaymentsListProps) -> Html {
+fn repayments_list(RepaymentsListProps { repayments, users, limit }: &RepaymentsListProps) -> Html {
+    let map = |repayment: &rmmt::Repayment| {
+        html! {
+            <tr>
+                <td class="is-vcentered">{ &repayment.date }</td>
+                <td class="is-vcentered"><UserName users={ users.clone() } id={ repayment.payer_id } /></td>
+                <td class="is-vcentered">{ "a remboursé" }</td>
+                <td class="is-vcentered"><Amount amount={ repayment.amount } /></td>
+                <td class="is-vcentered">{ "à" }</td>
+                <td class="is-vcentered"><UserName users={ users.clone() } id={ repayment.beneficiary_id } /></td>
+                <td class="is-vcentered">
+                    <a aria-label="Éditer" class="button is-info" href="">
+                        <i class="fa fa-pencil fa-lg"></i>
+                    </a>
+                    <button aria-label="Supprimer" class="button is-danger"><i class="fa fa-trash-o fa-lg"></i></button>
+                </td>
+            </tr>
+        }
+    };
     html! {
         <table class="table is-fullwidth is-striped is-hoverable">
             <thead>
@@ -313,30 +365,40 @@ fn repayments_list(RepaymentsListProps { repayments }: &RepaymentsListProps) -> 
             </thead>
         <tbody>
         {
-            repayments
-                .iter()
-                .map(|repayment| {
-                    html! {
-                        <tr>
-                            <td>{ &repayment.date }</td>
-                            <td>{ &repayment.payer_id }</td>
-                            <td>{ "a remboursé" }</td>
-                            <td>{ &repayment.amount }{ " €" }</td>
-                            <td>{ "à" }</td>
-                            <td>{ &repayment.beneficiary_id }</td>
-                            <td>
-                                <a aria-label="Éditer" class="button is-info" href="">
-                                    <i class="fa fa-pencil fa-lg"></i>
-                                </a>
-                                <button aria-label="Supprimer" class="button is-danger"><i class="fa fa-trash-o fa-lg"></i></button>
-                            </td>
-                        </tr>
-                    }
-                })
-                .collect::<Html>()
+            match limit {
+                Some(limit) => repayments.iter().take(*limit).map(map).collect::<Html>(),
+                None => repayments.iter().map(map).collect::<Html>(),
+            }
         }
         </tbody>
         </table>
+    }
+}
+
+#[derive(Properties, PartialEq)]
+struct UserProps {
+    users: Rc<HashMap<Uuid, rmmt::User>>,
+    id: Uuid,
+}
+
+#[function_component(UserName)]
+fn user_name(UserProps { users, id }: &UserProps) -> Html {
+    html! {
+        { &users.get(&id).unwrap().name }
+    }
+}
+
+#[derive(Properties, PartialEq)]
+struct AmountProps {
+    amount: i32,
+}
+
+#[function_component(Amount)]
+fn amount(AmountProps { amount }: &AmountProps) -> Html {
+    html! {
+        <>
+        { *amount as f64 / 100f64 }{ " €" }
+        </>
     }
 }
 
