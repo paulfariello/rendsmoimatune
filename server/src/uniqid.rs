@@ -3,7 +3,8 @@ use uuid::Uuid;
 
 pub struct UniqId(Uuid);
 
-static ALPHABET: &'static [u8] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
+static ALPHABET: &'static [u8] =
+    b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
 static BASE: u128 = 64; // len of ALPHABET
 
 impl<'r> FromParam<'r> for UniqId {
@@ -19,8 +20,12 @@ impl<'r> FromParam<'r> for UniqId {
                 .ok_or(format!("Invalid input char {}", needle))?
                 .try_into()
                 .unwrap();
-            quad = quad.checked_mul(BASE).ok_or(format!("u128 mul overflow: {}", quad))?;
-            quad = quad.checked_add(value).ok_or(format!("u128 add overflow: {}", quad))?;
+            quad = quad
+                .checked_mul(BASE)
+                .ok_or(format!("u128 mul overflow: {}", quad))?;
+            quad = quad
+                .checked_add(value)
+                .ok_or(format!("u128 add overflow: {}", quad))?;
         }
 
         let uuid = Uuid::from_u128(quad.swap_bytes());

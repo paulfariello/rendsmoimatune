@@ -1,10 +1,10 @@
 use reqwasm::http::Request;
-use std::ops::Deref;
 use std::collections::HashMap;
+use std::ops::Deref;
+use std::rc::Rc;
 use uuid::Uuid;
 use yew::prelude::*;
 use yew_router::prelude::*;
-use std::rc::Rc;
 
 use rmmt;
 
@@ -89,8 +89,35 @@ fn account(props: &AccountProps) -> Html {
                             .json()
                             .await
                             .unwrap();
-                    let users_map: HashMap<Uuid, rmmt::User> = fetched_users.into_iter().map(|u| (u.id.clone(), u)).collect();
+                    let users_map: HashMap<Uuid, rmmt::User> = fetched_users
+                        .into_iter()
+                        .map(|u| (u.id.clone(), u))
+                        .collect();
                     users.set(Some(Rc::new(users_map)));
+                });
+                || ()
+            },
+            (),
+        );
+    }
+
+    let balance = use_state(|| None);
+    {
+        let id = props.id.clone();
+        let balance = balance.clone();
+        use_effect_with_deps(
+            move |_| {
+                let balance = balance.clone();
+                wasm_bindgen_futures::spawn_local(async move {
+                    let fetched_balance: Vec<rmmt::Balance> =
+                        Request::get(&format!("/api/account/{}/balance", id))
+                            .send()
+                            .await
+                            .unwrap()
+                            .json()
+                            .await
+                            .unwrap();
+                    balance.set(Some(fetched_balance));
                 });
                 || ()
             },
@@ -148,6 +175,7 @@ fn account(props: &AccountProps) -> Html {
 
     let account = account.deref().clone();
     let users = users.deref().clone();
+    let balance = balance.deref().clone();
     let expenditures = expenditures.deref().clone();
     let repayments = repayments.deref().clone();
     html! {
@@ -176,6 +204,11 @@ fn account(props: &AccountProps) -> Html {
                             { "Balance" }
                         </h3>
                         <div class="balance">
+                        if let (Some(users), Some(balance)) = (users.clone(), balance) {
+                            <BalanceList balance={ balance } users={ users } />
+                        } else {
+                            <Loading/>
+                        }
                         </div>
                     </div>
                 </div>
@@ -235,7 +268,7 @@ fn account(props: &AccountProps) -> Html {
                     <div class="column">
                         <h3 class="subtitle is-3"><a href=""><i class="fa fa-credit-card fa-lg fa-fw"></i>{ "Dépenses" }</a></h3>
                         if let (Some(users), Some(expenditures)) = (users.clone(), expenditures) {
-                            <ExpendituresList expenditures={expenditures} users={users} limit=10 />
+                            <ExpendituresList expenditures={ expenditures } users={ users } limit=10 />
                         } else {
                             <Loading/>
                         }
@@ -250,7 +283,7 @@ fn account(props: &AccountProps) -> Html {
                     <div class="column">
                         <h3 class="subtitle is-3"><a href=""><i class="fa fa-credit-card fa-lg fa-fw"></i>{ "Dépenses" }</a></h3>
                         if let (Some(users), Some(repayments)) = (users.clone(), repayments) {
-                            <RepaymentsList repayments={repayments} users={users} limit=10 />
+                            <RepaymentsList repayments={ repayments } users={ users } limit=10 />
                         } else {
                             <Loading/>
                         }
@@ -274,6 +307,38 @@ fn switch(routes: &Route) -> Html {
 }
 
 #[derive(Properties, PartialEq)]
+struct BalanceListProps {
+    balance: Vec<rmmt::Balance>,
+    users: Rc<HashMap<Uuid, rmmt::User>>,
+}
+
+#[function_component(BalanceList)]
+fn balance_list(
+    BalanceListProps {
+        balance,
+        users,
+    }: &BalanceListProps,
+) -> Html {
+    html! {
+        <table class="table is-fullwidth is-striped is-hoverable">
+            <tbody>
+                {
+                    balance.iter().map(|balance| {
+                        html! {
+                            <tr>
+                                <td class="is-vcentered"><Amount amount={ balance.amount } /></td>
+                                <td class="is-vcentered"><UserName users={ users.clone() } id={ balance.user_id }/></td>
+                                <td class="is-vcentered">{ "todo" }</td>
+                            </tr>
+                        }
+                    }).collect::<Html>()
+                }
+            </tbody>
+        </table>
+    }
+}
+
+#[derive(Properties, PartialEq)]
 struct ExpendituresListProps {
     expenditures: Vec<rmmt::Expenditure>,
     users: Rc<HashMap<Uuid, rmmt::User>>,
@@ -281,7 +346,13 @@ struct ExpendituresListProps {
 }
 
 #[function_component(ExpendituresList)]
-fn expenditures_list(ExpendituresListProps { expenditures, users, limit }: &ExpendituresListProps) -> Html {
+fn expenditures_list(
+    ExpendituresListProps {
+        expenditures,
+        users,
+        limit,
+    }: &ExpendituresListProps,
+) -> Html {
     let map = |expenditure: &rmmt::Expenditure| {
         html! {
             <tr>
@@ -331,7 +402,13 @@ struct RepaymentsListProps {
 }
 
 #[function_component(RepaymentsList)]
-fn repayments_list(RepaymentsListProps { repayments, users, limit }: &RepaymentsListProps) -> Html {
+fn repayments_list(
+    RepaymentsListProps {
+        repayments,
+        users,
+        limit,
+    }: &RepaymentsListProps,
+) -> Html {
     let map = |repayment: &rmmt::Repayment| {
         html! {
             <tr>

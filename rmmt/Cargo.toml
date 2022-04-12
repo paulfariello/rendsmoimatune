@@ -12,4 +12,5 @@ db = ["diesel"]
 chrono = { version = "*", features = ["serde"] }
 diesel = { version = "1.4.4", features = ["postgres", "uuid", "chrono"], optional = true }
 serde = { version = "*", features = ["derive"] }
-uuid = { version = "0.6.5", features = ["serde"] }
+uuid = { version = "0.6.5", features = ["serde", "v4"] }
+log = "*"
