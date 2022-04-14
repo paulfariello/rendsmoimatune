@@ -42,3 +42,40 @@ $font-family-base: 'Roboto';
 		color: $rmmt-blue;
 	}
 }
+
+.progress-wrapper {
+	position: relative;
+
+	.progress-value {
+		position: absolute;
+		top: 0;
+		left: 50%;
+		transform: translateX(-50%);
+		font-size: calc($size-normal / 1.5);
+		line-height: $size-normal;
+		font-weight: bold;
+	}
+
+	.progress {
+		margin: 0;
+	}
+
+	.progress.is-small+.progress-value {
+		font-size: calc($size-small / 1.5);
+		line-height: $size-small;
+	}
+
+	.progress.is-medium+.progress-value {
+		font-size: calc($size-medium / 1.5);
+		line-height: $size-medium;
+	}
+
+	.progress.is-large+.progress-value {
+		font-size: calc($size-large / 1.5);
+		line-height: $size-large;
+	}
+
+	.progress.is-revert {
+		transform: scaleX(-1);
+	}
+}

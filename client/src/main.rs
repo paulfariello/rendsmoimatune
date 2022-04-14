@@ -319,6 +319,10 @@ fn balance_list(
         users,
     }: &BalanceListProps,
 ) -> Html {
+    let max = balance.iter().map(|b| b.amount).max().unwrap_or(0).to_string();
+    let mut balance = balance.clone();
+    balance.sort_by(|a, b| a.user_id.partial_cmp(&b.user_id).unwrap());
+
     html! {
         <table class="table is-fullwidth is-striped is-hoverable">
             <tbody>
@@ -326,9 +330,39 @@ fn balance_list(
                     balance.iter().map(|balance| {
                         html! {
                             <tr>
-                                <td class="is-vcentered"><Amount amount={ balance.amount } /></td>
-                                <td class="is-vcentered"><UserName users={ users.clone() } id={ balance.user_id }/></td>
-                                <td class="is-vcentered">{ "todo" }</td>
+                                <td class="is-vcentered">
+                                {
+                                    if balance.amount < 0 {
+                                        html! {
+                                            <div class="progress-wrapper">
+                                                <progress class="progress is-large is-danger is-revert" value={ balance.amount.abs().to_string() } max={ max.clone() }>
+                                                    <Amount amount={ balance.amount } />
+                                                </progress>
+                                                <p class="progress-value has-text-white"><Amount amount={ balance.amount } /></p>
+                                            </div>
+                                        }
+                                    } else {
+                                        html! {}
+                                    }
+                                }
+                                </td>
+                                <td class="is-vcentered has-text-centered"><UserName users={ users.clone() } id={ balance.user_id }/></td>
+                                <td class="is-vcentered">
+                                {
+                                    if balance.amount > 0 {
+                                        html! {
+                                            <div class="progress-wrapper">
+                                                <progress class="progress is-large is-success" value={ balance.amount.abs().to_string() } max={ max.clone() }>
+                                                    <Amount amount={ balance.amount } />
+                                                </progress>
+                                                <p class="progress-value has-text-white"><Amount amount={ balance.amount } /></p>
+                                            </div>
+                                        }
+                                    } else {
+                                        html! {}
+                                    }
+                                }
+                                </td>
                             </tr>
                         }
                     }).collect::<Html>()
