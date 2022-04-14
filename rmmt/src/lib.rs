@@ -3,18 +3,17 @@
 extern crate diesel;
 
 use chrono::NaiveDate;
-use std::collections::HashMap;
-use serde::{Serialize, Deserialize};
-use uuid::Uuid;
 use log::info;
+use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
+use uuid::Uuid;
 
-
+pub mod prelude;
 #[cfg(feature = "db")]
 mod schema;
-pub mod prelude;
 
 #[cfg(feature = "db")]
-use schema::{accounts, expenditures, repayments, users, debts};
+use schema::{accounts, debts, expenditures, repayments, users};
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 #[cfg_attr(feature = "db", derive(Identifiable, Queryable))]
@@ -93,14 +92,14 @@ impl Balance {
                         user_id: u.id.clone(),
                         amount: 0,
                     },
-                )
+                    )
             })
-            .collect();
+        .collect();
 
         for (expenditure, debts) in debts {
             // Update payer balance
             let balance = balances.get_mut(&expenditure.payer_id).unwrap();
-            info!("{}: +{}", expenditure.payer_id, expenditure.amount);
+            info!("expenditure {} {}: {} += {}", expenditure.id, expenditure.payer_id, balance.amount, expenditure.amount);
             balance.amount += expenditure.amount;
 
             // Update deptors balances
@@ -108,82 +107,148 @@ impl Balance {
 
             for debt in debts {
                 let balance = balances.get_mut(&debt.debtor_id).unwrap();
-                info!("{}: -{}", debt.debtor_id, (expenditure.amount as f64 * (debt.share as f64 / share_sum as f64)) as i32);
-                balance.amount -= (expenditure.amount as f64 * (debt.share as f64 / share_sum as f64)) as i32;
+                info!(
+                    "debt {}: {} -= {}",
+                    debt.debtor_id,
+                    balance.amount,
+                    (expenditure.amount as f64 * (debt.share as f64 / share_sum as f64)) as i32
+                );
+                balance.amount -=
+                    (expenditure.amount as f64 * (debt.share as f64 / share_sum as f64)) as i32;
             }
         }
-
 
         for repayment in repayments {
             let balance = balances.get_mut(&repayment.payer_id).unwrap();
             balance.amount += repayment.amount;
-            info!("{}: +{}", repayment.payer_id, repayment.amount);
+            info!("repayment {}: {} += {}", repayment.payer_id, balance.amount, repayment.amount);
 
             let balance = balances.get_mut(&repayment.beneficiary_id).unwrap();
             balance.amount -= repayment.amount;
-            info!("{}: -{}", repayment.beneficiary_id, repayment.amount);
+            info!("repayment {}: {} -= {}", repayment.beneficiary_id, balance.amount, repayment.amount);
         }
 
-        info!("{:?}", balances);
-        balances.into_values().collect()
+        let balances = balances.into_values().collect::<Vec<_>>();
+        assert_eq!(0, balances.iter().map(|b| b.amount).sum(), "balance doesn't sum up to 0");
+
+        balances
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use test_log::test;
+
+    fn uuid(name: &str) -> Uuid {
+        Uuid::new_v5(&uuid::NAMESPACE_X500, name)
+    }
+
+    fn user(name: &str) -> User {
+        User {
+            id: uuid(name),
+            account_id: uuid("account"),
+            name: name.to_string(),
+        }
+    }
+
+    fn expenditure(
+        payer: &str,
+        amount: i32,
+        debtors: Vec<(&str, i32)>,
+    ) -> (Expenditure, Vec<Debt>) {
+        let expenditure_id = Uuid::new_v4();
+        (
+            Expenditure {
+                id: expenditure_id,
+                account_id: uuid("account"),
+                payer_id: uuid(payer),
+                amount,
+                name: format!("{}", expenditure_id),
+                date: NaiveDate::from_yo(2015, 73),
+            },
+            debtors
+                .iter()
+                .map(|(user, share)| Debt {
+                    id: Uuid::new_v4(),
+                    expenditure_id,
+                    debtor_id: uuid(user),
+                    share: *share,
+                })
+                .collect::<Vec<_>>(),
+        )
+    }
+
+    fn repayment(payer: &str, beneficiary: &str, amount: i32) -> Repayment {
+        Repayment {
+            id: Uuid::new_v4(),
+            account_id: uuid("account"),
+            date: NaiveDate::from_yo(2015, 73),
+            payer_id: uuid(payer),
+            beneficiary_id: uuid(beneficiary),
+            amount,
+        }
+    }
+
+    fn assert_balance(balances: Vec<Balance>, reference: Vec<(&str, i32)>) {
+        let map_balances = balances
+            .iter()
+            .map(|b| (b.user_id.clone(), b))
+            .collect::<HashMap<_, _>>();
+        assert_eq!(0, balances.iter().map(|b| b.amount).sum(), "balance doesn't sum up to 0");
+        for (user, amount) in reference {
+            let balance = map_balances.get(&uuid(user)).unwrap();
+            assert_eq!(
+                balance.amount, amount,
+                "invalid balance {} (expected {}) for {}",
+                balance.amount, amount, user
+            );
+        }
+    }
 
     #[test]
-    fn balance() {
+    fn balance_simple() {
         // Given
-        let account_id = Uuid::new_v4();
-        let users = vec![User {
-            id: Uuid::new_v4(),
-            account_id,
-            name: "user1".to_string(),
-        },
-        User {
-            id: Uuid::new_v4(),
-            account_id,
-            name: "user1".to_string(),
-        }];
-
-        let expenditure = Expenditure {
-            id: Uuid::new_v4(),
-            account_id,
-            payer_id: users[0].id.clone(),
-            amount: 10,
-            name: "expenditure1".to_string(),
-            date: NaiveDate::from_yo(2015, 73),
-        };
-
-        let debts = vec![(expenditure.clone(), vec![Debt {
-            id: Uuid::new_v4(),
-            expenditure_id: expenditure.id.clone(),
-            debtor_id: users[0].id.clone(),
-            share: 1,
-        },
-        Debt {
-            id: Uuid::new_v4(),
-            expenditure_id: expenditure.id.clone(),
-            debtor_id: users[1].id.clone(),
-            share: 1,
-        }])];
-
+        let users = vec![user("user1"), user("user2")];
+        let debts = vec![expenditure("user1", 10, vec![("user1", 1), ("user2", 1)])];
         let repayments = vec![];
 
         // When
-        let balances = Balance::from_account(users.clone(), debts, repayments);
+        let balances = Balance::from_account(users, debts, repayments);
 
         // Then
-        assert_eq!(balances[0], Balance {
-            user_id: users[0].id.clone(),
-            amount: 5
-        });
-        assert_eq!(balances[1], Balance {
-            user_id: users[1].id.clone(),
-            amount: -5
-        });
+        assert_balance(balances, vec![("user1", 5), ("user2", -5)]);
+    }
 
+    #[test]
+    fn balance_with_repayment() {
+        // Given
+        let users = vec![user("user1"), user("user2")];
+        let debts = vec![expenditure("user1", 10, vec![("user1", 1), ("user2", 1)])];
+        let repayments = vec![repayment("user2", "user1", 5)];
+
+        // When
+        let balances = Balance::from_account(users, debts, repayments);
+
+        // Then
+        assert_balance(balances, vec![("user1", 0), ("user2", 0)]);
+    }
+
+    #[test]
+    fn balance_with_few_expenditures() {
+        // Given
+        let users = vec![user("user1"), user("user2")];
+        let debts = vec![
+            expenditure("user1", 10, vec![("user1", 1), ("user2", 1)]),
+            expenditure("user1", 100, vec![("user1", 7), ("user2", 3)]),
+            expenditure("user2", 50, vec![("user1", 7), ("user2", 3)]),
+        ];
+        let repayments = vec![repayment("user2", "user1", 5)];
+
+        // When
+        let balances = Balance::from_account(users, debts, repayments);
+
+        // Then
+        assert_balance(balances, vec![("user1", -5), ("user2", 5)]);
     }
 }

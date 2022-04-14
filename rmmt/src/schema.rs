@@ -51,10 +51,4 @@ joinable!(expenditures -> users (payer_id));
 joinable!(repayments -> accounts (account_id));
 joinable!(users -> accounts (account_id));
 
-allow_tables_to_appear_in_same_query!(
-    accounts,
-    debts,
-    expenditures,
-    repayments,
-    users,
-);
+allow_tables_to_appear_in_same_query!(accounts, debts, expenditures, repayments, users,);

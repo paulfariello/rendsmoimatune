@@ -6,11 +6,14 @@ edition = "2021"
 [features]
 db = ["diesel"]
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [dependencies]
 chrono = { version = "*", features = ["serde"] }
 diesel = { version = "1.4.4", features = ["postgres", "uuid", "chrono"], optional = true }
 serde = { version = "*", features = ["derive"] }
-uuid = { version = "0.6.5", features = ["serde", "v4"] }
+uuid = { version = "0.6.5", features = ["serde"] }
 log = "*"
+
+[dev-dependencies]
+uuid = { version = "0.6.5", features = ["serde", "v4", "v5"] }
+env_logger = "*"
+test-log = "*"
