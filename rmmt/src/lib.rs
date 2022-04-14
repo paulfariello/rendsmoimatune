@@ -3,7 +3,7 @@
 extern crate diesel;
 
 use chrono::NaiveDate;
-use log::info;
+use log::warn;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use uuid::Uuid;
@@ -92,46 +92,68 @@ impl Balance {
                         user_id: u.id.clone(),
                         amount: 0,
                     },
-                    )
+                )
             })
-        .collect();
+            .collect();
 
         for (expenditure, debts) in debts {
             // Update payer balance
-            let balance = balances.get_mut(&expenditure.payer_id).unwrap();
-            info!("expenditure {} {}: {} += {}", expenditure.id, expenditure.payer_id, balance.amount, expenditure.amount);
+            let balance = Self::get_balance(&mut balances, &expenditure.payer_id);
             balance.amount += expenditure.amount;
 
             // Update deptors balances
             let share_sum: i32 = debts.iter().map(|d| d.share).sum();
 
-            for debt in debts {
-                let balance = balances.get_mut(&debt.debtor_id).unwrap();
-                info!(
-                    "debt {}: {} -= {}",
-                    debt.debtor_id,
-                    balance.amount,
-                    (expenditure.amount as f64 * (debt.share as f64 / share_sum as f64)) as i32
-                );
-                balance.amount -=
-                    (expenditure.amount as f64 * (debt.share as f64 / share_sum as f64)) as i32;
+            let mut sum = 0;
+            for debt in &debts {
+                let balance = Self::get_balance(&mut balances, &debt.debtor_id);
+                let amount = (expenditure.amount as f64 * (debt.share as f64 / share_sum as f64))
+                    .round() as i32;
+                balance.amount -= amount;
+                sum += amount;
+            }
+
+            if sum != expenditure.amount {
+                let mut remaining = expenditure.amount - sum;
+                // Fix missing part to first debtors, sorry bro
+                let mut debts_iter = debts.iter();
+                while remaining != 0 {
+                    // Can safely unwrap next() here, since we can't loss more than 1 on each debtor
+                    let debt = debts_iter.next().unwrap();
+                    let balance = Self::get_balance(&mut balances, &debt.debtor_id);
+                    let fix = remaining / remaining.abs();
+                    balance.amount -= fix;
+                    remaining -= fix;
+                }
             }
         }
 
         for repayment in repayments {
-            let balance = balances.get_mut(&repayment.payer_id).unwrap();
+            let balance = Self::get_balance(&mut balances, &repayment.payer_id);
             balance.amount += repayment.amount;
-            info!("repayment {}: {} += {}", repayment.payer_id, balance.amount, repayment.amount);
 
-            let balance = balances.get_mut(&repayment.beneficiary_id).unwrap();
+            let balance = Self::get_balance(&mut balances, &repayment.beneficiary_id);
             balance.amount -= repayment.amount;
-            info!("repayment {}: {} -= {}", repayment.beneficiary_id, balance.amount, repayment.amount);
         }
 
         let balances = balances.into_values().collect::<Vec<_>>();
-        assert_eq!(0, balances.iter().map(|b| b.amount).sum(), "balance doesn't sum up to 0");
+
+        let sum: i32 = balances.iter().map(|b| b.amount).sum();
+        if sum != 0 {
+            warn!(
+                "balance for account {} doesn't sum up to 0: {}",
+                users[0].account_id, sum
+            );
+        }
 
         balances
+    }
+
+    #[inline]
+    fn get_balance<'a>(balances: &'a mut HashMap<Uuid, Balance>, id: &Uuid) -> &'a mut Balance {
+        balances.get_mut(id).expect(&format!(
+            "Corrupted db? Missing user {} in balances", id
+        ))
     }
 }
 
@@ -195,7 +217,11 @@ mod tests {
             .iter()
             .map(|b| (b.user_id.clone(), b))
             .collect::<HashMap<_, _>>();
-        assert_eq!(0, balances.iter().map(|b| b.amount).sum(), "balance doesn't sum up to 0");
+        assert_eq!(
+            0,
+            balances.iter().map(|b| b.amount).sum(),
+            "balance doesn't sum up to 0"
+        );
         for (user, amount) in reference {
             let balance = map_balances.get(&uuid(user)).unwrap();
             assert_eq!(
@@ -250,5 +276,33 @@ mod tests {
 
         // Then
         assert_balance(balances, vec![("user1", -5), ("user2", 5)]);
+    }
+
+    #[test]
+    fn balance_with_remaining() {
+        // Given
+        let users = vec![user("user1"), user("user2")];
+        let debts = vec![expenditure("user1", 7, vec![("user1", 1), ("user2", 2)])];
+        let repayments = vec![];
+
+        // When
+        let balances = Balance::from_account(users, debts, repayments);
+
+        // Then
+        assert_balance(balances, vec![("user1", 5), ("user2", -5)]);
+    }
+
+    #[test]
+    fn balance_with_even_remaining() {
+        // Given
+        let users = vec![user("user1"), user("user2")];
+        let debts = vec![expenditure("user1", 1, vec![("user1", 1), ("user2", 1)])];
+        let repayments = vec![];
+
+        // When
+        let balances = Balance::from_account(users, debts, repayments);
+
+        // Then
+        assert_balance(balances, vec![("user1", 1), ("user2", -1)]);
     }
 }
