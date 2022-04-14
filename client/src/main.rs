@@ -272,7 +272,6 @@ fn account(props: &AccountProps) -> Html {
                         } else {
                             <Loading/>
                         }
-                        <a href="">{ "Et XX autres…" }</a>
                         <a class="button is-info fa fa-plus-circle" href="">{ "Nouvelle dépense" }</a>
                     </div>
                 </div>
@@ -287,7 +286,6 @@ fn account(props: &AccountProps) -> Html {
                         } else {
                             <Loading/>
                         }
-                        <a href="">{ "Et XX autres…" }</a>
                         <a class="button is-info fa fa-plus-circle" href="">{ "Nouveau remboursement" }</a>
                     </div>
                 </div>
@@ -331,36 +329,24 @@ fn balance_list(
                         html! {
                             <tr>
                                 <td class="is-vcentered">
-                                {
-                                    if balance.amount < 0 {
-                                        html! {
-                                            <div class="progress-wrapper">
-                                                <progress class="progress is-large is-danger is-revert" value={ balance.amount.abs().to_string() } max={ max.clone() }>
-                                                    <Amount amount={ balance.amount } />
-                                                </progress>
-                                                <p class="progress-value has-text-white"><Amount amount={ balance.amount } /></p>
-                                            </div>
-                                        }
-                                    } else {
-                                        html! {}
-                                    }
+                                if balance.amount < 0 {
+                                    <div class="progress-wrapper">
+                                        <progress class="progress is-large is-danger is-revert" value={ balance.amount.abs().to_string() } max={ max.clone() }>
+                                            <Amount amount={ balance.amount } />
+                                        </progress>
+                                        <p class="progress-value has-text-white"><Amount amount={ balance.amount } /></p>
+                                    </div>
                                 }
                                 </td>
                                 <td class="is-vcentered has-text-centered"><UserName users={ users.clone() } id={ balance.user_id }/></td>
                                 <td class="is-vcentered">
-                                {
-                                    if balance.amount > 0 {
-                                        html! {
-                                            <div class="progress-wrapper">
-                                                <progress class="progress is-large is-success" value={ balance.amount.abs().to_string() } max={ max.clone() }>
-                                                    <Amount amount={ balance.amount } />
-                                                </progress>
-                                                <p class="progress-value has-text-white"><Amount amount={ balance.amount } /></p>
-                                            </div>
-                                        }
-                                    } else {
-                                        html! {}
-                                    }
+                                if balance.amount > 0 {
+                                    <div class="progress-wrapper">
+                                        <progress class="progress is-large is-success" value={ balance.amount.abs().to_string() } max={ max.clone() }>
+                                            <Amount amount={ balance.amount } />
+                                        </progress>
+                                        <p class="progress-value has-text-white"><Amount amount={ balance.amount } /></p>
+                                    </div>
                                 }
                                 </td>
                             </tr>
@@ -387,6 +373,7 @@ fn expenditures_list(
         limit,
     }: &ExpendituresListProps,
 ) -> Html {
+    let len = expenditures.len();
     let map = |expenditure: &rmmt::Expenditure| {
         html! {
             <tr>
@@ -405,26 +392,31 @@ fn expenditures_list(
         }
     };
     html! {
-        <table class="table is-fullwidth is-striped is-hoverable">
-            <thead>
-                <tr>
-                    <th>{ "Date" }</th>
-                    <th>{ "Nom" }</th>
-                    <th>{ "Montant" }</th>
-                    <th>{ "Payeur" }</th>
-                    <th>{ "Participants" }</th>
-                    <th>{ "Actions" }</th>
-                </tr>
-            </thead>
-        <tbody>
-        {
-            match limit {
-                None => expenditures.iter().map(map).collect::<Html>(),
-                Some(limit) => expenditures.iter().take(*limit).map(map).collect::<Html>(),
+        <>
+            <table class="table is-fullwidth is-striped is-hoverable">
+                <thead>
+                    <tr>
+                        <th>{ "Date" }</th>
+                        <th>{ "Nom" }</th>
+                        <th>{ "Montant" }</th>
+                        <th>{ "Payeur" }</th>
+                        <th>{ "Participants" }</th>
+                        <th>{ "Actions" }</th>
+                    </tr>
+                </thead>
+            <tbody>
+            {
+                match limit {
+                    None => expenditures.iter().map(map).collect::<Html>(),
+                    Some(limit) => expenditures.iter().take(*limit).map(map).collect::<Html>(),
+                }
             }
-        }
-        </tbody>
-        </table>
+            </tbody>
+            </table>
+            if let Some(limit) = limit {
+                <a href="">{ format!("Et {} autres…", len - limit) }</a>
+            }
+        </>
     }
 }
 
@@ -443,6 +435,7 @@ fn repayments_list(
         limit,
     }: &RepaymentsListProps,
 ) -> Html {
+    let len = repayments.len();
     let map = |repayment: &rmmt::Repayment| {
         html! {
             <tr>
@@ -462,27 +455,32 @@ fn repayments_list(
         }
     };
     html! {
-        <table class="table is-fullwidth is-striped is-hoverable">
-            <thead>
-                <tr>
-                    <th>{ "Date" }</th>
-                    <th>{ "De" }</th>
-                    <th></th>
-                    <th>{ "Montant" }</th>
-                    <th></th>
-                    <th>{ "Payeur" }</th>
-                    <th>{ "Actions" }</th>
-                </tr>
-            </thead>
-        <tbody>
-        {
-            match limit {
-                Some(limit) => repayments.iter().take(*limit).map(map).collect::<Html>(),
-                None => repayments.iter().map(map).collect::<Html>(),
+        <>
+            <table class="table is-fullwidth is-striped is-hoverable">
+                <thead>
+                    <tr>
+                        <th>{ "Date" }</th>
+                        <th>{ "De" }</th>
+                        <th></th>
+                        <th>{ "Montant" }</th>
+                        <th></th>
+                        <th>{ "Payeur" }</th>
+                        <th>{ "Actions" }</th>
+                    </tr>
+                </thead>
+            <tbody>
+            {
+                match limit {
+                    Some(limit) => repayments.iter().take(*limit).map(map).collect::<Html>(),
+                    None => repayments.iter().map(map).collect::<Html>(),
+                }
             }
-        }
-        </tbody>
-        </table>
+            </tbody>
+            </table>
+            if let Some(limit) = limit {
+                <a href="">{ format!("Et {} autres…", len - limit) }</a>
+            }
+        </>
     }
 }
 
