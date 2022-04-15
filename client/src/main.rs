@@ -296,11 +296,20 @@ fn account(props: &AccountProps) -> Html {
 
 fn switch(routes: &Route) -> Html {
     match routes {
-        Route::Home => html! { <h1>{ "Home" }</h1> },
+        Route::Home => html! { <CreateAccount /> },
         Route::Account { id } => html! {
             <Account id={ id.clone() } />
         },
         Route::NotFound => html! { <h1>{ "404" }</h1> },
+    }
+}
+
+#[function_component(CreateAccount)]
+fn create_account() -> Html {
+    html! {
+        <div class="cover">
+            { "Hello world" }
+        </div>
     }
 }
 
