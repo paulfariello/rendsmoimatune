@@ -29,3 +29,11 @@ cd client/; trunk serve --proxy-backend=http://127.0.0.1:8000/api/
 ```
 
 Then open http://127.0.0.1:8080/
+
+Dev
+===
+
+```sh
+docker pull postgres
+docker run --name rmmt-postgres -e POSTGRES_PASSWORD=password -p 127.0.0.1:5432:5432/tcp -d postgres
+```
