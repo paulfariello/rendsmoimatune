@@ -1,9 +1,9 @@
-use yew::prelude::*;
+use crate::components::{user::UserName, utils::Amount};
+use rmmt;
 use std::collections::HashMap;
 use std::rc::Rc;
 use uuid::Uuid;
-use rmmt;
-use crate::components::{user::UserName, utils::Amount};
+use yew::prelude::*;
 
 #[derive(Properties, PartialEq)]
 pub struct ExpendituresListProps {

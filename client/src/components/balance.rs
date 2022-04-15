@@ -1,8 +1,8 @@
-use yew::prelude::*;
+use crate::components::{user::UserName, utils::Amount};
 use std::collections::HashMap;
 use std::rc::Rc;
 use uuid::Uuid;
-use crate::components::{user::UserName, utils::Amount};
+use yew::prelude::*;
 
 #[derive(Properties, PartialEq)]
 pub struct BalanceListProps {

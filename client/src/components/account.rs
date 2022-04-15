@@ -1,15 +1,17 @@
+use crate::components::{
+    balance::BalanceList, expenditure::ExpendituresList, repayment::RepaymentsList, utils::Loading,
+};
 #[allow(unused_imports)]
 use log::{debug, error, info, warn};
-use web_sys::FormData;
-use yew::prelude::*;
 use reqwasm::http::Request;
+use rmmt;
 use std::collections::HashMap;
+use std::ops::Deref;
 use std::rc::Rc;
 use uuid::Uuid;
 use wasm_bindgen::JsCast;
-use std::ops::Deref;
-use rmmt;
-use crate::components::{balance::BalanceList, expenditure::ExpendituresList, repayment::RepaymentsList, utils::Loading};
+use web_sys::FormData;
+use yew::prelude::*;
 
 #[derive(Properties, PartialEq)]
 pub struct AccountProps {
@@ -263,38 +265,77 @@ pub fn account(props: &AccountProps) -> Html {
     }
 }
 
-#[function_component(CreateAccount)]
-pub fn create_account() -> Html {
-    let onsubmit = Callback::from(|event: FocusEvent| {
-        event.prevent_default();
-        let target = event.target().unwrap().dyn_ref::<web_sys::HtmlFormElement>().unwrap().clone();
-        let data: FormData = FormData::new_with_form(&target).unwrap();
-        debug!("{:?}", data.get("name").as_string().unwrap());
-    });
+#[derive(PartialEq, Properties)]
+pub struct CreateAccountProps;
 
-    html! {
-        <div class="cover">
-            <div class="container">
-                <section class="section">
-                    <div class="columns">
-                        <div class="column">
-                            <h3 class="subtitle is-3">
-                                { "Créer un nouveau compte" }
-                            </h3>
-                            <form {onsubmit}>
-                                <div class="field has-addons">
-                                    <div class="control">
-                                        <input class="input" type="text" placeholder="Nom" name="name" />
-                                    </div>
-                                    <div class="control">
-                                        <button class="button is-info" type="submit">{ "Créer" }</button>
-                                    </div>
-                                </div>
-                            </form>
+pub enum CreateAccountMsg {
+    Submit { name: String },
+}
+
+pub struct CreateAccount {
+    creating: bool,
+}
+
+impl Component for CreateAccount {
+    type Message = CreateAccountMsg;
+    type Properties = CreateAccountProps;
+
+    fn create(_ctx: &Context<Self>) -> Self {
+        Self { creating: false }
+    }
+
+    fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
+        match msg {
+            CreateAccountMsg::Submit { name } => {
+                self.creating = true;
+                true
+            }
+        }
+    }
+
+    fn view(&self, ctx: &Context<Self>) -> Html {
+        let onsubmit = ctx.link().callback(|event: FocusEvent| {
+            event.prevent_default();
+            let target = event
+                .target()
+                .unwrap()
+                .dyn_ref::<web_sys::HtmlFormElement>()
+                .unwrap()
+                .clone();
+            let data: FormData = FormData::new_with_form(&target).unwrap();
+            CreateAccountMsg::Submit {
+                name: data.get("name").as_string().unwrap(),
+            }
+        });
+
+        html! {
+            <div class="cover">
+                <div class="container">
+                    <section class="section">
+                        <div class="columns">
+                            <div class="column">
+                                <h3 class="subtitle is-3">
+                                    { "Créer un nouveau compte" }
+                                </h3>
+                                if self.creating {
+                                    <Loading/>
+                                } else {
+                                    <form {onsubmit}>
+                                        <div class="field has-addons">
+                                            <div class="control">
+                                                <input class="input" type="text" placeholder="Nom" name="name" />
+                                            </div>
+                                            <div class="control">
+                                                <button class="button is-info" type="submit">{ "Créer" }</button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                }
+                            </div>
                         </div>
-                    </div>
-                </section>
+                    </section>
+                </div>
             </div>
-        </div>
+        }
     }
 }

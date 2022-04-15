@@ -4,7 +4,10 @@ use yew_router::prelude::*;
 
 mod components;
 
-use components::{account::{Account, CreateAccount}, utils::TopBar};
+use components::{
+    account::{Account, CreateAccount},
+    utils::TopBar,
+};
 
 #[derive(Clone, Routable, PartialEq)]
 enum Route {
@@ -16,7 +19,6 @@ enum Route {
     #[at("/404")]
     NotFound,
 }
-
 
 fn switch(routes: &Route) -> Html {
     match routes {
