@@ -13,3 +13,7 @@ serde = { version = "1.0", features = ["derive"] }
 wasm-bindgen-futures = "0.4"
 rmmt = { path = "../rmmt" }
 uuid = "0.6.5"
+wasm-logger = "*"
+log = "*"
+web-sys = { version = "*", features = ["HtmlFormElement"] }
+wasm-bindgen = "*"

@@ -1,10 +1,15 @@
+#[allow(unused_imports)]
+use log::{debug, error, info, warn};
 use reqwasm::http::Request;
 use std::collections::HashMap;
 use std::ops::Deref;
 use std::rc::Rc;
+use web_sys::FormData;
 use uuid::Uuid;
+use wasm_logger;
 use yew::prelude::*;
 use yew_router::prelude::*;
+use wasm_bindgen::JsCast;
 
 use rmmt;
 
@@ -306,9 +311,36 @@ fn switch(routes: &Route) -> Html {
 
 #[function_component(CreateAccount)]
 fn create_account() -> Html {
+    let onsubmit = Callback::from(|event: FocusEvent| {
+        event.prevent_default();
+        let target = event.target().unwrap().dyn_ref::<web_sys::HtmlFormElement>().unwrap().clone();
+        let data: FormData = FormData::new_with_form(&target).unwrap();
+        debug!("{:?}", data.get("name").as_string().unwrap());
+    });
+
     html! {
         <div class="cover">
-            { "Hello world" }
+            <div class="container">
+                <section class="section">
+                    <div class="columns">
+                        <div class="column">
+                            <h3 class="subtitle is-3">
+                                { "Créer un nouveau compte" }
+                            </h3>
+                            <form {onsubmit}>
+                                <div class="field has-addons">
+                                    <div class="control">
+                                        <input class="input" type="text" placeholder="Nom" name="name" />
+                                    </div>
+                                    <div class="control">
+                                        <button class="button is-info" type="submit">{ "Créer" }</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </section>
+            </div>
         </div>
     }
 }
@@ -320,13 +352,13 @@ struct BalanceListProps {
 }
 
 #[function_component(BalanceList)]
-fn balance_list(
-    BalanceListProps {
-        balance,
-        users,
-    }: &BalanceListProps,
-) -> Html {
-    let max = balance.iter().map(|b| b.amount).max().unwrap_or(0).to_string();
+fn balance_list(BalanceListProps { balance, users }: &BalanceListProps) -> Html {
+    let max = balance
+        .iter()
+        .map(|b| b.amount)
+        .max()
+        .unwrap_or(0)
+        .to_string();
     let mut balance = balance.clone();
     balance.sort_by(|a, b| a.user_id.partial_cmp(&b.user_id).unwrap());
 
@@ -542,5 +574,6 @@ fn app() -> Html {
 }
 
 fn main() {
+    wasm_logger::init(wasm_logger::Config::default());
     yew::start_app::<App>();
 }

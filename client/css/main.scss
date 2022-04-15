@@ -88,4 +88,12 @@ $font-family-base: 'Roboto';
 	background-size: auto;
 	background-size: cover;
 	color: #fff;
+
+	section {
+		background: rgba(27,27,27,.75) none repeat scroll 0 0;
+	}
+
+	h3 {
+		color: $rmmt-white;
+	}
 }
