@@ -270,6 +270,7 @@ pub struct CreateAccountProps;
 
 pub enum CreateAccountMsg {
     Submit { name: String },
+    Created { id: String },
 }
 
 pub struct CreateAccount {
@@ -284,11 +285,28 @@ impl Component for CreateAccount {
         Self { creating: false }
     }
 
-    fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
+    fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
             CreateAccountMsg::Submit { name } => {
                 self.creating = true;
+                ctx.link().send_future(async {
+                    let created_account: String =
+                        Request::post("/api/account/")
+                            .send()
+                            .await
+                            .unwrap()
+                            .json()
+                            .await
+                            .unwrap();
+                    CreateAccountMsg::Created {
+                        id: created_account,
+                    }
+                });
                 true
+            }
+            CreateAccountMsg::Created { id } => {
+                info!("Created account: {}", id);
+                todo!("redirect to account")
             }
         }
     }

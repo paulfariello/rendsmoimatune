@@ -17,3 +17,4 @@ wasm-logger = "*"
 log = "*"
 web-sys = { version = "*", features = ["HtmlFormElement"] }
 wasm-bindgen = "*"
+yewtil = "0.4"

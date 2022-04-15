@@ -16,6 +16,11 @@ use uniqid::UniqId;
 #[database("main")]
 struct MainDbConn(PgConnection);
 
+#[post("/api/account")]
+async fn post_account(conn: MainDbConn) -> Result<Json<String>, Error> {
+    Ok(Json("test".to_string()))
+}
+
 #[get("/api/account/<uniq_id>")]
 async fn get_account(conn: MainDbConn, uniq_id: UniqId) -> Result<Json<Account>, Error> {
     let uuid: uuid::Uuid = uniq_id.into();
@@ -93,6 +98,7 @@ fn rocket() -> _ {
     rocket::build().attach(MainDbConn::fairing()).mount(
         "/",
         routes![
+            post_account,
             get_account,
             get_expenditures,
             get_repayments,
