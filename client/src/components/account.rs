@@ -12,8 +12,7 @@ use uuid::Uuid;
 use wasm_bindgen::JsCast;
 use web_sys::FormData;
 use yew::prelude::*;
-use yew_router::scope_ext::RouterScopeExt;
-use yew_router::history::History;
+use yew_router::prelude::*;
 
 use crate::Route;
 
@@ -157,7 +156,7 @@ pub fn account(props: &AccountProps) -> Html {
         <div class="container">
             <div class="columns">
                 <div class="column">
-                    <a href="/">
+                    <Link<Route> to={Route::Account { id: props.id.clone() }}>
                         <h2 class="title is-1">
                             <i class="fa fa-bank fa-lg fa-fw"/>
                             {
@@ -167,7 +166,7 @@ pub fn account(props: &AccountProps) -> Html {
                                 }
                             }
                         </h2>
-                    </a>
+                    </Link<Route>>
                 </div>
             </div>
 
