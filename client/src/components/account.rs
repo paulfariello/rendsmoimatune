@@ -12,6 +12,10 @@ use uuid::Uuid;
 use wasm_bindgen::JsCast;
 use web_sys::FormData;
 use yew::prelude::*;
+use yew_router::scope_ext::RouterScopeExt;
+use yew_router::history::History;
+
+use crate::Route;
 
 #[derive(Properties, PartialEq)]
 pub struct AccountProps {
@@ -311,7 +315,9 @@ impl Component for CreateAccount {
             }
             CreateAccountMsg::Created { id } => {
                 info!("Created account: {}", id);
-                todo!("redirect to account")
+                let history = ctx.link().history().unwrap();
+                history.push(Route::Account { id });
+                false
             }
         }
     }
