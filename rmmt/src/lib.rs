@@ -24,6 +24,13 @@ pub struct Account {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[cfg_attr(feature = "db", derive(Insertable))]
+#[cfg_attr(feature = "db", table_name = "accounts")]
+pub struct NewAccount {
+    pub name: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 #[cfg_attr(feature = "db", derive(Identifiable, Queryable, Associations))]
 #[cfg_attr(feature = "db", belongs_to(Account))]
 #[cfg_attr(feature = "db", table_name = "expenditures")]

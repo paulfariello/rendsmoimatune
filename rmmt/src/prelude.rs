@@ -1,5 +1,5 @@
 #[cfg(feature = "db")]
-pub use crate::schema::accounts::dsl::*;
+pub use crate::schema::accounts::dsl::{accounts};
 #[cfg(feature = "db")]
 pub use crate::schema::expenditures::dsl::{account_id as expenditures_account_id, expenditures};
 #[cfg(feature = "db")]

@@ -2,11 +2,12 @@
 extern crate rocket;
 
 use diesel::{prelude::*, PgConnection};
-use rmmt::{prelude::*, Account, Balance, Debt, Expenditure, Repayment, User};
+use rmmt::{prelude::*, Balance, Debt, Expenditure, Repayment, User};
 use rocket::serde::json::Json;
 use rocket_sync_db_pools::database;
 use uuid;
 
+mod account;
 mod error;
 mod uniqid;
 
@@ -15,18 +16,6 @@ use uniqid::UniqId;
 
 #[database("main")]
 struct MainDbConn(PgConnection);
-
-#[post("/api/account")]
-async fn post_account(conn: MainDbConn) -> Result<Json<String>, Error> {
-    Ok(Json("test".to_string()))
-}
-
-#[get("/api/account/<uniq_id>")]
-async fn get_account(conn: MainDbConn, uniq_id: UniqId) -> Result<Json<Account>, Error> {
-    let uuid: uuid::Uuid = uniq_id.into();
-    let account: Account = conn.run(move |c| accounts.find(uuid).first(c)).await?;
-    Ok(Json(account))
-}
 
 #[get("/api/account/<uniq_id>/expenditures")]
 async fn get_expenditures(
@@ -73,8 +62,13 @@ async fn get_balance(conn: MainDbConn, uniq_id: UniqId) -> Result<Json<Vec<Balan
             let account_expenditures = expenditures
                 .filter(expenditures_account_id.eq(uuid))
                 .load(c)?;
-            let account_debts = Debt::belonging_to(&account_expenditures).load(c)?.grouped_by(&account_expenditures);
-            let map: Vec<(Expenditure, Vec<Debt>)> = account_expenditures.into_iter().zip(account_debts).collect();
+            let account_debts = Debt::belonging_to(&account_expenditures)
+                .load(c)?
+                .grouped_by(&account_expenditures);
+            let map: Vec<(Expenditure, Vec<Debt>)> = account_expenditures
+                .into_iter()
+                .zip(account_debts)
+                .collect();
             Ok(map)
         })
         .await?;
@@ -98,8 +92,8 @@ fn rocket() -> _ {
     rocket::build().attach(MainDbConn::fairing()).mount(
         "/",
         routes![
-            post_account,
-            get_account,
+            account::post_account,
+            account::get_account,
             get_expenditures,
             get_repayments,
             get_users,

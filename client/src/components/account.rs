@@ -289,9 +289,14 @@ impl Component for CreateAccount {
         match msg {
             CreateAccountMsg::Submit { name } => {
                 self.creating = true;
-                ctx.link().send_future(async {
+                let account = rmmt::NewAccount {
+                    name
+                };
+                ctx.link().send_future(async move {
                     let created_account: String =
                         Request::post("/api/account/")
+                            .json(&account)
+                            .unwrap()
                             .send()
                             .await
                             .unwrap()
