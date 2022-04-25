@@ -168,11 +168,11 @@ pub fn account(props: &AccountProps) -> Html {
                         </h2>
                     </Link<Route>>
                 </div>
-            </div>
 
-            <section class="section">
-                <div class="columns">
-                    <div class="column">
+            </div>
+            <div class="tile is-ancestor">
+                <div class="tile is-parent is-6">
+                    <div class="tile is-child box">
                         <h3 class="subtitle is-3">
                             <i class="fa fa-balance-scale fa-lg fa-fw"/>
                             { "Balance" }
@@ -184,32 +184,21 @@ pub fn account(props: &AccountProps) -> Html {
                             <Loading/>
                         }
                         </div>
-                    </div>
-                </div>
-            </section>
-
-            <section class="section">
-                <div class="columns">
-                    <form>
-                        <div class="column">
-                            <h4 class="subtitle is-3">
-                                <i class="fa fa-user fa-lg fa-fw"></i>
-                                { "Nouveau participant" }
-                            </h4>
-                            <div class="input-group">
-                                <input type="text" class="input-group-field" required=true/>
-                                <div class="input-group-button">
-                                    <button type="submit" class="button fa fa-user-plus">{ "Ajouter" }</button>
+                        <form>
+                            <div class="field has-addons">
+                                <div class="control">
+                                    <input type="text" class="input" required=true />
+                                </div>
+                                <div class="control">
+                                    <button type="submit" class="button is-info fa fa-user-plus">{ "Ajouter" }</button>
                                 </div>
                             </div>
-                        </div>
-                    </form>
+                        </form>
+                    </div>
                 </div>
-            </section>
 
-            <section class="section">
-                <div class="columns">
-                    <div class="column">
+                <div class="tile is-parent is-6">
+                    <div class="tile is-child box">
                         <h3 class="subtitle is-3"><i class="fa fa-exchange fa-lg fa-fw"></i> { "Équilibrage" }</h3>
                         <table>
                             <thead>
@@ -235,11 +224,11 @@ pub fn account(props: &AccountProps) -> Html {
                         </table>
                     </div>
                 </div>
-            </section>
+            </div>
 
-            <section class="section">
-                <div class="columns">
-                    <div class="column">
+            <div class="tile is-ancestor">
+                <div class="tile is-parent">
+                    <div class="tile is-child box">
                         <h3 class="subtitle is-3"><a href=""><i class="fa fa-credit-card fa-lg fa-fw"></i>{ "Dépenses" }</a></h3>
                         if let (Some(users), Some(expenditures)) = (users.clone(), expenditures) {
                             <ExpendituresList expenditures={ expenditures } users={ users } limit=10 />
@@ -249,12 +238,12 @@ pub fn account(props: &AccountProps) -> Html {
                         <a class="button is-info fa fa-plus-circle" href="">{ "Nouvelle dépense" }</a>
                     </div>
                 </div>
-            </section>
+            </div>
 
-            <section class="section">
-                <div class="columns">
-                    <div class="column">
-                        <h3 class="subtitle is-3"><a href=""><i class="fa fa-credit-card fa-lg fa-fw"></i>{ "Dépenses" }</a></h3>
+            <div class="tile is-ancestor">
+                <div class="tile is-parent">
+                    <div class="tile is-child box">
+                        <h3 class="subtitle is-3"><a href=""><i class="fa fa-credit-card fa-lg fa-fw"></i>{ "Remboursements" }</a></h3>
                         if let (Some(users), Some(repayments)) = (users.clone(), repayments) {
                             <RepaymentsList repayments={ repayments } users={ users } limit=10 />
                         } else {
@@ -263,7 +252,7 @@ pub fn account(props: &AccountProps) -> Html {
                         <a class="button is-info fa fa-plus-circle" href="">{ "Nouveau remboursement" }</a>
                     </div>
                 </div>
-            </section>
+            </div>
         </div>
     }
 }
