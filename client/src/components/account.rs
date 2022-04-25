@@ -3,7 +3,7 @@ use crate::components::{
 };
 #[allow(unused_imports)]
 use log::{debug, error, info, warn};
-use reqwasm::http::Request;
+use gloo_net::http::Request;
 use rmmt;
 use std::collections::HashMap;
 use std::ops::Deref;
