@@ -1,12 +1,16 @@
 @charset 'utf-8';
 
-@import "font-awesome/scss/font-awesome";
-@import "bulma/bulma";
-
 $rmmt-blue: #5494af;
 $rmmt-red: #c66653;
 $rmmt-white: #ffffff;
 $font-family-base: 'Roboto';
+
+// Set bulma setting
+$family-sans-serif: $font-family-base;
+$primary: $rmmt-blue;
+
+@import "font-awesome/scss/font-awesome";
+@import "bulma/bulma";
 
 @font-face {
 	font-family: alfphabet;
