@@ -209,7 +209,14 @@ pub fn account(props: &AccountProps) -> Html {
                                     <td>{ 2970.65 }{ " €" }</td>
                                     <td>{ "à" }</td>
                                     <td>{ "john" }</td>
-                                    <td><a class="fa fa-plus-circle button" href="">{ "Ajouter" }</a></td>
+                                    <td>
+                                        <a class="button is-primary" href="">
+                                            <span class="icon">
+                                                <i class="fa fa-plus-circle" />
+                                            </span>
+                                            <span>{ "Rembourser" }</span>
+                                        </a>
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>
@@ -226,7 +233,12 @@ pub fn account(props: &AccountProps) -> Html {
                         } else {
                             <Loading/>
                         }
-                        <a class="button is-primary fa fa-plus-circle" href="">{ "Nouvelle dépense" }</a>
+                        <a class="button is-primary" href="">
+                            <span class="icon">
+                                <i class="fa fa-plus-circle" />
+                            </span>
+                            <span>{ "Nouvelle dépense" }</span>
+                        </a>
                     </div>
                 </div>
             </div>
@@ -240,7 +252,12 @@ pub fn account(props: &AccountProps) -> Html {
                         } else {
                             <Loading/>
                         }
-                        <a class="button is-primary fa fa-plus-circle" href="">{ "Nouveau remboursement" }</a>
+                        <a class="button is-primary" href="">
+                            <span class="icon">
+                                <i class="fa fa-plus-circle" />
+                            </span>
+                            <span>{ "Nouveau remboursement" }</span>
+                        </a>
                     </div>
                 </div>
             </div>
@@ -337,11 +354,11 @@ impl Component for CreateAccount {
                                 <form {onsubmit}>
                                     <div class="field has-addons">
                                         <div class={classes!("control", self.creating.then(|| "is-loading"))}>
-                                            <input ref={self.input_name.clone()} class="input" type="text" placeholder="Nom" name="name" />
+                                            <input ref={self.input_name.clone()} class="input is-primary" type="text" placeholder="Nom" name="name" required=true />
                                         </div>
-                                        <div class="control">
-                                            <button class={classes!("button", "is-primary", self.creating.then(|| "is-loading"))} type="submit">{ "Créer" }</button>
-                                        </div>
+                                        <button type="submit" class={classes!("button", "is-primary", self.creating.then(|| "is-loading"))}>
+                                            <span>{ "Créer" }</span>
+                                        </button>
                                     </div>
                                 </form>
                             </div>
