@@ -1,19 +1,19 @@
-use crate::components::{
-    balance::BalanceList, expenditure::ExpendituresList, repayment::RepaymentsList, utils::Loading,
-};
-#[allow(unused_imports)]
-use log::{debug, error, info, warn};
-use gloo_net::http::Request;
-use rmmt;
 use std::collections::HashMap;
 use std::ops::Deref;
 use std::rc::Rc;
+
+use crate::components::{
+    balance::BalanceList, expenditure::ExpendituresList, repayment::RepaymentsList, utils::Loading,
+};
+use gloo_net::http::Request;
+#[allow(unused_imports)]
+use log::{debug, error, info, warn};
+use rmmt;
 use uuid::Uuid;
-use wasm_bindgen::JsCast;
-use web_sys::FormData;
 use yew::prelude::*;
 use yew_router::prelude::*;
 
+use crate::components::user::CreateUser;
 use crate::Route;
 
 #[derive(Properties, PartialEq)]
@@ -184,16 +184,7 @@ pub fn account(props: &AccountProps) -> Html {
                             <Loading/>
                         }
                         </div>
-                        <form>
-                            <div class="field has-addons">
-                                <div class="control">
-                                    <input type="text" class="input" required=true />
-                                </div>
-                                <div class="control">
-                                    <button type="submit" class="button is-info fa fa-user-plus">{ "Ajouter" }</button>
-                                </div>
-                            </div>
-                        </form>
+                        <CreateUser account_id={ props.id.clone() } />
                     </div>
                 </div>
 
@@ -235,7 +226,7 @@ pub fn account(props: &AccountProps) -> Html {
                         } else {
                             <Loading/>
                         }
-                        <a class="button is-info fa fa-plus-circle" href="">{ "Nouvelle dépense" }</a>
+                        <a class="button is-primary fa fa-plus-circle" href="">{ "Nouvelle dépense" }</a>
                     </div>
                 </div>
             </div>
@@ -249,7 +240,7 @@ pub fn account(props: &AccountProps) -> Html {
                         } else {
                             <Loading/>
                         }
-                        <a class="button is-info fa fa-plus-circle" href="">{ "Nouveau remboursement" }</a>
+                        <a class="button is-primary fa fa-plus-circle" href="">{ "Nouveau remboursement" }</a>
                     </div>
                 </div>
             </div>
@@ -261,12 +252,43 @@ pub fn account(props: &AccountProps) -> Html {
 pub struct CreateAccountProps;
 
 pub enum CreateAccountMsg {
-    Submit { name: String },
+    Submit,
     Created { id: String },
 }
 
 pub struct CreateAccount {
     creating: bool,
+    input_name: NodeRef,
+}
+
+impl CreateAccount {
+    fn create_account(&mut self, ctx: &Context<Self>) {
+        self.creating = true;
+
+        let input_name = self.input_name.cast::<web_sys::HtmlInputElement>().unwrap();
+        let name = input_name.value();
+
+        let account = rmmt::NewAccount { name };
+        ctx.link().send_future(async move {
+            let created_account: String = Request::post("/api/account/")
+                .json(&account)
+                .unwrap()
+                .send()
+                .await
+                .unwrap()
+                .json()
+                .await
+                .unwrap();
+            CreateAccountMsg::Created {
+                id: created_account,
+            }
+        });
+    }
+
+    fn clear(&mut self) {
+        let input_name = self.input_name.cast::<web_sys::HtmlInputElement>().unwrap();
+        input_name.set_value("");
+    }
 }
 
 impl Component for CreateAccount {
@@ -274,35 +296,22 @@ impl Component for CreateAccount {
     type Properties = CreateAccountProps;
 
     fn create(_ctx: &Context<Self>) -> Self {
-        Self { creating: false }
+        Self { creating: false, input_name: NodeRef::default() }
     }
 
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
-            CreateAccountMsg::Submit { name } => {
-                self.creating = true;
-                let account = rmmt::NewAccount {
-                    name
-                };
-                ctx.link().send_future(async move {
-                    let created_account: String =
-                        Request::post("/api/account/")
-                            .json(&account)
-                            .unwrap()
-                            .send()
-                            .await
-                            .unwrap()
-                            .json()
-                            .await
-                            .unwrap();
-                    CreateAccountMsg::Created {
-                        id: created_account,
-                    }
-                });
-                true
+            CreateAccountMsg::Submit => {
+                if self.creating {
+                    false
+                } else {
+                    self.create_account(ctx);
+                    true
+                }
             }
             CreateAccountMsg::Created { id } => {
                 info!("Created account: {}", id);
+                self.clear();
                 let history = ctx.link().history().unwrap();
                 history.push(Route::Account { id });
                 false
@@ -313,16 +322,7 @@ impl Component for CreateAccount {
     fn view(&self, ctx: &Context<Self>) -> Html {
         let onsubmit = ctx.link().callback(|event: FocusEvent| {
             event.prevent_default();
-            let target = event
-                .target()
-                .unwrap()
-                .dyn_ref::<web_sys::HtmlFormElement>()
-                .unwrap()
-                .clone();
-            let data: FormData = FormData::new_with_form(&target).unwrap();
-            CreateAccountMsg::Submit {
-                name: data.get("name").as_string().unwrap(),
-            }
+            CreateAccountMsg::Submit
         });
 
         html! {
@@ -334,20 +334,16 @@ impl Component for CreateAccount {
                                 <h3 class="subtitle is-3">
                                     { "Créer un nouveau compte" }
                                 </h3>
-                                if self.creating {
-                                    <Loading/>
-                                } else {
-                                    <form {onsubmit}>
-                                        <div class="field has-addons">
-                                            <div class="control">
-                                                <input class="input" type="text" placeholder="Nom" name="name" />
-                                            </div>
-                                            <div class="control">
-                                                <button class="button is-info" type="submit">{ "Créer" }</button>
-                                            </div>
+                                <form {onsubmit}>
+                                    <div class="field has-addons">
+                                        <div class={classes!("control", self.creating.then(|| "is-loading"))}>
+                                            <input ref={self.input_name.clone()} class="input" type="text" placeholder="Nom" name="name" />
                                         </div>
-                                    </form>
-                                }
+                                        <div class="control">
+                                            <button class={classes!("button", "is-primary", self.creating.then(|| "is-loading"))} type="submit">{ "Créer" }</button>
+                                        </div>
+                                    </div>
+                                </form>
                             </div>
                         </div>
                     </section>

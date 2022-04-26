@@ -3,7 +3,6 @@ use rmmt::{prelude::*, Account, NewAccount};
 use rocket::serde::json::Json;
 
 use crate::error::Error;
-use crate::uniqid::UniqId;
 use crate::MainDbConn;
 
 #[post("/api/account", format = "json", data = "<account>")]
@@ -18,9 +17,9 @@ pub(crate) async fn post_account(
     Ok(Json(uniq_id.to_string()))
 }
 
-#[get("/api/account/<uniq_id>")]
-pub(crate) async fn get_account(conn: MainDbConn, uniq_id: UniqId) -> Result<Json<Account>, Error> {
-    let uuid: uuid::Uuid = uniq_id.into();
+#[get("/api/account/<account_id>")]
+pub(crate) async fn get_account(conn: MainDbConn, account_id: UniqId) -> Result<Json<Account>, Error> {
+    let uuid: uuid::Uuid = account_id.into();
     let account: Account = conn.run(move |c| accounts.find(uuid).first(c)).await?;
     Ok(Json(account))
 }

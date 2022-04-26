@@ -9,6 +9,7 @@ use std::collections::HashMap;
 use uuid::Uuid;
 
 pub mod prelude;
+pub mod uniqid;
 #[cfg(feature = "db")]
 mod schema;
 
@@ -62,6 +63,14 @@ pub struct Repayment {
 #[cfg_attr(feature = "db", table_name = "users")]
 pub struct User {
     pub id: Uuid,
+    pub account_id: Uuid,
+    pub name: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[cfg_attr(feature = "db", derive(Insertable))]
+#[cfg_attr(feature = "db", table_name = "users")]
+pub struct NewUser {
     pub account_id: Uuid,
     pub name: String,
 }

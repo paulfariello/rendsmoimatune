@@ -33,7 +33,7 @@ pub fn repayments_list(
                     <td class="is-vcentered">{ "à" }</td>
                     <td class="is-vcentered"><UserName users={ users.clone() } id={ repayment.beneficiary_id } /></td>
                     <td class="is-vcentered">
-                        <a aria-label="Éditer" class="button is-info" href="">
+                        <a aria-label="Éditer" class="button is-primary" href="">
                             <i class="fa fa-pencil fa-lg"></i>
                         </a>
                         <button aria-label="Supprimer" class="button is-danger"><i class="fa fa-trash-o fa-lg"></i></button>
@@ -72,6 +72,6 @@ pub fn repayments_list(
             </>
         }
     } else {
-        html! { }
+        html! {}
     }
 }

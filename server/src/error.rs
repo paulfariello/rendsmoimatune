@@ -9,6 +9,7 @@ use std::io::Cursor;
 #[derive(Debug)]
 pub enum Error {
     DbError(diesel::result::Error),
+    IdError,
 }
 
 impl From<diesel::result::Error> for Error {

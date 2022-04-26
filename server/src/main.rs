@@ -8,11 +8,10 @@ use rocket_sync_db_pools::database;
 use uuid;
 
 mod account;
+mod user;
 mod error;
-mod uniqid;
 
 use error::Error;
-use uniqid::UniqId;
 
 #[database("main")]
 struct MainDbConn(PgConnection);
@@ -42,16 +41,6 @@ async fn get_repayments(conn: MainDbConn, uniq_id: UniqId) -> Result<Json<Vec<Re
         .await?;
 
     Ok(Json(account_repayments))
-}
-
-#[get("/api/account/<uniq_id>/users")]
-async fn get_users(conn: MainDbConn, uniq_id: UniqId) -> Result<Json<Vec<User>>, Error> {
-    let uuid: uuid::Uuid = uniq_id.into();
-    let account_users: Vec<User> = conn
-        .run(move |c| users.filter(users_account_id.eq(uuid)).load(c))
-        .await?;
-
-    Ok(Json(account_users))
 }
 
 #[get("/api/account/<uniq_id>/balance")]
@@ -96,7 +85,8 @@ fn rocket() -> _ {
             account::get_account,
             get_expenditures,
             get_repayments,
-            get_users,
+            user::post_user,
+            user::get_users,
             get_balance
         ],
     )

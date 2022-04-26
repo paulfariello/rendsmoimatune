@@ -1,3 +1,4 @@
+pub use crate::uniqid::UniqId;
 #[cfg(feature = "db")]
 pub use crate::schema::accounts::dsl::{accounts};
 #[cfg(feature = "db")]

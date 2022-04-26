@@ -1,21 +1,31 @@
+#[cfg(feature = "rocket")]
 use rocket::request::FromParam;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
+use std::convert::TryFrom;
 
-#[derive(Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct UniqId(Uuid);
 
 static ALPHABET: &'static [u8] =
     b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
 static BASE: u128 = 64; // len of ALPHABET
 
-impl<'r> FromParam<'r> for UniqId {
+impl TryFrom<String> for UniqId {
     type Error = String;
 
-    fn from_param(param: &'r str) -> Result<Self, Self::Error> {
+    fn try_from(string: String) -> Result<Self, Self::Error> {
+        UniqId::try_from(string.as_str())
+    }
+}
+
+impl TryFrom<&str> for UniqId {
+    type Error = String;
+
+    fn try_from(string: &str) -> Result<Self, Self::Error> {
         let mut quad: u128 = 0;
 
-        for needle in param.bytes().rev() {
+        for needle in string.bytes().rev() {
             let value: u128 = ALPHABET
                 .iter()
                 .position(|c| *c == needle)
@@ -59,6 +69,28 @@ impl ToString for UniqId {
         }
 
         String::from_utf8(raw).unwrap()
+    }
+}
+
+impl PartialEq<Uuid> for UniqId {
+    fn eq(&self, other: &Uuid) -> bool {
+        self.0 == *other
+    }
+}
+
+impl PartialEq<UniqId> for Uuid {
+    fn eq(&self, other: &UniqId) -> bool {
+        *self == other.0
+    }
+}
+
+
+#[cfg(feature = "rocket")]
+impl<'r> FromParam<'r> for UniqId {
+    type Error = String;
+
+    fn from_param(param: &'r str) -> Result<Self, Self::Error> {
+        param.try_into()
     }
 }
 
