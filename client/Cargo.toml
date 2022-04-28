@@ -8,6 +8,7 @@ edition = "2021"
 [dependencies]
 yew = "0.19"
 yew-router = "0.16"
+yew-agent = "0.1"
 gloo-net = "0.2"
 serde = { version = "1.0", features = ["derive"] }
 wasm-bindgen-futures = "0.4"

@@ -7,10 +7,13 @@ use log::{debug, error, info, warn};
 use rmmt::{self, prelude::*};
 use uuid::Uuid;
 use yew::prelude::*;
+use yew_agent::{Dispatcher, Dispatched};
+
+use crate::agent::{RmmtAgent, RmmtMsg};
 
 #[derive(Properties, PartialEq)]
 pub struct UserProps {
-    pub users: Rc<HashMap<Uuid, rmmt::User>>,
+    pub users: HashMap<Uuid, rmmt::User>,
     pub id: Uuid,
 }
 
@@ -34,6 +37,7 @@ pub enum CreateUserMsg {
 pub struct CreateUser {
     creating: bool,
     input_name: NodeRef,
+    agent: Dispatcher<RmmtAgent>,
 }
 
 impl CreateUser {
@@ -78,6 +82,7 @@ impl Component for CreateUser {
         Self {
             creating: false,
             input_name: NodeRef::default(),
+            agent: RmmtAgent::dispatcher(),
         }
     }
 
@@ -93,6 +98,7 @@ impl Component for CreateUser {
             }
             CreateUserMsg::Created { user } => {
                 info!("Created user: {}", user.name);
+                self.agent.send(RmmtMsg::NewUser(user));
                 self.clear();
                 true
             }

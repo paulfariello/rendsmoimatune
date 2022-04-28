@@ -8,7 +8,7 @@ use yew::prelude::*;
 #[derive(Properties, PartialEq)]
 pub struct RepaymentsListProps {
     pub repayments: Vec<rmmt::Repayment>,
-    pub users: Rc<HashMap<Uuid, rmmt::User>>,
+    pub users: HashMap<Uuid, rmmt::User>,
     pub limit: Option<usize>,
 }
 

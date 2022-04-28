@@ -67,7 +67,7 @@ pub fn account(props: &AccountProps) -> Html {
                         .into_iter()
                         .map(|u| (u.id.clone(), u))
                         .collect();
-                    users.set(Some(Rc::new(users_map)));
+                    users.set(Some(users_map));
                 });
                 || ()
             },
