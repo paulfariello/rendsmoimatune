@@ -1,3 +1,4 @@
+use std::cell::RefCell;
 use std::collections::HashMap;
 use std::rc::Rc;
 
@@ -7,20 +8,29 @@ use log::{debug, error, info, warn};
 use rmmt::{self, prelude::*};
 use uuid::Uuid;
 use yew::prelude::*;
-use yew_agent::{Dispatcher, Dispatched};
+use yew_agent::{Dispatched, Dispatcher};
 
-use crate::agent::{RmmtAgent, RmmtMsg};
+use crate::components::account::{AccountAgent, AccountMsg};
 
 #[derive(Properties, PartialEq)]
 pub struct UserProps {
-    pub users: HashMap<Uuid, rmmt::User>,
+    pub users: Rc<RefCell<Option<HashMap<Uuid, rmmt::User>>>>,
     pub id: Uuid,
 }
 
 #[function_component(UserName)]
 pub fn user_name(UserProps { users, id }: &UserProps) -> Html {
-    html! {
-        { &users.get(&id).unwrap().name }
+    if let Some(users) = &*users.borrow() {
+        if let Some(user) = users.get(&id) {
+            html! {
+                { &user.name }
+            }
+        } else {
+            error!("Unknown user {}", id);
+            html! {}
+        }
+    } else {
+        html! {}
     }
 }
 
@@ -37,7 +47,7 @@ pub enum CreateUserMsg {
 pub struct CreateUser {
     creating: bool,
     input_name: NodeRef,
-    agent: Dispatcher<RmmtAgent>,
+    agent: Dispatcher<AccountAgent>,
 }
 
 impl CreateUser {
@@ -82,7 +92,7 @@ impl Component for CreateUser {
         Self {
             creating: false,
             input_name: NodeRef::default(),
-            agent: RmmtAgent::dispatcher(),
+            agent: AccountAgent::dispatcher(),
         }
     }
 
@@ -98,7 +108,7 @@ impl Component for CreateUser {
             }
             CreateUserMsg::Created { user } => {
                 info!("Created user: {}", user.name);
-                self.agent.send(RmmtMsg::NewUser(user));
+                self.agent.send(AccountMsg::FetchUsers);
                 self.clear();
                 true
             }

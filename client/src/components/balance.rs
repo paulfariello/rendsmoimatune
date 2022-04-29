@@ -1,39 +1,28 @@
-use crate::components::{user::UserName, utils::Amount};
+use std::cell::RefCell;
 use std::collections::HashMap;
 use std::rc::Rc;
+
+#[allow(unused_imports)]
+use log::{debug, error, info, warn};
 use uuid::Uuid;
 use yew::prelude::*;
 use yew_agent::{Bridge, Bridged};
-#[allow(unused_imports)]
-use log::{debug, error, info, warn};
 
-use crate::agent::{RmmtAgent, RmmtMsg};
+use crate::components::account::{AccountAgent, AccountMsg};
+use crate::components::utils::Loading;
+use crate::components::{user::UserName, utils::Amount};
 
 #[derive(Properties, PartialEq)]
-pub(crate) struct BalanceListProps {
-    pub balance: Vec<rmmt::Balance>,
-    pub users: HashMap<Uuid, rmmt::User>,
+pub struct BalanceListProps {}
+
+pub enum BalanceListMsg {
+    AccountMsg(AccountMsg),
 }
 
-pub(crate) enum BalanceListMsg {
-    RmmtMsg(RmmtMsg),
-}
-
-pub(crate) struct BalanceList {
-    balance: Vec<rmmt::Balance>,
-    users: HashMap<Uuid, rmmt::User>,
-    producer: Box<dyn Bridge<RmmtAgent>>,
-}
-
-impl BalanceList {
-    fn add_user(&mut self, user: rmmt::User) {
-        self.users.insert(user.id, user.clone());
-        self.balance.push(rmmt::Balance {
-            user_id: user.id,
-            amount: 0,
-        });
-        self.balance.sort_by(|a, b| a.user_id.partial_cmp(&b.user_id).unwrap());
-    }
+pub struct BalanceList {
+    balances: Rc<RefCell<Option<Vec<rmmt::Balance>>>>,
+    users: Rc<RefCell<Option<HashMap<Uuid, rmmt::User>>>>,
+    _account_bridge: Box<dyn Bridge<AccountAgent>>,
 }
 
 impl Component for BalanceList {
@@ -41,70 +30,75 @@ impl Component for BalanceList {
     type Properties = BalanceListProps;
 
     fn create(ctx: &Context<Self>) -> Self {
-        let mut balance = ctx.props().balance.clone();
-        balance.sort_by(|a, b| a.user_id.partial_cmp(&b.user_id).unwrap());
-
         Self {
-            balance,
-            users: ctx.props().users.clone(),
-            producer: RmmtAgent::bridge(ctx.link().callback(BalanceListMsg::RmmtMsg)),
+            balances: Rc::new(RefCell::new(None)),
+            users: Rc::new(RefCell::new(None)),
+            _account_bridge: AccountAgent::bridge(ctx.link().callback(BalanceListMsg::AccountMsg)),
         }
     }
 
-    fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
+    fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
-            BalanceListMsg::RmmtMsg(msg) => match msg {
-                RmmtMsg::NewUser(user) => {
-                    info!("new user: {:?}", user);
-                    self.add_user(user);
+            BalanceListMsg::AccountMsg(msg) => match msg {
+                AccountMsg::UpdateUsers(users) => {
+                    self.users = users;
                     true
                 }
-            }
+                AccountMsg::UpdateBalances(balances) => {
+                    self.balances = balances;
+                    true
+                }
+                _ => false,
+            },
         }
     }
 
     fn view(&self, _ctx: &Context<Self>) -> Html {
-        let max = self.balance
-            .iter()
-            .map(|b| b.amount)
-            .max()
-            .unwrap_or(0)
-            .to_string();
+        if let Some(balances) = &*self.balances.borrow() {
+            let max = balances
+                .iter()
+                .map(|b| b.amount)
+                .max()
+                .unwrap_or(0)
+                .to_string();
 
-        html! {
-            <table class="table is-fullwidth is-striped is-hoverable">
-                <tbody>
-                    {
-                        self.balance.iter().map(|balance| {
-                            html! {
-                                <tr>
-                                    <td class="is-vcentered">
-                                    if balance.amount < 0 {
-                                        <div class="progress-wrapper">
-                                            <progress class="progress is-large is-danger is-revert" value={ balance.amount.abs().to_string() } max={ max.clone() }>
-                                                <Amount amount={ balance.amount } />
-                                            </progress>
-                                            <p class="progress-value has-text-white"><Amount amount={ balance.amount } /></p>
-                                        </div>
-                                    }
-                                    </td>
-                                    <td class="is-vcentered has-text-centered"><UserName users={ self.users.clone() } id={ balance.user_id }/></td>
-                                    <td class="is-vcentered">
-                                    if balance.amount > 0 {
-                                        <div class="progress-wrapper">
-                                            <progress class="progress is-large is-success" value={ balance.amount.abs().to_string() } max={ max.clone() }>
-                                                <Amount amount={ balance.amount } />
-                                            </progress>
-                                            <p class="progress-value has-text-white"><Amount amount={ balance.amount } /></p>
-                                        </div>
-                                    }
-                                    </td>
-                                </tr>
-                            }
-                        }).collect::<Html>()
-                    }
-                </tbody>
-            </table>
+            html! {
+                <table class="table is-fullwidth is-striped is-hoverable">
+                    <tbody>
+                        {
+                            balances.iter().map(|balance| {
+                                html! {
+                                    <tr>
+                                        <td class="is-vcentered">
+                                        if balance.amount < 0 {
+                                            <div class="progress-wrapper">
+                                                <progress class="progress is-large is-danger is-revert" value={ balance.amount.abs().to_string() } max={ max.clone() }>
+                                                    <Amount amount={ balance.amount } />
+                                                </progress>
+                                                <p class="progress-value has-text-white"><Amount amount={ balance.amount } /></p>
+                                            </div>
+                                        }
+                                        </td>
+                                        <td class="is-vcentered has-text-centered"><UserName users={ self.users.clone() } id={ balance.user_id }/></td>
+                                        <td class="is-vcentered">
+                                        if balance.amount > 0 {
+                                            <div class="progress-wrapper">
+                                                <progress class="progress is-large is-success" value={ balance.amount.abs().to_string() } max={ max.clone() }>
+                                                    <Amount amount={ balance.amount } />
+                                                </progress>
+                                                <p class="progress-value has-text-white"><Amount amount={ balance.amount } /></p>
+                                            </div>
+                                        }
+                                        </td>
+                                    </tr>
+                                }
+                            }).collect::<Html>()
+                        }
+                    </tbody>
+                </table>
+            }
+        } else {
+            html! { <Loading /> }
         }
     }
 }

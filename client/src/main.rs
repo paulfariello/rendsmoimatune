@@ -3,7 +3,6 @@ use yew::prelude::*;
 use yew_router::prelude::*;
 
 mod components;
-mod agent;
 
 use components::{
     account::{Account, CreateAccount},
