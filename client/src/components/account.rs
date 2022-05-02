@@ -131,7 +131,7 @@ impl AccountAgent {
                 let account_id = account_id.clone();
                 let expenditures = self.expenditures.clone();
                 self.link.send_future(async move {
-                    let fetched_expenditures: Vec<rmmt::Expenditure> =
+                    let mut fetched_expenditures: Vec<rmmt::Expenditure> =
                         Request::get(&format!("/api/account/{}/expenditures", account_id))
                             .send()
                             .await
@@ -144,6 +144,7 @@ impl AccountAgent {
                         fetched_expenditures.len(),
                         account_id
                     );
+                    fetched_expenditures.sort_by(|a, b| b.date.partial_cmp(&a.date).unwrap());
                     expenditures.replace(Some(fetched_expenditures));
                     AccountMsg::UpdateExpenditures(expenditures)
                 });
@@ -159,7 +160,7 @@ impl AccountAgent {
                 let account_id = account_id.clone();
                 let repayments = self.repayments.clone();
                 self.link.send_future(async move {
-                    let fetched_repayments: Vec<rmmt::Repayment> =
+                    let mut fetched_repayments: Vec<rmmt::Repayment> =
                         Request::get(&format!("/api/account/{}/repayments", account_id))
                             .send()
                             .await
@@ -172,6 +173,7 @@ impl AccountAgent {
                         fetched_repayments.len(),
                         account_id
                     );
+                    fetched_repayments.sort_by(|a, b| b.date.partial_cmp(&a.date).unwrap());
                     repayments.replace(Some(fetched_repayments));
                     AccountMsg::UpdateRepayments(repayments)
                 });
