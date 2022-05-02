@@ -123,7 +123,7 @@ impl Component for Account {
                             </span>
                         </h3>
                         if let (Some(users), Some(balances)) = (self.users.clone(), self.balances.clone()) {
-                            <BalanceList users={ users } balances={ balances } loading={ self.fetching_users } />
+                            <BalanceList { users } { balances } loading={ self.fetching_users } />
                         } else {
                             <Loading />
                         }
@@ -184,7 +184,7 @@ impl Component for Account {
                             </h3>
                         </Link<Route>>
                         if let (Some(users), Some(expenditures)) = (self.users.clone(), self.expenditures.clone()) {
-                            <ExpendituresList expenditures={ expenditures } users={ users } limit=10 />
+                            <ExpendituresList { expenditures } { users } limit=10 />
                         } else {
                             <Loading />
                         }

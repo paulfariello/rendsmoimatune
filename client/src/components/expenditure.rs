@@ -97,7 +97,7 @@ impl Component for Expenditures {
                             </h3>
                         </Link<Route>>
                         if let (Some(users), Some(expenditures)) = (self.users.clone(), self.expenditures.clone()) {
-                            <ExpendituresList expenditures={ expenditures } users={ users }/>
+                            <ExpendituresList { expenditures } { users }/>
                         } else {
                             <Loading />
                         }

@@ -97,7 +97,7 @@ impl Component for Repayments {
                         </h3>
                         </Link<Route>>
                         if let (Some(users), Some(repayments)) = (self.users.clone(), self.repayments.clone()) {
-                            <RepaymentsList repayments={ repayments } users={ users }/>
+                            <RepaymentsList { repayments } { users }/>
                         } else {
                             <Loading />
                         }
