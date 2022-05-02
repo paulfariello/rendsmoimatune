@@ -222,6 +222,10 @@ impl Agent for AccountAgent {
                 self.fetch_expenditures();
                 self.fetch_repayments();
             }
+            AccountMsg::FetchUsers => {
+                self.fetch_users();
+                self.fetch_balances();
+            }
             _ => {}
         }
 
@@ -257,7 +261,6 @@ impl Component for Account {
         let bridge = AccountAgent::bridge(ctx.link().callback(|msg| msg));
         let mut dispatcher = AccountAgent::dispatcher();
         dispatcher.send(AccountMsg::FetchAccount(id.clone()));
-        dispatcher.send(AccountMsg::FetchUsers);
         Self {
             // TODO default?
             account: Rc::new(RefCell::new(None)),
@@ -300,9 +303,7 @@ impl Component for Account {
                                 <i class="fa fa-balance-scale fa-lg fa-fw"/>
                                 { "Balance" }
                             </h3>
-                            <div class="balance">
-                                <BalanceList />
-                            </div>
+                            <BalanceList />
                             <CreateUser account_id={ ctx.props().id.clone() } />
                         </div>
                     </div>

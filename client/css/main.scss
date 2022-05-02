@@ -101,3 +101,21 @@ $primary: $rmmt-blue;
 		color: $rmmt-white;
 	}
 }
+
+.loading {
+  @include loader;
+  margin: auto;
+  border: 2px solid $rmmt-blue;
+  border-radius: $radius-rounded;
+  border-right-color: transparent;
+  border-top-color: transparent;
+}
+
+.loading-overlay {
+  @include overlay(0em);
+  opacity: 0.9;
+  background: $rmmt-white;
+  display: flex;
+  align-content: center;
+  align-items: center;
+}

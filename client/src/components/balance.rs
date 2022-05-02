@@ -20,6 +20,7 @@ pub enum BalanceListMsg {
 }
 
 pub struct BalanceList {
+    loading: bool,
     balances: Rc<RefCell<Option<Vec<rmmt::Balance>>>>,
     users: Rc<RefCell<Option<HashMap<Uuid, rmmt::User>>>>,
     _account_bridge: Box<dyn Bridge<AccountAgent>>,
@@ -31,6 +32,7 @@ impl Component for BalanceList {
 
     fn create(ctx: &Context<Self>) -> Self {
         Self {
+            loading: false,
             balances: Rc::new(RefCell::new(None)),
             users: Rc::new(RefCell::new(None)),
             _account_bridge: AccountAgent::bridge(ctx.link().callback(BalanceListMsg::AccountMsg)),
@@ -45,7 +47,12 @@ impl Component for BalanceList {
                     true
                 }
                 AccountMsg::UpdateBalances(balances) => {
+                    self.loading = false;
                     self.balances = balances;
+                    true
+                }
+                AccountMsg::FetchUsers => {
+                    self.loading = true;
                     true
                 }
                 _ => false,
@@ -63,39 +70,46 @@ impl Component for BalanceList {
                 .to_string();
 
             html! {
-                <table class="table is-fullwidth is-striped is-hoverable">
-                    <tbody>
-                        {
-                            balances.iter().map(|balance| {
-                                html! {
-                                    <tr>
-                                        <td class="is-vcentered">
-                                        if balance.amount < 0 {
-                                            <div class="progress-wrapper">
-                                                <progress class="progress is-large is-danger is-revert" value={ balance.amount.abs().to_string() } max={ max.clone() }>
-                                                    <Amount amount={ balance.amount } />
-                                                </progress>
-                                                <p class="progress-value has-text-white"><Amount amount={ balance.amount } /></p>
-                                            </div>
-                                        }
-                                        </td>
-                                        <td class="is-vcentered has-text-centered"><UserName users={ self.users.clone() } id={ balance.user_id }/></td>
-                                        <td class="is-vcentered">
-                                        if balance.amount > 0 {
-                                            <div class="progress-wrapper">
-                                                <progress class="progress is-large is-success" value={ balance.amount.abs().to_string() } max={ max.clone() }>
-                                                    <Amount amount={ balance.amount } />
-                                                </progress>
-                                                <p class="progress-value has-text-white"><Amount amount={ balance.amount } /></p>
-                                            </div>
-                                        }
-                                        </td>
-                                    </tr>
-                                }
-                            }).collect::<Html>()
-                        }
-                    </tbody>
-                </table>
+                <div class="balance is-relative block">
+                    if self.loading {
+                        <div class="loading-overlay">
+                            <Loading />
+                        </div>
+                    }
+                    <table class="table is-fullwidth is-striped is-hoverable">
+                        <tbody>
+                            {
+                                balances.iter().map(|balance| {
+                                    html! {
+                                        <tr>
+                                            <td class="is-vcentered">
+                                            if balance.amount < 0 {
+                                                <div class="progress-wrapper">
+                                                    <progress class="progress is-large is-danger is-revert" value={ balance.amount.abs().to_string() } max={ max.clone() }>
+                                                        <Amount amount={ balance.amount } />
+                                                    </progress>
+                                                    <p class="progress-value has-text-white"><Amount amount={ balance.amount } /></p>
+                                                </div>
+                                            }
+                                            </td>
+                                            <td class="is-vcentered has-text-centered"><UserName users={ self.users.clone() } id={ balance.user_id }/></td>
+                                            <td class="is-vcentered">
+                                            if balance.amount > 0 {
+                                                <div class="progress-wrapper">
+                                                    <progress class="progress is-large is-success" value={ balance.amount.abs().to_string() } max={ max.clone() }>
+                                                        <Amount amount={ balance.amount } />
+                                                    </progress>
+                                                    <p class="progress-value has-text-white"><Amount amount={ balance.amount } /></p>
+                                                </div>
+                                            }
+                                            </td>
+                                        </tr>
+                                    }
+                                }).collect::<Html>()
+                            }
+                        </tbody>
+                    </table>
+                </div>
             }
         } else {
             html! { <Loading /> }

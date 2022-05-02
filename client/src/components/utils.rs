@@ -40,8 +40,6 @@ pub fn amount(AmountProps { amount }: &AmountProps) -> Html {
 #[function_component(Loading)]
 pub fn loading() -> Html {
     html! {
-        <div class="loading">
-            { "Loading..." }
-        </div>
+        <div class="loading block"></div>
     }
 }
