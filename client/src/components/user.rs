@@ -10,26 +10,23 @@ use uuid::Uuid;
 use yew::prelude::*;
 use yew_agent::{Dispatched, Dispatcher};
 
-use crate::components::account::{AccountAgent, AccountMsg};
+use crate::agent::{AccountAgent, AccountMsg};
 
 #[derive(Properties, PartialEq)]
 pub struct UserProps {
-    pub users: Rc<RefCell<Option<HashMap<Uuid, rmmt::User>>>>,
+    pub users: Rc<RefCell<HashMap<Uuid, rmmt::User>>>,
     pub id: Uuid,
 }
 
 #[function_component(UserName)]
 pub fn user_name(UserProps { users, id }: &UserProps) -> Html {
-    if let Some(users) = &*users.borrow() {
-        if let Some(user) = users.get(&id) {
-            html! {
-                { &user.name }
-            }
-        } else {
-            error!("Unknown user {}", id);
-            html! {}
+    let users = &*users.borrow();
+    if let Some(user) = users.get(&id) {
+        html! {
+            { &user.name }
         }
     } else {
+        error!("Unknown user {}", id);
         html! {}
     }
 }

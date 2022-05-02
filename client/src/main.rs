@@ -3,9 +3,11 @@ use yew::prelude::*;
 use yew_router::prelude::*;
 
 mod components;
+mod agent;
 
 use components::{
     account::{Account, CreateAccount},
+    expenditure::Expenditures,
     utils::TopBar,
 };
 
@@ -13,8 +15,10 @@ use components::{
 enum Route {
     #[at("/")]
     Home,
-    #[at("/account/:id")]
-    Account { id: String },
+    #[at("/account/:account_id")]
+    Account { account_id: String },
+    #[at("/account/:account_id/expenditures")]
+    Expenditures { account_id: String },
     #[not_found]
     #[at("/404")]
     NotFound,
@@ -23,8 +27,11 @@ enum Route {
 fn switch(routes: &Route) -> Html {
     match routes {
         Route::Home => html! { <CreateAccount /> },
-        Route::Account { id } => html! {
-            <Account id={ id.clone() } />
+        Route::Account { account_id } => html! {
+            <Account id={ account_id.clone() } />
+        },
+        Route::Expenditures { account_id } => html! {
+            <Expenditures account_id={ account_id.clone() } />
         },
         Route::NotFound => html! { <h1>{ "404" }</h1> },
     }
@@ -35,9 +42,11 @@ fn app() -> Html {
     html! {
         <body>
             <TopBar/>
-            <BrowserRouter>
-                <Switch<Route> render={Switch::render(switch)} />
-            </BrowserRouter>
+            <div class="container">
+                <BrowserRouter>
+                    <Switch<Route> render={Switch::render(switch)} />
+                </BrowserRouter>
+            </div>
         </body>
     }
 }
