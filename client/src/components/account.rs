@@ -93,16 +93,22 @@ impl Component for Account {
                 <div class="column">
                     <Link<Route> to={Route::Account { account_id: ctx.props().id.clone() }}>
                         <h2 class="title is-1">
-                            <i class="fa fa-bank fa-lg fa-fw"/>
-                            {
-                                match &self.account {
-                                    Some(account) => {
-                                        let account = &*account.borrow();
-                                        account.name.clone()
+                            <span class="icon-text">
+                                <span class="icon">
+                                    <i class="fa fa-bank"/>
+                                </span>
+                                <span>
+                                {
+                                    match &self.account {
+                                        Some(account) => {
+                                            let account = &*account.borrow();
+                                            account.name.clone()
+                                        }
+                                        None => "Loading...".to_string(),
                                     }
-                                    None => "Loading...".to_string(),
                                 }
-                            }
+                                </span>
+                            </span>
                         </h2>
                     </Link<Route>>
                 </div>
@@ -111,8 +117,10 @@ impl Component for Account {
                 <div class="tile is-parent is-6">
                     <div class="tile is-child box">
                         <h3 class="subtitle is-3">
-                            <i class="fa fa-balance-scale fa-lg fa-fw"/>
-                            { "Balance" }
+                            <span class="icon-text">
+                                <span class="icon"><i class="fa fa-balance-scale"></i></span>
+                                <span>{ "Balance" }</span>
+                            </span>
                         </h3>
                         if let (Some(users), Some(balances)) = (self.users.clone(), self.balances.clone()) {
                             <BalanceList users={ users } balances={ balances } loading={ self.fetching_users } />
@@ -125,7 +133,12 @@ impl Component for Account {
 
                 <div class="tile is-parent is-6">
                     <div class="tile is-child box">
-                        <h3 class="subtitle is-3"><i class="fa fa-exchange fa-lg fa-fw"></i> { "Équilibrage" }</h3>
+                        <h3 class="subtitle is-3">
+                            <span class="icon-text">
+                                <span class="icon"><i class="fa fa-exchange"></i></span>
+                                <span>{ "Équilibrage" }</span>
+                            </span>
+                        </h3>
                         <table>
                             <thead>
                                 <tr>
@@ -163,7 +176,12 @@ impl Component for Account {
                 <div class="tile is-parent">
                     <div class="tile is-child box">
                         <Link<Route> to={Route::Expenditures { account_id: ctx.props().id.clone() }}>
-                            <h3 class="subtitle is-3"><a href=""><i class="fa fa-credit-card fa-lg fa-fw"></i>{ "Dépenses" }</a></h3>
+                            <h3 class="subtitle is-3">
+                                <span class="icon-text">
+                                    <span class="icon"><i class="fa fa-credit-card"></i></span>
+                                    <span>{ "Dépenses" }</span>
+                                </span>
+                            </h3>
                         </Link<Route>>
                         if let (Some(users), Some(expenditures)) = (self.users.clone(), self.expenditures.clone()) {
                             <ExpendituresList expenditures={ expenditures } users={ users } limit=10 />
@@ -183,7 +201,14 @@ impl Component for Account {
             <div class="tile is-ancestor">
                 <div class="tile is-parent">
                     <div class="tile is-child box">
-                        <h3 class="subtitle is-3"><a href=""><i class="fa fa-credit-card fa-lg fa-fw"></i>{ "Remboursements" }</a></h3>
+                        <Link<Route> to={Route::Repayments { account_id: ctx.props().id.clone() }}>
+                            <h3 class="subtitle is-3">
+                                <span class="icon-text">
+                                    <span class="icon"><i class="fa fa-exchange"></i></span>
+                                    <span>{ "Remboursements" }</span>
+                                </span>
+                            </h3>
+                        </Link<Route>>
                         if let (Some(users), Some(repayments)) = (self.users.clone(), self.repayments.clone()) {
                             <RepaymentsList users={ users } repayments={ repayments } limit=10 />
                         } else {

@@ -5,13 +5,108 @@ use std::rc::Rc;
 use rmmt;
 use uuid::Uuid;
 use yew::prelude::*;
-use yew_agent::{Bridge, Bridged};
+use yew_agent::{Bridge, Bridged, Dispatched};
+use yew_router::prelude::*;
 
 use crate::components::{
     user::UserName,
     utils::{Amount, Loading},
 };
 use crate::agent::{AccountAgent, AccountMsg};
+use crate::Route;
+
+#[derive(Properties, PartialEq)]
+pub struct RepaymentsProps {
+    pub account_id: String,
+}
+
+pub struct Repayments {
+    account: Option<Rc<RefCell<rmmt::Account>>>,
+    repayments: Option<Rc<RefCell<Vec<rmmt::Repayment>>>>,
+    users: Option<Rc<RefCell<HashMap<Uuid, rmmt::User>>>>,
+    _account_bridge: Box<dyn Bridge<AccountAgent>>,
+}
+
+impl Component for Repayments {
+    type Message = AccountMsg;
+    type Properties = RepaymentsProps;
+
+    fn create(ctx: &Context<Self>) -> Self {
+        let account_bridge = AccountAgent::bridge(ctx.link().callback(|msg| msg));
+
+        let mut dispatcher = AccountAgent::dispatcher();
+        dispatcher.send(AccountMsg::FetchAccount(ctx.props().account_id.clone()));
+
+        Self {
+            account: None,
+            repayments: None,
+            users: None,
+            _account_bridge: account_bridge,
+        }
+    }
+
+    fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
+        match msg {
+            AccountMsg::UpdateAccount(account) => {
+                self.account = Some(account);
+                true
+            },
+            AccountMsg::UpdateUsers(users) => {
+                self.users = Some(users);
+                true
+            },
+            AccountMsg::UpdateRepayments(repayments) => {
+                self.repayments = Some(repayments);
+                true
+            }
+            _ => false,
+        }
+    }
+
+    fn view(&self, ctx: &Context<Self>) -> Html {
+        html! {
+            <div class="columns">
+                <div class="column">
+                    <Link<Route> to={Route::Account { account_id: ctx.props().account_id.clone() }}>
+                        <h2 class="title is-1">
+                            <span class="icon-text">
+                                <span class="icon">
+                                    <i class="fa fa-bank"/>
+                                </span>
+                                <span>
+                                {
+                                    match &self.account {
+                                        Some(account) => {
+                                            let account = &*account.borrow();
+                                            account.name.clone()
+                                        }
+                                        None => "Loading...".to_string(),
+                                    }
+                                }
+                                </span>
+                            </span>
+                        </h2>
+                    </Link<Route>>
+                    <div class="box">
+                        <Link<Route> to={Route::Repayments { account_id: ctx.props().account_id.clone() }}>
+                        <h3 class="subtitle is-3">
+                            <span class="icon-text">
+                                <span class="icon"><i class="fa fa-exchange"></i></span>
+                                <span>{ "Remboursements" }</span>
+                            </span>
+                        </h3>
+                        </Link<Route>>
+                        if let (Some(users), Some(repayments)) = (self.users.clone(), self.repayments.clone()) {
+                            <RepaymentsList repayments={ repayments } users={ users }/>
+                        } else {
+                            <Loading />
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    }
+}
 
 #[derive(Properties, PartialEq)]
 pub struct RepaymentsListProps {

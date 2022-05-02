@@ -68,27 +68,40 @@ impl Component for Expenditures {
             <div class="columns">
                 <div class="column">
                     <Link<Route> to={Route::Account { account_id: ctx.props().account_id.clone() }}>
-                        <h2 class="title is-1 is-spaced">
-                            <i class="fa fa-bank fa-lg fa-fw"/>
-                            {
-                                match &self.account {
-                                    Some(account) => {
-                                        let account = &*account.borrow();
-                                        account.name.clone()
+                        <h2 class="title is-1">
+                            <span class="icon-text">
+                                <span class="icon">
+                                    <i class="fa fa-bank"/>
+                                </span>
+                                <span>
+                                {
+                                    match &self.account {
+                                        Some(account) => {
+                                            let account = &*account.borrow();
+                                            account.name.clone()
+                                        }
+                                        None => "Loading...".to_string(),
                                     }
-                                    None => "Loading...".to_string(),
                                 }
-                            }
+                                </span>
+                            </span>
                         </h2>
                     </Link<Route>>
-                    <Link<Route> to={Route::Expenditures { account_id: ctx.props().account_id.clone() }}>
-                        <h3 class="subtitle is-3"><a href=""><i class="fa fa-credit-card fa-lg fa-fw"></i>{ "Dépenses" }</a></h3>
-                    </Link<Route>>
-                    if let (Some(users), Some(expenditures)) = (self.users.clone(), self.expenditures.clone()) {
-                        <ExpendituresList expenditures={ expenditures } users={ users }/>
-                    } else {
-                        <Loading />
-                    }
+                    <div class="box">
+                        <Link<Route> to={Route::Expenditures { account_id: ctx.props().account_id.clone() }}>
+                            <h3 class="subtitle is-3">
+                                <span class="icon-text">
+                                    <span class="icon"><i class="fa fa-credit-card"></i></span>
+                                    <span>{ "Dépenses" }</span>
+                                </span>
+                            </h3>
+                        </Link<Route>>
+                        if let (Some(users), Some(expenditures)) = (self.users.clone(), self.expenditures.clone()) {
+                            <ExpendituresList expenditures={ expenditures } users={ users }/>
+                        } else {
+                            <Loading />
+                        }
+                    </div>
                 </div>
             </div>
         }
