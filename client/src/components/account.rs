@@ -276,30 +276,6 @@ impl Component for Account {
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
-        //let repayments = use_state(|| None);
-        //{
-        //    let id = props.id.clone();
-        //    let repayments = repayments.clone();
-        //    use_effect_with_deps(
-        //        move |_| {
-        //            let repayments = repayments.clone();
-        //            wasm_bindgen_futures::spawn_local(async move {
-        //                let fetched_repayments: Vec<rmmt::Repayment> =
-        //                    Request::get(&format!("/api/account/{}/repayments", id))
-        //                        .send()
-        //                        .await
-        //                        .unwrap()
-        //                        .json()
-        //                        .await
-        //                        .unwrap();
-        //                repayments.set(Some(fetched_repayments));
-        //            });
-        //            || ()
-        //        },
-        //        (),
-        //    );
-        //}
-
         html! {
             <div class="container">
                 <div class="columns">

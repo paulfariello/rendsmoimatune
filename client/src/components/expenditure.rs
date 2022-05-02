@@ -10,7 +10,7 @@ use yew_agent::{Bridge, Bridged};
 use crate::components::{
     account::{AccountAgent, AccountMsg},
     user::UserName,
-    utils::Amount,
+    utils::{Amount, Loading},
 };
 
 #[derive(Properties, PartialEq)]
@@ -113,7 +113,9 @@ impl Component for ExpendituresList {
                 html! {}
             }
         } else {
-            html! {}
+            html! {
+                <Loading />
+            }
         }
     }
 }
