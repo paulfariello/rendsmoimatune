@@ -2,16 +2,16 @@ use std::cell::RefCell;
 use std::collections::HashMap;
 use std::rc::Rc;
 
+use chrono::naive::NaiveDate;
+use chrono::Local;
 use gloo_net::http::Request;
 #[allow(unused_imports)]
 use log::{debug, error, info, warn};
 use rmmt::{self, prelude::*};
 use uuid::Uuid;
 use yew::prelude::*;
-use yew_agent::{Bridge, Bridged, Dispatcher, Dispatched};
+use yew_agent::{Bridge, Bridged, Dispatched, Dispatcher};
 use yew_router::prelude::*;
-use chrono::naive::NaiveDate;
-use chrono::Local;
 
 use crate::agent::{AccountAgent, AccountMsg};
 use crate::components::{
@@ -199,6 +199,8 @@ pub enum CreateRepaymentMsg {
     AccountMsg(AccountMsg),
     Submit,
     Created { repayment: rmmt::Repayment },
+    Error(String),
+    ClearError,
 }
 
 pub struct CreateRepayment {
@@ -209,6 +211,7 @@ pub struct CreateRepayment {
     select_beneficiary: NodeRef,
     input_date: NodeRef,
     creating: bool,
+    error: Option<String>,
     _account_bridge: Box<dyn Bridge<AccountAgent>>,
     agent: Dispatcher<AccountAgent>,
 }
@@ -249,25 +252,40 @@ impl CreateRepayment {
         };
         let url = format!("/api/account/{}/repayments", ctx.props().account_id);
         ctx.link().send_future(async move {
-            let created_repayment: rmmt::Repayment = Request::post(&url)
-                .json(&repayment)
-                .unwrap()
-                .send()
-                .await
-                .unwrap()
-                .json()
-                .await
-                .unwrap();
+            let resp = Request::post(&url).json(&repayment).unwrap().send().await;
+
+            let resp = match resp {
+                Err(err) => return CreateRepaymentMsg::Error(format!("{}", err)),
+                Ok(resp) => resp,
+            };
+
+            if !resp.ok() {
+                return CreateRepaymentMsg::Error(format!(
+                    "{}: {}",
+                    resp.status(),
+                    resp.status_text()
+                ));
+            }
+
+            let resp = resp.json::<rmmt::Repayment>().await;
+
+            if let Err(err) = resp {
+                return CreateRepaymentMsg::Error(format!("{}", err));
+            }
             CreateRepaymentMsg::Created {
-                repayment: created_repayment,
+                repayment: resp.unwrap(),
             }
         });
     }
 
     fn clear(&mut self) {
         self.creating = false;
+        self.error = None;
 
-        let input_amount = self.input_amount.cast::<web_sys::HtmlInputElement>().unwrap();
+        let input_amount = self
+            .input_amount
+            .cast::<web_sys::HtmlInputElement>()
+            .unwrap();
         input_amount.set_value("0");
 
         let today = Local::today();
@@ -295,6 +313,7 @@ impl Component for CreateRepayment {
             select_beneficiary: NodeRef::default(),
             input_date: NodeRef::default(),
             creating: false,
+            error: None,
             _account_bridge: account_bridge,
             agent: AccountAgent::dispatcher(),
         }
@@ -320,16 +339,27 @@ impl Component for CreateRepayment {
                     self.create_repayment(ctx);
                     true
                 }
-            },
+            }
             CreateRepaymentMsg::Created { repayment } => {
                 info!("Created repayment: {:?}", repayment);
                 self.agent.send(AccountMsg::FetchRepayments);
                 self.clear();
 
                 let history = ctx.link().history().unwrap();
-                history.push(Route::Account { account_id: ctx.props().account_id.clone() });
+                history.push(Route::Account {
+                    account_id: ctx.props().account_id.clone(),
+                });
 
                 false
+            }
+            CreateRepaymentMsg::Error(error) => {
+                self.creating = false;
+                self.error = Some(error);
+                true
+            }
+            CreateRepaymentMsg::ClearError => {
+                self.error = None;
+                true
             }
         }
     }
@@ -340,6 +370,8 @@ impl Component for CreateRepayment {
             CreateRepaymentMsg::Submit
         });
 
+        let delete_error = ctx.link().callback(|_| CreateRepaymentMsg::ClearError);
+
         let today = format!("{}", Local::today().format("%Y-%m-%d"));
 
         html! {
@@ -347,21 +379,27 @@ impl Component for CreateRepayment {
                 <div class="column">
                     <AccountTitle id={ ctx.props().account_id.clone() } account={ self.account.clone() } />
                     <div class="box">
-                        <Link<Route> to={Route::Repayments { account_id: ctx.props().account_id.clone() }}>
-                        <h3 class="subtitle is-3">
-                            <span class="icon-text">
-                                <span class="icon"><i class="fa fa-exchange"></i></span>
-                                <span>{ "Nouveau remboursement" }</span>
-                            </span>
-                        </h3>
+                        <Link<Route> to={Route::CreateRepayment { account_id: ctx.props().account_id.clone() }}>
+                            <h3 class="subtitle is-3">
+                                <span class="icon-text">
+                                    <span class="icon"><i class="fa fa-exchange"></i></span>
+                                    <span>{ "Nouveau remboursement" }</span>
+                                </span>
+                            </h3>
                         </Link<Route>>
+                        if let Some(error) = self.error.as_ref() {
+                            <div class="notification is-danger">
+                              <button class="delete" onclick={delete_error}></button>
+                              { error }
+                            </div>
+                        }
                         if let Some(users) = self.users.clone() {
                             <form {onsubmit}>
                                 <div class="field is-horizontal">
                                     <div class="field-body">
                                         <div class="field">
                                             <p class="control is-expanded has-icons-left">
-                                                <div class="select is-fullwidth">
+                                                <div class="select is-fullwidth is-primary">
                                                     <select ref={ self.select_payer.clone() } required=true>
                                                     {
                                                         (&*users.borrow()).iter().map(|(_, user)| html! {
@@ -391,7 +429,7 @@ impl Component for CreateRepayment {
                                         </div>
                                         <div class="field">
                                             <p class="control is-expanded has-icons-left">
-                                                <div class="select is-fullwidth">
+                                                <div class="select is-fullwidth is-primary">
                                                     <select ref={ self.select_beneficiary.clone() } required=true>
                                                     {
                                                         (&*users.borrow()).iter().map(|(_, user)| html! {

@@ -2,16 +2,20 @@ use std::cell::RefCell;
 use std::collections::HashMap;
 use std::rc::Rc;
 
-use rmmt;
-use uuid::Uuid;
+use chrono::naive::NaiveDate;
+use chrono::Local;
+use gloo_net::http::Request;
 #[allow(unused_imports)]
 use log::{debug, error, info, warn};
+use rmmt::{self, prelude::*};
+use uuid::Uuid;
 use yew::prelude::*;
-use yew_agent::{Bridge, Bridged, Dispatched};
+use yew_agent::{Bridge, Bridged, Dispatched, Dispatcher};
 use yew_router::prelude::*;
 
 use crate::agent::{AccountAgent, AccountMsg};
 use crate::components::{
+    account::AccountTitle,
     user::UserName,
     utils::{Amount, Loading},
 };
@@ -180,6 +184,315 @@ impl Component for ExpendituresList {
             }
         } else {
             html! {}
+        }
+    }
+}
+
+#[derive(Properties, PartialEq)]
+pub struct CreateExpenditureProps {
+    pub account_id: String,
+}
+
+pub enum CreateExpenditureMsg {
+    AccountMsg(AccountMsg),
+    Submit,
+    Created { expenditure: rmmt::Expenditure, debts: Vec<rmmt::Debt> },
+    Error(String),
+    ClearError,
+}
+
+pub struct CreateExpenditure {
+    account: Option<Rc<RefCell<rmmt::Account>>>,
+    users: Option<Rc<RefCell<HashMap<Uuid, rmmt::User>>>>,
+    input_name: NodeRef,
+    input_date: NodeRef,
+    input_amount: NodeRef,
+    select_payer: NodeRef,
+    debtors_checkbox: HashMap<Uuid, NodeRef>,
+    debtors_input_share: HashMap<Uuid, NodeRef>,
+    creating: bool,
+    error: Option<String>,
+    _account_bridge: Box<dyn Bridge<AccountAgent>>,
+    agent: Dispatcher<AccountAgent>,
+}
+
+impl CreateExpenditure {
+    fn create_expenditure(&mut self, ctx: &Context<Self>) {
+        self.creating = true;
+
+        let input_name = self.input_name.cast::<web_sys::HtmlInputElement>().unwrap();
+        let name = input_name.value();
+
+        let input_date = self.input_date.cast::<web_sys::HtmlInputElement>().unwrap();
+        let date = NaiveDate::parse_from_str(&input_date.value(), "%Y-%m-%d").unwrap();
+
+        let input_amount = self
+            .input_amount
+            .cast::<web_sys::HtmlInputElement>()
+            .unwrap();
+        let amount = input_amount.value().parse::<f32>().unwrap();
+        let amount = (amount * 100f32).round() as i32;
+
+        let select_payer = self
+            .select_payer
+            .cast::<web_sys::HtmlInputElement>()
+            .unwrap();
+        let payer_id = Uuid::parse_str(&select_payer.value()).unwrap();
+
+        let account_id: UniqId = ctx.props().account_id.clone().try_into().unwrap();
+        let expenditure = rmmt::NewExpenditure {
+            account_id: account_id.into(),
+            name,
+            date,
+            amount,
+            payer_id,
+        };
+
+        let mut debtors = Vec::new();
+        for (id, user) in (&*self.users.as_ref().unwrap().borrow()).iter() {
+            let checkbox = self.debtors_checkbox.get(id).unwrap();
+            let enabled = checkbox.cast::<web_sys::HtmlInputElement>().unwrap().checked();
+            if enabled {
+                let input_share = self.debtors_input_share.get(id).unwrap();
+                let share = input_share.cast::<web_sys::HtmlInputElement>().unwrap().value().parse::<i32>().unwrap();
+                info!("{}: {}", user.name, share);
+                debtors.push((id.clone(), share));
+            }
+        }
+
+        let url = format!("/api/account/{}/expenditures", ctx.props().account_id);
+        ctx.link().send_future(async move {
+            let resp = Request::post(&url).json(&(expenditure, debtors)).unwrap().send().await;
+
+            let resp = match resp {
+                Err(err) => return CreateExpenditureMsg::Error(format!("{}", err)),
+                Ok(resp) => resp,
+            };
+
+            if !resp.ok() {
+                return CreateExpenditureMsg::Error(format!(
+                    "{}: {}",
+                    resp.status(),
+                    resp.status_text()
+                ));
+            }
+
+            let resp = resp.json::<(rmmt::Expenditure, Vec<rmmt::Debt>)>().await;
+
+            if let Err(err) = resp {
+                return CreateExpenditureMsg::Error(format!("{}", err));
+            }
+
+            let (expenditure, debts) = resp.unwrap();
+            CreateExpenditureMsg::Created {
+                expenditure,
+                debts,
+            }
+        });
+    }
+
+    fn clear(&mut self) {
+        self.creating = false;
+        self.error = None;
+
+        let input_name = self.input_name.cast::<web_sys::HtmlInputElement>().unwrap();
+        input_name.set_value("");
+
+        let input_amount = self
+            .input_amount
+            .cast::<web_sys::HtmlInputElement>()
+            .unwrap();
+        input_amount.set_value("");
+
+        let today = Local::today();
+        let input_date = self.input_date.cast::<web_sys::HtmlInputElement>().unwrap();
+        input_date.set_value(&format!("{}", today.format("%Y-%m-%d")));
+    }
+}
+
+impl Component for CreateExpenditure {
+    type Message = CreateExpenditureMsg;
+    type Properties = CreateExpenditureProps;
+
+    fn create(ctx: &Context<Self>) -> Self {
+        let account_bridge =
+            AccountAgent::bridge(ctx.link().callback(CreateExpenditureMsg::AccountMsg));
+
+        let mut dispatcher = AccountAgent::dispatcher();
+        dispatcher.send(AccountMsg::FetchAccount(ctx.props().account_id.clone()));
+
+        Self {
+            account: None,
+            users: None,
+            input_name: NodeRef::default(),
+            input_date: NodeRef::default(),
+            input_amount: NodeRef::default(),
+            select_payer: NodeRef::default(),
+            debtors_checkbox: HashMap::new(),
+            debtors_input_share: HashMap::new(),
+            creating: false,
+            error: None,
+            _account_bridge: account_bridge,
+            agent: AccountAgent::dispatcher(),
+        }
+    }
+
+    fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
+        match msg {
+            CreateExpenditureMsg::AccountMsg(msg) => match msg {
+                AccountMsg::UpdateAccount(account) => {
+                    self.account = Some(account);
+                    true
+                }
+                AccountMsg::UpdateUsers(users) => {
+                    self.users = Some(users);
+                    self.debtors_checkbox = (&*self.users.as_ref().unwrap().borrow()).iter().map(|(id, _)| (id.clone(), NodeRef::default())).collect();
+                    self.debtors_input_share = (&*self.users.as_ref().unwrap().borrow()).iter().map(|(id, _)| (id.clone(), NodeRef::default())).collect();
+                    true
+                }
+                _ => false,
+            },
+            CreateExpenditureMsg::Submit => {
+                if self.creating {
+                    false
+                } else {
+                    self.error = None;
+                    self.create_expenditure(ctx);
+                    true
+                }
+            }
+            CreateExpenditureMsg::Created { expenditure, debts } => {
+                info!("Created expenditure: {:?} with debts: {:?}", expenditure, debts);
+                self.agent.send(AccountMsg::FetchExpenditures);
+                self.clear();
+
+                let history = ctx.link().history().unwrap();
+                history.push(Route::Account {
+                    account_id: ctx.props().account_id.clone(),
+                });
+
+                false
+            }
+            CreateExpenditureMsg::Error(error) => {
+                self.creating = false;
+                self.error = Some(error);
+                true
+            }
+            CreateExpenditureMsg::ClearError => {
+                self.error = None;
+                true
+            }
+        }
+    }
+
+    fn view(&self, ctx: &Context<Self>) -> Html {
+        let onsubmit = ctx.link().callback(|event: FocusEvent| {
+            event.prevent_default();
+            CreateExpenditureMsg::Submit
+        });
+
+        let delete_error = ctx.link().callback(|_| CreateExpenditureMsg::ClearError);
+
+        let today = format!("{}", Local::today().format("%Y-%m-%d"));
+
+        html! {
+            <div class="columns">
+                <div class="column">
+                    <AccountTitle id={ ctx.props().account_id.clone() } account={ self.account.clone() } />
+                    <div class="box">
+                        <Link<Route> to={Route::CreateExpenditure { account_id: ctx.props().account_id.clone() }}>
+                        <h3 class="subtitle is-3">
+                            <span class="icon-text">
+                                <span class="icon"><i class="fa fa-exchange"></i></span>
+                                <span>{ "Nouvelle dépense" }</span>
+                            </span>
+                        </h3>
+                        </Link<Route>>
+                        if let Some(error) = self.error.as_ref() {
+                            <div class="notification is-danger">
+                              <button class="delete" onclick={delete_error}></button>
+                              { error }
+                            </div>
+                        }
+                        if let Some(users) = self.users.clone() {
+                            <form {onsubmit}>
+                                <div class="field">
+                                    <label class="label">{ "Nom" }</label>
+                                    <div class="control">
+                                        <input ref={ self.input_name.clone() } class="input is-primary" type="text" placeholder="Baguette de pain" required=true />
+                                    </div>
+                                </div>
+
+                                <div class="field">
+                                    <label class="label">{ "Montant" }</label>
+                                    <div class="field has-addons">
+                                        <div class="control is-expanded">
+                                            <input ref={ self.input_amount.clone() } type="number" min="0" class="input is-primary" required=true placeholder="montant" />
+                                        </div>
+                                        <div class="control">
+                                            <p class="button is-static">{ "€" }</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="field">
+                                    <label class="label">{ "Date" }</label>
+                                    <div class="control">
+                                        <input ref={self.input_date.clone()} type="date" class="input is-primary" required=true value={ today } />
+                                    </div>
+                                </div>
+
+                                <div class="field">
+                                    <label class="label">{ "Payeur" }</label>
+                                    <p class="control is-expanded has-icons-left">
+                                        <div class="select is-fullwidth is-primary">
+                                            <select ref={ self.select_payer.clone() } required=true>
+                                            {
+                                                (&*users.borrow()).iter().map(|(_, user)| html! {
+                                                    <option value={ user.id.to_string() }>{ &user.name }</option>
+                                                }).collect::<Html>()
+                                            }
+                                            </select>
+                                        </div>
+                                        <span class="icon is-small is-left">
+                                            <i class="fa fa-user"></i>
+                                        </span>
+                                    </p>
+                                </div>
+
+                                {
+                                    (&*users.borrow()).iter().map(|(id, user)| html! {
+                                        <div class="field has-addons">
+                                            <div class="control">
+                                                <label class="is-checkbox is-primary">
+                                                    <input ref={ self.debtors_checkbox.get(id).clone().unwrap() } type="checkbox" />
+                                                    <span class="icon checkmark">
+                                                        <i class="fa fa-check"></i>
+                                                    </span>
+                                                    <span>{ &user.name }</span>
+                                                </label>
+                                            </div>
+                                            <div class="control">
+                                                <input ref={ self.debtors_input_share.get(id).clone().unwrap() } type="number" min="0" class="input is-primary" />
+                                            </div>
+                                        </div>
+                                    }).collect::<Html>()
+                                }
+                                <div class="control">
+                                    <button type="submit" class={classes!("button", "is-primary", self.creating.then(|| "is-loading"))}>
+                                        <span class="icon">
+                                            <i class="fa fa-user-plus" />
+                                        </span>
+                                        <span>{ "Ajouter" }</span>
+                                    </button>
+                                </div>
+                            </form>
+                        } else {
+                            <Loading />
+                        }
+                    </div>
+                </div>
+            </div>
         }
     }
 }

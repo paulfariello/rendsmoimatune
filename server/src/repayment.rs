@@ -1,11 +1,15 @@
 use diesel::prelude::*;
-use rmmt::{prelude::*, Repayment, NewRepayment};
+use rmmt::{prelude::*, NewRepayment, Repayment};
 use rocket::serde::json::Json;
 
 use crate::error::Error;
 use crate::MainDbConn;
 
-#[post("/api/account/<account_id>/repayments", format = "json", data = "<repayment>")]
+#[post(
+    "/api/account/<account_id>/repayments",
+    format = "json",
+    data = "<repayment>"
+)]
 pub(crate) async fn post_repayment(
     conn: MainDbConn,
     account_id: UniqId,
@@ -15,14 +19,21 @@ pub(crate) async fn post_repayment(
         Err(Error::IdError)
     } else {
         let repayment: Repayment = conn
-            .run(move |c| diesel::insert_into(repayments).values(repayment.into_inner()).get_result(c))
+            .run(move |c| {
+                diesel::insert_into(repayments)
+                    .values(repayment.into_inner())
+                    .get_result(c)
+            })
             .await?;
         Ok(Json(repayment))
     }
 }
 
 #[get("/api/account/<account_id>/repayments")]
-pub(crate) async fn get_repayments(conn: MainDbConn, account_id: UniqId) -> Result<Json<Vec<Repayment>>, Error> {
+pub(crate) async fn get_repayments(
+    conn: MainDbConn,
+    account_id: UniqId,
+) -> Result<Json<Vec<Repayment>>, Error> {
     let uuid: uuid::Uuid = account_id.into();
     let account_repayments: Vec<Repayment> = conn
         .run(move |c| repayments.filter(repayments_account_id.eq(uuid)).load(c))

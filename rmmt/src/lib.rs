@@ -9,9 +9,9 @@ use std::collections::HashMap;
 use uuid::Uuid;
 
 pub mod prelude;
-pub mod uniqid;
 #[cfg(feature = "db")]
 mod schema;
+pub mod uniqid;
 
 #[cfg(feature = "db")]
 use schema::{accounts, debts, expenditures, repayments, users};
@@ -63,6 +63,17 @@ pub struct Expenditure {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[cfg_attr(feature = "db", derive(Insertable))]
+#[cfg_attr(feature = "db", table_name = "expenditures")]
+pub struct NewExpenditure {
+    pub account_id: Uuid,
+    pub name: String,
+    pub date: NaiveDate,
+    pub amount: i32,
+    pub payer_id: Uuid,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 #[cfg_attr(feature = "db", derive(Identifiable, Queryable, Associations))]
 #[cfg_attr(feature = "db", belongs_to(Account))]
 #[cfg_attr(feature = "db", table_name = "repayments")]
@@ -93,6 +104,15 @@ pub struct NewRepayment {
 #[cfg_attr(feature = "db", table_name = "debts")]
 pub struct Debt {
     pub id: Uuid,
+    pub debtor_id: Uuid,
+    pub expenditure_id: Uuid,
+    pub share: i32,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[cfg_attr(feature = "db", derive(Insertable))]
+#[cfg_attr(feature = "db", table_name = "debts")]
+pub struct NewDebt {
     pub debtor_id: Uuid,
     pub expenditure_id: Uuid,
     pub share: i32,
@@ -178,9 +198,9 @@ impl Balance {
 
     #[inline]
     fn get_balance<'a>(balances: &'a mut HashMap<Uuid, Balance>, id: &Uuid) -> &'a mut Balance {
-        balances.get_mut(id).expect(&format!(
-            "Corrupted db? Missing user {} in balances", id
-        ))
+        balances
+            .get_mut(id)
+            .expect(&format!("Corrupted db? Missing user {} in balances", id))
     }
 }
 

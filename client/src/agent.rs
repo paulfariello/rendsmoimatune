@@ -17,6 +17,7 @@ pub enum AccountMsg {
     FetchUsers,
     UpdateUsers(Rc<RefCell<HashMap<Uuid, rmmt::User>>>),
     UpdateBalances(Rc<RefCell<Vec<rmmt::Balance>>>),
+    FetchExpenditures,
     UpdateExpenditures(Rc<RefCell<Vec<rmmt::Expenditure>>>),
     FetchRepayments,
     UpdateRepayments(Rc<RefCell<Vec<rmmt::Repayment>>>),
@@ -209,6 +210,9 @@ impl Agent for AccountAgent {
             AccountMsg::FetchUsers => {
                 self.fetch_users();
                 self.fetch_balances();
+            }
+            AccountMsg::FetchExpenditures => {
+                self.fetch_expenditures();
             }
             AccountMsg::FetchRepayments => {
                 self.fetch_repayments();

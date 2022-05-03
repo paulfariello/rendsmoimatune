@@ -1,8 +1,8 @@
 #[cfg(feature = "rocket")]
 use rocket::request::FromParam;
 use serde::{Deserialize, Serialize};
-use uuid::Uuid;
 use std::convert::TryFrom;
+use uuid::Uuid;
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct UniqId(Uuid);
@@ -84,7 +84,6 @@ impl PartialEq<UniqId> for Uuid {
     }
 }
 
-
 #[cfg(feature = "rocket")]
 impl<'r> FromParam<'r> for UniqId {
     type Error = String;
@@ -97,8 +96,8 @@ impl<'r> FromParam<'r> for UniqId {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use test_log::test;
     use std::str::FromStr;
+    use test_log::test;
 
     #[test]
     fn uniq_id_from_str() {
@@ -110,7 +109,10 @@ mod tests {
 
         // Then
         assert!(uniq_id.is_ok());
-        assert_eq!(uniq_id.unwrap().0, Uuid::from_str("a87f72fd-9cec-4394-94af-9fd861e0bbdf").unwrap());
+        assert_eq!(
+            uniq_id.unwrap().0,
+            Uuid::from_str("a87f72fd-9cec-4394-94af-9fd861e0bbdf").unwrap()
+        );
     }
 
     #[test]

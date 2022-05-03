@@ -7,7 +7,7 @@ mod components;
 
 use components::{
     account::{Account, CreateAccount},
-    expenditure::Expenditures,
+    expenditure::{CreateExpenditure, Expenditures},
     repayment::{CreateRepayment, Repayments},
     utils::TopBar,
 };
@@ -20,6 +20,8 @@ enum Route {
     Account { account_id: String },
     #[at("/account/:account_id/expenditures")]
     Expenditures { account_id: String },
+    #[at("/account/:account_id/create_expenditure")]
+    CreateExpenditure { account_id: String },
     #[at("/account/:account_id/repayments")]
     Repayments { account_id: String },
     #[at("/account/:account_id/create_repayment")]
@@ -37,6 +39,9 @@ fn switch(routes: &Route) -> Html {
         },
         Route::Expenditures { account_id } => html! {
             <Expenditures account_id={ account_id.clone() } />
+        },
+        Route::CreateExpenditure { account_id } => html! {
+            <CreateExpenditure account_id={ account_id.clone() } />
         },
         Route::Repayments { account_id } => html! {
             <Repayments account_id={ account_id.clone() } />
