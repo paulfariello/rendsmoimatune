@@ -2,13 +2,13 @@ use wasm_logger;
 use yew::prelude::*;
 use yew_router::prelude::*;
 
-mod components;
 mod agent;
+mod components;
 
 use components::{
     account::{Account, CreateAccount},
     expenditure::Expenditures,
-    repayment::Repayments,
+    repayment::{CreateRepayment, Repayments},
     utils::TopBar,
 };
 
@@ -22,6 +22,8 @@ enum Route {
     Expenditures { account_id: String },
     #[at("/account/:account_id/repayments")]
     Repayments { account_id: String },
+    #[at("/account/:account_id/create_repayment")]
+    CreateRepayment { account_id: String },
     #[not_found]
     #[at("/404")]
     NotFound,
@@ -39,7 +41,12 @@ fn switch(routes: &Route) -> Html {
         Route::Repayments { account_id } => html! {
             <Repayments account_id={ account_id.clone() } />
         },
-        Route::NotFound => html! { <h1>{ "404" }</h1> },
+        Route::CreateRepayment { account_id } => html! {
+            <CreateRepayment account_id={ account_id.clone() } />
+        },
+        Route::NotFound => {
+            html! { <h1 class="title is-1">{ "Oups… Cette page n'existe pas" }</h1> }
+        }
     }
 }
 

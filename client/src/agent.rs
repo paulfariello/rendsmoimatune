@@ -3,14 +3,12 @@ use std::collections::HashMap;
 use std::collections::HashSet;
 use std::rc::Rc;
 
+use gloo_net::http::Request;
 #[allow(unused_imports)]
 use log::{debug, error, info, warn};
-use gloo_net::http::Request;
-use yew_agent::{
-    Agent, AgentLink, Context as AgentContext, HandlerId,
-};
 use rmmt;
 use uuid::Uuid;
+use yew_agent::{Agent, AgentLink, Context as AgentContext, HandlerId};
 
 #[derive(Debug, Clone)]
 pub enum AccountMsg {
@@ -20,6 +18,7 @@ pub enum AccountMsg {
     UpdateUsers(Rc<RefCell<HashMap<Uuid, rmmt::User>>>),
     UpdateBalances(Rc<RefCell<Vec<rmmt::Balance>>>),
     UpdateExpenditures(Rc<RefCell<Vec<rmmt::Expenditure>>>),
+    FetchRepayments,
     UpdateRepayments(Rc<RefCell<Vec<rmmt::Repayment>>>),
 }
 
@@ -40,14 +39,13 @@ impl AccountAgent {
         self.account_id = Some(account_id);
         let account_id = self.account_id.clone().unwrap();
         self.link.send_future(async move {
-            let account: rmmt::Account =
-                Request::get(&format!("/api/account/{}", account_id))
-                    .send()
-                    .await
-                    .unwrap()
-                    .json()
-                    .await
-                    .unwrap();
+            let account: rmmt::Account = Request::get(&format!("/api/account/{}", account_id))
+                .send()
+                .await
+                .unwrap()
+                .json()
+                .await
+                .unwrap();
             AccountMsg::UpdateAccount(Rc::new(RefCell::new(account)))
         })
     }
@@ -66,15 +64,8 @@ impl AccountAgent {
                             .json()
                             .await
                             .unwrap();
-                    info!(
-                        "Fetched {} users for account: {}",
-                        users.len(),
-                        account_id
-                    );
-                    let users = users
-                            .into_iter()
-                            .map(|u| (u.id.clone(), u))
-                            .collect();
+                    info!("Fetched {} users for account: {}", users.len(), account_id);
+                    let users = users.into_iter().map(|u| (u.id.clone(), u)).collect();
                     AccountMsg::UpdateUsers(Rc::new(RefCell::new(users)))
                 });
             }
@@ -194,9 +185,11 @@ impl Agent for AccountAgent {
             AccountMsg::UpdateAccount(account) => self.account = Some(account.clone()),
             AccountMsg::UpdateUsers(users) => self.users = Some(users.clone()),
             AccountMsg::UpdateBalances(balances) => self.balances = Some(balances.clone()),
-            AccountMsg::UpdateExpenditures(expenditures) => self.expenditures = Some(expenditures.clone()),
+            AccountMsg::UpdateExpenditures(expenditures) => {
+                self.expenditures = Some(expenditures.clone())
+            }
             AccountMsg::UpdateRepayments(repayments) => self.repayments = Some(repayments.clone()),
-            _ => {},
+            _ => {}
         }
         self.broadcast(msg);
     }
@@ -217,6 +210,9 @@ impl Agent for AccountAgent {
                 self.fetch_users();
                 self.fetch_balances();
             }
+            AccountMsg::FetchRepayments => {
+                self.fetch_repayments();
+            }
             _ => {}
         }
 
@@ -235,10 +231,12 @@ impl Agent for AccountAgent {
             self.link.respond(id, AccountMsg::UpdateBalances(balances));
         }
         if let Some(expenditures) = self.expenditures.clone() {
-            self.link.respond(id, AccountMsg::UpdateExpenditures(expenditures));
+            self.link
+                .respond(id, AccountMsg::UpdateExpenditures(expenditures));
         }
         if let Some(repayments) = self.repayments.clone() {
-            self.link.respond(id, AccountMsg::UpdateRepayments(repayments));
+            self.link
+                .respond(id, AccountMsg::UpdateRepayments(repayments));
         }
     }
 

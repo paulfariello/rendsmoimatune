@@ -19,3 +19,4 @@ log = "*"
 web-sys = { version = "*", features = ["HtmlFormElement"] }
 wasm-bindgen = "*"
 yewtil = "0.4"
+chrono = { version = "*", features = ["wasmbind"] }

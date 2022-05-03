@@ -2,17 +2,23 @@ use std::cell::RefCell;
 use std::collections::HashMap;
 use std::rc::Rc;
 
-use rmmt;
+use gloo_net::http::Request;
+#[allow(unused_imports)]
+use log::{debug, error, info, warn};
+use rmmt::{self, prelude::*};
 use uuid::Uuid;
 use yew::prelude::*;
-use yew_agent::{Bridge, Bridged, Dispatched};
+use yew_agent::{Bridge, Bridged, Dispatcher, Dispatched};
 use yew_router::prelude::*;
+use chrono::naive::NaiveDate;
+use chrono::Local;
 
+use crate::agent::{AccountAgent, AccountMsg};
 use crate::components::{
+    account::AccountTitle,
     user::UserName,
     utils::{Amount, Loading},
 };
-use crate::agent::{AccountAgent, AccountMsg};
 use crate::Route;
 
 #[derive(Properties, PartialEq)]
@@ -50,11 +56,11 @@ impl Component for Repayments {
             AccountMsg::UpdateAccount(account) => {
                 self.account = Some(account);
                 true
-            },
+            }
             AccountMsg::UpdateUsers(users) => {
                 self.users = Some(users);
                 true
-            },
+            }
             AccountMsg::UpdateRepayments(repayments) => {
                 self.repayments = Some(repayments);
                 true
@@ -180,6 +186,247 @@ impl Component for RepaymentsList {
             }
         } else {
             html! {}
+        }
+    }
+}
+
+#[derive(Properties, PartialEq)]
+pub struct CreateRepaymentProps {
+    pub account_id: String,
+}
+
+pub enum CreateRepaymentMsg {
+    AccountMsg(AccountMsg),
+    Submit,
+    Created { repayment: rmmt::Repayment },
+}
+
+pub struct CreateRepayment {
+    account: Option<Rc<RefCell<rmmt::Account>>>,
+    users: Option<Rc<RefCell<HashMap<Uuid, rmmt::User>>>>,
+    select_payer: NodeRef,
+    input_amount: NodeRef,
+    select_beneficiary: NodeRef,
+    input_date: NodeRef,
+    creating: bool,
+    _account_bridge: Box<dyn Bridge<AccountAgent>>,
+    agent: Dispatcher<AccountAgent>,
+}
+
+impl CreateRepayment {
+    fn create_repayment(&mut self, ctx: &Context<Self>) {
+        self.creating = true;
+
+        let select_payer = self
+            .select_payer
+            .cast::<web_sys::HtmlInputElement>()
+            .unwrap();
+        let payer_id = Uuid::parse_str(&select_payer.value()).unwrap();
+
+        let input_amount = self
+            .input_amount
+            .cast::<web_sys::HtmlInputElement>()
+            .unwrap();
+        let amount = input_amount.value().parse::<f32>().unwrap();
+        let amount = (amount * 100f32).round() as i32;
+
+        let select_beneficiary = self
+            .select_beneficiary
+            .cast::<web_sys::HtmlInputElement>()
+            .unwrap();
+        let beneficiary_id = Uuid::parse_str(&select_beneficiary.value()).unwrap();
+
+        let input_date = self.input_date.cast::<web_sys::HtmlInputElement>().unwrap();
+        let date = NaiveDate::parse_from_str(&input_date.value(), "%Y-%m-%d").unwrap();
+
+        let account_id: UniqId = ctx.props().account_id.clone().try_into().unwrap();
+        let repayment = rmmt::NewRepayment {
+            account_id: account_id.into(),
+            amount,
+            payer_id,
+            beneficiary_id,
+            date,
+        };
+        let url = format!("/api/account/{}/repayments", ctx.props().account_id);
+        ctx.link().send_future(async move {
+            let created_repayment: rmmt::Repayment = Request::post(&url)
+                .json(&repayment)
+                .unwrap()
+                .send()
+                .await
+                .unwrap()
+                .json()
+                .await
+                .unwrap();
+            CreateRepaymentMsg::Created {
+                repayment: created_repayment,
+            }
+        });
+    }
+
+    fn clear(&mut self) {
+        self.creating = false;
+
+        let input_amount = self.input_amount.cast::<web_sys::HtmlInputElement>().unwrap();
+        input_amount.set_value("0");
+
+        let today = Local::today();
+        let input_date = self.input_date.cast::<web_sys::HtmlInputElement>().unwrap();
+        input_date.set_value(&format!("{}", today.format("%Y-%m-%d")));
+    }
+}
+
+impl Component for CreateRepayment {
+    type Message = CreateRepaymentMsg;
+    type Properties = CreateRepaymentProps;
+
+    fn create(ctx: &Context<Self>) -> Self {
+        let account_bridge =
+            AccountAgent::bridge(ctx.link().callback(CreateRepaymentMsg::AccountMsg));
+
+        let mut dispatcher = AccountAgent::dispatcher();
+        dispatcher.send(AccountMsg::FetchAccount(ctx.props().account_id.clone()));
+
+        Self {
+            account: None,
+            users: None,
+            select_payer: NodeRef::default(),
+            input_amount: NodeRef::default(),
+            select_beneficiary: NodeRef::default(),
+            input_date: NodeRef::default(),
+            creating: false,
+            _account_bridge: account_bridge,
+            agent: AccountAgent::dispatcher(),
+        }
+    }
+
+    fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
+        match msg {
+            CreateRepaymentMsg::AccountMsg(msg) => match msg {
+                AccountMsg::UpdateAccount(account) => {
+                    self.account = Some(account);
+                    true
+                }
+                AccountMsg::UpdateUsers(users) => {
+                    self.users = Some(users);
+                    true
+                }
+                _ => false,
+            },
+            CreateRepaymentMsg::Submit => {
+                if self.creating {
+                    false
+                } else {
+                    self.create_repayment(ctx);
+                    true
+                }
+            },
+            CreateRepaymentMsg::Created { repayment } => {
+                info!("Created repayment: {:?}", repayment);
+                self.agent.send(AccountMsg::FetchRepayments);
+                self.clear();
+
+                let history = ctx.link().history().unwrap();
+                history.push(Route::Account { account_id: ctx.props().account_id.clone() });
+
+                false
+            }
+        }
+    }
+
+    fn view(&self, ctx: &Context<Self>) -> Html {
+        let onsubmit = ctx.link().callback(|event: FocusEvent| {
+            event.prevent_default();
+            CreateRepaymentMsg::Submit
+        });
+
+        let today = format!("{}", Local::today().format("%Y-%m-%d"));
+
+        html! {
+            <div class="columns">
+                <div class="column">
+                    <AccountTitle id={ ctx.props().account_id.clone() } account={ self.account.clone() } />
+                    <div class="box">
+                        <Link<Route> to={Route::Repayments { account_id: ctx.props().account_id.clone() }}>
+                        <h3 class="subtitle is-3">
+                            <span class="icon-text">
+                                <span class="icon"><i class="fa fa-exchange"></i></span>
+                                <span>{ "Nouveau remboursement" }</span>
+                            </span>
+                        </h3>
+                        </Link<Route>>
+                        if let Some(users) = self.users.clone() {
+                            <form {onsubmit}>
+                                <div class="field is-horizontal">
+                                    <div class="field-body">
+                                        <div class="field">
+                                            <p class="control is-expanded has-icons-left">
+                                                <div class="select is-fullwidth">
+                                                    <select ref={ self.select_payer.clone() } required=true>
+                                                    {
+                                                        (&*users.borrow()).iter().map(|(_, user)| html! {
+                                                            <option value={ user.id.to_string() }>{ &user.name }</option>
+                                                        }).collect::<Html>()
+                                                    }
+                                                    </select>
+                                                </div>
+                                                <span class="icon is-small is-left">
+                                                    <i class="fa fa-user"></i>
+                                                </span>
+                                            </p>
+                                        </div>
+                                        <div class="field">
+                                            <label class="label is-large">{ "rembourse" }</label>
+                                        </div>
+                                        <div class="field has-addons">
+                                            <div class="control is-expanded">
+                                            <input ref={ self.input_amount.clone() } type="number" min="0" class="input is-primary" required=true placeholder="montant" />
+                                            </div>
+                                            <div class="control">
+                                                <p class="button is-static">{ "€" }</p>
+                                            </div>
+                                        </div>
+                                        <div class="field">
+                                            <label class="label is-large">{ "à" }</label>
+                                        </div>
+                                        <div class="field">
+                                            <p class="control is-expanded has-icons-left">
+                                                <div class="select is-fullwidth">
+                                                    <select ref={ self.select_beneficiary.clone() } required=true>
+                                                    {
+                                                        (&*users.borrow()).iter().map(|(_, user)| html! {
+                                                            <option value={ user.id.to_string() }>{ &user.name }</option>
+                                                        }).collect::<Html>()
+                                                    }
+                                                    </select>
+                                                </div>
+                                                <span class="icon is-small is-left">
+                                                    <i class="fa fa-user"></i>
+                                                </span>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field">
+                                    <div class="control">
+                                        <input ref={self.input_date.clone()} type="date" class="input is-primary" required=true value={ today } />
+                                    </div>
+                                </div>
+                                <div class="control">
+                                    <button type="submit" class={classes!("button", "is-primary", self.creating.then(|| "is-loading"))}>
+                                        <span class="icon">
+                                            <i class="fa fa-user-plus" />
+                                        </span>
+                                        <span>{ "Ajouter" }</span>
+                                    </button>
+                                </div>
+                            </form>
+                        } else {
+                            <Loading />
+                        }
+                    </div>
+                </div>
+            </div>
         }
     }
 }

@@ -34,6 +34,24 @@ pub struct NewAccount {
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 #[cfg_attr(feature = "db", derive(Identifiable, Queryable, Associations))]
 #[cfg_attr(feature = "db", belongs_to(Account))]
+#[cfg_attr(feature = "db", table_name = "users")]
+pub struct User {
+    pub id: Uuid,
+    pub account_id: Uuid,
+    pub name: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[cfg_attr(feature = "db", derive(Insertable))]
+#[cfg_attr(feature = "db", table_name = "users")]
+pub struct NewUser {
+    pub account_id: Uuid,
+    pub name: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[cfg_attr(feature = "db", derive(Identifiable, Queryable, Associations))]
+#[cfg_attr(feature = "db", belongs_to(Account))]
 #[cfg_attr(feature = "db", table_name = "expenditures")]
 pub struct Expenditure {
     pub id: Uuid,
@@ -58,21 +76,14 @@ pub struct Repayment {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
-#[cfg_attr(feature = "db", derive(Identifiable, Queryable, Associations))]
-#[cfg_attr(feature = "db", belongs_to(Account))]
-#[cfg_attr(feature = "db", table_name = "users")]
-pub struct User {
-    pub id: Uuid,
-    pub account_id: Uuid,
-    pub name: String,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 #[cfg_attr(feature = "db", derive(Insertable))]
-#[cfg_attr(feature = "db", table_name = "users")]
-pub struct NewUser {
+#[cfg_attr(feature = "db", table_name = "repayments")]
+pub struct NewRepayment {
     pub account_id: Uuid,
-    pub name: String,
+    pub date: NaiveDate,
+    pub amount: i32,
+    pub payer_id: Uuid,
+    pub beneficiary_id: Uuid,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]

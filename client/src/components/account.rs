@@ -5,20 +5,18 @@ use std::rc::Rc;
 use gloo_net::http::Request;
 #[allow(unused_imports)]
 use log::{debug, error, info, warn};
-use uuid::Uuid;
 use rmmt;
+use uuid::Uuid;
 use yew::prelude::*;
-use yew_agent::{
-    Bridge, Bridged, Dispatched,
-};
+use yew_agent::{Bridge, Bridged, Dispatched};
 use yew_router::prelude::*;
 
+use crate::agent::{AccountAgent, AccountMsg};
 use crate::components::{
     balance::BalanceList, expenditure::ExpendituresList, repayment::RepaymentsList,
-    utils::Loading, user::CreateUser,
+    user::CreateUser, utils::Loading,
 };
 use crate::Route;
-use crate::agent::{AccountMsg, AccountAgent};
 
 #[derive(Properties, PartialEq)]
 pub struct AccountProps {
@@ -210,16 +208,18 @@ impl Component for Account {
                             </h3>
                         </Link<Route>>
                         if let (Some(users), Some(repayments)) = (self.users.clone(), self.repayments.clone()) {
-                            <RepaymentsList users={ users } repayments={ repayments } limit=10 />
+                            <RepaymentsList { users } { repayments } limit=10 />
                         } else {
                             <Loading />
                         }
-                        <a class="button is-primary" href="">
-                            <span class="icon">
-                                <i class="fa fa-plus-circle" />
-                            </span>
-                            <span>{ "Nouveau remboursement" }</span>
-                        </a>
+                        <Link<Route> to={Route::CreateRepayment { account_id: ctx.props().id.clone() }}>
+                            <a class="button is-primary" href="">
+                                <span class="icon">
+                                    <i class="fa fa-plus-circle" />
+                                </span>
+                                <span>{ "Nouveau remboursement" }</span>
+                            </a>
+                        </Link<Route>>
                     </div>
                 </div>
             </div>
@@ -333,5 +333,37 @@ impl Component for CreateAccount {
                 </div>
             </div>
         }
+    }
+}
+
+#[derive(Properties, PartialEq)]
+pub struct AccountTitleProps {
+    pub id: String,
+    pub account: Option<Rc<RefCell<rmmt::Account>>>,
+}
+
+#[function_component(AccountTitle)]
+pub fn account_title(AccountTitleProps { id, account }: &AccountTitleProps) -> Html {
+    html! {
+        <Link<Route> to={Route::Account { account_id: id.clone() }}>
+            <h2 class="title is-1">
+                <span class="icon-text">
+                    <span class="icon">
+                        <i class="fa fa-bank"/>
+                    </span>
+                    <span>
+                    {
+                        match account {
+                            Some(account) => {
+                                let account = &*account.borrow();
+                                account.name.clone()
+                            }
+                            None => "Loading...".to_string(),
+                        }
+                    }
+                    </span>
+                </span>
+            </h2>
+        </Link<Route>>
     }
 }

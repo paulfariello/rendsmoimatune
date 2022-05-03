@@ -4,15 +4,17 @@ use std::rc::Rc;
 
 use rmmt;
 use uuid::Uuid;
+#[allow(unused_imports)]
+use log::{debug, error, info, warn};
 use yew::prelude::*;
 use yew_agent::{Bridge, Bridged, Dispatched};
 use yew_router::prelude::*;
 
+use crate::agent::{AccountAgent, AccountMsg};
 use crate::components::{
     user::UserName,
     utils::{Amount, Loading},
 };
-use crate::agent::{AccountAgent, AccountMsg};
 use crate::Route;
 
 #[derive(Properties, PartialEq)]
@@ -50,11 +52,11 @@ impl Component for Expenditures {
             AccountMsg::UpdateAccount(account) => {
                 self.account = Some(account);
                 true
-            },
+            }
             AccountMsg::UpdateUsers(users) => {
                 self.users = Some(users);
                 true
-            },
+            }
             AccountMsg::UpdateExpenditures(expenditures) => {
                 self.expenditures = Some(expenditures);
                 true
