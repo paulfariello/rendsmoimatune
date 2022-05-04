@@ -144,3 +144,17 @@ fn balance_with_even_remaining() {
     // Then
     assert_balance(balances, vec![("user1", 1), ("user2", -1)]);
 }
+
+#[test]
+fn resolved_remaining() {
+    // Given
+    let users = vec![user("user1"), user("user2"), user("user3")];
+    let debts = vec![expenditure("user1", 100, vec![("user2", 1), ("user1", 1), ("user3", 1)]), expenditure("user2", 200, vec![("user1", 1), ("user2", 1), ("user3", 1)])];
+    let repayments = vec![];
+
+    // When
+    let balances = Balance::from_account(users, debts, repayments);
+
+    // Then
+    assert_balance(balances, vec![("user1", 0), ("user2", 100), ("user3", -100)]);
+}
