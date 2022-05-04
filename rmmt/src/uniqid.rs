@@ -40,7 +40,7 @@ impl TryFrom<&str> for UniqId {
                 .ok_or(format!("u128 add overflow: {}", quad))?;
         }
 
-        let uuid = Uuid::from_u128(quad.swap_bytes());
+        let uuid = Uuid::from_u128(quad);
 
         Ok(UniqId(uuid))
     }
@@ -61,7 +61,7 @@ impl From<Uuid> for UniqId {
 impl ToString for UniqId {
     fn to_string(&self) -> String {
         let mut raw = vec![];
-        let mut quad: u128 = u128::from_le_bytes(*self.0.as_bytes()).swap_bytes();
+        let mut quad: u128 = self.0.as_u128();
 
         while quad > 0 {
             raw.push(ALPHABET[(quad % BASE) as usize]);
@@ -105,7 +105,7 @@ mod tests {
         let string = "fvL4hh9nvSJlDxOn9L3foC";
 
         // When
-        let uniq_id = UniqId::from_param(&string);
+        let uniq_id = UniqId::try_from(string);
 
         // Then
         assert!(uniq_id.is_ok());

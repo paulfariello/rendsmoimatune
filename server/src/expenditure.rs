@@ -1,5 +1,5 @@
 use diesel::prelude::*;
-use rmmt::{prelude::*, Expenditure, NewExpenditure, Debt, NewDebt};
+use rmmt::{prelude::*, Debt, Expenditure, NewDebt, NewExpenditure};
 use rocket::serde::json::Json;
 use uuid::Uuid;
 
@@ -28,37 +28,56 @@ pub(crate) async fn post_expenditure(
                         .values(expenditure)
                         .get_result(c)?;
 
-                    let new_debts = debtors.into_iter().map(|(debtor_id, share)| NewDebt {
-                        debtor_id,
-                        expenditure_id: expenditure.id,
-                        share,
-                    }).collect::<Vec<_>>();
+                    let new_debts = debtors
+                        .into_iter()
+                        .map(|(debtor_id, share)| NewDebt {
+                            debtor_id,
+                            expenditure_id: expenditure.id,
+                            share,
+                        })
+                        .collect::<Vec<_>>();
 
-                    let new_debts: Vec<Debt> = diesel::insert_into(debts).values(new_debts).get_results(c)?;
+                    let new_debts: Vec<Debt> = diesel::insert_into(debts)
+                        .values(new_debts)
+                        .get_results(c)?;
 
                     Ok((expenditure, new_debts))
                 })
             })
             .await?;
 
-
         Ok(Json((expenditure, new_debts)))
     }
 }
 
-#[get("/api/account/<uniq_id>/expenditures")]
+#[get("/api/account/<account_id>/expenditures")]
 pub(crate) async fn get_expenditures(
     conn: MainDbConn,
-    uniq_id: UniqId,
+    account_id: UniqId,
 ) -> Result<Json<Vec<Expenditure>>, Error> {
-    let uuid: uuid::Uuid = uniq_id.into();
+    let account_uuid: uuid::Uuid = account_id.into();
     let account_expenditures: Vec<Expenditure> = conn
         .run(move |c| {
             expenditures
-                .filter(expenditures_account_id.eq(uuid))
+                .filter(expenditures_account_id.eq(account_uuid))
                 .load(c)
         })
         .await?;
 
     Ok(Json(account_expenditures))
+}
+
+#[delete("/api/account/<account_id>/expenditures/<expenditure_id>")]
+pub(crate) async fn del_expenditures(
+    conn: MainDbConn,
+    account_id: UniqId,
+    expenditure_id: uuid::Uuid,
+) -> Result<(), Error> {
+    let account_uuid: uuid::Uuid = account_id.into();
+    conn.run(move |c| {
+        diesel::delete(expenditures.filter(expenditures_id.eq(expenditure_id))).execute(c)
+    })
+    .await?;
+
+    Ok(())
 }

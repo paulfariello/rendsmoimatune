@@ -210,7 +210,7 @@ mod tests {
     use test_log::test;
 
     fn uuid(name: &str) -> Uuid {
-        Uuid::new_v5(&uuid::NAMESPACE_X500, name)
+        Uuid::new_v5(&Uuid::NAMESPACE_X500, name.as_bytes())
     }
 
     fn user(name: &str) -> User {

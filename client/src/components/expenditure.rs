@@ -196,7 +196,10 @@ pub struct CreateExpenditureProps {
 pub enum CreateExpenditureMsg {
     AccountMsg(AccountMsg),
     Submit,
-    Created { expenditure: rmmt::Expenditure, debts: Vec<rmmt::Debt> },
+    Created {
+        expenditure: rmmt::Expenditure,
+        debts: Vec<rmmt::Debt>,
+    },
     Error(String),
     ClearError,
 }
@@ -251,10 +254,18 @@ impl CreateExpenditure {
         let mut debtors = Vec::new();
         for (id, user) in (&*self.users.as_ref().unwrap().borrow()).iter() {
             let checkbox = self.debtors_checkbox.get(id).unwrap();
-            let enabled = checkbox.cast::<web_sys::HtmlInputElement>().unwrap().checked();
+            let enabled = checkbox
+                .cast::<web_sys::HtmlInputElement>()
+                .unwrap()
+                .checked();
             if enabled {
                 let input_share = self.debtors_input_share.get(id).unwrap();
-                let share = input_share.cast::<web_sys::HtmlInputElement>().unwrap().value().parse::<i32>().unwrap();
+                let share = input_share
+                    .cast::<web_sys::HtmlInputElement>()
+                    .unwrap()
+                    .value()
+                    .parse::<i32>()
+                    .unwrap();
                 info!("{}: {}", user.name, share);
                 debtors.push((id.clone(), share));
             }
@@ -262,7 +273,11 @@ impl CreateExpenditure {
 
         let url = format!("/api/account/{}/expenditures", ctx.props().account_id);
         ctx.link().send_future(async move {
-            let resp = Request::post(&url).json(&(expenditure, debtors)).unwrap().send().await;
+            let resp = Request::post(&url)
+                .json(&(expenditure, debtors))
+                .unwrap()
+                .send()
+                .await;
 
             let resp = match resp {
                 Err(err) => return CreateExpenditureMsg::Error(format!("{}", err)),
@@ -284,10 +299,7 @@ impl CreateExpenditure {
             }
 
             let (expenditure, debts) = resp.unwrap();
-            CreateExpenditureMsg::Created {
-                expenditure,
-                debts,
-            }
+            CreateExpenditureMsg::Created { expenditure, debts }
         });
     }
 
@@ -346,8 +358,14 @@ impl Component for CreateExpenditure {
                 }
                 AccountMsg::UpdateUsers(users) => {
                     self.users = Some(users);
-                    self.debtors_checkbox = (&*self.users.as_ref().unwrap().borrow()).iter().map(|(id, _)| (id.clone(), NodeRef::default())).collect();
-                    self.debtors_input_share = (&*self.users.as_ref().unwrap().borrow()).iter().map(|(id, _)| (id.clone(), NodeRef::default())).collect();
+                    self.debtors_checkbox = (&*self.users.as_ref().unwrap().borrow())
+                        .iter()
+                        .map(|(id, _)| (id.clone(), NodeRef::default()))
+                        .collect();
+                    self.debtors_input_share = (&*self.users.as_ref().unwrap().borrow())
+                        .iter()
+                        .map(|(id, _)| (id.clone(), NodeRef::default()))
+                        .collect();
                     true
                 }
                 _ => false,
@@ -362,7 +380,10 @@ impl Component for CreateExpenditure {
                 }
             }
             CreateExpenditureMsg::Created { expenditure, debts } => {
-                info!("Created expenditure: {:?} with debts: {:?}", expenditure, debts);
+                info!(
+                    "Created expenditure: {:?} with debts: {:?}",
+                    expenditure, debts
+                );
                 self.agent.send(AccountMsg::FetchExpenditures);
                 self.clear();
 
@@ -504,16 +525,18 @@ impl Component for Debtor {
     type Properties = DebtorProps;
 
     fn create(_ctx: &Context<Self>) -> Self {
-        Self {
-            checked: true,
-        }
+        Self { checked: true }
     }
 
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
             DebtorMsg::Switch => {
                 self.checked = !self.checked;
-                let input_state = ctx.props().state_ref.cast::<web_sys::HtmlInputElement>().unwrap();
+                let input_state = ctx
+                    .props()
+                    .state_ref
+                    .cast::<web_sys::HtmlInputElement>()
+                    .unwrap();
                 input_state.set_checked(self.checked);
                 true
             }
@@ -521,9 +544,7 @@ impl Component for Debtor {
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
-        let onclick = ctx.link().callback(|_| {
-            DebtorMsg::Switch
-        });
+        let onclick = ctx.link().callback(|_| DebtorMsg::Switch);
 
         html! {
             <div class="field has-addons">
