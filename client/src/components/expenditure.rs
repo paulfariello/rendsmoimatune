@@ -138,7 +138,7 @@ impl Component for ExpendituresList {
         if len > 0 {
             let map = |expenditure: &rmmt::Expenditure| {
                 html! {
-                    <tr>
+                    <tr key={ expenditure.id.to_string() }>
                         <td class="is-vcentered">{ &expenditure.date }</td>
                         <td class="is-vcentered">{ &expenditure.name }</td>
                         <td class="is-vcentered"><Amount amount={ expenditure.amount } /></td>
