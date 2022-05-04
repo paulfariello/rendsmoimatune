@@ -41,7 +41,7 @@ impl Component for Repayments {
         let account_bridge = AccountAgent::bridge(ctx.link().callback(|msg| msg));
 
         let mut dispatcher = AccountAgent::dispatcher();
-        dispatcher.send(AccountMsg::FetchAccount(ctx.props().account_id.clone()));
+        dispatcher.send(AccountMsg::LoadAccount(ctx.props().account_id.clone()));
 
         Self {
             account: None,
@@ -103,7 +103,7 @@ impl Component for Repayments {
                         </h3>
                         </Link<Route>>
                         if let (Some(users), Some(repayments)) = (self.users.clone(), self.repayments.clone()) {
-                            <RepaymentsList { repayments } { users }/>
+                            <RepaymentsList { repayments } { users } loading=false />
                         } else {
                             <Loading />
                         }
@@ -119,6 +119,7 @@ pub struct RepaymentsListProps {
     pub limit: Option<usize>,
     pub users: Rc<RefCell<HashMap<Uuid, rmmt::User>>>,
     pub repayments: Rc<RefCell<Vec<rmmt::Repayment>>>,
+    pub loading: bool,
 }
 
 pub struct RepaymentsList;
@@ -149,13 +150,18 @@ impl Component for RepaymentsList {
                             <a aria-label="Éditer" class="button is-primary" href="">
                                 <i class="fa fa-pencil fa-lg"></i>
                             </a>
-                            <button aria-label="Supprimer" class="button is-danger"><i class="fa fa-trash-o fa-lg"></i></button>
+                            <DeleteRepayment account_id={ repayment.account_id.clone() } id={ repayment.id.clone() } />
                         </td>
                     </tr>
                 }
             };
             html! {
-                <>
+                <div class="is-relative block">
+                    if ctx.props().loading {
+                        <div class="loading-overlay">
+                            <Loading />
+                        </div>
+                    }
                     <table class="table is-fullwidth is-striped is-hoverable">
                         <thead>
                             <tr>
@@ -182,7 +188,7 @@ impl Component for RepaymentsList {
                             <a href="">{ format!("Et {} autres…", len - limit) }</a>
                         }
                     }
-                </>
+                </div>
             }
         } else {
             html! {}
@@ -303,7 +309,7 @@ impl Component for CreateRepayment {
             AccountAgent::bridge(ctx.link().callback(CreateRepaymentMsg::AccountMsg));
 
         let mut dispatcher = AccountAgent::dispatcher();
-        dispatcher.send(AccountMsg::FetchAccount(ctx.props().account_id.clone()));
+        dispatcher.send(AccountMsg::LoadAccount(ctx.props().account_id.clone()));
 
         Self {
             account: None,
@@ -342,7 +348,7 @@ impl Component for CreateRepayment {
             }
             CreateRepaymentMsg::Created { repayment } => {
                 info!("Created repayment: {:?}", repayment);
-                self.agent.send(AccountMsg::FetchRepayments);
+                self.agent.send(AccountMsg::ChangedRepayments);
                 self.clear();
 
                 let history = ctx.link().history().unwrap();
@@ -465,6 +471,98 @@ impl Component for CreateRepayment {
                     </div>
                 </div>
             </div>
+        }
+    }
+}
+
+#[derive(Properties, PartialEq)]
+pub struct DeleteRepaymentProps {
+    pub account_id: Uuid,
+    pub id: Uuid,
+}
+
+pub enum DeleteRepaymentMsg {
+    Delete,
+    Deleted,
+    Error(String),
+}
+
+struct DeleteRepayment {
+    deleting: bool,
+    agent: Dispatcher<AccountAgent>,
+    error: Option<String>,
+}
+
+impl DeleteRepayment {
+    fn delete_repayment(&mut self, ctx: &Context<Self>) {
+        self.deleting = true;
+
+        let url = format!("/api/account/{}/repayments/{}", UniqId::from(ctx.props().account_id), ctx.props().id);
+        ctx.link().send_future(async move {
+            let resp = Request::delete(&url)
+                .send()
+                .await;
+
+            let resp = match resp {
+                Err(err) => return DeleteRepaymentMsg::Error(format!("{}", err)),
+                Ok(resp) => resp,
+            };
+
+            if !resp.ok() {
+                return DeleteRepaymentMsg::Error(format!(
+                    "{}: {}",
+                    resp.status(),
+                    resp.status_text()
+                ));
+            }
+
+            DeleteRepaymentMsg::Deleted
+        });
+    }
+}
+
+impl Component for DeleteRepayment {
+    type Message = DeleteRepaymentMsg;
+    type Properties = DeleteRepaymentProps;
+
+    fn create(_ctx: &Context<Self>) -> Self {
+        Self {
+            deleting: false,
+            error: None,
+            agent: AccountAgent::dispatcher(),
+        }
+    }
+
+    fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
+        match msg {
+            DeleteRepaymentMsg::Delete => {
+                if self.deleting {
+                    false
+                } else {
+                    self.error = None;
+                    self.delete_repayment(ctx);
+                    true
+                }
+            }
+            DeleteRepaymentMsg::Deleted => {
+                self.deleting = false;
+                self.agent.send(AccountMsg::ChangedRepayments);
+                true
+            }
+            DeleteRepaymentMsg::Error(error) => {
+                error!("Cannot delete repayment: {}", error);
+                self.deleting = false;
+                self.error = Some(error);
+                true
+            }
+        }
+    }
+
+    fn view(&self, ctx: &Context<Self>) -> Html {
+        let onclick = ctx.link().callback(|_| DeleteRepaymentMsg::Delete);
+
+        html! {
+            <button aria-label="Supprimer" class={ classes!("button", "is-danger", self.deleting.then(|| "is-loading")) } { onclick }><i class="fa fa-trash-o fa-lg"></i></button>
         }
     }
 }

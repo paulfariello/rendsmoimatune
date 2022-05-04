@@ -41,7 +41,7 @@ impl Component for Expenditures {
         let account_bridge = AccountAgent::bridge(ctx.link().callback(|msg| msg));
 
         let mut dispatcher = AccountAgent::dispatcher();
-        dispatcher.send(AccountMsg::FetchAccount(ctx.props().account_id.clone()));
+        dispatcher.send(AccountMsg::LoadAccount(ctx.props().account_id.clone()));
 
         Self {
             account: None,
@@ -103,7 +103,7 @@ impl Component for Expenditures {
                             </h3>
                         </Link<Route>>
                         if let (Some(users), Some(expenditures)) = (self.users.clone(), self.expenditures.clone()) {
-                            <ExpendituresList { expenditures } { users }/>
+                            <ExpendituresList { expenditures } { users } loading=false />
                         } else {
                             <Loading />
                         }
@@ -119,6 +119,7 @@ pub struct ExpendituresListProps {
     pub expenditures: Rc<RefCell<Vec<rmmt::Expenditure>>>,
     pub users: Rc<RefCell<HashMap<Uuid, rmmt::User>>>,
     pub limit: Option<usize>,
+    pub loading: bool,
 }
 
 pub struct ExpendituresList;
@@ -145,16 +146,21 @@ impl Component for ExpendituresList {
                         <td class="is-vcentered"><UserName users={ ctx.props().users.clone() } id={ expenditure.payer_id }/></td>
                         <td class="is-vcentered">{ "todo" }</td>
                         <td class="is-vcentered">
-                        <a aria-label="Éditer" class="button is-primary" href="">
-                        <i class="fa fa-pencil fa-lg"></i>
-                        </a>
-                        <DeleteExpenditure account_id={ expenditure.account_id.clone() } id={ expenditure.id.clone() } />
+                            <a aria-label="Éditer" class="button is-primary" href="">
+                                <i class="fa fa-pencil fa-lg"></i>
+                            </a>
+                            <DeleteExpenditure account_id={ expenditure.account_id.clone() } id={ expenditure.id.clone() } />
                         </td>
                         </tr>
                 }
             };
             html! {
                 <div class="is-relative block">
+                    if ctx.props().loading {
+                        <div class="loading-overlay">
+                            <Loading />
+                        </div>
+                    }
                     <table class="table is-fullwidth is-striped is-hoverable">
                         <thead>
                             <tr>
@@ -331,7 +337,7 @@ impl Component for CreateExpenditure {
             AccountAgent::bridge(ctx.link().callback(CreateExpenditureMsg::AccountMsg));
 
         let mut dispatcher = AccountAgent::dispatcher();
-        dispatcher.send(AccountMsg::FetchAccount(ctx.props().account_id.clone()));
+        dispatcher.send(AccountMsg::LoadAccount(ctx.props().account_id.clone()));
 
         Self {
             account: None,
@@ -384,7 +390,7 @@ impl Component for CreateExpenditure {
                     "Created expenditure: {:?} with debts: {:?}",
                     expenditure, debts
                 );
-                self.agent.send(AccountMsg::FetchExpenditures);
+                self.agent.send(AccountMsg::ChangedExpenditures);
                 self.clear();
 
                 let history = ctx.link().history().unwrap();
@@ -639,7 +645,7 @@ impl Component for DeleteExpenditure {
             }
             DeleteExpenditureMsg::Deleted => {
                 self.deleting = false;
-                self.agent.send(AccountMsg::FetchExpenditures);
+                self.agent.send(AccountMsg::ChangedExpenditures);
                 true
             }
             DeleteExpenditureMsg::Error(error) => {

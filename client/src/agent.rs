@@ -12,14 +12,14 @@ use yew_agent::{Agent, AgentLink, Context as AgentContext, HandlerId};
 
 #[derive(Debug, Clone)]
 pub enum AccountMsg {
-    FetchAccount(String),
+    LoadAccount(String),
     UpdateAccount(Rc<RefCell<rmmt::Account>>),
-    FetchUsers,
+    ChangedUsers,
     UpdateUsers(Rc<RefCell<HashMap<Uuid, rmmt::User>>>),
     UpdateBalances(Rc<RefCell<Vec<rmmt::Balance>>>),
-    FetchExpenditures,
+    ChangedExpenditures,
     UpdateExpenditures(Rc<RefCell<Vec<rmmt::Expenditure>>>),
-    FetchRepayments,
+    ChangedRepayments,
     UpdateRepayments(Rc<RefCell<Vec<rmmt::Repayment>>>),
 }
 
@@ -198,7 +198,7 @@ impl Agent for AccountAgent {
     fn handle_input(&mut self, msg: Self::Input, _id: HandlerId) {
         debug!("Handle account msg: {:?}", msg);
         match &msg {
-            AccountMsg::FetchAccount(id) => {
+            AccountMsg::LoadAccount(id) => {
                 if Some(id) != self.account_id.as_ref() {
                     self.fetch_account(id.clone());
                     self.fetch_users();
@@ -207,15 +207,17 @@ impl Agent for AccountAgent {
                     self.fetch_repayments();
                 }
             }
-            AccountMsg::FetchUsers => {
+            AccountMsg::ChangedUsers => {
                 self.fetch_users();
                 self.fetch_balances();
             }
-            AccountMsg::FetchExpenditures => {
+            AccountMsg::ChangedExpenditures => {
                 self.fetch_expenditures();
+                self.fetch_balances();
             }
-            AccountMsg::FetchRepayments => {
+            AccountMsg::ChangedRepayments => {
                 self.fetch_repayments();
+                self.fetch_balances();
             }
             _ => {}
         }

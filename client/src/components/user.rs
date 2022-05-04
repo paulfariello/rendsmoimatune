@@ -105,7 +105,7 @@ impl Component for CreateUser {
             }
             CreateUserMsg::Created { user } => {
                 info!("Created user: {}", user.name);
-                self.agent.send(AccountMsg::FetchUsers);
+                self.agent.send(AccountMsg::ChangedUsers);
                 self.clear();
                 true
             }

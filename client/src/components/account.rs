@@ -30,6 +30,9 @@ pub struct Account {
     expenditures: Option<Rc<RefCell<Vec<rmmt::Expenditure>>>>,
     repayments: Option<Rc<RefCell<Vec<rmmt::Repayment>>>>,
     fetching_users: bool,
+    fetching_expenditures: bool,
+    fetching_repayments: bool,
+    fetching_balances: bool,
     _account_bridge: Box<dyn Bridge<AccountAgent>>,
 }
 
@@ -41,7 +44,7 @@ impl Component for Account {
         let id = ctx.props().id.clone();
         let account_bridge = AccountAgent::bridge(ctx.link().callback(|msg| msg));
         let mut dispatcher = AccountAgent::dispatcher();
-        dispatcher.send(AccountMsg::FetchAccount(id.clone()));
+        dispatcher.send(AccountMsg::LoadAccount(id.clone()));
         Self {
             account: None,
             users: None,
@@ -49,6 +52,9 @@ impl Component for Account {
             expenditures: None,
             repayments: None,
             fetching_users: false,
+            fetching_expenditures: false,
+            fetching_repayments: false,
+            fetching_balances: false,
             _account_bridge: account_bridge,
         }
     }
@@ -59,8 +65,19 @@ impl Component for Account {
                 self.account = Some(account);
                 true
             }
-            AccountMsg::FetchUsers => {
+            AccountMsg::ChangedUsers => {
                 self.fetching_users = true;
+                self.fetching_balances = true;
+                true
+            }
+            AccountMsg::ChangedExpenditures => {
+                self.fetching_expenditures = true;
+                self.fetching_balances = true;
+                true
+            }
+            AccountMsg::ChangedRepayments => {
+                self.fetching_repayments = true;
+                self.fetching_balances = true;
                 true
             }
             AccountMsg::UpdateUsers(users) => {
@@ -69,14 +86,17 @@ impl Component for Account {
                 true
             }
             AccountMsg::UpdateBalances(balances) => {
+                self.fetching_balances = false;
                 self.balances = Some(balances);
                 true
             }
             AccountMsg::UpdateExpenditures(expenditures) => {
+                self.fetching_expenditures = false;
                 self.expenditures = Some(expenditures);
                 true
             }
             AccountMsg::UpdateRepayments(repayments) => {
+                self.fetching_repayments = false;
                 self.repayments = Some(repayments);
                 true
             }
@@ -121,7 +141,7 @@ impl Component for Account {
                             </span>
                         </h3>
                         if let (Some(users), Some(balances)) = (self.users.clone(), self.balances.clone()) {
-                            <BalanceList { users } { balances } loading={ self.fetching_users } />
+                            <BalanceList { users } { balances } loading={ self.fetching_balances } />
                         } else {
                             <Loading />
                         }
@@ -182,7 +202,7 @@ impl Component for Account {
                             </h3>
                         </Link<Route>>
                         if let (Some(users), Some(expenditures)) = (self.users.clone(), self.expenditures.clone()) {
-                            <ExpendituresList { expenditures } { users } limit=10 />
+                            <ExpendituresList { expenditures } { users } limit=10 loading={ self.fetching_expenditures } />
                         } else {
                             <Loading />
                         }
@@ -210,7 +230,7 @@ impl Component for Account {
                             </h3>
                         </Link<Route>>
                         if let (Some(users), Some(repayments)) = (self.users.clone(), self.repayments.clone()) {
-                            <RepaymentsList { users } { repayments } limit=10 />
+                            <RepaymentsList { users } { repayments } limit=10 loading={ self.fetching_repayments } />
                         } else {
                             <Loading />
                         }
