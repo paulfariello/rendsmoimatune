@@ -143,6 +143,10 @@ label.is-checkbox {
   &.is-success {
     background: $success;
   }
+  &.is-light {
+    background-color: $light;
+    color: $dark;
+  }
   &.is-static {
     background-color: $button-static-background-color;
     border-color: $button-static-border-color;
@@ -159,9 +163,6 @@ label.is-checkbox {
   white-space: nowrap;
   display: inline-flex;
   justify-content:center;
-  &.is-primary {
-    background: $primary;
-  }
   padding: $button-padding-vertical $button-padding-horizontal;
   border-radius: $radius-small;
   cursor: pointer;

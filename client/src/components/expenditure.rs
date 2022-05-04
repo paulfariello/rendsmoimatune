@@ -462,20 +462,7 @@ impl Component for CreateExpenditure {
 
                                 {
                                     (&*users.borrow()).iter().map(|(id, user)| html! {
-                                        <div class="field has-addons">
-                                            <div class="control">
-                                                <label class="is-checkbox is-primary">
-                                                    <input ref={ self.debtors_checkbox.get(id).clone().unwrap() } type="checkbox" />
-                                                    <span class="icon checkmark">
-                                                        <i class="fa fa-check"></i>
-                                                    </span>
-                                                    <span>{ &user.name }</span>
-                                                </label>
-                                            </div>
-                                            <div class="control">
-                                                <input ref={ self.debtors_input_share.get(id).clone().unwrap() } type="number" min="0" class="input is-primary" />
-                                            </div>
-                                        </div>
+                                        <Debtor name={ user.name.clone() } state_ref={ self.debtors_checkbox.get(&id).clone().unwrap() } share_ref={ self.debtors_input_share.get(&id).clone().unwrap() } />
                                     }).collect::<Html>()
                                 }
                                 <div class="control">
@@ -492,6 +479,68 @@ impl Component for CreateExpenditure {
                         }
                     </div>
                 </div>
+            </div>
+        }
+    }
+}
+
+#[derive(Properties, PartialEq)]
+pub struct DebtorProps {
+    pub name: String,
+    pub state_ref: NodeRef,
+    pub share_ref: NodeRef,
+}
+
+pub enum DebtorMsg {
+    Switch,
+}
+
+struct Debtor {
+    checked: bool,
+}
+
+impl Component for Debtor {
+    type Message = DebtorMsg;
+    type Properties = DebtorProps;
+
+    fn create(_ctx: &Context<Self>) -> Self {
+        Self {
+            checked: true,
+        }
+    }
+
+    fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
+        match msg {
+            DebtorMsg::Switch => {
+                self.checked = !self.checked;
+                let input_state = ctx.props().state_ref.cast::<web_sys::HtmlInputElement>().unwrap();
+                input_state.set_checked(self.checked);
+                true
+            }
+        }
+    }
+
+    fn view(&self, ctx: &Context<Self>) -> Html {
+        let onclick = ctx.link().callback(|_| {
+            DebtorMsg::Switch
+        });
+
+        html! {
+            <div class="field has-addons">
+                <div class="control">
+                    <label class={ classes!("is-checkbox", match self.checked { true => "is-primary", false => "is-light" }) }>
+                        <input ref={ ctx.props().state_ref.clone() } type="checkbox" checked={ self.checked } { onclick } />
+                        <span class="icon checkmark">
+                            <i class="fa fa-check"></i>
+                        </span>
+                        <span>{ &ctx.props().name }</span>
+                    </label>
+                </div>
+                if self.checked {
+                    <div class="control">
+                        <input ref={ ctx.props().share_ref.clone() } type="number" min="0" class="input is-primary" value="1" />
+                    </div>
+                }
             </div>
         }
     }
