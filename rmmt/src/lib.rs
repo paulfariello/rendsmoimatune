@@ -14,7 +14,7 @@ mod schema;
 pub mod uniqid;
 
 #[cfg(feature = "db")]
-use schema::{accounts, debts, expenditures, repayments, users};
+pub use schema::{accounts, debts, expenditures, repayments, users};
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 #[cfg_attr(feature = "db", derive(Identifiable, Queryable))]

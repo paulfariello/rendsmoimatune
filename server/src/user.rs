@@ -1,5 +1,5 @@
 use diesel::prelude::*;
-use rmmt::{prelude::*, NewUser, User};
+use rmmt::{self, prelude::*, NewUser, User};
 use rocket::serde::json::Json;
 
 use crate::error::Error;
@@ -16,7 +16,7 @@ pub(crate) async fn post_user(
     } else {
         let user: User = conn
             .run(move |c| {
-                diesel::insert_into(users)
+                diesel::insert_into(rmmt::users::dsl::users)
                     .values(user.into_inner())
                     .get_result(c)
             })
@@ -32,7 +32,7 @@ pub(crate) async fn get_users(
 ) -> Result<Json<Vec<User>>, Error> {
     let uuid: uuid::Uuid = account_id.into();
     let account_users: Vec<User> = conn
-        .run(move |c| users.filter(users_account_id.eq(uuid)).load(c))
+        .run(move |c| rmmt::users::dsl::users.filter(rmmt::users::dsl::account_id.eq(uuid)).load(c))
         .await?;
 
     Ok(Json(account_users))

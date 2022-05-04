@@ -2,7 +2,7 @@
 extern crate rocket;
 
 use diesel::{prelude::*, PgConnection};
-use rmmt::{prelude::*, Balance, Debt, Expenditure, Repayment, User};
+use rmmt::{self, prelude::*, Balance, Debt, Expenditure, Repayment, User};
 use rocket::serde::json::Json;
 use rocket_sync_db_pools::database;
 use uuid;
@@ -23,8 +23,8 @@ async fn get_balance(conn: MainDbConn, uniq_id: UniqId) -> Result<Json<Vec<Balan
     let uuid: uuid::Uuid = uniq_id.into();
     let account_debts: Vec<(Expenditure, Vec<Debt>)> = conn
         .run::<_, Result<Vec<(Expenditure, Vec<Debt>)>, diesel::result::Error>>(move |c| {
-            let account_expenditures = expenditures
-                .filter(expenditures_account_id.eq(uuid))
+            let account_expenditures = rmmt::expenditures::dsl::expenditures
+                .filter(rmmt::expenditures::dsl::account_id.eq(uuid))
                 .load(c)?;
             let account_debts = Debt::belonging_to(&account_expenditures)
                 .load(c)?
@@ -38,10 +38,10 @@ async fn get_balance(conn: MainDbConn, uniq_id: UniqId) -> Result<Json<Vec<Balan
         .await?;
 
     let account_repayments: Vec<Repayment> = conn
-        .run(move |c| repayments.filter(repayments_account_id.eq(uuid)).load(c))
+        .run(move |c| rmmt::repayments::dsl::repayments.filter(rmmt::repayments::dsl::account_id.eq(uuid)).load(c))
         .await?;
     let account_users: Vec<User> = conn
-        .run(move |c| users.filter(users_account_id.eq(uuid)).load(c))
+        .run(move |c| rmmt::users::dsl::users.filter(rmmt::users::dsl::account_id.eq(uuid)).load(c))
         .await?;
 
     Ok(Json(Balance::from_account(
@@ -60,8 +60,10 @@ fn rocket() -> _ {
             account::get_account,
             expenditure::post_expenditure,
             expenditure::get_expenditures,
+            expenditure::del_expenditure,
             repayment::post_repayment,
             repayment::get_repayments,
+            repayment::del_repayment,
             user::post_user,
             user::get_users,
             get_balance

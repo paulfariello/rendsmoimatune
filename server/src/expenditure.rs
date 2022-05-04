@@ -24,7 +24,7 @@ pub(crate) async fn post_expenditure(
         let (expenditure, new_debts): (Expenditure, Vec<Debt>) = conn
             .run(move |c| {
                 c.transaction::<(Expenditure, Vec<Debt>), diesel::result::Error, _>(|| {
-                    let expenditure: Expenditure = diesel::insert_into(expenditures)
+                    let expenditure: Expenditure = diesel::insert_into(rmmt::expenditures::dsl::expenditures)
                         .values(expenditure)
                         .get_result(c)?;
 
@@ -37,7 +37,7 @@ pub(crate) async fn post_expenditure(
                         })
                         .collect::<Vec<_>>();
 
-                    let new_debts: Vec<Debt> = diesel::insert_into(debts)
+                    let new_debts: Vec<Debt> = diesel::insert_into(rmmt::debts::dsl::debts)
                         .values(new_debts)
                         .get_results(c)?;
 
@@ -58,8 +58,8 @@ pub(crate) async fn get_expenditures(
     let account_uuid: uuid::Uuid = account_id.into();
     let account_expenditures: Vec<Expenditure> = conn
         .run(move |c| {
-            expenditures
-                .filter(expenditures_account_id.eq(account_uuid))
+            rmmt::expenditures::dsl::expenditures
+                .filter(rmmt::expenditures::dsl::account_id.eq(account_uuid))
                 .load(c)
         })
         .await?;
@@ -68,14 +68,14 @@ pub(crate) async fn get_expenditures(
 }
 
 #[delete("/api/account/<account_id>/expenditures/<expenditure_id>")]
-pub(crate) async fn del_expenditures(
+pub(crate) async fn del_expenditure(
     conn: MainDbConn,
     account_id: UniqId,
     expenditure_id: uuid::Uuid,
 ) -> Result<(), Error> {
     let account_uuid: uuid::Uuid = account_id.into();
     conn.run(move |c| {
-        diesel::delete(expenditures.filter(expenditures_id.eq(expenditure_id))).execute(c)
+        diesel::delete(rmmt::expenditures::dsl::expenditures.filter(rmmt::expenditures::dsl::id.eq(expenditure_id))).execute(c)
     })
     .await?;
 
