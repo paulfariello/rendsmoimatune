@@ -3,6 +3,7 @@ use rocket::request::FromParam;
 use serde::{Deserialize, Serialize};
 use std::convert::TryFrom;
 use uuid::Uuid;
+use std::fmt;
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct UniqId(Uuid);
@@ -58,20 +59,6 @@ impl From<Uuid> for UniqId {
     }
 }
 
-impl ToString for UniqId {
-    fn to_string(&self) -> String {
-        let mut raw = vec![];
-        let mut quad: u128 = self.0.as_u128();
-
-        while quad > 0 {
-            raw.push(ALPHABET[(quad % BASE) as usize]);
-            quad = quad / BASE;
-        }
-
-        String::from_utf8(raw).unwrap()
-    }
-}
-
 impl PartialEq<Uuid> for UniqId {
     fn eq(&self, other: &Uuid) -> bool {
         self.0 == *other
@@ -81,6 +68,21 @@ impl PartialEq<Uuid> for UniqId {
 impl PartialEq<UniqId> for Uuid {
     fn eq(&self, other: &UniqId) -> bool {
         *self == other.0
+    }
+}
+
+impl fmt::Display for UniqId {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> Result<(), fmt::Error> {
+        let mut raw = vec![];
+        let mut quad: u128 = self.0.as_u128();
+
+        while quad > 0 {
+            raw.push(ALPHABET[(quad % BASE) as usize]);
+            quad = quad / BASE;
+        }
+
+        let string = String::from_utf8(raw).unwrap();
+        write!(f, "{}", string)
     }
 }
 

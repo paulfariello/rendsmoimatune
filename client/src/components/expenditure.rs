@@ -148,7 +148,7 @@ impl Component for ExpendituresList {
                         <a aria-label="Éditer" class="button is-primary" href="">
                         <i class="fa fa-pencil fa-lg"></i>
                         </a>
-                        <button aria-label="Supprimer" class="button is-danger"><i class="fa fa-trash-o fa-lg"></i></button>
+                        <DeleteExpenditure account_id={ expenditure.account_id.clone() } id={ expenditure.id.clone() } />
                         </td>
                         </tr>
                 }
@@ -395,6 +395,7 @@ impl Component for CreateExpenditure {
                 false
             }
             CreateExpenditureMsg::Error(error) => {
+                error!("Cannot create expenditure: {}", error);
                 self.creating = false;
                 self.error = Some(error);
                 true
@@ -563,6 +564,98 @@ impl Component for Debtor {
                     </div>
                 }
             </div>
+        }
+    }
+}
+
+#[derive(Properties, PartialEq)]
+pub struct DeleteExpenditureProps {
+    pub account_id: Uuid,
+    pub id: Uuid,
+}
+
+pub enum DeleteExpenditureMsg {
+    Delete,
+    Deleted,
+    Error(String),
+}
+
+struct DeleteExpenditure {
+    deleting: bool,
+    agent: Dispatcher<AccountAgent>,
+    error: Option<String>,
+}
+
+impl DeleteExpenditure {
+    fn delete_expenditure(&mut self, ctx: &Context<Self>) {
+        self.deleting = true;
+
+        let url = format!("/api/account/{}/expenditures/{}", UniqId::from(ctx.props().account_id), ctx.props().id);
+        ctx.link().send_future(async move {
+            let resp = Request::delete(&url)
+                .send()
+                .await;
+
+            let resp = match resp {
+                Err(err) => return DeleteExpenditureMsg::Error(format!("{}", err)),
+                Ok(resp) => resp,
+            };
+
+            if !resp.ok() {
+                return DeleteExpenditureMsg::Error(format!(
+                    "{}: {}",
+                    resp.status(),
+                    resp.status_text()
+                ));
+            }
+
+            DeleteExpenditureMsg::Deleted
+        });
+    }
+}
+
+impl Component for DeleteExpenditure {
+    type Message = DeleteExpenditureMsg;
+    type Properties = DeleteExpenditureProps;
+
+    fn create(_ctx: &Context<Self>) -> Self {
+        Self {
+            deleting: false,
+            error: None,
+            agent: AccountAgent::dispatcher(),
+        }
+    }
+
+    fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
+        match msg {
+            DeleteExpenditureMsg::Delete => {
+                if self.deleting {
+                    false
+                } else {
+                    self.error = None;
+                    self.delete_expenditure(ctx);
+                    true
+                }
+            }
+            DeleteExpenditureMsg::Deleted => {
+                self.deleting = false;
+                self.agent.send(AccountMsg::FetchExpenditures);
+                true
+            }
+            DeleteExpenditureMsg::Error(error) => {
+                error!("Cannot delete expenditure: {}", error);
+                self.deleting = false;
+                self.error = Some(error);
+                true
+            }
+        }
+    }
+
+    fn view(&self, ctx: &Context<Self>) -> Html {
+        let onclick = ctx.link().callback(|_| DeleteExpenditureMsg::Delete);
+
+        html! {
+            <button aria-label="Supprimer" class={ classes!("button", "is-danger", self.deleting.then(|| "is-loading")) } { onclick }><i class="fa fa-trash-o fa-lg"></i></button>
         }
     }
 }
