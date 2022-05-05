@@ -78,9 +78,9 @@ impl Component for BalanceList {
                         }
                     </tbody>
                 </table>
-                if *remaining > 0 {
+                if *remaining != 0 {
                     <div class="notification is-info">
-                      { "Oups, nous avons perdu " }<Amount amount={ *remaining } />{ " dans des arrondis…" }
+                      { "Oups, nous avons perdu " }<Amount amount={ remaining.abs() } />{ " dans des arrondis…" }
                     </div>
                 }
             </div>

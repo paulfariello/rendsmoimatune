@@ -130,11 +130,11 @@ fn balance_with_remaining() {
     let (balances, remaining) = Balance::from_account(users, debts, repayments);
 
     // Then
-    assert_balance(balances, vec![("user1", 5), ("user2", -4)], remaining, 1);
+    assert_balance(balances, vec![("user1", 5), ("user2", -5)], remaining, 0);
 }
 
 #[test]
-fn balance_with_even_remaining() {
+fn balance_with_even_remaining_favour_payers() {
     // Given
     let users = vec![user("user1"), user("user2")];
     let debts = vec![expenditure("user1", 1, vec![("user1", 1), ("user2", 1)])];
@@ -144,25 +144,25 @@ fn balance_with_even_remaining() {
     let (balances, remaining) = Balance::from_account(users, debts, repayments);
 
     // Then
-    assert_balance(balances, vec![("user1", 1), ("user2", 0)], remaining, 1);
+    assert_balance(balances, vec![("user1", 1), ("user2", -1)], remaining, 0);
 }
 
 #[test]
-fn resolved_remaining() {
+fn balance_with_fractional_remaining_favour_payers_and_have_remaining() {
     // Given
     let users = vec![user("user1"), user("user2"), user("user3")];
-    let debts = vec![expenditure("user1", 100, vec![("user2", 1), ("user1", 1), ("user3", 1)]), expenditure("user2", 200, vec![("user1", 1), ("user2", 1), ("user3", 1)])];
+    let debts = vec![expenditure("user1", 100, vec![("user2", 1), ("user1", 1), ("user3", 1)]), expenditure("user2", 100, vec![("user1", 1), ("user2", 1), ("user3", 1)])];
     let repayments = vec![];
 
     // When
     let (balances, remaining) = Balance::from_account(users, debts, repayments);
 
     // Then
-    assert_balance(balances, vec![("user1", 0), ("user2", 100), ("user3", -100)], remaining, 0);
+    assert_balance(balances, vec![("user1", 34), ("user2", 34), ("user3", -67)], remaining, 1);
 }
 
 #[test]
-fn resolved_remaining_all_floored() {
+fn balance_with_resolved_fractional_remaining_has_no_remaining() {
     // Given
     let users = vec![user("user1"), user("user2"), user("user3")];
     let debts = vec![expenditure("user1", 100, vec![("user2", 1), ("user1", 1), ("user3", 1)]), expenditure("user2", 100, vec![("user1", 1), ("user2", 1), ("user3", 1)]), expenditure("user3", 100, vec![("user1", 1), ("user2", 1), ("user3", 1)])];

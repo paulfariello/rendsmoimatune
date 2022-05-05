@@ -3,7 +3,6 @@
 extern crate diesel;
 
 use chrono::NaiveDate;
-use log::{debug, warn};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use uuid::Uuid;
@@ -133,7 +132,15 @@ struct TmpBalance {
 
 impl TmpBalance {
     fn result(&self) -> i64 {
-        self.credit - self.debts.iter().sum::<Rational64>().to_integer()
+        // round debts in order to favor the ones who advanced money
+        let debts = self.debts.iter().sum::<Rational64>();
+        let debts = if Rational64::new(self.credit, 1) > debts {
+            debts.floor().to_integer()
+        } else {
+            debts.ceil().to_integer()
+        };
+
+        self.credit - debts
     }
 }
 
