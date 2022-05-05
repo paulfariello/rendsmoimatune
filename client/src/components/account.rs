@@ -161,7 +161,7 @@ impl Component for Account {
                             </span>
                         </h3>
                         if let (Some(users), Some(balance)) = (self.users.clone(), self.balance.clone()) {
-                            <BalancingList { users } { balance } loading={ self.fetching_balance } />
+                            <BalancingList account_id={ ctx.props().id.clone() } { users } { balance } loading={ self.fetching_balance } />
                         } else {
                             <Loading />
                         }

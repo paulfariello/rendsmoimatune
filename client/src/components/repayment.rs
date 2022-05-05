@@ -371,6 +371,11 @@ impl Component for CreateRepayment {
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
+        let balancing: Option<rmmt::Balancing> = match ctx.link().location() {
+            Some(location) => location.query().ok(),
+            None => None
+        };
+
         let onsubmit = ctx.link().callback(|event: FocusEvent| {
             event.prevent_default();
             CreateRepaymentMsg::Submit
@@ -424,7 +429,7 @@ impl Component for CreateRepayment {
                                         </div>
                                         <div class="field has-addons">
                                             <div class="control is-expanded">
-                                            <input ref={ self.input_amount.clone() } type="number" min="0" class="input is-primary" required=true placeholder="montant" />
+                                            <input ref={ self.input_amount.clone() } type="number" min="0" class="input is-primary" required=true placeholder="montant" value={ balancing.map(|b| (b.amount as f64 / 100f64).to_string() ) } />
                                             </div>
                                             <div class="control">
                                                 <p class="button is-static">{ "€" }</p>

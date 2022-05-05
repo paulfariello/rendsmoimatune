@@ -6,9 +6,11 @@ use std::rc::Rc;
 use log::{debug, error, info, warn};
 use uuid::Uuid;
 use yew::prelude::*;
+use yew_router::prelude::*;
 
-use crate::components::utils::Loading;
-use crate::components::{user::UserName, utils::Amount};
+use crate::Route;
+
+use crate::components::{utils::{Loading, Amount}, user::UserName};
 
 #[derive(Properties, PartialEq)]
 pub struct BalanceListProps {
@@ -90,6 +92,7 @@ impl Component for BalanceList {
 
 #[derive(Properties, PartialEq)]
 pub struct BalancingListProps {
+    pub account_id: String,
     pub users: Rc<RefCell<HashMap<Uuid, rmmt::User>>>,
     pub balance: Rc<RefCell<rmmt::Balance>>,
     pub loading: bool,
@@ -135,12 +138,14 @@ impl Component for BalancingList {
                                             <td class="is-vcentered has-text-centered">{ "à" }</td>
                                             <td class="is-vcentered has-text-centered"><UserName users={ users.clone() } id={ balance.beneficiary_id }/></td>
                                             <td>
-                                                <button class="button is-primary">
-                                                    <span class="icon">
-                                                        <i class="fa fa-credit-card" />
-                                                    </span>
-                                                    <span>{ "Rembourser" }</span>
-                                                </button>
+                                                <Link<Route, rmmt::Balancing> to={Route::CreateRepayment { account_id: ctx.props().account_id.clone() } } query={ Some(balance.clone()) }>
+                                                    <button class="button is-primary">
+                                                        <span class="icon">
+                                                            <i class="fa fa-credit-card" />
+                                                        </span>
+                                                        <span>{ "Rembourser" }</span>
+                                                    </button>
+                                                </Link<Route, rmmt::Balancing>>
                                             </td>
                                         </tr>
                                     }
