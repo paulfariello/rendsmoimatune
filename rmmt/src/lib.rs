@@ -121,7 +121,7 @@ pub struct NewDebt {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
-pub struct Balance {
+pub struct UserBalance {
     pub user_id: Uuid,
     pub amount: i64,
 }
@@ -146,14 +146,34 @@ impl TmpBalance {
     }
 }
 
-impl From<TmpBalance> for Balance {
-    fn from(tmp: TmpBalance) -> Balance {
+impl From<TmpBalance> for UserBalance {
+    fn from(tmp: TmpBalance) -> UserBalance {
         let result = tmp.result();
-        Balance {
+        UserBalance {
             user_id: tmp.user_id,
             amount: result,
         }
     }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+pub struct Balancing {
+    pub payer_id: Uuid,
+    pub beneficiary_id: Uuid,
+    pub amount: i64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+pub struct Balance {
+    /// Represent each user own balance.
+    pub user_balances: Vec<UserBalance>,
+    /// Difference between account and sum of user balances.
+    /// Mainly due to rounding in expenditure shares.
+    pub account_remaining: i64,
+    /// List of possible repayments.
+    pub balancing: Vec<Balancing>,
+    /// Remaining balances once all proposed repayment are done.
+    pub balancing_remaining: Vec<UserBalance>,
 }
 
 impl Balance {
@@ -161,7 +181,73 @@ impl Balance {
         users: Vec<User>,
         debts: Vec<(Expenditure, Vec<Debt>)>,
         repayments: Vec<Repayment>,
-    ) -> (Vec<Balance>, i64) {
+    ) -> Self {
+        let (mut user_balances, account_remaining) =
+            Self::get_user_balances(users, debts, repayments);
+
+        let (balancing, balancing_remaining) = Self::get_balancing(&mut user_balances);
+
+        Self {
+            user_balances,
+            account_remaining,
+            balancing,
+            balancing_remaining,
+        }
+    }
+
+    /// Create balancing from a vector of balances.
+    ///
+    /// Ensure balancing doesn't change given new repayments are done.
+    fn get_balancing(balances: &mut Vec<UserBalance>) -> (Vec<Balancing>, Vec<UserBalance>) {
+        let mut balancing = Vec::new();
+
+        // Sort to ensure idempotence
+        balances.sort_by(|a, b| a.user_id.partial_cmp(&b.user_id).unwrap());
+
+        let mut creditors = balances
+            .iter()
+            .filter(|b| b.amount > 0)
+            .cloned()
+            .collect::<Vec<_>>();
+        let mut debtors = balances
+            .iter()
+            .filter(|b| b.amount < 0)
+            .cloned()
+            .collect::<Vec<_>>();
+
+        while !creditors.is_empty() && !debtors.is_empty() {
+            let mut debtor = debtors.pop().unwrap();
+            let mut creditor = creditors.pop().unwrap();
+
+            let amount = cmp::min(-debtor.amount, creditor.amount);
+
+            balancing.push(Balancing {
+                payer_id: debtor.user_id,
+                beneficiary_id: creditor.user_id,
+                amount,
+            });
+
+            debtor.amount += amount;
+            creditor.amount -= amount;
+
+            if debtor.amount < 0 {
+                debtors.push(debtor);
+            }
+            if creditor.amount > 0 {
+                creditors.push(creditor);
+            }
+        }
+
+        let remaining = [&creditors[..], &debtors[..]].concat();
+        (balancing, remaining)
+    }
+
+    /// Compute balance for each user.
+    fn get_user_balances(
+        users: Vec<User>,
+        debts: Vec<(Expenditure, Vec<Debt>)>,
+        repayments: Vec<Repayment>,
+    ) -> (Vec<UserBalance>, i64) {
         let mut balances: HashMap<Uuid, TmpBalance> = users
             .iter()
             .map(|u| {
@@ -203,7 +289,7 @@ impl Balance {
                 .push(Rational64::new(repayment.amount as i64, 1i64));
         }
 
-        let balances: Vec<Balance> = balances.into_values().map(|b| b.into()).collect::<Vec<_>>();
+        let balances: Vec<UserBalance> = balances.into_values().map(|b| b.into()).collect::<Vec<_>>();
 
         let remaining: i64 = balances.iter().map(|b| b.amount).sum();
 
@@ -218,64 +304,6 @@ impl Balance {
         balances
             .get_mut(id)
             .expect(&format!("Corrupted db? Missing user {} in balances", id))
-    }
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
-pub struct Balancing {
-    pub payer_id: Uuid,
-    pub beneficiary_id: Uuid,
-    pub amount: i64,
-}
-
-impl Balancing {
-    /// Create balancing from a vector of balances.
-    ///
-    /// Ensure balancing doesn't change given new repayments are done.
-    pub fn from_balances(mut balances: Vec<Balance>) -> Vec<Balancing> {
-        let mut balancing = Vec::new();
-
-        // Sort to ensure idempotence
-        balances.sort_by(|a, b| a.user_id.partial_cmp(&b.user_id).unwrap());
-
-        let mut creditors = balances
-            .iter()
-            .filter(|b| b.amount > 0)
-            .cloned()
-            .collect::<Vec<_>>();
-        let mut debtors = balances
-            .iter()
-            .filter(|b| b.amount < 0)
-            .cloned()
-            .collect::<Vec<_>>();
-
-        while !creditors.is_empty() && !debtors.is_empty() {
-            let mut debtor = debtors.pop().unwrap();
-            let mut creditor = creditors.pop().unwrap();
-
-            let amount = cmp::min(-debtor.amount, creditor.amount);
-
-            balancing.push(Balancing {
-                payer_id: debtor.user_id,
-                beneficiary_id: creditor.user_id,
-                amount,
-            });
-
-            debtor.amount += amount;
-            creditor.amount -= amount;
-
-            if debtor.amount < 0 {
-                debtors.push(debtor);
-            }
-            if creditor.amount > 0 {
-                creditors.push(creditor);
-            }
-        }
-
-        assert!(creditors.is_empty(), "creditors not empty: {:?}", creditors);
-        assert!(debtors.is_empty(), "debtors not empty: {:?}", debtors);
-
-        balancing
     }
 }
 

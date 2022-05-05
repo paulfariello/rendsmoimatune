@@ -29,13 +29,13 @@ pub struct AccountProps {
 pub struct Account {
     account: Option<Rc<RefCell<rmmt::Account>>>,
     users: Option<Rc<RefCell<HashMap<Uuid, rmmt::User>>>>,
-    balances: Option<Rc<RefCell<(Vec<rmmt::Balance>, i64, Vec<rmmt::Balancing>)>>>,
+    balance: Option<Rc<RefCell<rmmt::Balance>>>,
     expenditures: Option<Rc<RefCell<Vec<rmmt::Expenditure>>>>,
     repayments: Option<Rc<RefCell<Vec<rmmt::Repayment>>>>,
     fetching_users: bool,
     fetching_expenditures: bool,
     fetching_repayments: bool,
-    fetching_balances: bool,
+    fetching_balance: bool,
     _account_bridge: Box<dyn Bridge<AccountAgent>>,
 }
 
@@ -51,13 +51,13 @@ impl Component for Account {
         Self {
             account: None,
             users: None,
-            balances: None,
+            balance: None,
             expenditures: None,
             repayments: None,
             fetching_users: false,
             fetching_expenditures: false,
             fetching_repayments: false,
-            fetching_balances: false,
+            fetching_balance: false,
             _account_bridge: account_bridge,
         }
     }
@@ -70,17 +70,17 @@ impl Component for Account {
             }
             AccountMsg::ChangedUsers => {
                 self.fetching_users = true;
-                self.fetching_balances = true;
+                self.fetching_balance = true;
                 true
             }
             AccountMsg::ChangedExpenditures => {
                 self.fetching_expenditures = true;
-                self.fetching_balances = true;
+                self.fetching_balance = true;
                 true
             }
             AccountMsg::ChangedRepayments => {
                 self.fetching_repayments = true;
-                self.fetching_balances = true;
+                self.fetching_balance = true;
                 true
             }
             AccountMsg::UpdateUsers(users) => {
@@ -88,9 +88,9 @@ impl Component for Account {
                 self.users = Some(users);
                 true
             }
-            AccountMsg::UpdateBalances(balances) => {
-                self.fetching_balances = false;
-                self.balances = Some(balances);
+            AccountMsg::UpdateBalance(balance) => {
+                self.fetching_balance = false;
+                self.balance = Some(balance);
                 true
             }
             AccountMsg::UpdateExpenditures(expenditures) => {
@@ -143,8 +143,8 @@ impl Component for Account {
                                 <span>{ "Balance" }</span>
                             </span>
                         </h3>
-                        if let (Some(users), Some(balances)) = (self.users.clone(), self.balances.clone()) {
-                            <BalanceList { users } { balances } loading={ self.fetching_balances } />
+                        if let (Some(users), Some(balance)) = (self.users.clone(), self.balance.clone()) {
+                            <BalanceList { users } { balance } loading={ self.fetching_balance } />
                         } else {
                             <Loading />
                         }
@@ -160,8 +160,8 @@ impl Component for Account {
                                 <span>{ "Équilibrage" }</span>
                             </span>
                         </h3>
-                        if let (Some(users), Some(balances)) = (self.users.clone(), self.balances.clone()) {
-                            <BalancingList { users } { balances } loading={ self.fetching_balances } />
+                        if let (Some(users), Some(balance)) = (self.users.clone(), self.balance.clone()) {
+                            <BalancingList { users } { balance } loading={ self.fetching_balance } />
                         } else {
                             <Loading />
                         }

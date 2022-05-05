@@ -16,7 +16,7 @@ pub enum AccountMsg {
     UpdateAccount(Rc<RefCell<rmmt::Account>>),
     ChangedUsers,
     UpdateUsers(Rc<RefCell<HashMap<Uuid, rmmt::User>>>),
-    UpdateBalances(Rc<RefCell<(Vec<rmmt::Balance>, i64, Vec<rmmt::Balancing>)>>),
+    UpdateBalance(Rc<RefCell<rmmt::Balance>>),
     ChangedExpenditures,
     UpdateExpenditures(Rc<RefCell<Vec<rmmt::Expenditure>>>),
     ChangedRepayments,
@@ -29,7 +29,7 @@ pub struct AccountAgent {
     account_id: Option<String>,
     account: Option<Rc<RefCell<rmmt::Account>>>,
     users: Option<Rc<RefCell<HashMap<Uuid, rmmt::User>>>>,
-    balances: Option<Rc<RefCell<(Vec<rmmt::Balance>, i64, Vec<rmmt::Balancing>)>>>,
+    balance: Option<Rc<RefCell<rmmt::Balance>>>,
     expenditures: Option<Rc<RefCell<Vec<rmmt::Expenditure>>>>,
     repayments: Option<Rc<RefCell<Vec<rmmt::Repayment>>>>,
 }
@@ -74,17 +74,13 @@ impl AccountAgent {
         }
     }
 
-    fn fetch_balances(&mut self) {
+    fn fetch_balance(&mut self) {
         match self.account_id.as_ref() {
             Some(account_id) => {
-                info!("Fetching balances for account: {}", account_id);
+                info!("Fetching balance for account: {}", account_id);
                 let account_id = account_id.clone();
                 self.link.send_future(async move {
-                    let (mut balances, remaining, mut balancing): (
-                        Vec<rmmt::Balance>,
-                        i64,
-                        Vec<rmmt::Balancing>,
-                    ) = Request::get(&format!("/api/account/{}/balance", account_id))
+                    let mut balance: rmmt::Balance = Request::get(&format!("/api/account/{}/balance", account_id))
                         .send()
                         .await
                         .unwrap()
@@ -92,18 +88,15 @@ impl AccountAgent {
                         .await
                         .unwrap();
                     info!(
-                        "Fetched {} balances for account: {}",
-                        balances.len(),
+                        "Fetched balance for account: {}",
                         account_id
                     );
-                    balances.sort_by(|a, b| a.user_id.partial_cmp(&b.user_id).unwrap());
-                    balancing.sort_by(|a, b| a.payer_id.partial_cmp(&b.payer_id).unwrap());
-                    AccountMsg::UpdateBalances(Rc::new(RefCell::new((
-                        balances, remaining, balancing,
-                    ))))
+                    balance.user_balances.sort_by(|a, b| a.user_id.partial_cmp(&b.user_id).unwrap());
+                    balance.balancing.sort_by(|a, b| a.payer_id.partial_cmp(&b.payer_id).unwrap());
+                    AccountMsg::UpdateBalance(Rc::new(RefCell::new(balance)))
                 });
             }
-            None => error!("Cannot fetch balances without account id"),
+            None => error!("Cannot fetch balance without account id"),
         }
     }
 
@@ -181,7 +174,7 @@ impl Agent for AccountAgent {
             account_id: None,
             account: None,
             users: None,
-            balances: None,
+            balance: None,
             expenditures: None,
             repayments: None,
         }
@@ -191,7 +184,7 @@ impl Agent for AccountAgent {
         match &msg {
             AccountMsg::UpdateAccount(account) => self.account = Some(account.clone()),
             AccountMsg::UpdateUsers(users) => self.users = Some(users.clone()),
-            AccountMsg::UpdateBalances(balances) => self.balances = Some(balances.clone()),
+            AccountMsg::UpdateBalance(balance) => self.balance = Some(balance.clone()),
             AccountMsg::UpdateExpenditures(expenditures) => {
                 self.expenditures = Some(expenditures.clone())
             }
@@ -208,22 +201,22 @@ impl Agent for AccountAgent {
                 if Some(id) != self.account_id.as_ref() {
                     self.fetch_account(id.clone());
                     self.fetch_users();
-                    self.fetch_balances();
+                    self.fetch_balance();
                     self.fetch_expenditures();
                     self.fetch_repayments();
                 }
             }
             AccountMsg::ChangedUsers => {
                 self.fetch_users();
-                self.fetch_balances();
+                self.fetch_balance();
             }
             AccountMsg::ChangedExpenditures => {
                 self.fetch_expenditures();
-                self.fetch_balances();
+                self.fetch_balance();
             }
             AccountMsg::ChangedRepayments => {
                 self.fetch_repayments();
-                self.fetch_balances();
+                self.fetch_balance();
             }
             _ => {}
         }
@@ -239,8 +232,8 @@ impl Agent for AccountAgent {
         if let Some(users) = self.users.clone() {
             self.link.respond(id, AccountMsg::UpdateUsers(users));
         }
-        if let Some(balances) = self.balances.clone() {
-            self.link.respond(id, AccountMsg::UpdateBalances(balances));
+        if let Some(balance) = self.balance.clone() {
+            self.link.respond(id, AccountMsg::UpdateBalance(balance));
         }
         if let Some(expenditures) = self.expenditures.clone() {
             self.link

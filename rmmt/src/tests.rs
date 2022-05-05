@@ -48,7 +48,7 @@ fn repayment(payer: &str, beneficiary: &str, amount: i32) -> Repayment {
 }
 
 fn assert_balance(
-    balances: Vec<Balance>,
+    balances: Vec<UserBalance>,
     reference: Vec<(&str, i64)>,
     remaining: i64,
     remaining_ref: i64,
@@ -72,8 +72,8 @@ fn assert_balance(
     }
 }
 
-fn balance(user: &str, amount: i64) -> Balance {
-    Balance {
+fn user_balance(user: &str, amount: i64) -> UserBalance {
+    UserBalance {
         user_id: uuid(user),
         amount,
     }
@@ -106,7 +106,7 @@ fn balance_simple() {
     let repayments = vec![];
 
     // When
-    let (balances, remaining) = Balance::from_account(users, debts, repayments);
+    let (balances, remaining) = Balance::get_user_balances(users, debts, repayments);
 
     // Then
     assert_balance(balances, vec![("user1", 5), ("user2", -5)], remaining, 0);
@@ -120,7 +120,7 @@ fn balance_with_repayment() {
     let repayments = vec![repayment("user2", "user1", 5)];
 
     // When
-    let (balances, remaining) = Balance::from_account(users, debts, repayments);
+    let (balances, remaining) = Balance::get_user_balances(users, debts, repayments);
 
     // Then
     assert_balance(balances, vec![("user1", 0), ("user2", 0)], remaining, 0);
@@ -138,7 +138,7 @@ fn balance_with_few_expenditures() {
     let repayments = vec![repayment("user2", "user1", 5)];
 
     // When
-    let (balances, remaining) = Balance::from_account(users, debts, repayments);
+    let (balances, remaining) = Balance::get_user_balances(users, debts, repayments);
 
     // Then
     assert_balance(balances, vec![("user1", -5), ("user2", 5)], remaining, 0);
@@ -152,7 +152,7 @@ fn balance_with_remaining() {
     let repayments = vec![];
 
     // When
-    let (balances, remaining) = Balance::from_account(users, debts, repayments);
+    let (balances, remaining) = Balance::get_user_balances(users, debts, repayments);
 
     // Then
     assert_balance(balances, vec![("user1", 5), ("user2", -5)], remaining, 0);
@@ -166,7 +166,7 @@ fn balance_with_even_remaining_favour_payers() {
     let repayments = vec![];
 
     // When
-    let (balances, remaining) = Balance::from_account(users, debts, repayments);
+    let (balances, remaining) = Balance::get_user_balances(users, debts, repayments);
 
     // Then
     assert_balance(balances, vec![("user1", 1), ("user2", -1)], remaining, 0);
@@ -183,7 +183,7 @@ fn balance_with_fractional_remaining_favour_payers_and_have_remaining() {
     let repayments = vec![];
 
     // When
-    let (balances, remaining) = Balance::from_account(users, debts, repayments);
+    let (balances, remaining) = Balance::get_user_balances(users, debts, repayments);
 
     // Then
     assert_balance(
@@ -206,7 +206,7 @@ fn balance_with_resolved_fractional_remaining_has_no_remaining() {
     let repayments = vec![];
 
     // When
-    let (balances, remaining) = Balance::from_account(users, debts, repayments);
+    let (balances, remaining) = Balance::get_user_balances(users, debts, repayments);
 
     // Then
     assert_balance(
@@ -220,10 +220,10 @@ fn balance_with_resolved_fractional_remaining_has_no_remaining() {
 #[test]
 fn balancing() {
     // Given
-    let balances = vec![balance("user1", 100), balance("user2", -100)];
+    let mut balances = vec![user_balance("user1", 100), user_balance("user2", -100)];
 
     // When
-    let balancing = Balancing::from_balances(balances);
+    let (balancing, _) = Balance::get_balancing(&mut balances);
 
     // Then
     assert_balancing(balancing, vec![("user2", "user1", 100)]);
@@ -232,14 +232,14 @@ fn balancing() {
 #[test]
 fn multi_balancing() {
     // Given
-    let balances = vec![
-        balance("user1", 100),
-        balance("user2", -50),
-        balance("user3", -50),
+    let mut balances = vec![
+        user_balance("user1", 100),
+        user_balance("user2", -50),
+        user_balance("user3", -50),
     ];
 
     // When
-    let balancing = Balancing::from_balances(balances);
+    let (balancing, _) = Balance::get_balancing(&mut balances);
 
     // Then
     assert_balancing(

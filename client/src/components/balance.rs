@@ -13,7 +13,7 @@ use crate::components::{user::UserName, utils::Amount};
 #[derive(Properties, PartialEq)]
 pub struct BalanceListProps {
     pub users: Rc<RefCell<HashMap<Uuid, rmmt::User>>>,
-    pub balances: Rc<RefCell<(Vec<rmmt::Balance>, i64, Vec<rmmt::Balancing>)>>,
+    pub balance: Rc<RefCell<rmmt::Balance>>,
     pub loading: bool,
 }
 
@@ -28,10 +28,10 @@ impl Component for BalanceList {
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
-        let (balances, remaining, _) = &*ctx.props().balances.borrow();
+        let balance = &*ctx.props().balance.borrow();
         let users = &ctx.props().users;
 
-        let max = balances
+        let max = balance.user_balances
             .iter()
             .map(|b| b.amount)
             .max()
@@ -48,7 +48,7 @@ impl Component for BalanceList {
                 <table class="table is-fullwidth is-striped is-hoverable">
                     <tbody>
                         {
-                            balances.iter().map(|balance| {
+                            balance.user_balances.iter().map(|balance| {
                                 html! {
                                     <tr>
                                         <td class="is-vcentered">
@@ -78,9 +78,9 @@ impl Component for BalanceList {
                         }
                     </tbody>
                 </table>
-                if *remaining != 0 {
+                if balance.account_remaining != 0 {
                     <div class="notification is-info">
-                      { "Oups, nous avons perdu " }<Amount amount={ remaining.abs() } />{ " dans des arrondis…" }
+                      { "Oups, nous avons perdu " }<Amount amount={ balance.account_remaining.abs() } />{ " dans des arrondis…" }
                     </div>
                 }
             </div>
@@ -91,7 +91,7 @@ impl Component for BalanceList {
 #[derive(Properties, PartialEq)]
 pub struct BalancingListProps {
     pub users: Rc<RefCell<HashMap<Uuid, rmmt::User>>>,
-    pub balances: Rc<RefCell<(Vec<rmmt::Balance>, i64, Vec<rmmt::Balancing>)>>,
+    pub balance: Rc<RefCell<rmmt::Balance>>,
     pub loading: bool,
 }
 
@@ -106,7 +106,7 @@ impl Component for BalancingList {
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
-        let (_, _, balancing) = &*ctx.props().balances.borrow();
+        let balance = &*ctx.props().balance.borrow();
         let users = &ctx.props().users;
 
         html! {
@@ -116,7 +116,7 @@ impl Component for BalancingList {
                         <Loading />
                     </div>
                 }
-                if balancing.is_empty() {
+                if balance.balancing.is_empty() {
                     <div class="notification is-success">
                         { "Bien joué, personne de doit rien à personne." }
                     </div>
@@ -124,7 +124,7 @@ impl Component for BalancingList {
                     <table class="table is-fullwidth is-striped is-hoverable">
                         <tbody>
                             {
-                                balancing.iter().map(|balance| {
+                                balance.balancing.iter().map(|balance| {
                                     html! {
                                         <tr>
                                             <td class="is-vcentered has-text-centered"><UserName users={ users.clone() } id={ balance.payer_id }/></td>
@@ -148,6 +148,26 @@ impl Component for BalancingList {
                             }
                         </tbody>
                     </table>
+                }
+                if !balance.balancing_remaining.is_empty() {
+                    <div class="notification is-info content">
+                        { "Avec ces histoires d'arrondis il y a des gagnants et des perdants…" }
+                        <ul>
+                            {
+                                balance.balancing_remaining.iter().map(|balance| html!{
+                                    <li>
+                                        <UserName users={ users.clone() } id={ balance.user_id }/>
+                                        if balance.amount > 0 {
+                                            { " à perdu " }
+                                        } else {
+                                            { " à gagné " }
+                                        }
+                                        <Amount amount={ balance.amount.abs() } />
+                                    </li>
+                                }).collect::<Html>()
+                            }
+                        </ul>
+                    </div>
                 }
             </div>
         }
