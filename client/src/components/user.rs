@@ -122,7 +122,7 @@ impl Component for CreateUser {
             <form {onsubmit}>
                 <div class="field has-addons">
                     <div class={classes!("control", self.creating.then(|| "is-loading"))}>
-                        <input ref={self.input_name.clone()} type="text" class="input is-primary" name="name" required=true />
+                        <input ref={self.input_name.clone()} type="text" class="input is-primary" name="name" required=true placeholder="François" />
                     </div>
                     <div class="control">
                         <button type="submit" class={classes!("button", "is-primary", self.creating.then(|| "is-loading"))}>
