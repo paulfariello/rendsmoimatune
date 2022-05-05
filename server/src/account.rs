@@ -27,6 +27,8 @@ pub(crate) async fn get_account(
     account_id: UniqId,
 ) -> Result<Json<Account>, Error> {
     let uuid: uuid::Uuid = account_id.into();
-    let account: Account = conn.run(move |c| rmmt::accounts::dsl::accounts.find(uuid).first(c)).await?;
+    let account: Account = conn
+        .run(move |c| rmmt::accounts::dsl::accounts.find(uuid).first(c))
+        .await?;
     Ok(Json(account))
 }

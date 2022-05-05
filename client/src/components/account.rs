@@ -13,8 +13,11 @@ use yew_router::prelude::*;
 
 use crate::agent::{AccountAgent, AccountMsg};
 use crate::components::{
-    balance::BalanceList, expenditure::ExpendituresList, repayment::RepaymentsList,
-    user::CreateUser, utils::Loading,
+    balance::{BalanceList, BalancingList},
+    expenditure::ExpendituresList,
+    repayment::RepaymentsList,
+    user::CreateUser,
+    utils::Loading,
 };
 use crate::Route;
 
@@ -26,7 +29,7 @@ pub struct AccountProps {
 pub struct Account {
     account: Option<Rc<RefCell<rmmt::Account>>>,
     users: Option<Rc<RefCell<HashMap<Uuid, rmmt::User>>>>,
-    balances: Option<Rc<RefCell<(Vec<rmmt::Balance>, i64)>>>,
+    balances: Option<Rc<RefCell<(Vec<rmmt::Balance>, i64, Vec<rmmt::Balancing>)>>>,
     expenditures: Option<Rc<RefCell<Vec<rmmt::Expenditure>>>>,
     repayments: Option<Rc<RefCell<Vec<rmmt::Repayment>>>>,
     fetching_users: bool,
@@ -157,35 +160,11 @@ impl Component for Account {
                                 <span>{ "Équilibrage" }</span>
                             </span>
                         </h3>
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th> { "De" }</th>
-                                    <th></th>
-                                    <th> { "Montant" }</th>
-                                    <th></th>
-                                    <th>{ "À" }</th>
-                                    <th>{ "Action" }</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>{ "john" }</td>
-                                    <td>{ "doit" }</td>
-                                    <td>{ 2970.65 }{ " €" }</td>
-                                    <td>{ "à" }</td>
-                                    <td>{ "john" }</td>
-                                    <td>
-                                        <a class="button is-primary" href="">
-                                            <span class="icon">
-                                                <i class="fa fa-plus-circle" />
-                                            </span>
-                                            <span>{ "Rembourser" }</span>
-                                        </a>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                        if let (Some(users), Some(balances)) = (self.users.clone(), self.balances.clone()) {
+                            <BalancingList { users } { balances } loading={ self.fetching_balances } />
+                        } else {
+                            <Loading />
+                        }
                     </div>
                 </div>
             </div>

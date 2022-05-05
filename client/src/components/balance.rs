@@ -13,7 +13,7 @@ use crate::components::{user::UserName, utils::Amount};
 #[derive(Properties, PartialEq)]
 pub struct BalanceListProps {
     pub users: Rc<RefCell<HashMap<Uuid, rmmt::User>>>,
-    pub balances: Rc<RefCell<(Vec<rmmt::Balance>, i64)>>,
+    pub balances: Rc<RefCell<(Vec<rmmt::Balance>, i64, Vec<rmmt::Balancing>)>>,
     pub loading: bool,
 }
 
@@ -28,7 +28,7 @@ impl Component for BalanceList {
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
-        let (balances, remaining) = &*ctx.props().balances.borrow();
+        let (balances, remaining, _) = &*ctx.props().balances.borrow();
         let users = &ctx.props().users;
 
         let max = balances
@@ -82,6 +82,72 @@ impl Component for BalanceList {
                     <div class="notification is-info">
                       { "Oups, nous avons perdu " }<Amount amount={ remaining.abs() } />{ " dans des arrondis…" }
                     </div>
+                }
+            </div>
+        }
+    }
+}
+
+#[derive(Properties, PartialEq)]
+pub struct BalancingListProps {
+    pub users: Rc<RefCell<HashMap<Uuid, rmmt::User>>>,
+    pub balances: Rc<RefCell<(Vec<rmmt::Balance>, i64, Vec<rmmt::Balancing>)>>,
+    pub loading: bool,
+}
+
+pub struct BalancingList;
+
+impl Component for BalancingList {
+    type Message = ();
+    type Properties = BalancingListProps;
+
+    fn create(_ctx: &Context<Self>) -> Self {
+        Self {}
+    }
+
+    fn view(&self, ctx: &Context<Self>) -> Html {
+        let (_, _, balancing) = &*ctx.props().balances.borrow();
+        let users = &ctx.props().users;
+
+        html! {
+            <div class="balancing is-relative block">
+                if ctx.props().loading {
+                    <div class="loading-overlay">
+                        <Loading />
+                    </div>
+                }
+                if balancing.is_empty() {
+                    <div class="notification is-success">
+                        { "Bien joué, personne de doit rien à personne." }
+                    </div>
+                } else {
+                    <table class="table is-fullwidth is-striped is-hoverable">
+                        <tbody>
+                            {
+                                balancing.iter().map(|balance| {
+                                    html! {
+                                        <tr>
+                                            <td class="is-vcentered has-text-centered"><UserName users={ users.clone() } id={ balance.payer_id }/></td>
+                                            <td class="is-vcentered has-text-centered">{ "doit" }</td>
+                                            <td class="is-vcentered">
+                                                <Amount amount={ balance.amount } />
+                                            </td>
+                                            <td class="is-vcentered has-text-centered">{ "à" }</td>
+                                            <td class="is-vcentered has-text-centered"><UserName users={ users.clone() } id={ balance.beneficiary_id }/></td>
+                                            <td>
+                                                <button class="button is-primary">
+                                                    <span class="icon">
+                                                        <i class="fa fa-credit-card" />
+                                                    </span>
+                                                    <span>{ "Rembourser" }</span>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    }
+                                }).collect::<Html>()
+                            }
+                        </tbody>
+                    </table>
                 }
             </div>
         }

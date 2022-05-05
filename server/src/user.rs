@@ -32,7 +32,11 @@ pub(crate) async fn get_users(
 ) -> Result<Json<Vec<User>>, Error> {
     let uuid: uuid::Uuid = account_id.into();
     let account_users: Vec<User> = conn
-        .run(move |c| rmmt::users::dsl::users.filter(rmmt::users::dsl::account_id.eq(uuid)).load(c))
+        .run(move |c| {
+            rmmt::users::dsl::users
+                .filter(rmmt::users::dsl::account_id.eq(uuid))
+                .load(c)
+        })
         .await?;
 
     Ok(Json(account_users))

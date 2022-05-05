@@ -497,11 +497,13 @@ impl DeleteRepayment {
     fn delete_repayment(&mut self, ctx: &Context<Self>) {
         self.deleting = true;
 
-        let url = format!("/api/account/{}/repayments/{}", UniqId::from(ctx.props().account_id), ctx.props().id);
+        let url = format!(
+            "/api/account/{}/repayments/{}",
+            UniqId::from(ctx.props().account_id),
+            ctx.props().id
+        );
         ctx.link().send_future(async move {
-            let resp = Request::delete(&url)
-                .send()
-                .await;
+            let resp = Request::delete(&url).send().await;
 
             let resp = match resp {
                 Err(err) => return DeleteRepaymentMsg::Error(format!("{}", err)),
@@ -562,7 +564,9 @@ impl Component for DeleteRepayment {
         let onclick = ctx.link().callback(|_| DeleteRepaymentMsg::Delete);
 
         html! {
-            <button aria-label="Supprimer" class={ classes!("button", "is-danger", self.deleting.then(|| "is-loading")) } { onclick }><i class="fa fa-trash-o fa-lg"></i></button>
+            <button aria-label="Supprimer" class={ classes!("button", "is-danger", self.deleting.then(|| "is-loading")) } { onclick }>
+                <i class="fa fa-trash-o fa-lg"></i>
+            </button>
         }
     }
 }

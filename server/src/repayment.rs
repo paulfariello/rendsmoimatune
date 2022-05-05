@@ -36,7 +36,11 @@ pub(crate) async fn get_repayments(
 ) -> Result<Json<Vec<Repayment>>, Error> {
     let uuid: uuid::Uuid = account_id.into();
     let account_repayments: Vec<Repayment> = conn
-        .run(move |c| rmmt::repayments::dsl::repayments.filter(rmmt::repayments::dsl::account_id.eq(uuid)).load(c))
+        .run(move |c| {
+            rmmt::repayments::dsl::repayments
+                .filter(rmmt::repayments::dsl::account_id.eq(uuid))
+                .load(c)
+        })
         .await?;
 
     Ok(Json(account_repayments))
@@ -50,7 +54,10 @@ pub(crate) async fn del_repayment(
 ) -> Result<(), Error> {
     let account_uuid: uuid::Uuid = account_id.into();
     conn.run(move |c| {
-        diesel::delete(rmmt::repayments::dsl::repayments.filter(rmmt::repayments::dsl::id.eq(repayment_id))).execute(c)
+        diesel::delete(
+            rmmt::repayments::dsl::repayments.filter(rmmt::repayments::dsl::id.eq(repayment_id)),
+        )
+        .execute(c)
     })
     .await?;
 

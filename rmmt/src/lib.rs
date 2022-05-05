@@ -2,13 +2,13 @@
 #[cfg(feature = "db")]
 extern crate diesel;
 
-use std::collections::HashMap;
 use std::cmp;
+use std::collections::HashMap;
 
 use chrono::NaiveDate;
+use num::rational::Rational64;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
-use num::rational::Rational64;
 
 pub mod prelude;
 #[cfg(feature = "db")]
@@ -186,7 +186,10 @@ impl Balance {
 
             for debt in &debts {
                 let balance = Self::get_balance(&mut balances, &debt.debtor_id);
-                balance.debts.push(Rational64::new(expenditure.amount as i64 * debt.share as i64, share_sum as i64));
+                balance.debts.push(Rational64::new(
+                    expenditure.amount as i64 * debt.share as i64,
+                    share_sum as i64,
+                ));
             }
         }
 
@@ -195,7 +198,9 @@ impl Balance {
             balance.credit += repayment.amount as i64;
 
             let balance = Self::get_balance(&mut balances, &repayment.beneficiary_id);
-            balance.debts.push(Rational64::new(repayment.amount as i64, 1i64));
+            balance
+                .debts
+                .push(Rational64::new(repayment.amount as i64, 1i64));
         }
 
         let balances: Vec<Balance> = balances.into_values().map(|b| b.into()).collect::<Vec<_>>();
@@ -206,13 +211,17 @@ impl Balance {
     }
 
     #[inline]
-    fn get_balance<'a>(balances: &'a mut HashMap<Uuid, TmpBalance>, id: &Uuid) -> &'a mut TmpBalance {
+    fn get_balance<'a>(
+        balances: &'a mut HashMap<Uuid, TmpBalance>,
+        id: &Uuid,
+    ) -> &'a mut TmpBalance {
         balances
             .get_mut(id)
             .expect(&format!("Corrupted db? Missing user {} in balances", id))
     }
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct Balancing {
     pub payer_id: Uuid,
     pub beneficiary_id: Uuid,
@@ -229,8 +238,16 @@ impl Balancing {
         // Sort to ensure idempotence
         balances.sort_by(|a, b| a.user_id.partial_cmp(&b.user_id).unwrap());
 
-        let mut creditors = balances.iter().filter(|b| b.amount > 0).cloned().collect::<Vec<_>>();
-        let mut debtors = balances.iter().filter(|b| b.amount < 0).cloned().collect::<Vec<_>>();
+        let mut creditors = balances
+            .iter()
+            .filter(|b| b.amount > 0)
+            .cloned()
+            .collect::<Vec<_>>();
+        let mut debtors = balances
+            .iter()
+            .filter(|b| b.amount < 0)
+            .cloned()
+            .collect::<Vec<_>>();
 
         while !creditors.is_empty() && !debtors.is_empty() {
             let mut debtor = debtors.pop().unwrap();

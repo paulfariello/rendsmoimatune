@@ -2,8 +2,8 @@
 use rocket::request::FromParam;
 use serde::{Deserialize, Serialize};
 use std::convert::TryFrom;
-use uuid::Uuid;
 use std::fmt;
+use uuid::Uuid;
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct UniqId(Uuid);

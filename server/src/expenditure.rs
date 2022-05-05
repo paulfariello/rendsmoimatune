@@ -24,9 +24,10 @@ pub(crate) async fn post_expenditure(
         let (expenditure, new_debts): (Expenditure, Vec<Debt>) = conn
             .run(move |c| {
                 c.transaction::<(Expenditure, Vec<Debt>), diesel::result::Error, _>(|| {
-                    let expenditure: Expenditure = diesel::insert_into(rmmt::expenditures::dsl::expenditures)
-                        .values(expenditure)
-                        .get_result(c)?;
+                    let expenditure: Expenditure =
+                        diesel::insert_into(rmmt::expenditures::dsl::expenditures)
+                            .values(expenditure)
+                            .get_result(c)?;
 
                     let new_debts = debtors
                         .into_iter()
@@ -75,7 +76,11 @@ pub(crate) async fn del_expenditure(
 ) -> Result<(), Error> {
     let account_uuid: uuid::Uuid = account_id.into();
     conn.run(move |c| {
-        diesel::delete(rmmt::expenditures::dsl::expenditures.filter(rmmt::expenditures::dsl::id.eq(expenditure_id))).execute(c)
+        diesel::delete(
+            rmmt::expenditures::dsl::expenditures
+                .filter(rmmt::expenditures::dsl::id.eq(expenditure_id)),
+        )
+        .execute(c)
     })
     .await?;
 
