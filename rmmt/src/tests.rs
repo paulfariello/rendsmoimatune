@@ -73,6 +73,28 @@ fn assert_balance(balances: Vec<Balance>, reference: Vec<(&str, i64)>, remaining
     }
 }
 
+fn balance(user: &str, amount: i64) -> Balance {
+    Balance {
+        user_id: uuid(user),
+        amount,
+    }
+}
+
+fn assert_balancing(balancing: Vec<Balancing>, reference: Vec<(&str, &str, i64)>) {
+    let map_balancing = balancing
+        .into_iter()
+        .map(|b| ((b.payer_id.clone(), b.beneficiary_id.clone()), b.amount))
+        .collect::<HashMap<_, _>>();
+    for (payer, beneficiary, amount_ref) in reference {
+        let amount = map_balancing.get(&(uuid(payer), uuid(beneficiary)));
+        assert_eq!(
+            amount, Some(&amount_ref),
+            "invalid balancing {:?} (expected {}) from {} to {}",
+            amount, amount_ref, payer, beneficiary
+        );
+    }
+}
+
 #[test]
 fn balance_simple() {
     // Given
@@ -173,4 +195,28 @@ fn balance_with_resolved_fractional_remaining_has_no_remaining() {
 
     // Then
     assert_balance(balances, vec![("user1", 0), ("user2", 0), ("user3", 0)], remaining, 0);
+}
+
+#[test]
+fn balancing() {
+    // Given
+    let balances = vec![balance("user1", 100), balance("user2", -100)];
+
+    // When
+    let balancing = Balancing::from_balances(balances);
+
+    // Then
+    assert_balancing(balancing, vec![("user2", "user1", 100)]);
+}
+
+#[test]
+fn multi_balancing() {
+    // Given
+    let balances = vec![balance("user1", 100), balance("user2", -50), balance("user3", -50)];
+
+    // When
+    let balancing = Balancing::from_balances(balances);
+
+    // Then
+    assert_balancing(balancing, vec![("user2", "user1", 50), ("user3", "user1", 50)]);
 }

@@ -2,9 +2,11 @@
 #[cfg(feature = "db")]
 extern crate diesel;
 
+use std::collections::HashMap;
+use std::cmp;
+
 use chrono::NaiveDate;
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
 use uuid::Uuid;
 use num::rational::Rational64;
 
@@ -208,6 +210,55 @@ impl Balance {
         balances
             .get_mut(id)
             .expect(&format!("Corrupted db? Missing user {} in balances", id))
+    }
+}
+
+pub struct Balancing {
+    pub payer_id: Uuid,
+    pub beneficiary_id: Uuid,
+    pub amount: i64,
+}
+
+impl Balancing {
+    /// Create balancing from a vector of balances.
+    ///
+    /// Ensure balancing doesn't change given new repayments are done.
+    pub fn from_balances(mut balances: Vec<Balance>) -> Vec<Balancing> {
+        let mut balancing = Vec::new();
+
+        // Sort to ensure idempotence
+        balances.sort_by(|a, b| a.user_id.partial_cmp(&b.user_id).unwrap());
+
+        let mut creditors = balances.iter().filter(|b| b.amount > 0).cloned().collect::<Vec<_>>();
+        let mut debtors = balances.iter().filter(|b| b.amount < 0).cloned().collect::<Vec<_>>();
+
+        while !creditors.is_empty() && !debtors.is_empty() {
+            let mut debtor = debtors.pop().unwrap();
+            let mut creditor = creditors.pop().unwrap();
+
+            let amount = cmp::min(-debtor.amount, creditor.amount);
+
+            balancing.push(Balancing {
+                payer_id: debtor.user_id,
+                beneficiary_id: creditor.user_id,
+                amount,
+            });
+
+            debtor.amount += amount;
+            creditor.amount -= amount;
+
+            if debtor.amount < 0 {
+                debtors.push(debtor);
+            }
+            if creditor.amount > 0 {
+                creditors.push(creditor);
+            }
+        }
+
+        assert!(creditors.is_empty(), "creditors not empty: {:?}", creditors);
+        assert!(debtors.is_empty(), "debtors not empty: {:?}", debtors);
+
+        balancing
     }
 }
 
