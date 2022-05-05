@@ -142,7 +142,7 @@ impl Component for ExpendituresList {
                     <tr key={ expenditure.id.to_string() }>
                         <td class="is-vcentered">{ &expenditure.date }</td>
                         <td class="is-vcentered">{ &expenditure.name }</td>
-                        <td class="is-vcentered"><Amount amount={ expenditure.amount } /></td>
+                        <td class="is-vcentered"><Amount amount={ expenditure.amount as i64} /></td>
                         <td class="is-vcentered"><UserName users={ ctx.props().users.clone() } id={ expenditure.payer_id }/></td>
                         <td class="is-vcentered">{ "todo" }</td>
                         <td class="is-vcentered">

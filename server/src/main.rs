@@ -19,7 +19,7 @@ use error::Error;
 struct MainDbConn(PgConnection);
 
 #[get("/api/account/<uniq_id>/balance")]
-async fn get_balance(conn: MainDbConn, uniq_id: UniqId) -> Result<Json<Vec<Balance>>, Error> {
+async fn get_balance(conn: MainDbConn, uniq_id: UniqId) -> Result<Json<(Vec<Balance>, i64)>, Error> {
     let uuid: uuid::Uuid = uniq_id.into();
     let account_debts: Vec<(Expenditure, Vec<Debt>)> = conn
         .run::<_, Result<Vec<(Expenditure, Vec<Debt>)>, diesel::result::Error>>(move |c| {

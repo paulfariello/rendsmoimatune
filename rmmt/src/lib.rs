@@ -3,10 +3,11 @@
 extern crate diesel;
 
 use chrono::NaiveDate;
-use log::warn;
+use log::{debug, warn};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use uuid::Uuid;
+use num::rational::Rational64;
 
 pub mod prelude;
 #[cfg(feature = "db")]
@@ -121,7 +122,29 @@ pub struct NewDebt {
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct Balance {
     pub user_id: Uuid,
-    pub amount: i32,
+    pub amount: i64,
+}
+
+struct TmpBalance {
+    pub user_id: Uuid,
+    pub credit: i64,
+    pub debts: Vec<Rational64>,
+}
+
+impl TmpBalance {
+    fn result(&self) -> i64 {
+        self.credit - self.debts.iter().sum::<Rational64>().to_integer()
+    }
+}
+
+impl From<TmpBalance> for Balance {
+    fn from(tmp: TmpBalance) -> Balance {
+        let result = tmp.result();
+        Balance {
+            user_id: tmp.user_id,
+            amount: result,
+        }
+    }
 }
 
 impl Balance {
@@ -129,15 +152,16 @@ impl Balance {
         users: Vec<User>,
         debts: Vec<(Expenditure, Vec<Debt>)>,
         repayments: Vec<Repayment>,
-    ) -> Vec<Balance> {
-        let mut balances: HashMap<Uuid, Balance> = users
+    ) -> (Vec<Balance>, i64) {
+        let mut balances: HashMap<Uuid, TmpBalance> = users
             .iter()
             .map(|u| {
                 (
                     u.id,
-                    Balance {
+                    TmpBalance {
                         user_id: u.id.clone(),
-                        amount: 0,
+                        credit: 0,
+                        debts: Vec::new(),
                     },
                 )
             })
@@ -146,58 +170,34 @@ impl Balance {
         for (expenditure, debts) in debts {
             // Update payer balance
             let balance = Self::get_balance(&mut balances, &expenditure.payer_id);
-            balance.amount += expenditure.amount;
+            balance.credit += expenditure.amount as i64;
 
             // Update deptors balances
             let share_sum: i32 = debts.iter().map(|d| d.share).sum();
 
-            let mut sum = 0;
             for debt in &debts {
                 let balance = Self::get_balance(&mut balances, &debt.debtor_id);
-                let amount = (expenditure.amount as f64 * (debt.share as f64 / share_sum as f64))
-                    .round() as i32;
-                balance.amount -= amount;
-                sum += amount;
-            }
-
-            if sum != expenditure.amount {
-                let mut remaining = expenditure.amount - sum;
-                // Fix missing part to first debtors, sorry bro
-                let mut debts_iter = debts.iter();
-                while remaining != 0 {
-                    // Can safely unwrap next() here, since we can't loss more than 1 on each debtor
-                    let debt = debts_iter.next().unwrap();
-                    let balance = Self::get_balance(&mut balances, &debt.debtor_id);
-                    let fix = remaining / remaining.abs();
-                    balance.amount -= fix;
-                    remaining -= fix;
-                }
+                balance.debts.push(Rational64::new(expenditure.amount as i64 * debt.share as i64, share_sum as i64));
             }
         }
 
         for repayment in repayments {
             let balance = Self::get_balance(&mut balances, &repayment.payer_id);
-            balance.amount += repayment.amount;
+            balance.credit += repayment.amount as i64;
 
             let balance = Self::get_balance(&mut balances, &repayment.beneficiary_id);
-            balance.amount -= repayment.amount;
+            balance.debts.push(Rational64::new(repayment.amount as i64, 1i64));
         }
 
-        let balances = balances.into_values().collect::<Vec<_>>();
+        let balances: Vec<Balance> = balances.into_values().map(|b| b.into()).collect::<Vec<_>>();
 
-        let sum: i32 = balances.iter().map(|b| b.amount).sum();
-        if sum != 0 {
-            warn!(
-                "balance for account {} doesn't sum up to 0: {}",
-                users[0].account_id, sum
-            );
-        }
+        let remaining: i64 = balances.iter().map(|b| b.amount).sum();
 
-        balances
+        (balances, remaining)
     }
 
     #[inline]
-    fn get_balance<'a>(balances: &'a mut HashMap<Uuid, Balance>, id: &Uuid) -> &'a mut Balance {
+    fn get_balance<'a>(balances: &'a mut HashMap<Uuid, TmpBalance>, id: &Uuid) -> &'a mut TmpBalance {
         balances
             .get_mut(id)
             .expect(&format!("Corrupted db? Missing user {} in balances", id))

@@ -16,7 +16,7 @@ pub enum AccountMsg {
     UpdateAccount(Rc<RefCell<rmmt::Account>>),
     ChangedUsers,
     UpdateUsers(Rc<RefCell<HashMap<Uuid, rmmt::User>>>),
-    UpdateBalances(Rc<RefCell<Vec<rmmt::Balance>>>),
+    UpdateBalances(Rc<RefCell<(Vec<rmmt::Balance>, i64)>>),
     ChangedExpenditures,
     UpdateExpenditures(Rc<RefCell<Vec<rmmt::Expenditure>>>),
     ChangedRepayments,
@@ -29,7 +29,7 @@ pub struct AccountAgent {
     account_id: Option<String>,
     account: Option<Rc<RefCell<rmmt::Account>>>,
     users: Option<Rc<RefCell<HashMap<Uuid, rmmt::User>>>>,
-    balances: Option<Rc<RefCell<Vec<rmmt::Balance>>>>,
+    balances: Option<Rc<RefCell<(Vec<rmmt::Balance>, i64)>>>,
     expenditures: Option<Rc<RefCell<Vec<rmmt::Expenditure>>>>,
     repayments: Option<Rc<RefCell<Vec<rmmt::Repayment>>>>,
 }
@@ -80,7 +80,7 @@ impl AccountAgent {
                 info!("Fetching balances for account: {}", account_id);
                 let account_id = account_id.clone();
                 self.link.send_future(async move {
-                    let mut balances: Vec<rmmt::Balance> =
+                    let (mut balances, remaining): (Vec<rmmt::Balance>, i64) =
                         Request::get(&format!("/api/account/{}/balance", account_id))
                             .send()
                             .await
@@ -94,7 +94,7 @@ impl AccountAgent {
                         account_id
                     );
                     balances.sort_by(|a, b| a.user_id.partial_cmp(&b.user_id).unwrap());
-                    AccountMsg::UpdateBalances(Rc::new(RefCell::new(balances)))
+                    AccountMsg::UpdateBalances(Rc::new(RefCell::new((balances, remaining))))
                 });
             }
             None => error!("Cannot fetch balances without account id"),

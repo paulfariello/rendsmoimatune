@@ -51,15 +51,17 @@ fn repayment(payer: &str, beneficiary: &str, amount: i32) -> Repayment {
     }
 }
 
-fn assert_balance(balances: Vec<Balance>, reference: Vec<(&str, i32)>) {
+fn assert_balance(balances: Vec<Balance>, reference: Vec<(&str, i64)>, remaining: i64, remaining_ref: i64) {
     let map_balances = balances
         .iter()
         .map(|b| (b.user_id.clone(), b))
         .collect::<HashMap<_, _>>();
     assert_eq!(
-        0,
-        balances.iter().map(|b| b.amount).sum(),
-        "balance doesn't sum up to 0"
+        remaining,
+        remaining_ref,
+        "balance remaining mismatch {} (expected {})",
+        remaining,
+        remaining_ref,
     );
     for (user, amount) in reference {
         let balance = map_balances.get(&uuid(user)).unwrap();
@@ -79,10 +81,10 @@ fn balance_simple() {
     let repayments = vec![];
 
     // When
-    let balances = Balance::from_account(users, debts, repayments);
+    let (balances, remaining) = Balance::from_account(users, debts, repayments);
 
     // Then
-    assert_balance(balances, vec![("user1", 5), ("user2", -5)]);
+    assert_balance(balances, vec![("user1", 5), ("user2", -5)], remaining, 0);
 }
 
 #[test]
@@ -93,10 +95,10 @@ fn balance_with_repayment() {
     let repayments = vec![repayment("user2", "user1", 5)];
 
     // When
-    let balances = Balance::from_account(users, debts, repayments);
+    let (balances, remaining) = Balance::from_account(users, debts, repayments);
 
     // Then
-    assert_balance(balances, vec![("user1", 0), ("user2", 0)]);
+    assert_balance(balances, vec![("user1", 0), ("user2", 0)], remaining, 0);
 }
 
 #[test]
@@ -111,10 +113,10 @@ fn balance_with_few_expenditures() {
     let repayments = vec![repayment("user2", "user1", 5)];
 
     // When
-    let balances = Balance::from_account(users, debts, repayments);
+    let (balances, remaining) = Balance::from_account(users, debts, repayments);
 
     // Then
-    assert_balance(balances, vec![("user1", -5), ("user2", 5)]);
+    assert_balance(balances, vec![("user1", -5), ("user2", 5)], remaining, 0);
 }
 
 #[test]
@@ -125,10 +127,10 @@ fn balance_with_remaining() {
     let repayments = vec![];
 
     // When
-    let balances = Balance::from_account(users, debts, repayments);
+    let (balances, remaining) = Balance::from_account(users, debts, repayments);
 
     // Then
-    assert_balance(balances, vec![("user1", 5), ("user2", -5)]);
+    assert_balance(balances, vec![("user1", 5), ("user2", -4)], remaining, 1);
 }
 
 #[test]
@@ -139,10 +141,10 @@ fn balance_with_even_remaining() {
     let repayments = vec![];
 
     // When
-    let balances = Balance::from_account(users, debts, repayments);
+    let (balances, remaining) = Balance::from_account(users, debts, repayments);
 
     // Then
-    assert_balance(balances, vec![("user1", 1), ("user2", -1)]);
+    assert_balance(balances, vec![("user1", 1), ("user2", 0)], remaining, 1);
 }
 
 #[test]
@@ -153,8 +155,22 @@ fn resolved_remaining() {
     let repayments = vec![];
 
     // When
-    let balances = Balance::from_account(users, debts, repayments);
+    let (balances, remaining) = Balance::from_account(users, debts, repayments);
 
     // Then
-    assert_balance(balances, vec![("user1", 0), ("user2", 100), ("user3", -100)]);
+    assert_balance(balances, vec![("user1", 0), ("user2", 100), ("user3", -100)], remaining, 0);
+}
+
+#[test]
+fn resolved_remaining_all_floored() {
+    // Given
+    let users = vec![user("user1"), user("user2"), user("user3")];
+    let debts = vec![expenditure("user1", 100, vec![("user2", 1), ("user1", 1), ("user3", 1)]), expenditure("user2", 100, vec![("user1", 1), ("user2", 1), ("user3", 1)]), expenditure("user3", 100, vec![("user1", 1), ("user2", 1), ("user3", 1)])];
+    let repayments = vec![];
+
+    // When
+    let (balances, remaining) = Balance::from_account(users, debts, repayments);
+
+    // Then
+    assert_balance(balances, vec![("user1", 0), ("user2", 0), ("user3", 0)], remaining, 0);
 }

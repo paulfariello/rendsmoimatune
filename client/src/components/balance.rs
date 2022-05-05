@@ -13,7 +13,7 @@ use crate::components::{user::UserName, utils::Amount};
 #[derive(Properties, PartialEq)]
 pub struct BalanceListProps {
     pub users: Rc<RefCell<HashMap<Uuid, rmmt::User>>>,
-    pub balances: Rc<RefCell<Vec<rmmt::Balance>>>,
+    pub balances: Rc<RefCell<(Vec<rmmt::Balance>, i64)>>,
     pub loading: bool,
 }
 
@@ -28,7 +28,7 @@ impl Component for BalanceList {
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
-        let balances = &*ctx.props().balances.borrow();
+        let (balances, remaining) = &*ctx.props().balances.borrow();
         let users = &ctx.props().users;
 
         let max = balances
@@ -78,6 +78,11 @@ impl Component for BalanceList {
                         }
                     </tbody>
                 </table>
+                if *remaining > 0 {
+                    <div class="notification is-info">
+                      { "Oups, nous avons perdu " }<Amount amount={ *remaining } />{ " dans des arrondis…" }
+                    </div>
+                }
             </div>
         }
     }

@@ -26,7 +26,7 @@ pub struct AccountProps {
 pub struct Account {
     account: Option<Rc<RefCell<rmmt::Account>>>,
     users: Option<Rc<RefCell<HashMap<Uuid, rmmt::User>>>>,
-    balances: Option<Rc<RefCell<Vec<rmmt::Balance>>>>,
+    balances: Option<Rc<RefCell<(Vec<rmmt::Balance>, i64)>>>,
     expenditures: Option<Rc<RefCell<Vec<rmmt::Expenditure>>>>,
     repayments: Option<Rc<RefCell<Vec<rmmt::Repayment>>>>,
     fetching_users: bool,

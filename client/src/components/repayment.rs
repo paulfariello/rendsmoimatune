@@ -143,7 +143,7 @@ impl Component for RepaymentsList {
                         <td class="is-vcentered">{ &repayment.date }</td>
                         <td class="is-vcentered"><UserName users={ ctx.props().users.clone() } id={ repayment.payer_id } /></td>
                         <td class="is-vcentered">{ "a remboursé" }</td>
-                        <td class="is-vcentered"><Amount amount={ repayment.amount } /></td>
+                        <td class="is-vcentered"><Amount amount={ repayment.amount as i64 } /></td>
                         <td class="is-vcentered">{ "à" }</td>
                         <td class="is-vcentered"><UserName users={ ctx.props().users.clone() } id={ repayment.beneficiary_id } /></td>
                         <td class="is-vcentered">

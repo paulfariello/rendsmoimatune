@@ -25,7 +25,7 @@ pub fn top_bar() -> Html {
 
 #[derive(Properties, PartialEq)]
 pub struct AmountProps {
-    pub amount: i32,
+    pub amount: i64,
 }
 
 #[function_component(Amount)]
