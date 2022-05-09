@@ -375,6 +375,8 @@ impl Component for CreateRepayment {
             Some(location) => location.query().ok(),
             None => None
         };
+        let beneficiary = balancing.as_ref().map(|b| b.beneficiary_id);
+        let payer = balancing.as_ref().map(|b| b.payer_id);
 
         let onsubmit = ctx.link().callback(|event: FocusEvent| {
             event.prevent_default();
@@ -414,7 +416,7 @@ impl Component for CreateRepayment {
                                                     <select ref={ self.select_payer.clone() } required=true>
                                                     {
                                                         (&*users.borrow()).iter().map(|(_, user)| html! {
-                                                            <option value={ user.id.to_string() }>{ &user.name }</option>
+                                                            <option value={ user.id.to_string() } selected={ payer.map(|b| b == user.id).unwrap_or(false) }>{ &user.name }</option>
                                                         }).collect::<Html>()
                                                     }
                                                     </select>
@@ -444,7 +446,7 @@ impl Component for CreateRepayment {
                                                     <select ref={ self.select_beneficiary.clone() } required=true>
                                                     {
                                                         (&*users.borrow()).iter().map(|(_, user)| html! {
-                                                            <option value={ user.id.to_string() }>{ &user.name }</option>
+                                                            <option value={ user.id.to_string() } selected={ beneficiary.map(|b| b == user.id).unwrap_or(false) }>{ &user.name }</option>
                                                         }).collect::<Html>()
                                                     }
                                                     </select>
