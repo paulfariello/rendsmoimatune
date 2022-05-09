@@ -373,7 +373,7 @@ impl Component for CreateRepayment {
     fn view(&self, ctx: &Context<Self>) -> Html {
         let balancing: Option<rmmt::Balancing> = match ctx.link().location() {
             Some(location) => location.query().ok(),
-            None => None
+            None => None,
         };
         let beneficiary = balancing.as_ref().map(|b| b.beneficiary_id);
         let payer = balancing.as_ref().map(|b| b.payer_id);

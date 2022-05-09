@@ -10,7 +10,10 @@ use yew_router::prelude::*;
 
 use crate::Route;
 
-use crate::components::{utils::{Loading, Amount}, user::UserName};
+use crate::components::{
+    user::UserName,
+    utils::{Amount, Loading},
+};
 
 #[derive(Properties, PartialEq)]
 pub struct BalanceListProps {
@@ -33,7 +36,8 @@ impl Component for BalanceList {
         let balance = &*ctx.props().balance.borrow();
         let users = &ctx.props().users;
 
-        let max = balance.user_balances
+        let max = balance
+            .user_balances
             .iter()
             .map(|b| b.amount)
             .max()

@@ -80,19 +80,21 @@ impl AccountAgent {
                 info!("Fetching balance for account: {}", account_id);
                 let account_id = account_id.clone();
                 self.link.send_future(async move {
-                    let mut balance: rmmt::Balance = Request::get(&format!("/api/account/{}/balance", account_id))
-                        .send()
-                        .await
-                        .unwrap()
-                        .json()
-                        .await
-                        .unwrap();
-                    info!(
-                        "Fetched balance for account: {}",
-                        account_id
-                    );
-                    balance.user_balances.sort_by(|a, b| a.user_id.partial_cmp(&b.user_id).unwrap());
-                    balance.balancing.sort_by(|a, b| a.payer_id.partial_cmp(&b.payer_id).unwrap());
+                    let mut balance: rmmt::Balance =
+                        Request::get(&format!("/api/account/{}/balance", account_id))
+                            .send()
+                            .await
+                            .unwrap()
+                            .json()
+                            .await
+                            .unwrap();
+                    info!("Fetched balance for account: {}", account_id);
+                    balance
+                        .user_balances
+                        .sort_by(|a, b| a.user_id.partial_cmp(&b.user_id).unwrap());
+                    balance
+                        .balancing
+                        .sort_by(|a, b| a.payer_id.partial_cmp(&b.payer_id).unwrap());
                     AccountMsg::UpdateBalance(Rc::new(RefCell::new(balance)))
                 });
             }

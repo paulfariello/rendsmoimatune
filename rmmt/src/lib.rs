@@ -289,7 +289,8 @@ impl Balance {
                 .push(Rational64::new(repayment.amount as i64, 1i64));
         }
 
-        let balances: Vec<UserBalance> = balances.into_values().map(|b| b.into()).collect::<Vec<_>>();
+        let balances: Vec<UserBalance> =
+            balances.into_values().map(|b| b.into()).collect::<Vec<_>>();
 
         let remaining: i64 = balances.iter().map(|b| b.amount).sum();
 

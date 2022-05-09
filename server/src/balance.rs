@@ -6,10 +6,7 @@ use crate::error::Error;
 use crate::MainDbConn;
 
 #[get("/api/account/<uniq_id>/balance")]
-pub(crate) async fn get_balance(
-    conn: MainDbConn,
-    uniq_id: UniqId,
-) -> Result<Json<Balance>, Error> {
+pub(crate) async fn get_balance(conn: MainDbConn, uniq_id: UniqId) -> Result<Json<Balance>, Error> {
     let uuid: uuid::Uuid = uniq_id.into();
     let debts: Vec<(Expenditure, Vec<Debt>)> = conn
         .run::<_, Result<Vec<(Expenditure, Vec<Debt>)>, diesel::result::Error>>(move |c| {
@@ -19,10 +16,7 @@ pub(crate) async fn get_balance(
             let debts = Debt::belonging_to(&expenditures)
                 .load(c)?
                 .grouped_by(&expenditures);
-            let map: Vec<(Expenditure, Vec<Debt>)> = expenditures
-                .into_iter()
-                .zip(debts)
-                .collect();
+            let map: Vec<(Expenditure, Vec<Debt>)> = expenditures.into_iter().zip(debts).collect();
             Ok(map)
         })
         .await?;
