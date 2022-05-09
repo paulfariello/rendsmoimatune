@@ -455,7 +455,7 @@ impl Component for CreateExpenditure {
                                     <label class="label">{ "Montant" }</label>
                                     <div class="field has-addons">
                                         <div class="control is-expanded">
-                                            <input ref={ self.input_amount.clone() } type="number" min="0" class="input is-primary" required=true placeholder="montant" />
+                                            <input ref={ self.input_amount.clone() } type="number" min="0" step="0.01" class="input is-primary" required=true placeholder="montant" />
                                         </div>
                                         <div class="control">
                                             <p class="button is-static">{ "€" }</p>
@@ -566,7 +566,7 @@ impl Component for Debtor {
                 </div>
                 if self.checked {
                     <div class="control">
-                        <input ref={ ctx.props().share_ref.clone() } type="number" min="0" class="input is-primary" value="1" />
+                        <input ref={ ctx.props().share_ref.clone() } type="number" min="0" step="1" class="input is-primary" value="1" />
                     </div>
                 }
             </div>

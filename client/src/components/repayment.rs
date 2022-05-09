@@ -429,7 +429,7 @@ impl Component for CreateRepayment {
                                         </div>
                                         <div class="field has-addons">
                                             <div class="control is-expanded">
-                                            <input ref={ self.input_amount.clone() } type="number" min="0" class="input is-primary" required=true placeholder="montant" value={ balancing.map(|b| (b.amount as f64 / 100f64).to_string() ) } />
+                                            <input ref={ self.input_amount.clone() } type="number" min="0" step="0.01" class="input is-primary" required=true placeholder="montant" value={ balancing.map(|b| (b.amount as f64 / 100f64).to_string() ) } />
                                             </div>
                                             <div class="control">
                                                 <p class="button is-static">{ "€" }</p>
