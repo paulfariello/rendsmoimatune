@@ -30,8 +30,8 @@ pub struct Account {
     account: Option<Rc<RefCell<rmmt::Account>>>,
     users: Option<Rc<RefCell<HashMap<Uuid, rmmt::User>>>>,
     balance: Option<Rc<RefCell<rmmt::Balance>>>,
-    expenditures: Option<Rc<RefCell<Vec<rmmt::Expenditure>>>>,
-    repayments: Option<Rc<RefCell<Vec<rmmt::Repayment>>>>,
+    expenditures: Option<Rc<RefCell<HashMap<Uuid, rmmt::Expenditure>>>>,
+    repayments: Option<Rc<RefCell<HashMap<Uuid, rmmt::Repayment>>>>,
     fetching_users: bool,
     fetching_expenditures: bool,
     fetching_repayments: bool,
@@ -209,7 +209,7 @@ impl Component for Account {
                             </h3>
                         </Link<Route>>
                         if let (Some(users), Some(repayments)) = (self.users.clone(), self.repayments.clone()) {
-                            <RepaymentsList { users } { repayments } limit=10 loading={ self.fetching_repayments } />
+                            <RepaymentsList account_id={ ctx.props().id.clone() } { users } { repayments } limit=10 loading={ self.fetching_repayments } />
                         } else {
                             <Loading />
                         }

@@ -28,7 +28,7 @@ pub struct RepaymentsProps {
 
 pub struct Repayments {
     account: Option<Rc<RefCell<rmmt::Account>>>,
-    repayments: Option<Rc<RefCell<Vec<rmmt::Repayment>>>>,
+    repayments: Option<Rc<RefCell<HashMap<Uuid, rmmt::Repayment>>>>,
     users: Option<Rc<RefCell<HashMap<Uuid, rmmt::User>>>>,
     _account_bridge: Box<dyn Bridge<AccountAgent>>,
 }
@@ -103,7 +103,7 @@ impl Component for Repayments {
                         </h3>
                         </Link<Route>>
                         if let (Some(users), Some(repayments)) = (self.users.clone(), self.repayments.clone()) {
-                            <RepaymentsList { repayments } { users } loading=false />
+                            <RepaymentsList account_id={ ctx.props().account_id.clone() } { repayments } { users } loading=false />
                         } else {
                             <Loading />
                         }
@@ -116,9 +116,10 @@ impl Component for Repayments {
 
 #[derive(Properties, PartialEq)]
 pub struct RepaymentsListProps {
+    pub account_id: String,
     pub limit: Option<usize>,
     pub users: Rc<RefCell<HashMap<Uuid, rmmt::User>>>,
-    pub repayments: Rc<RefCell<Vec<rmmt::Repayment>>>,
+    pub repayments: Rc<RefCell<HashMap<Uuid, rmmt::Repayment>>>,
     pub loading: bool,
 }
 
@@ -137,7 +138,7 @@ impl Component for RepaymentsList {
         let len = repayments.len();
 
         if len > 0 {
-            let map = |repayment: &rmmt::Repayment| {
+            let map = |(_, repayment): (&Uuid, &rmmt::Repayment)| {
                 html! {
                     <tr>
                         <td class="is-vcentered">{ &repayment.date }</td>
@@ -147,9 +148,11 @@ impl Component for RepaymentsList {
                         <td class="is-vcentered">{ "à" }</td>
                         <td class="is-vcentered"><UserName users={ ctx.props().users.clone() } id={ repayment.beneficiary_id } /></td>
                         <td class="is-vcentered">
-                            <a aria-label="Éditer" class="button is-primary" href="">
-                                <i class="fa fa-pencil fa-lg"></i>
-                            </a>
+                            <Link<Route> to={Route::EditRepayment { account_id: ctx.props().account_id.clone(), repayment_id: { repayment.id } }}>
+                                <a aria-label="Éditer" class="button is-primary" href="">
+                                    <i class="fa fa-pencil fa-lg"></i>
+                                </a>
+                            </Link<Route>>
                             <DeleteRepayment account_id={ repayment.account_id.clone() } id={ repayment.id.clone() } />
                         </td>
                     </tr>
@@ -196,22 +199,69 @@ impl Component for RepaymentsList {
     }
 }
 
-#[derive(Properties, PartialEq)]
-pub struct CreateRepaymentProps {
-    pub account_id: String,
+#[derive(Debug, Clone)]
+struct DefaultRepayment {
+    id: Option<Uuid>,
+    payer_id: Option<Uuid>,
+    beneficiary_id: Option<Uuid>,
+    amount: i32,
+    date: NaiveDate,
 }
 
-pub enum CreateRepaymentMsg {
+impl From<rmmt::Repayment> for DefaultRepayment {
+    fn from(repayment: rmmt::Repayment) -> Self {
+        Self {
+            id: Some(repayment.id),
+            payer_id: Some(repayment.payer_id),
+            beneficiary_id: Some(repayment.beneficiary_id),
+            amount: repayment.amount,
+            date: repayment.date,
+        }
+    }
+}
+
+impl From<rmmt::Balancing> for DefaultRepayment {
+    fn from(balancing: rmmt::Balancing) -> Self {
+        Self {
+            payer_id: Some(balancing.payer_id),
+            beneficiary_id: Some(balancing.beneficiary_id),
+            amount: balancing.amount as i32,
+            ..Default::default()
+        }
+    }
+}
+
+impl Default for DefaultRepayment {
+    fn default() -> Self {
+        Self {
+            id: None,
+            payer_id: None,
+            beneficiary_id: None,
+            amount: 0,
+            date: Local::today().naive_local(),
+        }
+    }
+}
+
+#[derive(Properties, PartialEq)]
+pub struct EditRepaymentProps {
+    pub account_id: String,
+    #[prop_or_default]
+    pub repayment_id: Option<Uuid>,
+}
+
+pub enum EditRepaymentMsg {
     AccountMsg(AccountMsg),
     Submit,
-    Created { repayment: rmmt::Repayment },
+    Edited { repayment: rmmt::Repayment },
     Error(String),
     ClearError,
 }
 
-pub struct CreateRepayment {
+pub struct EditRepayment {
     account: Option<Rc<RefCell<rmmt::Account>>>,
     users: Option<Rc<RefCell<HashMap<Uuid, rmmt::User>>>>,
+    default: Option<DefaultRepayment>,
     select_payer: NodeRef,
     input_amount: NodeRef,
     select_beneficiary: NodeRef,
@@ -222,8 +272,8 @@ pub struct CreateRepayment {
     agent: Dispatcher<AccountAgent>,
 }
 
-impl CreateRepayment {
-    fn create_repayment(&mut self, ctx: &Context<Self>) {
+impl EditRepayment {
+    fn save_repayment(&mut self, ctx: &Context<Self>) {
         self.creating = true;
 
         let select_payer = self
@@ -249,24 +299,42 @@ impl CreateRepayment {
         let date = NaiveDate::parse_from_str(&input_date.value(), "%Y-%m-%d").unwrap();
 
         let account_id: UniqId = ctx.props().account_id.clone().try_into().unwrap();
-        let repayment = rmmt::NewRepayment {
-            account_id: account_id.into(),
-            amount,
-            payer_id,
-            beneficiary_id,
-            date,
+        let req = match ctx.props().repayment_id {
+            Some(id) => {
+                let repayment = rmmt::Repayment {
+                    id: id.clone(),
+                    account_id: account_id.into(),
+                    amount,
+                    payer_id,
+                    beneficiary_id,
+                    date,
+                };
+                debug!("Update repayment: {:?}", repayment);
+                Request::put(&format!("/api/account/{}/repayments/{}", ctx.props().account_id, id)).json(&repayment).unwrap()
+            },
+            None => {
+                let repayment = rmmt::NewRepayment {
+                    account_id: account_id.into(),
+                    amount,
+                    payer_id,
+                    beneficiary_id,
+                    date,
+                };
+                debug!("Create repayment: {:?}", repayment);
+                Request::post(&format!("/api/account/{}/repayments", ctx.props().account_id)).json(&repayment).unwrap()
+            },
         };
-        let url = format!("/api/account/{}/repayments", ctx.props().account_id);
+
         ctx.link().send_future(async move {
-            let resp = Request::post(&url).json(&repayment).unwrap().send().await;
+            let resp = req.send().await;
 
             let resp = match resp {
-                Err(err) => return CreateRepaymentMsg::Error(format!("{}", err)),
+                Err(err) => return EditRepaymentMsg::Error(format!("{}", err)),
                 Ok(resp) => resp,
             };
 
             if !resp.ok() {
-                return CreateRepaymentMsg::Error(format!(
+                return EditRepaymentMsg::Error(format!(
                     "{}: {}",
                     resp.status(),
                     resp.status_text()
@@ -276,9 +344,9 @@ impl CreateRepayment {
             let resp = resp.json::<rmmt::Repayment>().await;
 
             if let Err(err) = resp {
-                return CreateRepaymentMsg::Error(format!("{}", err));
+                return EditRepaymentMsg::Error(format!("{}", err));
             }
-            CreateRepaymentMsg::Created {
+            EditRepaymentMsg::Edited {
                 repayment: resp.unwrap(),
             }
         });
@@ -300,20 +368,24 @@ impl CreateRepayment {
     }
 }
 
-impl Component for CreateRepayment {
-    type Message = CreateRepaymentMsg;
-    type Properties = CreateRepaymentProps;
+impl Component for EditRepayment {
+    type Message = EditRepaymentMsg;
+    type Properties = EditRepaymentProps;
 
     fn create(ctx: &Context<Self>) -> Self {
         let account_bridge =
-            AccountAgent::bridge(ctx.link().callback(CreateRepaymentMsg::AccountMsg));
+            AccountAgent::bridge(ctx.link().callback(EditRepaymentMsg::AccountMsg));
 
         let mut dispatcher = AccountAgent::dispatcher();
         dispatcher.send(AccountMsg::LoadAccount(ctx.props().account_id.clone()));
+        if let Some(repayment_id) = ctx.props().repayment_id.as_ref() {
+            dispatcher.send(AccountMsg::LoadRepayment{ account_id: ctx.props().account_id.clone(), repayment_id: repayment_id.clone() });
+        }
 
         Self {
             account: None,
             users: None,
+            default: None,
             select_payer: NodeRef::default(),
             input_amount: NodeRef::default(),
             select_beneficiary: NodeRef::default(),
@@ -327,7 +399,7 @@ impl Component for CreateRepayment {
 
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
-            CreateRepaymentMsg::AccountMsg(msg) => match msg {
+            EditRepaymentMsg::AccountMsg(msg) => match msg {
                 AccountMsg::UpdateAccount(account) => {
                     self.account = Some(account);
                     true
@@ -336,18 +408,26 @@ impl Component for CreateRepayment {
                     self.users = Some(users);
                     true
                 }
+                AccountMsg::UpdateRepayment(repayment) => {
+                    if Some(repayment.id) == ctx.props().repayment_id {
+                        self.default = Some(repayment.into());
+                        true
+                    } else {
+                        false
+                    }
+                }
                 _ => false,
             },
-            CreateRepaymentMsg::Submit => {
+            EditRepaymentMsg::Submit => {
                 if self.creating {
                     false
                 } else {
-                    self.create_repayment(ctx);
+                    self.save_repayment(ctx);
                     true
                 }
             }
-            CreateRepaymentMsg::Created { repayment } => {
-                info!("Created repayment: {:?}", repayment);
+            EditRepaymentMsg::Edited { repayment } => {
+                info!("Edited repayment: {:?}", repayment);
                 self.agent.send(AccountMsg::ChangedRepayments);
                 self.clear();
 
@@ -358,12 +438,12 @@ impl Component for CreateRepayment {
 
                 false
             }
-            CreateRepaymentMsg::Error(error) => {
+            EditRepaymentMsg::Error(error) => {
                 self.creating = false;
                 self.error = Some(error);
                 true
             }
-            CreateRepaymentMsg::ClearError => {
+            EditRepaymentMsg::ClearError => {
                 self.error = None;
                 true
             }
@@ -371,35 +451,51 @@ impl Component for CreateRepayment {
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
-        let balancing: Option<rmmt::Balancing> = match ctx.link().location() {
-            Some(location) => location.query().ok(),
-            None => None,
+        let default = match self.default.as_ref() {
+            Some(default) => default.clone(),
+            None => match ctx.link().location() {
+                Some(location) => match location.query::<rmmt::Balancing>() {
+                    Err(err) => {
+                        error!("Invalid query: {}", err);
+                        Default::default()
+                    },
+                    Ok(balancing) => balancing.into()
+                },
+                None => Default::default(),
+            }
         };
-        let beneficiary = balancing.as_ref().map(|b| b.beneficiary_id);
-        let payer = balancing.as_ref().map(|b| b.payer_id);
 
         let onsubmit = ctx.link().callback(|event: FocusEvent| {
             event.prevent_default();
-            CreateRepaymentMsg::Submit
+            EditRepaymentMsg::Submit
         });
 
-        let delete_error = ctx.link().callback(|_| CreateRepaymentMsg::ClearError);
-
-        let today = format!("{}", Local::today().format("%Y-%m-%d"));
+        let delete_error = ctx.link().callback(|_| EditRepaymentMsg::ClearError);
 
         html! {
             <div class="columns">
                 <div class="column">
                     <AccountTitle id={ ctx.props().account_id.clone() } account={ self.account.clone() } />
                     <div class="box">
-                        <Link<Route> to={Route::CreateRepayment { account_id: ctx.props().account_id.clone() }}>
-                            <h3 class="subtitle is-3">
-                                <span class="icon-text">
-                                    <span class="icon"><i class="fa fa-exchange"></i></span>
-                                    <span>{ "Nouveau remboursement" }</span>
-                                </span>
-                            </h3>
-                        </Link<Route>>
+                        if default.id.is_some() {
+                            <Link<Route> to={Route::EditRepayment { account_id: ctx.props().account_id.clone(), repayment_id: ctx.props().repayment_id.unwrap().clone() }}>
+                                <h3 class="subtitle is-3">
+                                    <span class="icon-text">
+                                        <span class="icon"><i class="fa fa-exchange"></i></span>
+                                        <span>{ "Remboursement" }</span>
+                                    </span>
+                                </h3>
+                            </Link<Route>>
+                        } else {
+                            <Link<Route> to={Route::CreateRepayment { account_id: ctx.props().account_id.clone() }}>
+                                <h3 class="subtitle is-3">
+                                    <span class="icon-text">
+                                        <span class="icon"><i class="fa fa-exchange"></i></span>
+                                        <span>{ "Nouveau remboursement" }</span>
+                                    </span>
+                                </h3>
+                            </Link<Route>>
+                        }
                         if let Some(error) = self.error.as_ref() {
                             <div class="notification is-danger">
                               <button class="delete" onclick={delete_error}></button>
@@ -416,7 +512,7 @@ impl Component for CreateRepayment {
                                                     <select ref={ self.select_payer.clone() } required=true>
                                                     {
                                                         (&*users.borrow()).iter().map(|(_, user)| html! {
-                                                            <option value={ user.id.to_string() } selected={ payer.map(|b| b == user.id).unwrap_or(false) }>{ &user.name }</option>
+                                                            <option value={ user.id.to_string() } selected={ default.payer_id == Some(user.id) }>{ &user.name }</option>
                                                         }).collect::<Html>()
                                                     }
                                                     </select>
@@ -431,7 +527,7 @@ impl Component for CreateRepayment {
                                         </div>
                                         <div class="field has-addons">
                                             <div class="control is-expanded">
-                                            <input ref={ self.input_amount.clone() } type="number" min="0" step="0.01" class="input is-primary" required=true placeholder="montant" value={ balancing.map(|b| (b.amount as f64 / 100f64).to_string() ) } />
+                                            <input ref={ self.input_amount.clone() } type="number" min="0" step="0.01" class="input is-primary" required=true placeholder="montant" value={ (default.amount as f64 / 100f64).to_string() } />
                                             </div>
                                             <div class="control">
                                                 <p class="button is-static">{ "€" }</p>
@@ -446,7 +542,7 @@ impl Component for CreateRepayment {
                                                     <select ref={ self.select_beneficiary.clone() } required=true>
                                                     {
                                                         (&*users.borrow()).iter().map(|(_, user)| html! {
-                                                            <option value={ user.id.to_string() } selected={ beneficiary.map(|b| b == user.id).unwrap_or(false) }>{ &user.name }</option>
+                                                            <option value={ user.id.to_string() } selected={ default.beneficiary_id == Some(user.id) }>{ &user.name }</option>
                                                         }).collect::<Html>()
                                                     }
                                                     </select>
@@ -460,15 +556,22 @@ impl Component for CreateRepayment {
                                 </div>
                                 <div class="field">
                                     <div class="control">
-                                        <input ref={self.input_date.clone()} type="date" class="input is-primary" required=true value={ today } />
+                                        <input ref={self.input_date.clone()} type="date" class="input is-primary" required=true value={ format!("{}", default.date.format("%Y-%m-%d")) } />
                                     </div>
                                 </div>
                                 <div class="control">
                                     <button type="submit" class={classes!("button", "is-primary", self.creating.then(|| "is-loading"))}>
+                                    if default.id.is_some() {
+                                        <span class="icon">
+                                            <i class="fa fa-save" />
+                                        </span>
+                                        <span>{ "Enregistrer" }</span>
+                                    } else {
                                         <span class="icon">
                                             <i class="fa fa-user-plus" />
                                         </span>
                                         <span>{ "Ajouter" }</span>
+                                    }
                                     </button>
                                 </div>
                             </form>

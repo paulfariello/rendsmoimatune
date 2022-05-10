@@ -28,7 +28,7 @@ pub struct ExpendituresProps {
 
 pub struct Expenditures {
     account: Option<Rc<RefCell<rmmt::Account>>>,
-    expenditures: Option<Rc<RefCell<Vec<rmmt::Expenditure>>>>,
+    expenditures: Option<Rc<RefCell<HashMap<Uuid, rmmt::Expenditure>>>>,
     users: Option<Rc<RefCell<HashMap<Uuid, rmmt::User>>>>,
     _account_bridge: Box<dyn Bridge<AccountAgent>>,
 }
@@ -116,7 +116,7 @@ impl Component for Expenditures {
 
 #[derive(Properties, PartialEq)]
 pub struct ExpendituresListProps {
-    pub expenditures: Rc<RefCell<Vec<rmmt::Expenditure>>>,
+    pub expenditures: Rc<RefCell<HashMap<Uuid, rmmt::Expenditure>>>,
     pub users: Rc<RefCell<HashMap<Uuid, rmmt::User>>>,
     pub limit: Option<usize>,
     pub loading: bool,
@@ -137,7 +137,7 @@ impl Component for ExpendituresList {
         let len = expenditures.len();
 
         if len > 0 {
-            let map = |expenditure: &rmmt::Expenditure| {
+            let map = |(_, expenditure): (&Uuid, &rmmt::Expenditure)| {
                 html! {
                     <tr key={ expenditure.id.to_string() }>
                         <td class="is-vcentered">{ &expenditure.date }</td>
@@ -195,14 +195,16 @@ impl Component for ExpendituresList {
 }
 
 #[derive(Properties, PartialEq)]
-pub struct CreateExpenditureProps {
+pub struct EditExpenditureProps {
     pub account_id: String,
+    #[prop_or_default]
+    pub expenditure_id: Option<Uuid>,
 }
 
-pub enum CreateExpenditureMsg {
+pub enum EditExpenditureMsg {
     AccountMsg(AccountMsg),
     Submit,
-    Created {
+    Edited {
         expenditure: rmmt::Expenditure,
         debts: Vec<rmmt::Debt>,
     },
@@ -210,7 +212,7 @@ pub enum CreateExpenditureMsg {
     ClearError,
 }
 
-pub struct CreateExpenditure {
+pub struct EditExpenditure {
     account: Option<Rc<RefCell<rmmt::Account>>>,
     users: Option<Rc<RefCell<HashMap<Uuid, rmmt::User>>>>,
     input_name: NodeRef,
@@ -225,7 +227,7 @@ pub struct CreateExpenditure {
     agent: Dispatcher<AccountAgent>,
 }
 
-impl CreateExpenditure {
+impl EditExpenditure {
     fn create_expenditure(&mut self, ctx: &Context<Self>) {
         self.creating = true;
 
@@ -286,12 +288,12 @@ impl CreateExpenditure {
                 .await;
 
             let resp = match resp {
-                Err(err) => return CreateExpenditureMsg::Error(format!("{}", err)),
+                Err(err) => return EditExpenditureMsg::Error(format!("{}", err)),
                 Ok(resp) => resp,
             };
 
             if !resp.ok() {
-                return CreateExpenditureMsg::Error(format!(
+                return EditExpenditureMsg::Error(format!(
                     "{}: {}",
                     resp.status(),
                     resp.status_text()
@@ -301,11 +303,11 @@ impl CreateExpenditure {
             let resp = resp.json::<(rmmt::Expenditure, Vec<rmmt::Debt>)>().await;
 
             if let Err(err) = resp {
-                return CreateExpenditureMsg::Error(format!("{}", err));
+                return EditExpenditureMsg::Error(format!("{}", err));
             }
 
             let (expenditure, debts) = resp.unwrap();
-            CreateExpenditureMsg::Created { expenditure, debts }
+            EditExpenditureMsg::Edited { expenditure, debts }
         });
     }
 
@@ -328,13 +330,13 @@ impl CreateExpenditure {
     }
 }
 
-impl Component for CreateExpenditure {
-    type Message = CreateExpenditureMsg;
-    type Properties = CreateExpenditureProps;
+impl Component for EditExpenditure {
+    type Message = EditExpenditureMsg;
+    type Properties = EditExpenditureProps;
 
     fn create(ctx: &Context<Self>) -> Self {
         let account_bridge =
-            AccountAgent::bridge(ctx.link().callback(CreateExpenditureMsg::AccountMsg));
+            AccountAgent::bridge(ctx.link().callback(EditExpenditureMsg::AccountMsg));
 
         let mut dispatcher = AccountAgent::dispatcher();
         dispatcher.send(AccountMsg::LoadAccount(ctx.props().account_id.clone()));
@@ -357,7 +359,7 @@ impl Component for CreateExpenditure {
 
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
-            CreateExpenditureMsg::AccountMsg(msg) => match msg {
+            EditExpenditureMsg::AccountMsg(msg) => match msg {
                 AccountMsg::UpdateAccount(account) => {
                     self.account = Some(account);
                     true
@@ -376,7 +378,7 @@ impl Component for CreateExpenditure {
                 }
                 _ => false,
             },
-            CreateExpenditureMsg::Submit => {
+            EditExpenditureMsg::Submit => {
                 if self.creating {
                     false
                 } else {
@@ -385,9 +387,9 @@ impl Component for CreateExpenditure {
                     true
                 }
             }
-            CreateExpenditureMsg::Created { expenditure, debts } => {
+            EditExpenditureMsg::Edited { expenditure, debts } => {
                 info!(
-                    "Created expenditure: {:?} with debts: {:?}",
+                    "Edited expenditure: {:?} with debts: {:?}",
                     expenditure, debts
                 );
                 self.agent.send(AccountMsg::ChangedExpenditures);
@@ -400,13 +402,13 @@ impl Component for CreateExpenditure {
 
                 false
             }
-            CreateExpenditureMsg::Error(error) => {
+            EditExpenditureMsg::Error(error) => {
                 error!("Cannot create expenditure: {}", error);
                 self.creating = false;
                 self.error = Some(error);
                 true
             }
-            CreateExpenditureMsg::ClearError => {
+            EditExpenditureMsg::ClearError => {
                 self.error = None;
                 true
             }
@@ -416,10 +418,10 @@ impl Component for CreateExpenditure {
     fn view(&self, ctx: &Context<Self>) -> Html {
         let onsubmit = ctx.link().callback(|event: FocusEvent| {
             event.prevent_default();
-            CreateExpenditureMsg::Submit
+            EditExpenditureMsg::Submit
         });
 
-        let delete_error = ctx.link().callback(|_| CreateExpenditureMsg::ClearError);
+        let delete_error = ctx.link().callback(|_| EditExpenditureMsg::ClearError);
 
         let today = format!("{}", Local::today().format("%Y-%m-%d"));
 

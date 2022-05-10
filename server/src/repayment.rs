@@ -1,6 +1,7 @@
 use diesel::prelude::*;
 use rmmt::{self, prelude::*, NewRepayment, Repayment};
 use rocket::serde::json::Json;
+use uuid::Uuid;
 
 use crate::error::Error;
 use crate::MainDbConn;
@@ -22,6 +23,31 @@ pub(crate) async fn post_repayment(
             .run(move |c| {
                 diesel::insert_into(rmmt::repayments::dsl::repayments)
                     .values(repayment.into_inner())
+                    .get_result(c)
+            })
+            .await?;
+        Ok(Json(repayment))
+    }
+}
+
+#[put(
+    "/api/account/<account_id>/repayments/<repayment_id>",
+    format = "json",
+    data = "<repayment>"
+)]
+pub(crate) async fn put_repayment(
+    conn: MainDbConn,
+    account_id: UniqId,
+    repayment_id: Uuid,
+    repayment: Json<Repayment>,
+) -> Result<Json<Repayment>, Error> {
+    if account_id != repayment.account_id {
+        Err(Error::IdError)
+    } else {
+        let repayment: Repayment = conn
+            .run(move |c| {
+                diesel::update(rmmt::repayments::dsl::repayments)
+                    .set(repayment.into_inner())
                     .get_result(c)
             })
             .await?;

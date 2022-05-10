@@ -14,13 +14,17 @@ use yew_agent::{Agent, AgentLink, Context as AgentContext, HandlerId};
 pub enum AccountMsg {
     LoadAccount(String),
     UpdateAccount(Rc<RefCell<rmmt::Account>>),
+    LoadExpenditure{ account_id: String, expenditure_id: Uuid },
+    UpdateExpenditure(rmmt::Expenditure),
+    LoadRepayment{ account_id: String, repayment_id: Uuid },
+    UpdateRepayment(rmmt::Repayment),
     ChangedUsers,
     UpdateUsers(Rc<RefCell<HashMap<Uuid, rmmt::User>>>),
     UpdateBalance(Rc<RefCell<rmmt::Balance>>),
     ChangedExpenditures,
-    UpdateExpenditures(Rc<RefCell<Vec<rmmt::Expenditure>>>),
+    UpdateExpenditures(Rc<RefCell<HashMap<Uuid, rmmt::Expenditure>>>),
     ChangedRepayments,
-    UpdateRepayments(Rc<RefCell<Vec<rmmt::Repayment>>>),
+    UpdateRepayments(Rc<RefCell<HashMap<Uuid, rmmt::Repayment>>>),
 }
 
 pub struct AccountAgent {
@@ -30,8 +34,8 @@ pub struct AccountAgent {
     account: Option<Rc<RefCell<rmmt::Account>>>,
     users: Option<Rc<RefCell<HashMap<Uuid, rmmt::User>>>>,
     balance: Option<Rc<RefCell<rmmt::Balance>>>,
-    expenditures: Option<Rc<RefCell<Vec<rmmt::Expenditure>>>>,
-    repayments: Option<Rc<RefCell<Vec<rmmt::Repayment>>>>,
+    expenditures: Option<Rc<RefCell<HashMap<Uuid, rmmt::Expenditure>>>>,
+    repayments: Option<Rc<RefCell<HashMap<Uuid, rmmt::Repayment>>>>,
 }
 
 impl AccountAgent {
@@ -121,7 +125,7 @@ impl AccountAgent {
                         expenditures.len(),
                         account_id
                     );
-                    expenditures.sort_by(|a, b| b.date.partial_cmp(&a.date).unwrap());
+                    let expenditures = expenditures.into_iter().map(|e| (e.id.clone(), e)).collect();
                     AccountMsg::UpdateExpenditures(Rc::new(RefCell::new(expenditures)))
                 });
             }
@@ -148,7 +152,7 @@ impl AccountAgent {
                         repayments.len(),
                         account_id
                     );
-                    repayments.sort_by(|a, b| b.date.partial_cmp(&a.date).unwrap());
+                    let repayments = repayments.into_iter().map(|r| (r.id.clone(), r)).collect();
                     AccountMsg::UpdateRepayments(Rc::new(RefCell::new(repayments)))
                 });
             }
@@ -206,6 +210,17 @@ impl Agent for AccountAgent {
                     self.fetch_balance();
                     self.fetch_expenditures();
                     self.fetch_repayments();
+                }
+            }
+            AccountMsg::LoadExpenditure{ account_id, expenditure_id } => {
+                todo!()
+            }
+            AccountMsg::LoadRepayment{ account_id, repayment_id } => {
+                if let Some(repayments) = self.repayments.as_ref() {
+                    match repayments.borrow().get(repayment_id) {
+                        Some(repayment) => self.broadcast(AccountMsg::UpdateRepayment(repayment.clone())),
+                        None => {}
+                    }
                 }
             }
             AccountMsg::ChangedUsers => {

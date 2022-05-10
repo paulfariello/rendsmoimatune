@@ -27,6 +27,7 @@ fn rocket() -> _ {
             repayment::post_repayment,
             repayment::get_repayments,
             repayment::del_repayment,
+            repayment::put_repayment,
             user::post_user,
             user::get_users,
             balance::get_balance,
