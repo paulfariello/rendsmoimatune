@@ -181,7 +181,7 @@ impl Component for Account {
                             </h3>
                         </Link<Route>>
                         if let (Some(users), Some(expenditures)) = (self.users.clone(), self.expenditures.clone()) {
-                            <ExpendituresList { expenditures } { users } limit=10 loading={ self.fetching_expenditures } />
+                            <ExpendituresList account_id={ ctx.props().id.clone() } { expenditures } { users } limit=10 loading={ self.fetching_expenditures } />
                         } else {
                             <Loading />
                         }

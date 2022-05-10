@@ -378,8 +378,8 @@ impl Component for EditRepayment {
 
         let mut dispatcher = AccountAgent::dispatcher();
         dispatcher.send(AccountMsg::LoadAccount(ctx.props().account_id.clone()));
-        if let Some(repayment_id) = ctx.props().repayment_id.as_ref() {
-            dispatcher.send(AccountMsg::LoadRepayment{ account_id: ctx.props().account_id.clone(), repayment_id: repayment_id.clone() });
+        if let Some(repayment_id) = ctx.props().repayment_id.clone() {
+            dispatcher.send(AccountMsg::LoadRepayment{ account_id: ctx.props().account_id.clone(), repayment_id });
         }
 
         Self {
@@ -477,8 +477,8 @@ impl Component for EditRepayment {
                 <div class="column">
                     <AccountTitle id={ ctx.props().account_id.clone() } account={ self.account.clone() } />
                     <div class="box">
-                        if default.id.is_some() {
-                            <Link<Route> to={Route::EditRepayment { account_id: ctx.props().account_id.clone(), repayment_id: ctx.props().repayment_id.unwrap().clone() }}>
+                        if let Some(repayment_id) = ctx.props().repayment_id.clone() {
+                            <Link<Route> to={Route::EditRepayment { account_id: ctx.props().account_id.clone(), repayment_id }}>
                                 <h3 class="subtitle is-3">
                                     <span class="icon-text">
                                         <span class="icon"><i class="fa fa-exchange"></i></span>
@@ -561,17 +561,17 @@ impl Component for EditRepayment {
                                 </div>
                                 <div class="control">
                                     <button type="submit" class={classes!("button", "is-primary", self.creating.then(|| "is-loading"))}>
-                                    if default.id.is_some() {
-                                        <span class="icon">
-                                            <i class="fa fa-save" />
-                                        </span>
-                                        <span>{ "Enregistrer" }</span>
-                                    } else {
-                                        <span class="icon">
-                                            <i class="fa fa-user-plus" />
-                                        </span>
-                                        <span>{ "Ajouter" }</span>
-                                    }
+                                        if ctx.props().repayment_id.is_some() {
+                                            <span class="icon">
+                                                <i class="fa fa-save" />
+                                            </span>
+                                            <span>{ "Enregistrer" }</span>
+                                        } else {
+                                            <span class="icon">
+                                                <i class="fa fa-plus" />
+                                            </span>
+                                            <span>{ "Ajouter" }</span>
+                                        }
                                     </button>
                                 </div>
                             </form>

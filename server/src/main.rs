@@ -24,6 +24,7 @@ fn rocket() -> _ {
             expenditure::post_expenditure,
             expenditure::get_expenditures,
             expenditure::del_expenditure,
+            expenditure::put_expenditure,
             repayment::post_repayment,
             repayment::get_repayments,
             repayment::del_repayment,

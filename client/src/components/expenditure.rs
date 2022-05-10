@@ -103,7 +103,7 @@ impl Component for Expenditures {
                             </h3>
                         </Link<Route>>
                         if let (Some(users), Some(expenditures)) = (self.users.clone(), self.expenditures.clone()) {
-                            <ExpendituresList { expenditures } { users } loading=false />
+                            <ExpendituresList account_id={ ctx.props().account_id.clone() } { expenditures } { users } loading=false />
                         } else {
                             <Loading />
                         }
@@ -116,6 +116,7 @@ impl Component for Expenditures {
 
 #[derive(Properties, PartialEq)]
 pub struct ExpendituresListProps {
+    pub account_id: String,
     pub expenditures: Rc<RefCell<HashMap<Uuid, rmmt::Expenditure>>>,
     pub users: Rc<RefCell<HashMap<Uuid, rmmt::User>>>,
     pub limit: Option<usize>,
@@ -146,9 +147,11 @@ impl Component for ExpendituresList {
                         <td class="is-vcentered"><UserName users={ ctx.props().users.clone() } id={ expenditure.payer_id }/></td>
                         <td class="is-vcentered">{ "todo" }</td>
                         <td class="is-vcentered">
-                            <a aria-label="Éditer" class="button is-primary" href="">
-                                <i class="fa fa-pencil fa-lg"></i>
-                            </a>
+                            <Link<Route> to={Route::EditExpenditure { account_id: ctx.props().account_id.clone(), expenditure_id: { expenditure.id } }}>
+                                <a aria-label="Éditer" class="button is-primary" href="">
+                                    <i class="fa fa-pencil fa-lg"></i>
+                                </a>
+                            </Link<Route>>
                             <DeleteExpenditure account_id={ expenditure.account_id.clone() } id={ expenditure.id.clone() } />
                         </td>
                         </tr>
@@ -215,6 +218,7 @@ pub enum EditExpenditureMsg {
 pub struct EditExpenditure {
     account: Option<Rc<RefCell<rmmt::Account>>>,
     users: Option<Rc<RefCell<HashMap<Uuid, rmmt::User>>>>,
+    expenditure: Option<rmmt::Expenditure>,
     input_name: NodeRef,
     input_date: NodeRef,
     input_amount: NodeRef,
@@ -228,7 +232,7 @@ pub struct EditExpenditure {
 }
 
 impl EditExpenditure {
-    fn create_expenditure(&mut self, ctx: &Context<Self>) {
+    fn save_expenditure(&mut self, ctx: &Context<Self>) {
         self.creating = true;
 
         let input_name = self.input_name.cast::<web_sys::HtmlInputElement>().unwrap();
@@ -251,13 +255,6 @@ impl EditExpenditure {
         let payer_id = Uuid::parse_str(&select_payer.value()).unwrap();
 
         let account_id: UniqId = ctx.props().account_id.clone().try_into().unwrap();
-        let expenditure = rmmt::NewExpenditure {
-            account_id: account_id.into(),
-            name,
-            date,
-            amount,
-            payer_id,
-        };
 
         let mut debtors = Vec::new();
         for (id, user) in (&*self.users.as_ref().unwrap().borrow()).iter() {
@@ -279,12 +276,36 @@ impl EditExpenditure {
             }
         }
 
-        let url = format!("/api/account/{}/expenditures", ctx.props().account_id);
-        ctx.link().send_future(async move {
-            let resp = Request::post(&url)
+
+        let req = match ctx.props().expenditure_id {
+            Some(id) => {
+                let expenditure = rmmt::Expenditure {
+                    id: id.clone(),
+                    account_id: account_id.into(),
+                    name,
+                    date,
+                    amount,
+                    payer_id,
+                };
+                Request::put(&format!("/api/account/{}/expenditures/{}", ctx.props().account_id, id))
                 .json(&(expenditure, debtors))
                 .unwrap()
-                .send()
+            }
+            None => {
+                let expenditure = rmmt::NewExpenditure {
+                    account_id: account_id.into(),
+                    name,
+                    date,
+                    amount,
+                    payer_id,
+                };
+                Request::post(&format!("/api/account/{}/expenditures", ctx.props().account_id))
+                .json(&(expenditure, debtors))
+                .unwrap()
+            }
+        };
+        ctx.link().send_future(async move {
+            let resp = req.send()
                 .await;
 
             let resp = match resp {
@@ -340,10 +361,14 @@ impl Component for EditExpenditure {
 
         let mut dispatcher = AccountAgent::dispatcher();
         dispatcher.send(AccountMsg::LoadAccount(ctx.props().account_id.clone()));
+        if let Some(expenditure_id) = ctx.props().expenditure_id.clone() {
+            dispatcher.send(AccountMsg::LoadExpenditure { account_id: ctx.props().account_id.clone(), expenditure_id });
+        }
 
         Self {
             account: None,
             users: None,
+            expenditure: None,
             input_name: NodeRef::default(),
             input_date: NodeRef::default(),
             input_amount: NodeRef::default(),
@@ -376,6 +401,14 @@ impl Component for EditExpenditure {
                         .collect();
                     true
                 }
+                AccountMsg::UpdateExpenditure(expenditure) => {
+                    if Some(expenditure.id) == ctx.props().expenditure_id {
+                        self.expenditure = Some(expenditure);
+                        true
+                    } else {
+                        false
+                    }
+                }
                 _ => false,
             },
             EditExpenditureMsg::Submit => {
@@ -383,7 +416,7 @@ impl Component for EditExpenditure {
                     false
                 } else {
                     self.error = None;
-                    self.create_expenditure(ctx);
+                    self.save_expenditure(ctx);
                     true
                 }
             }
@@ -423,21 +456,30 @@ impl Component for EditExpenditure {
 
         let delete_error = ctx.link().callback(|_| EditExpenditureMsg::ClearError);
 
-        let today = format!("{}", Local::today().format("%Y-%m-%d"));
-
         html! {
             <div class="columns">
                 <div class="column">
                     <AccountTitle id={ ctx.props().account_id.clone() } account={ self.account.clone() } />
                     <div class="box">
-                        <Link<Route> to={Route::CreateExpenditure { account_id: ctx.props().account_id.clone() }}>
-                        <h3 class="subtitle is-3">
-                            <span class="icon-text">
-                                <span class="icon"><i class="fa fa-exchange"></i></span>
-                                <span>{ "Nouvelle dépense" }</span>
-                            </span>
-                        </h3>
-                        </Link<Route>>
+                        if let Some(expenditure_id) = ctx.props().expenditure_id.clone() {
+                            <Link<Route> to={Route::EditExpenditure { account_id: ctx.props().account_id.clone(), expenditure_id }}>
+                                <h3 class="subtitle is-3">
+                                    <span class="icon-text">
+                                        <span class="icon"><i class="fa fa-exchange"></i></span>
+                                        <span>{ "Dépense" }</span>
+                                    </span>
+                                </h3>
+                            </Link<Route>>
+                        } else {
+                            <Link<Route> to={Route::CreateExpenditure { account_id: ctx.props().account_id.clone() }}>
+                                <h3 class="subtitle is-3">
+                                    <span class="icon-text">
+                                        <span class="icon"><i class="fa fa-exchange"></i></span>
+                                        <span>{ "Nouvelle dépense" }</span>
+                                    </span>
+                                </h3>
+                            </Link<Route>>
+                        }
                         if let Some(error) = self.error.as_ref() {
                             <div class="notification is-danger">
                               <button class="delete" onclick={delete_error}></button>
@@ -449,7 +491,7 @@ impl Component for EditExpenditure {
                                 <div class="field">
                                     <label class="label">{ "Nom" }</label>
                                     <div class="control">
-                                        <input ref={ self.input_name.clone() } class="input is-primary" type="text" placeholder="Baguette de pain" required=true />
+                                        <input ref={ self.input_name.clone() } class="input is-primary" type="text" placeholder="Baguette de pain" required=true value={ self.expenditure.as_ref().map(|e| e.name.clone()) }/>
                                     </div>
                                 </div>
 
@@ -457,7 +499,7 @@ impl Component for EditExpenditure {
                                     <label class="label">{ "Montant" }</label>
                                     <div class="field has-addons">
                                         <div class="control is-expanded">
-                                            <input ref={ self.input_amount.clone() } type="number" min="0" step="0.01" class="input is-primary" required=true placeholder="montant" />
+                                            <input ref={ self.input_amount.clone() } type="number" min="0" step="0.01" class="input is-primary" required=true placeholder="montant" value={ self.expenditure.as_ref().map(|e| (e.amount as f64 / 100f64).to_string()) }/>
                                         </div>
                                         <div class="control">
                                             <p class="button is-static">{ "€" }</p>
@@ -468,7 +510,7 @@ impl Component for EditExpenditure {
                                 <div class="field">
                                     <label class="label">{ "Date" }</label>
                                     <div class="control">
-                                        <input ref={self.input_date.clone()} type="date" class="input is-primary" required=true value={ today } />
+                                        <input ref={self.input_date.clone()} type="date" class="input is-primary" required=true value={ format!("{}", self.expenditure.as_ref().map(|e| e.date).unwrap_or(Local::today().naive_local()).format("%Y-%m-%d")) } />
                                     </div>
                                 </div>
 
@@ -479,7 +521,7 @@ impl Component for EditExpenditure {
                                             <select ref={ self.select_payer.clone() } required=true>
                                             {
                                                 (&*users.borrow()).iter().map(|(_, user)| html! {
-                                                    <option value={ user.id.to_string() }>{ &user.name }</option>
+                                                    <option value={ user.id.to_string() } selected={ self.expenditure.as_ref().map(|e| e.payer_id) == Some(user.id) }>{ &user.name }</option>
                                                 }).collect::<Html>()
                                             }
                                             </select>
@@ -497,10 +539,17 @@ impl Component for EditExpenditure {
                                 }
                                 <div class="control">
                                     <button type="submit" class={classes!("button", "is-primary", self.creating.then(|| "is-loading"))}>
-                                        <span class="icon">
-                                            <i class="fa fa-user-plus" />
-                                        </span>
-                                        <span>{ "Ajouter" }</span>
+                                        if ctx.props().expenditure_id.is_some() {
+                                            <span class="icon">
+                                                <i class="fa fa-save" />
+                                            </span>
+                                            <span>{ "Enregistrer" }</span>
+                                        } else {
+                                            <span class="icon">
+                                                <i class="fa fa-plus" />
+                                            </span>
+                                            <span>{ "Ajouter" }</span>
+                                        }
                                     </button>
                                 </div>
                             </form>

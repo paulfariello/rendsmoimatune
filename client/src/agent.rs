@@ -112,7 +112,7 @@ impl AccountAgent {
                 info!("Fetching expenditures for account: {}", account_id);
                 let account_id = account_id.clone();
                 self.link.send_future(async move {
-                    let mut expenditures: Vec<rmmt::Expenditure> =
+                    let expenditures: Vec<rmmt::Expenditure> =
                         Request::get(&format!("/api/account/{}/expenditures", account_id))
                             .send()
                             .await
@@ -139,7 +139,7 @@ impl AccountAgent {
                 info!("Fetching repayments for account: {}", account_id);
                 let account_id = account_id.clone();
                 self.link.send_future(async move {
-                    let mut repayments: Vec<rmmt::Repayment> =
+                    let repayments: Vec<rmmt::Repayment> =
                         Request::get(&format!("/api/account/{}/repayments", account_id))
                             .send()
                             .await
@@ -200,9 +200,9 @@ impl Agent for AccountAgent {
         self.broadcast(msg);
     }
 
-    fn handle_input(&mut self, msg: Self::Input, _id: HandlerId) {
+    fn handle_input(&mut self, msg: Self::Input, id: HandlerId) {
         debug!("Handle account msg: {:?}", msg);
-        match &msg {
+        let broadcast = match &msg {
             AccountMsg::LoadAccount(id) => {
                 if Some(id) != self.account_id.as_ref() {
                     self.fetch_account(id.clone());
@@ -211,34 +211,55 @@ impl Agent for AccountAgent {
                     self.fetch_expenditures();
                     self.fetch_repayments();
                 }
+                false
             }
             AccountMsg::LoadExpenditure{ account_id, expenditure_id } => {
-                todo!()
+                if Some(account_id) == self.account_id.as_ref() {
+                    if let Some(expenditures) = self.expenditures.as_ref() {
+                        match expenditures.borrow().get(expenditure_id) {
+                            Some(expenditure) => self.link.respond(id, AccountMsg::UpdateExpenditure(expenditure.clone())),
+                            None => {}
+                        }
+                    }
+                } else {
+                    error!("Invalid account_id: {} != {:?}", account_id, self.account_id);
+                }
+                false
             }
             AccountMsg::LoadRepayment{ account_id, repayment_id } => {
-                if let Some(repayments) = self.repayments.as_ref() {
-                    match repayments.borrow().get(repayment_id) {
-                        Some(repayment) => self.broadcast(AccountMsg::UpdateRepayment(repayment.clone())),
-                        None => {}
+                if Some(account_id) == self.account_id.as_ref() {
+                    if let Some(repayments) = self.repayments.as_ref() {
+                        match repayments.borrow().get(repayment_id) {
+                            Some(repayment) => self.link.respond(id, AccountMsg::UpdateRepayment(repayment.clone())),
+                            None => {}
+                        }
                     }
+                } else {
+                    error!("Invalid account_id: {} != {:?}", account_id, self.account_id);
                 }
+                false
             }
             AccountMsg::ChangedUsers => {
                 self.fetch_users();
                 self.fetch_balance();
+                true
             }
             AccountMsg::ChangedExpenditures => {
                 self.fetch_expenditures();
                 self.fetch_balance();
+                true
             }
             AccountMsg::ChangedRepayments => {
                 self.fetch_repayments();
                 self.fetch_balance();
+                true
             }
-            _ => {}
-        }
+            _ => true,
+        };
 
-        self.broadcast(msg);
+        if broadcast {
+            self.broadcast(msg);
+        }
     }
 
     fn connected(&mut self, id: HandlerId) {

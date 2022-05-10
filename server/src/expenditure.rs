@@ -51,6 +51,53 @@ pub(crate) async fn post_expenditure(
     }
 }
 
+#[put(
+    "/api/account/<account_id>/expenditures/<expenditure_id>",
+    format = "json",
+    data = "<expenditure_and_debtors>"
+)]
+pub(crate) async fn put_expenditure(
+    conn: MainDbConn,
+    account_id: UniqId,
+    expenditure_and_debtors: Json<(Expenditure, Vec<(Uuid, i32)>)>,
+) -> Result<Json<(Expenditure, Vec<Debt>)>, Error> {
+    let (expenditure, debtors) = expenditure_and_debtors.into_inner();
+
+    if account_id != expenditure.account_id {
+        Err(Error::IdError)
+    } else {
+        let (expenditure, new_debts): (Expenditure, Vec<Debt>) = conn
+            .run(move |c| {
+                c.transaction::<(Expenditure, Vec<Debt>), diesel::result::Error, _>(|| {
+                    let expenditure: Expenditure =
+                        diesel::update(rmmt::expenditures::dsl::expenditures)
+                            .set(expenditure)
+                            .get_result(c)?;
+
+                    diesel::delete(rmmt::debts::dsl::debts.filter(rmmt::debts::dsl::expenditure_id.eq(expenditure_id))).execute(c)?;
+
+                    let new_debts = debtors
+                        .into_iter()
+                        .map(|(debtor_id, share)| NewDebt {
+                            debtor_id,
+                            expenditure_id: expenditure.id,
+                            share,
+                        })
+                        .collect::<Vec<_>>();
+
+                    let new_debts: Vec<Debt> = diesel::insert_into(rmmt::debts::dsl::debts)
+                        .values(new_debts)
+                        .get_results(c)?;
+
+                    Ok((expenditure, new_debts))
+                })
+            })
+            .await?;
+
+        Ok(Json((expenditure, new_debts)))
+    }
+}
+
 #[get("/api/account/<account_id>/expenditures")]
 pub(crate) async fn get_expenditures(
     conn: MainDbConn,
