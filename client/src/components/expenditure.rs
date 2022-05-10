@@ -77,7 +77,7 @@ impl Component for Expenditures {
                         <h2 class="title is-1">
                             <span class="icon-text">
                                 <span class="icon">
-                                    <i class="fa fa-bank"/>
+                                    <i class="fas fa-bank"/>
                                 </span>
                                 <span>
                                 {
@@ -97,7 +97,7 @@ impl Component for Expenditures {
                         <Link<Route> to={Route::Expenditures { account_id: ctx.props().account_id.clone() }}>
                             <h3 class="subtitle is-3">
                                 <span class="icon-text">
-                                    <span class="icon"><i class="fa fa-credit-card"></i></span>
+                                    <span class="icon"><i class="fas fa-credit-card"></i></span>
                                     <span>{ "Dépenses" }</span>
                                 </span>
                             </h3>
@@ -149,7 +149,7 @@ impl Component for ExpendituresList {
                         <td class="is-vcentered">
                             <Link<Route> to={Route::EditExpenditure { account_id: ctx.props().account_id.clone(), expenditure_id: { expenditure.id } }}>
                                 <a aria-label="Éditer" class="button is-primary" href="">
-                                    <i class="fa fa-pencil fa-lg"></i>
+                                    <i class="fas fa-pencil"></i>
                                 </a>
                             </Link<Route>>
                             <DeleteExpenditure account_id={ expenditure.account_id.clone() } id={ expenditure.id.clone() } />
@@ -473,7 +473,7 @@ impl Component for EditExpenditure {
                             <Link<Route> to={Route::EditExpenditure { account_id: ctx.props().account_id.clone(), expenditure_id }}>
                                 <h3 class="subtitle is-3">
                                     <span class="icon-text">
-                                        <span class="icon"><i class="fa fa-exchange"></i></span>
+                                        <span class="icon"><i class="fas fa-exchange"></i></span>
                                         <span>{ "Dépense" }</span>
                                     </span>
                                 </h3>
@@ -482,7 +482,7 @@ impl Component for EditExpenditure {
                             <Link<Route> to={Route::CreateExpenditure { account_id: ctx.props().account_id.clone() }}>
                                 <h3 class="subtitle is-3">
                                     <span class="icon-text">
-                                        <span class="icon"><i class="fa fa-exchange"></i></span>
+                                        <span class="icon"><i class="fas fa-exchange"></i></span>
                                         <span>{ "Nouvelle dépense" }</span>
                                     </span>
                                 </h3>
@@ -535,7 +535,7 @@ impl Component for EditExpenditure {
                                             </select>
                                         </div>
                                         <span class="icon is-small is-left">
-                                            <i class="fa fa-user"></i>
+                                            <i class="fas fa-user"></i>
                                         </span>
                                     </p>
                                 </div>
@@ -549,12 +549,12 @@ impl Component for EditExpenditure {
                                     <button type="submit" class={classes!("button", "is-primary", self.creating.then(|| "is-loading"))}>
                                         if ctx.props().expenditure_id.is_some() {
                                             <span class="icon">
-                                                <i class="fa fa-save" />
+                                                <i class="fas fa-save" />
                                             </span>
                                             <span>{ "Enregistrer" }</span>
                                         } else {
                                             <span class="icon">
-                                                <i class="fa fa-plus" />
+                                                <i class="fas fa-plus" />
                                             </span>
                                             <span>{ "Ajouter" }</span>
                                         }
@@ -618,7 +618,7 @@ impl Component for Debtor {
                     <label class={ classes!("is-checkbox", match self.checked { true => "is-primary", false => "is-light" }) }>
                         <input ref={ ctx.props().state_ref.clone() } type="checkbox" checked={ self.checked } { onclick } />
                         <span class="icon checkmark">
-                            <i class="fa fa-check"></i>
+                            <i class="fas fa-check"></i>
                         </span>
                         <span>{ &ctx.props().name }</span>
                     </label>
@@ -723,7 +723,7 @@ impl Component for DeleteExpenditure {
 
         html! {
             <button aria-label="Supprimer" class={ classes!("button", "is-danger", self.deleting.then(|| "is-loading")) } { onclick }>
-                <i class="fa fa-trash-o fa-lg"></i>
+                <i class="fas fa-trash"></i>
             </button>
         }
     }

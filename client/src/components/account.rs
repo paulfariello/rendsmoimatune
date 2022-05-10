@@ -116,7 +116,7 @@ impl Component for Account {
                         <h2 class="title is-1">
                             <span class="icon-text">
                                 <span class="icon">
-                                    <i class="fa fa-bank"/>
+                                    <i class="fas fa-bank"/>
                                 </span>
                                 <span>
                                 {
@@ -139,7 +139,7 @@ impl Component for Account {
                     <div class="tile is-child box">
                         <h3 class="subtitle is-3">
                             <span class="icon-text">
-                                <span class="icon"><i class="fa fa-balance-scale"></i></span>
+                                <span class="icon"><i class="fas fa-balance-scale"></i></span>
                                 <span>{ "Balance" }</span>
                             </span>
                         </h3>
@@ -156,7 +156,7 @@ impl Component for Account {
                     <div class="tile is-child box">
                         <h3 class="subtitle is-3">
                             <span class="icon-text">
-                                <span class="icon"><i class="fa fa-exchange"></i></span>
+                                <span class="icon"><i class="fas fa-exchange"></i></span>
                                 <span>{ "Équilibrage" }</span>
                             </span>
                         </h3>
@@ -175,7 +175,7 @@ impl Component for Account {
                         <Link<Route> to={Route::Expenditures { account_id: ctx.props().id.clone() }}>
                             <h3 class="subtitle is-3">
                                 <span class="icon-text">
-                                    <span class="icon"><i class="fa fa-credit-card"></i></span>
+                                    <span class="icon"><i class="fas fa-credit-card"></i></span>
                                     <span>{ "Dépenses" }</span>
                                 </span>
                             </h3>
@@ -188,7 +188,7 @@ impl Component for Account {
                         <Link<Route> to={Route::CreateExpenditure { account_id: ctx.props().id.clone() }}>
                             <a class="button is-primary" href="">
                                 <span class="icon">
-                                    <i class="fa fa-plus-circle" />
+                                    <i class="fas fa-plus-circle" />
                                 </span>
                                 <span>{ "Nouvelle dépense" }</span>
                             </a>
@@ -203,7 +203,7 @@ impl Component for Account {
                         <Link<Route> to={Route::Repayments { account_id: ctx.props().id.clone() }}>
                             <h3 class="subtitle is-3">
                                 <span class="icon-text">
-                                    <span class="icon"><i class="fa fa-exchange"></i></span>
+                                    <span class="icon"><i class="fas fa-exchange"></i></span>
                                     <span>{ "Remboursements" }</span>
                                 </span>
                             </h3>
@@ -216,7 +216,7 @@ impl Component for Account {
                         <Link<Route> to={Route::CreateRepayment { account_id: ctx.props().id.clone() }}>
                             <a class="button is-primary" href="">
                                 <span class="icon">
-                                    <i class="fa fa-plus-circle" />
+                                    <i class="fas fa-plus-circle" />
                                 </span>
                                 <span>{ "Nouveau remboursement" }</span>
                             </a>
@@ -350,7 +350,7 @@ pub fn account_title(AccountTitleProps { id, account }: &AccountTitleProps) -> H
             <h2 class="title is-1">
                 <span class="icon-text">
                     <span class="icon">
-                        <i class="fa fa-bank"/>
+                        <i class="fas fa-bank"/>
                     </span>
                     <span>
                     {

@@ -5,11 +5,15 @@ $rmmt-red: #c66653;
 $rmmt-white: #ffffff;
 $font-family-base: 'Roboto';
 
-// Set bulma setting
+// Set bulma settings
 $family-sans-serif: $font-family-base;
 $primary: $rmmt-blue;
 
-@import "font-awesome/scss/font-awesome";
+// Set font-awesome settings
+$fa-font-path: "webfonts";
+
+@import "font-awesome/scss/fontawesome";
+@import "font-awesome/scss/solid.scss";
 @import "bulma/bulma";
 
 @font-face {

@@ -127,7 +127,7 @@ impl Component for CreateUser {
                     <div class="control">
                         <button type="submit" class={classes!("button", "is-primary", self.creating.then(|| "is-loading"))}>
                             <span class="icon">
-                                <i class="fa fa-user-plus" />
+                                <i class="fas fa-user-plus" />
                             </span>
                             <span>{ "Ajouter" }</span>
                         </button>

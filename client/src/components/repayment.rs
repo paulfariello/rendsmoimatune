@@ -77,7 +77,7 @@ impl Component for Repayments {
                         <h2 class="title is-1">
                             <span class="icon-text">
                                 <span class="icon">
-                                    <i class="fa fa-bank"/>
+                                    <i class="fas fa-bank"/>
                                 </span>
                                 <span>
                                 {
@@ -97,7 +97,7 @@ impl Component for Repayments {
                         <Link<Route> to={Route::Repayments { account_id: ctx.props().account_id.clone() }}>
                         <h3 class="subtitle is-3">
                             <span class="icon-text">
-                                <span class="icon"><i class="fa fa-exchange"></i></span>
+                                <span class="icon"><i class="fas fa-exchange"></i></span>
                                 <span>{ "Remboursements" }</span>
                             </span>
                         </h3>
@@ -150,7 +150,7 @@ impl Component for RepaymentsList {
                         <td class="is-vcentered">
                             <Link<Route> to={Route::EditRepayment { account_id: ctx.props().account_id.clone(), repayment_id: { repayment.id } }}>
                                 <a aria-label="Éditer" class="button is-primary" href="">
-                                    <i class="fa fa-pencil fa-lg"></i>
+                                    <i class="fas fa-pencil"></i>
                                 </a>
                             </Link<Route>>
                             <DeleteRepayment account_id={ repayment.account_id.clone() } id={ repayment.id.clone() } />
@@ -495,7 +495,7 @@ impl Component for EditRepayment {
                             <Link<Route> to={Route::EditRepayment { account_id: ctx.props().account_id.clone(), repayment_id }}>
                                 <h3 class="subtitle is-3">
                                     <span class="icon-text">
-                                        <span class="icon"><i class="fa fa-exchange"></i></span>
+                                        <span class="icon"><i class="fas fa-exchange"></i></span>
                                         <span>{ "Remboursement" }</span>
                                     </span>
                                 </h3>
@@ -504,7 +504,7 @@ impl Component for EditRepayment {
                             <Link<Route> to={Route::CreateRepayment { account_id: ctx.props().account_id.clone() }}>
                                 <h3 class="subtitle is-3">
                                     <span class="icon-text">
-                                        <span class="icon"><i class="fa fa-exchange"></i></span>
+                                        <span class="icon"><i class="fas fa-exchange"></i></span>
                                         <span>{ "Nouveau remboursement" }</span>
                                     </span>
                                 </h3>
@@ -532,7 +532,7 @@ impl Component for EditRepayment {
                                                     </select>
                                                 </div>
                                                 <span class="icon is-small is-left">
-                                                    <i class="fa fa-user"></i>
+                                                    <i class="fas fa-user"></i>
                                                 </span>
                                             </p>
                                         </div>
@@ -562,7 +562,7 @@ impl Component for EditRepayment {
                                                     </select>
                                                 </div>
                                                 <span class="icon is-small is-left">
-                                                    <i class="fa fa-user"></i>
+                                                    <i class="fas fa-user"></i>
                                                 </span>
                                             </p>
                                         </div>
@@ -577,12 +577,12 @@ impl Component for EditRepayment {
                                     <button type="submit" class={classes!("button", "is-primary", self.creating.then(|| "is-loading"))}>
                                         if ctx.props().repayment_id.is_some() {
                                             <span class="icon">
-                                                <i class="fa fa-save" />
+                                                <i class="fas fa-save" />
                                             </span>
                                             <span>{ "Enregistrer" }</span>
                                         } else {
                                             <span class="icon">
-                                                <i class="fa fa-plus" />
+                                                <i class="fas fa-plus" />
                                             </span>
                                             <span>{ "Ajouter" }</span>
                                         }
@@ -689,7 +689,7 @@ impl Component for DeleteRepayment {
 
         html! {
             <button aria-label="Supprimer" class={ classes!("button", "is-danger", self.deleting.then(|| "is-loading")) } { onclick }>
-                <i class="fa fa-trash-o fa-lg"></i>
+                <i class="fas fa-trash"></i>
             </button>
         }
     }

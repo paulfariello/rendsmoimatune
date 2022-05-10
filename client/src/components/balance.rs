@@ -145,7 +145,7 @@ impl Component for BalancingList {
                                                 <Link<Route, rmmt::Balancing> to={Route::CreateRepayment { account_id: ctx.props().account_id.clone() } } query={ Some(balance.clone()) }>
                                                     <button class="button is-primary">
                                                         <span class="icon">
-                                                            <i class="fa fa-credit-card" />
+                                                            <i class="fas fa-credit-card" />
                                                         </span>
                                                         <span>{ "Rembourser" }</span>
                                                     </button>
