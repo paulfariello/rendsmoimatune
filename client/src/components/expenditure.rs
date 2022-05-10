@@ -28,9 +28,10 @@ pub struct ExpendituresProps {
 
 pub struct Expenditures {
     account: Option<Rc<RefCell<rmmt::Account>>>,
-    expenditures: Option<Rc<RefCell<HashMap<Uuid, rmmt::Expenditure>>>>,
+    expenditures:
+        Option<Rc<RefCell<HashMap<Uuid, (rmmt::Expenditure, HashMap<Uuid, rmmt::Debt>)>>>>,
     users: Option<Rc<RefCell<HashMap<Uuid, rmmt::User>>>>,
-    _account_bridge: Box<dyn Bridge<AccountAgent>>,
+    _agent: Box<dyn Bridge<AccountAgent>>,
 }
 
 impl Component for Expenditures {
@@ -38,16 +39,15 @@ impl Component for Expenditures {
     type Properties = ExpendituresProps;
 
     fn create(ctx: &Context<Self>) -> Self {
-        let account_bridge = AccountAgent::bridge(ctx.link().callback(|msg| msg));
+        let mut agent = AccountAgent::bridge(ctx.link().callback(|msg| msg));
 
-        let mut dispatcher = AccountAgent::dispatcher();
-        dispatcher.send(AccountMsg::LoadAccount(ctx.props().account_id.clone()));
+        agent.send(AccountMsg::LoadAccount(ctx.props().account_id.clone()));
 
         Self {
             account: None,
             expenditures: None,
             users: None,
-            _account_bridge: account_bridge,
+            _agent: agent,
         }
     }
 
@@ -117,7 +117,7 @@ impl Component for Expenditures {
 #[derive(Properties, PartialEq)]
 pub struct ExpendituresListProps {
     pub account_id: String,
-    pub expenditures: Rc<RefCell<HashMap<Uuid, rmmt::Expenditure>>>,
+    pub expenditures: Rc<RefCell<HashMap<Uuid, (rmmt::Expenditure, HashMap<Uuid, rmmt::Debt>)>>>,
     pub users: Rc<RefCell<HashMap<Uuid, rmmt::User>>>,
     pub limit: Option<usize>,
     pub loading: bool,
@@ -138,14 +138,21 @@ impl Component for ExpendituresList {
         let len = expenditures.len();
 
         if len > 0 {
-            let map = |(_, expenditure): (&Uuid, &rmmt::Expenditure)| {
+            let map = |(_, (expenditure, debts)): (
+                &Uuid,
+                &(rmmt::Expenditure, HashMap<Uuid, rmmt::Debt>),
+            )| {
                 html! {
                     <tr key={ expenditure.id.to_string() }>
                         <td class="is-vcentered">{ &expenditure.date }</td>
                         <td class="is-vcentered">{ &expenditure.name }</td>
                         <td class="is-vcentered"><Amount amount={ expenditure.amount as i64} /></td>
                         <td class="is-vcentered"><UserName users={ ctx.props().users.clone() } id={ expenditure.payer_id }/></td>
-                        <td class="is-vcentered">{ "todo" }</td>
+                        <td class="is-vcentered">
+                        if debts.len() == ctx.props().users.borrow().len() {
+                            { "Tous" }
+                        }
+                        </td>
                         <td class="is-vcentered">
                             <Link<Route> to={Route::EditExpenditure { account_id: ctx.props().account_id.clone(), expenditure_id: { expenditure.id } }}>
                                 <a aria-label="Éditer" class="button is-primary" href="">
@@ -219,6 +226,7 @@ pub struct EditExpenditure {
     account: Option<Rc<RefCell<rmmt::Account>>>,
     users: Option<Rc<RefCell<HashMap<Uuid, rmmt::User>>>>,
     expenditure: Option<rmmt::Expenditure>,
+    debts: Option<HashMap<Uuid, rmmt::Debt>>,
     input_name: NodeRef,
     input_date: NodeRef,
     input_amount: NodeRef,
@@ -227,8 +235,7 @@ pub struct EditExpenditure {
     debtors_input_share: HashMap<Uuid, NodeRef>,
     creating: bool,
     error: Option<String>,
-    _account_bridge: Box<dyn Bridge<AccountAgent>>,
-    agent: Dispatcher<AccountAgent>,
+    agent: Box<dyn Bridge<AccountAgent>>,
 }
 
 impl EditExpenditure {
@@ -361,13 +368,11 @@ impl Component for EditExpenditure {
     type Properties = EditExpenditureProps;
 
     fn create(ctx: &Context<Self>) -> Self {
-        let account_bridge =
-            AccountAgent::bridge(ctx.link().callback(EditExpenditureMsg::AccountMsg));
+        let mut agent = AccountAgent::bridge(ctx.link().callback(EditExpenditureMsg::AccountMsg));
 
-        let mut dispatcher = AccountAgent::dispatcher();
-        dispatcher.send(AccountMsg::LoadAccount(ctx.props().account_id.clone()));
+        agent.send(AccountMsg::LoadAccount(ctx.props().account_id.clone()));
         if let Some(expenditure_id) = ctx.props().expenditure_id.clone() {
-            dispatcher.send(AccountMsg::LoadExpenditure {
+            agent.send(AccountMsg::LoadExpenditure {
                 account_id: ctx.props().account_id.clone(),
                 expenditure_id,
             });
@@ -377,6 +382,7 @@ impl Component for EditExpenditure {
             account: None,
             users: None,
             expenditure: None,
+            debts: None,
             input_name: NodeRef::default(),
             input_date: NodeRef::default(),
             input_amount: NodeRef::default(),
@@ -385,8 +391,7 @@ impl Component for EditExpenditure {
             debtors_input_share: HashMap::new(),
             creating: false,
             error: None,
-            _account_bridge: account_bridge,
-            agent: AccountAgent::dispatcher(),
+            agent,
         }
     }
 
@@ -409,9 +414,11 @@ impl Component for EditExpenditure {
                         .collect();
                     true
                 }
-                AccountMsg::UpdateExpenditure(expenditure) => {
+                AccountMsg::UpdateExpenditure(expenditure, debts) => {
+                    info!("Fetched expenditure from cache: {:?}", expenditure);
                     if Some(expenditure.id) == ctx.props().expenditure_id {
                         self.expenditure = Some(expenditure);
+                        self.debts = Some(debts);
                         true
                     } else {
                         false
@@ -542,7 +549,7 @@ impl Component for EditExpenditure {
 
                                 {
                                     (&*users.borrow()).iter().map(|(id, user)| html! {
-                                        <Debtor name={ user.name.clone() } state_ref={ self.debtors_checkbox.get(&id).clone().unwrap() } share_ref={ self.debtors_input_share.get(&id).clone().unwrap() } />
+                                        <Debtor name={ user.name.clone() } state_ref={ self.debtors_checkbox.get(&id).clone().unwrap() } share_ref={ self.debtors_input_share.get(&id).clone().unwrap() } debt={ self.debts.as_ref().and_then(|d| d.get(&id).cloned()) }/>
                                     }).collect::<Html>()
                                 }
                                 <div class="control">
@@ -576,6 +583,8 @@ pub struct DebtorProps {
     pub name: String,
     pub state_ref: NodeRef,
     pub share_ref: NodeRef,
+    #[prop_or_default]
+    pub debt: Option<rmmt::Debt>,
 }
 
 pub enum DebtorMsg {
@@ -590,8 +599,12 @@ impl Component for Debtor {
     type Message = DebtorMsg;
     type Properties = DebtorProps;
 
-    fn create(_ctx: &Context<Self>) -> Self {
-        Self { checked: true }
+    fn create(ctx: &Context<Self>) -> Self {
+        let checked = match &ctx.props().debt {
+            Some(debt) => debt.share > 0,
+            None => false,
+        };
+        Self { checked }
     }
 
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
@@ -625,7 +638,7 @@ impl Component for Debtor {
                 </div>
                 if self.checked {
                     <div class="control">
-                        <input ref={ ctx.props().share_ref.clone() } type="number" min="0" step="1" class="input is-primary" value="1" />
+                        <input ref={ ctx.props().share_ref.clone() } type="number" min="0" step="1" class="input is-primary" value={ ctx.props().debt.as_ref().map(|d| d.share.to_string()).or(Some(1.to_string())) } />
                     </div>
                 }
             </div>

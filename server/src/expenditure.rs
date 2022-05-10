@@ -59,11 +59,12 @@ pub(crate) async fn post_expenditure(
 pub(crate) async fn put_expenditure(
     conn: MainDbConn,
     account_id: UniqId,
+    expenditure_id: Uuid,
     expenditure_and_debtors: Json<(Expenditure, Vec<(Uuid, i32)>)>,
 ) -> Result<Json<(Expenditure, Vec<Debt>)>, Error> {
     let (expenditure, debtors) = expenditure_and_debtors.into_inner();
 
-    if account_id != expenditure.account_id {
+    if account_id != expenditure.account_id || expenditure_id != expenditure.id {
         Err(Error::IdError)
     } else {
         let (expenditure, new_debts): (Expenditure, Vec<Debt>) = conn
@@ -82,6 +83,7 @@ pub(crate) async fn put_expenditure(
 
                     let new_debts = debtors
                         .into_iter()
+                        .filter(|(_, share)| *share > 0)
                         .map(|(debtor_id, share)| NewDebt {
                             debtor_id,
                             expenditure_id: expenditure.id,
@@ -106,17 +108,21 @@ pub(crate) async fn put_expenditure(
 pub(crate) async fn get_expenditures(
     conn: MainDbConn,
     account_id: UniqId,
-) -> Result<Json<Vec<Expenditure>>, Error> {
+) -> Result<Json<Vec<(Expenditure, Vec<Debt>)>>, Error> {
     let account_uuid: uuid::Uuid = account_id.into();
-    let account_expenditures: Vec<Expenditure> = conn
-        .run(move |c| {
-            rmmt::expenditures::dsl::expenditures
+    let expenditures: Vec<(Expenditure, Vec<Debt>)> = conn
+        .run::<_, Result<_, diesel::result::Error>>(move |c| {
+            let expenditures: Vec<Expenditure> = rmmt::expenditures::dsl::expenditures
                 .filter(rmmt::expenditures::dsl::account_id.eq(account_uuid))
-                .load(c)
+                .load(c)?;
+            let debts = Debt::belonging_to(&expenditures)
+                .load(c)?
+                .grouped_by(&expenditures);
+            Ok(expenditures.into_iter().zip(debts).collect())
         })
         .await?;
 
-    Ok(Json(account_expenditures))
+    Ok(Json(expenditures))
 }
 
 #[delete("/api/account/<account_id>/expenditures/<expenditure_id>")]
@@ -129,7 +135,8 @@ pub(crate) async fn del_expenditure(
     conn.run(move |c| {
         diesel::delete(
             rmmt::expenditures::dsl::expenditures
-                .filter(rmmt::expenditures::dsl::id.eq(expenditure_id)),
+                .filter(rmmt::expenditures::dsl::id.eq(expenditure_id))
+                .filter(rmmt::expenditures::dsl::account_id.eq(account_uuid)),
         )
         .execute(c)
     })

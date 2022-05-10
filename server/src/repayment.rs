@@ -41,7 +41,7 @@ pub(crate) async fn put_repayment(
     repayment_id: Uuid,
     repayment: Json<Repayment>,
 ) -> Result<Json<Repayment>, Error> {
-    if account_id != repayment.account_id {
+    if account_id != repayment.account_id || repayment_id != repayment.id {
         Err(Error::IdError)
     } else {
         let repayment: Repayment = conn
@@ -81,7 +81,9 @@ pub(crate) async fn del_repayment(
     let account_uuid: uuid::Uuid = account_id.into();
     conn.run(move |c| {
         diesel::delete(
-            rmmt::repayments::dsl::repayments.filter(rmmt::repayments::dsl::id.eq(repayment_id)),
+            rmmt::repayments::dsl::repayments
+                .filter(rmmt::repayments::dsl::id.eq(repayment_id))
+                .filter(rmmt::repayments::dsl::account_id.eq(account_uuid)),
         )
         .execute(c)
     })

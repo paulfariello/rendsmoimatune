@@ -8,7 +8,7 @@ use log::{debug, error, info, warn};
 use rmmt;
 use uuid::Uuid;
 use yew::prelude::*;
-use yew_agent::{Bridge, Bridged, Dispatched};
+use yew_agent::{Bridge, Bridged};
 use yew_router::prelude::*;
 
 use crate::agent::{AccountAgent, AccountMsg};
@@ -30,13 +30,14 @@ pub struct Account {
     account: Option<Rc<RefCell<rmmt::Account>>>,
     users: Option<Rc<RefCell<HashMap<Uuid, rmmt::User>>>>,
     balance: Option<Rc<RefCell<rmmt::Balance>>>,
-    expenditures: Option<Rc<RefCell<HashMap<Uuid, rmmt::Expenditure>>>>,
+    expenditures:
+        Option<Rc<RefCell<HashMap<Uuid, (rmmt::Expenditure, HashMap<Uuid, rmmt::Debt>)>>>>,
     repayments: Option<Rc<RefCell<HashMap<Uuid, rmmt::Repayment>>>>,
     fetching_users: bool,
     fetching_expenditures: bool,
     fetching_repayments: bool,
     fetching_balance: bool,
-    _account_bridge: Box<dyn Bridge<AccountAgent>>,
+    _agent: Box<dyn Bridge<AccountAgent>>,
 }
 
 impl Component for Account {
@@ -45,9 +46,8 @@ impl Component for Account {
 
     fn create(ctx: &Context<Self>) -> Self {
         let id = ctx.props().id.clone();
-        let account_bridge = AccountAgent::bridge(ctx.link().callback(|msg| msg));
-        let mut dispatcher = AccountAgent::dispatcher();
-        dispatcher.send(AccountMsg::LoadAccount(id.clone()));
+        let mut agent = AccountAgent::bridge(ctx.link().callback(|msg| msg));
+        agent.send(AccountMsg::LoadAccount(id.clone()));
         Self {
             account: None,
             users: None,
@@ -58,7 +58,7 @@ impl Component for Account {
             fetching_expenditures: false,
             fetching_repayments: false,
             fetching_balance: false,
-            _account_bridge: account_bridge,
+            _agent: agent,
         }
     }
 

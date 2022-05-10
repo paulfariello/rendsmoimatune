@@ -18,7 +18,7 @@ pub enum AccountMsg {
         account_id: String,
         expenditure_id: Uuid,
     },
-    UpdateExpenditure(rmmt::Expenditure),
+    UpdateExpenditure(rmmt::Expenditure, HashMap<Uuid, rmmt::Debt>),
     LoadRepayment {
         account_id: String,
         repayment_id: Uuid,
@@ -28,7 +28,7 @@ pub enum AccountMsg {
     UpdateUsers(Rc<RefCell<HashMap<Uuid, rmmt::User>>>),
     UpdateBalance(Rc<RefCell<rmmt::Balance>>),
     ChangedExpenditures,
-    UpdateExpenditures(Rc<RefCell<HashMap<Uuid, rmmt::Expenditure>>>),
+    UpdateExpenditures(Rc<RefCell<HashMap<Uuid, (rmmt::Expenditure, HashMap<Uuid, rmmt::Debt>)>>>),
     ChangedRepayments,
     UpdateRepayments(Rc<RefCell<HashMap<Uuid, rmmt::Repayment>>>),
 }
@@ -40,7 +40,8 @@ pub struct AccountAgent {
     account: Option<Rc<RefCell<rmmt::Account>>>,
     users: Option<Rc<RefCell<HashMap<Uuid, rmmt::User>>>>,
     balance: Option<Rc<RefCell<rmmt::Balance>>>,
-    expenditures: Option<Rc<RefCell<HashMap<Uuid, rmmt::Expenditure>>>>,
+    expenditures:
+        Option<Rc<RefCell<HashMap<Uuid, (rmmt::Expenditure, HashMap<Uuid, rmmt::Debt>)>>>>,
     repayments: Option<Rc<RefCell<HashMap<Uuid, rmmt::Repayment>>>>,
 }
 
@@ -118,7 +119,7 @@ impl AccountAgent {
                 info!("Fetching expenditures for account: {}", account_id);
                 let account_id = account_id.clone();
                 self.link.send_future(async move {
-                    let expenditures: Vec<rmmt::Expenditure> =
+                    let expenditures: Vec<(rmmt::Expenditure, Vec<rmmt::Debt>)> =
                         Request::get(&format!("/api/account/{}/expenditures", account_id))
                             .send()
                             .await
@@ -133,7 +134,12 @@ impl AccountAgent {
                     );
                     let expenditures = expenditures
                         .into_iter()
-                        .map(|e| (e.id.clone(), e))
+                        .map(|e| {
+                            (
+                                e.0.id.clone(),
+                                (e.0, e.1.into_iter().map(|d| (d.debtor_id, d)).collect()),
+                            )
+                        })
                         .collect();
                     AccountMsg::UpdateExpenditures(Rc::new(RefCell::new(expenditures)))
                 });
@@ -229,9 +235,13 @@ impl Agent for AccountAgent {
                 if Some(account_id) == self.account_id.as_ref() {
                     if let Some(expenditures) = self.expenditures.as_ref() {
                         match expenditures.borrow().get(expenditure_id) {
-                            Some(expenditure) => self
-                                .link
-                                .respond(id, AccountMsg::UpdateExpenditure(expenditure.clone())),
+                            Some(expenditure) => self.link.respond(
+                                id,
+                                AccountMsg::UpdateExpenditure(
+                                    expenditure.0.clone(),
+                                    expenditure.1.clone(),
+                                ),
+                            ),
                             None => {}
                         }
                     }

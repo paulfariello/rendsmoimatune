@@ -30,7 +30,7 @@ pub struct Repayments {
     account: Option<Rc<RefCell<rmmt::Account>>>,
     repayments: Option<Rc<RefCell<HashMap<Uuid, rmmt::Repayment>>>>,
     users: Option<Rc<RefCell<HashMap<Uuid, rmmt::User>>>>,
-    _account_bridge: Box<dyn Bridge<AccountAgent>>,
+    _agent: Box<dyn Bridge<AccountAgent>>,
 }
 
 impl Component for Repayments {
@@ -38,16 +38,15 @@ impl Component for Repayments {
     type Properties = RepaymentsProps;
 
     fn create(ctx: &Context<Self>) -> Self {
-        let account_bridge = AccountAgent::bridge(ctx.link().callback(|msg| msg));
+        let mut agent = AccountAgent::bridge(ctx.link().callback(|msg| msg));
 
-        let mut dispatcher = AccountAgent::dispatcher();
-        dispatcher.send(AccountMsg::LoadAccount(ctx.props().account_id.clone()));
+        agent.send(AccountMsg::LoadAccount(ctx.props().account_id.clone()));
 
         Self {
             account: None,
             repayments: None,
             users: None,
-            _account_bridge: account_bridge,
+            _agent: agent,
         }
     }
 
@@ -169,11 +168,11 @@ impl Component for RepaymentsList {
                         <thead>
                             <tr>
                                 <th>{ "Date" }</th>
-                                <th>{ "De" }</th>
+                                <th>{ "Payeur" }</th>
                                 <th></th>
                                 <th>{ "Montant" }</th>
                                 <th></th>
-                                <th>{ "Payeur" }</th>
+                                <th>{ "Beneficiaire" }</th>
                                 <th>{ "Actions" }</th>
                             </tr>
                         </thead>
@@ -201,7 +200,6 @@ impl Component for RepaymentsList {
 
 #[derive(Debug, Clone)]
 struct DefaultRepayment {
-    id: Option<Uuid>,
     payer_id: Option<Uuid>,
     beneficiary_id: Option<Uuid>,
     amount: i32,
@@ -211,7 +209,6 @@ struct DefaultRepayment {
 impl From<rmmt::Repayment> for DefaultRepayment {
     fn from(repayment: rmmt::Repayment) -> Self {
         Self {
-            id: Some(repayment.id),
             payer_id: Some(repayment.payer_id),
             beneficiary_id: Some(repayment.beneficiary_id),
             amount: repayment.amount,
@@ -234,7 +231,6 @@ impl From<rmmt::Balancing> for DefaultRepayment {
 impl Default for DefaultRepayment {
     fn default() -> Self {
         Self {
-            id: None,
             payer_id: None,
             beneficiary_id: None,
             amount: 0,
@@ -268,8 +264,7 @@ pub struct EditRepayment {
     input_date: NodeRef,
     creating: bool,
     error: Option<String>,
-    _account_bridge: Box<dyn Bridge<AccountAgent>>,
-    agent: Dispatcher<AccountAgent>,
+    agent: Box<dyn Bridge<AccountAgent>>,
 }
 
 impl EditRepayment {
@@ -384,13 +379,11 @@ impl Component for EditRepayment {
     type Properties = EditRepaymentProps;
 
     fn create(ctx: &Context<Self>) -> Self {
-        let account_bridge =
-            AccountAgent::bridge(ctx.link().callback(EditRepaymentMsg::AccountMsg));
+        let mut agent = AccountAgent::bridge(ctx.link().callback(EditRepaymentMsg::AccountMsg));
 
-        let mut dispatcher = AccountAgent::dispatcher();
-        dispatcher.send(AccountMsg::LoadAccount(ctx.props().account_id.clone()));
+        agent.send(AccountMsg::LoadAccount(ctx.props().account_id.clone()));
         if let Some(repayment_id) = ctx.props().repayment_id.clone() {
-            dispatcher.send(AccountMsg::LoadRepayment {
+            agent.send(AccountMsg::LoadRepayment {
                 account_id: ctx.props().account_id.clone(),
                 repayment_id,
             });
@@ -406,8 +399,7 @@ impl Component for EditRepayment {
             input_date: NodeRef::default(),
             creating: false,
             error: None,
-            _account_bridge: account_bridge,
-            agent: AccountAgent::dispatcher(),
+            agent,
         }
     }
 
