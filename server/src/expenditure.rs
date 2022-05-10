@@ -74,7 +74,11 @@ pub(crate) async fn put_expenditure(
                             .set(expenditure)
                             .get_result(c)?;
 
-                    diesel::delete(rmmt::debts::dsl::debts.filter(rmmt::debts::dsl::expenditure_id.eq(expenditure_id))).execute(c)?;
+                    diesel::delete(
+                        rmmt::debts::dsl::debts
+                            .filter(rmmt::debts::dsl::expenditure_id.eq(expenditure_id)),
+                    )
+                    .execute(c)?;
 
                     let new_debts = debtors
                         .into_iter()

@@ -14,9 +14,15 @@ use yew_agent::{Agent, AgentLink, Context as AgentContext, HandlerId};
 pub enum AccountMsg {
     LoadAccount(String),
     UpdateAccount(Rc<RefCell<rmmt::Account>>),
-    LoadExpenditure{ account_id: String, expenditure_id: Uuid },
+    LoadExpenditure {
+        account_id: String,
+        expenditure_id: Uuid,
+    },
     UpdateExpenditure(rmmt::Expenditure),
-    LoadRepayment{ account_id: String, repayment_id: Uuid },
+    LoadRepayment {
+        account_id: String,
+        repayment_id: Uuid,
+    },
     UpdateRepayment(rmmt::Repayment),
     ChangedUsers,
     UpdateUsers(Rc<RefCell<HashMap<Uuid, rmmt::User>>>),
@@ -125,7 +131,10 @@ impl AccountAgent {
                         expenditures.len(),
                         account_id
                     );
-                    let expenditures = expenditures.into_iter().map(|e| (e.id.clone(), e)).collect();
+                    let expenditures = expenditures
+                        .into_iter()
+                        .map(|e| (e.id.clone(), e))
+                        .collect();
                     AccountMsg::UpdateExpenditures(Rc::new(RefCell::new(expenditures)))
                 });
             }
@@ -213,29 +222,45 @@ impl Agent for AccountAgent {
                 }
                 false
             }
-            AccountMsg::LoadExpenditure{ account_id, expenditure_id } => {
+            AccountMsg::LoadExpenditure {
+                account_id,
+                expenditure_id,
+            } => {
                 if Some(account_id) == self.account_id.as_ref() {
                     if let Some(expenditures) = self.expenditures.as_ref() {
                         match expenditures.borrow().get(expenditure_id) {
-                            Some(expenditure) => self.link.respond(id, AccountMsg::UpdateExpenditure(expenditure.clone())),
+                            Some(expenditure) => self
+                                .link
+                                .respond(id, AccountMsg::UpdateExpenditure(expenditure.clone())),
                             None => {}
                         }
                     }
                 } else {
-                    error!("Invalid account_id: {} != {:?}", account_id, self.account_id);
+                    error!(
+                        "Invalid account_id: {} != {:?}",
+                        account_id, self.account_id
+                    );
                 }
                 false
             }
-            AccountMsg::LoadRepayment{ account_id, repayment_id } => {
+            AccountMsg::LoadRepayment {
+                account_id,
+                repayment_id,
+            } => {
                 if Some(account_id) == self.account_id.as_ref() {
                     if let Some(repayments) = self.repayments.as_ref() {
                         match repayments.borrow().get(repayment_id) {
-                            Some(repayment) => self.link.respond(id, AccountMsg::UpdateRepayment(repayment.clone())),
+                            Some(repayment) => self
+                                .link
+                                .respond(id, AccountMsg::UpdateRepayment(repayment.clone())),
                             None => {}
                         }
                     }
                 } else {
-                    error!("Invalid account_id: {} != {:?}", account_id, self.account_id);
+                    error!(
+                        "Invalid account_id: {} != {:?}",
+                        account_id, self.account_id
+                    );
                 }
                 false
             }

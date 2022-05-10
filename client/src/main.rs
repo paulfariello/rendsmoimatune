@@ -1,7 +1,7 @@
+use uuid::Uuid;
 use wasm_logger;
 use yew::prelude::*;
 use yew_router::prelude::*;
-use uuid::Uuid;
 
 mod agent;
 mod components;
@@ -28,9 +28,15 @@ enum Route {
     #[at("/account/:account_id/create_repayment")]
     CreateRepayment { account_id: String },
     #[at("/account/:account_id/repayments/:repayment_id/edit")]
-    EditRepayment { account_id: String, repayment_id: Uuid },
+    EditRepayment {
+        account_id: String,
+        repayment_id: Uuid,
+    },
     #[at("/account/:account_id/expenditures/:expenditure_id/edit")]
-    EditExpenditure { account_id: String, expenditure_id: Uuid },
+    EditExpenditure {
+        account_id: String,
+        expenditure_id: Uuid,
+    },
     #[not_found]
     #[at("/404")]
     NotFound,
@@ -54,10 +60,16 @@ fn switch(routes: &Route) -> Html {
         Route::CreateRepayment { account_id } => html! {
             <EditRepayment account_id={ account_id.clone() } />
         },
-        Route::EditRepayment { account_id, repayment_id } => html! {
+        Route::EditRepayment {
+            account_id,
+            repayment_id,
+        } => html! {
             <EditRepayment account_id={ account_id.clone() } repayment_id={ repayment_id.clone() } />
         },
-        Route::EditExpenditure { account_id, expenditure_id } => html! {
+        Route::EditExpenditure {
+            account_id,
+            expenditure_id,
+        } => html! {
             <EditExpenditure account_id={ account_id.clone() } expenditure_id={ expenditure_id.clone() } />
         },
         Route::NotFound => {

@@ -310,8 +310,14 @@ impl EditRepayment {
                     date,
                 };
                 debug!("Update repayment: {:?}", repayment);
-                Request::put(&format!("/api/account/{}/repayments/{}", ctx.props().account_id, id)).json(&repayment).unwrap()
-            },
+                Request::put(&format!(
+                    "/api/account/{}/repayments/{}",
+                    ctx.props().account_id,
+                    id
+                ))
+                .json(&repayment)
+                .unwrap()
+            }
             None => {
                 let repayment = rmmt::NewRepayment {
                     account_id: account_id.into(),
@@ -321,8 +327,13 @@ impl EditRepayment {
                     date,
                 };
                 debug!("Create repayment: {:?}", repayment);
-                Request::post(&format!("/api/account/{}/repayments", ctx.props().account_id)).json(&repayment).unwrap()
-            },
+                Request::post(&format!(
+                    "/api/account/{}/repayments",
+                    ctx.props().account_id
+                ))
+                .json(&repayment)
+                .unwrap()
+            }
         };
 
         ctx.link().send_future(async move {
@@ -379,7 +390,10 @@ impl Component for EditRepayment {
         let mut dispatcher = AccountAgent::dispatcher();
         dispatcher.send(AccountMsg::LoadAccount(ctx.props().account_id.clone()));
         if let Some(repayment_id) = ctx.props().repayment_id.clone() {
-            dispatcher.send(AccountMsg::LoadRepayment{ account_id: ctx.props().account_id.clone(), repayment_id });
+            dispatcher.send(AccountMsg::LoadRepayment {
+                account_id: ctx.props().account_id.clone(),
+                repayment_id,
+            });
         }
 
         Self {
@@ -458,11 +472,11 @@ impl Component for EditRepayment {
                     Err(err) => {
                         error!("Invalid query: {}", err);
                         Default::default()
-                    },
-                    Ok(balancing) => balancing.into()
+                    }
+                    Ok(balancing) => balancing.into(),
                 },
                 None => Default::default(),
-            }
+            },
         };
 
         let onsubmit = ctx.link().callback(|event: FocusEvent| {

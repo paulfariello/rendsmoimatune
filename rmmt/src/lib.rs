@@ -52,7 +52,10 @@ pub struct NewUser {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
-#[cfg_attr(feature = "db", derive(Identifiable, Queryable, Associations, AsChangeset))]
+#[cfg_attr(
+    feature = "db",
+    derive(Identifiable, Queryable, Associations, AsChangeset)
+)]
 #[cfg_attr(feature = "db", belongs_to(Account))]
 #[cfg_attr(feature = "db", table_name = "expenditures")]
 pub struct Expenditure {
@@ -76,7 +79,10 @@ pub struct NewExpenditure {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
-#[cfg_attr(feature = "db", derive(Identifiable, Queryable, Associations, AsChangeset))]
+#[cfg_attr(
+    feature = "db",
+    derive(Identifiable, Queryable, Associations, AsChangeset)
+)]
 #[cfg_attr(feature = "db", belongs_to(Account))]
 #[cfg_attr(feature = "db", table_name = "repayments")]
 pub struct Repayment {

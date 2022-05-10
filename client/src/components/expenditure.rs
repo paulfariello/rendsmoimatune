@@ -276,7 +276,6 @@ impl EditExpenditure {
             }
         }
 
-
         let req = match ctx.props().expenditure_id {
             Some(id) => {
                 let expenditure = rmmt::Expenditure {
@@ -287,7 +286,11 @@ impl EditExpenditure {
                     amount,
                     payer_id,
                 };
-                Request::put(&format!("/api/account/{}/expenditures/{}", ctx.props().account_id, id))
+                Request::put(&format!(
+                    "/api/account/{}/expenditures/{}",
+                    ctx.props().account_id,
+                    id
+                ))
                 .json(&(expenditure, debtors))
                 .unwrap()
             }
@@ -299,14 +302,16 @@ impl EditExpenditure {
                     amount,
                     payer_id,
                 };
-                Request::post(&format!("/api/account/{}/expenditures", ctx.props().account_id))
+                Request::post(&format!(
+                    "/api/account/{}/expenditures",
+                    ctx.props().account_id
+                ))
                 .json(&(expenditure, debtors))
                 .unwrap()
             }
         };
         ctx.link().send_future(async move {
-            let resp = req.send()
-                .await;
+            let resp = req.send().await;
 
             let resp = match resp {
                 Err(err) => return EditExpenditureMsg::Error(format!("{}", err)),
@@ -362,7 +367,10 @@ impl Component for EditExpenditure {
         let mut dispatcher = AccountAgent::dispatcher();
         dispatcher.send(AccountMsg::LoadAccount(ctx.props().account_id.clone()));
         if let Some(expenditure_id) = ctx.props().expenditure_id.clone() {
-            dispatcher.send(AccountMsg::LoadExpenditure { account_id: ctx.props().account_id.clone(), expenditure_id });
+            dispatcher.send(AccountMsg::LoadExpenditure {
+                account_id: ctx.props().account_id.clone(),
+                expenditure_id,
+            });
         }
 
         Self {
