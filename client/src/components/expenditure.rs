@@ -5,6 +5,7 @@ use std::rc::Rc;
 use chrono::naive::NaiveDate;
 use chrono::Local;
 use gloo_net::http::Request;
+use itertools::Itertools;
 #[allow(unused_imports)]
 use log::{debug, error, info, warn};
 use rmmt::{self, prelude::*};
@@ -149,9 +150,7 @@ impl Component for ExpendituresList {
                         <td class="is-vcentered"><Amount amount={ expenditure.amount as i64} /></td>
                         <td class="is-vcentered"><UserName users={ ctx.props().users.clone() } id={ expenditure.payer_id }/></td>
                         <td class="is-vcentered">
-                        if debts.len() == ctx.props().users.borrow().len() {
-                            { "Tous" }
-                        }
+                            <Debtors debts={ debts.clone() } users={ ctx.props().users.clone() } />
                         </td>
                         <td class="is-vcentered">
                             <Link<Route> to={Route::EditExpenditure { account_id: ctx.props().account_id.clone(), expenditure_id: { expenditure.id } }}>
@@ -549,7 +548,7 @@ impl Component for EditExpenditure {
 
                                 {
                                     (&*users.borrow()).iter().map(|(id, user)| html! {
-                                        <Debtor name={ user.name.clone() } state_ref={ self.debtors_checkbox.get(&id).clone().unwrap() } share_ref={ self.debtors_input_share.get(&id).clone().unwrap() } debt={ self.debts.as_ref().and_then(|d| d.get(&id).cloned()) }/>
+                                        <DebtorInput name={ user.name.clone() } state_ref={ self.debtors_checkbox.get(&id).clone().unwrap() } share_ref={ self.debtors_input_share.get(&id).clone().unwrap() } debt={ self.debts.as_ref().and_then(|d| d.get(&id).cloned()) }/>
                                     }).collect::<Html>()
                                 }
                                 <div class="control">
@@ -579,7 +578,7 @@ impl Component for EditExpenditure {
 }
 
 #[derive(Properties, PartialEq)]
-pub struct DebtorProps {
+pub struct DebtorInputProps {
     pub name: String,
     pub state_ref: NodeRef,
     pub share_ref: NodeRef,
@@ -587,17 +586,17 @@ pub struct DebtorProps {
     pub debt: Option<rmmt::Debt>,
 }
 
-pub enum DebtorMsg {
+pub enum DebtorInputMsg {
     Switch,
 }
 
-struct Debtor {
+struct DebtorInput {
     checked: bool,
 }
 
-impl Component for Debtor {
-    type Message = DebtorMsg;
-    type Properties = DebtorProps;
+impl Component for DebtorInput {
+    type Message = DebtorInputMsg;
+    type Properties = DebtorInputProps;
 
     fn create(ctx: &Context<Self>) -> Self {
         let checked = match &ctx.props().debt {
@@ -609,7 +608,7 @@ impl Component for Debtor {
 
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
-            DebtorMsg::Switch => {
+            DebtorInputMsg::Switch => {
                 self.checked = !self.checked;
                 let input_state = ctx
                     .props()
@@ -623,7 +622,7 @@ impl Component for Debtor {
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
-        let onclick = ctx.link().callback(|_| DebtorMsg::Switch);
+        let onclick = ctx.link().callback(|_| DebtorInputMsg::Switch);
 
         html! {
             <div class="field has-addons">
@@ -738,6 +737,30 @@ impl Component for DeleteExpenditure {
             <button aria-label="Supprimer" class={ classes!("button", "is-danger", self.deleting.then(|| "is-loading")) } { onclick }>
                 <i class="fas fa-trash"></i>
             </button>
+        }
+    }
+}
+
+#[derive(Properties, PartialEq)]
+pub struct DebtorsProps {
+    pub users: Rc<RefCell<HashMap<Uuid, rmmt::User>>>,
+    pub debts: HashMap<Uuid, rmmt::Debt>,
+}
+
+#[function_component(Debtors)]
+fn debtors(props: &DebtorsProps) -> Html {
+    let debts_count = props.debts.len();
+    let users_count = props.users.borrow().len();
+    html! {
+        if debts_count == users_count {
+            { "Tous" }
+        } else if debts_count == 0 {
+            { "Personne" }
+        } else if debts_count > users_count / 2 {
+            { "Tous sauf " }
+            { props.users.borrow().iter().filter(|(id, _)| !props.debts.contains_key(id)).map(|(_, u)| &u.name).join(", ") }
+        } else {
+            { props.users.borrow().iter().filter(|(id, _)| props.debts.contains_key(id)).map(|(_, u)| &u.name).join(", ") }
         }
     }
 }
