@@ -46,34 +46,50 @@ fn switch(routes: &Route) -> Html {
     match routes {
         Route::Home => html! { <CreateAccount /> },
         Route::Account { account_id } => html! {
-            <Account id={ account_id.clone() } />
+            <div class="container">
+                <Account id={ account_id.clone() } />
+            </div>
         },
         Route::Expenditures { account_id } => html! {
-            <Expenditures account_id={ account_id.clone() } />
+            <div class="container">
+                <Expenditures account_id={ account_id.clone() } />
+            </div>
         },
         Route::CreateExpenditure { account_id } => html! {
-            <EditExpenditure account_id={ account_id.clone() } />
+            <div class="container">
+                <EditExpenditure account_id={ account_id.clone() } />
+            </div>
         },
         Route::Repayments { account_id } => html! {
-            <Repayments account_id={ account_id.clone() } />
+            <div class="container">
+                <Repayments account_id={ account_id.clone() } />
+            </div>
         },
         Route::CreateRepayment { account_id } => html! {
-            <EditRepayment account_id={ account_id.clone() } />
+            <div class="container">
+                <EditRepayment account_id={ account_id.clone() } />
+            </div>
         },
         Route::EditRepayment {
             account_id,
             repayment_id,
         } => html! {
-            <EditRepayment account_id={ account_id.clone() } repayment_id={ repayment_id.clone() } />
+            <div class="container">
+                <EditRepayment account_id={ account_id.clone() } repayment_id={ repayment_id.clone() } />
+            </div>
         },
         Route::EditExpenditure {
             account_id,
             expenditure_id,
         } => html! {
-            <EditExpenditure account_id={ account_id.clone() } expenditure_id={ expenditure_id.clone() } />
+            <div class="container">
+                <EditExpenditure account_id={ account_id.clone() } expenditure_id={ expenditure_id.clone() } />
+            </div>
         },
-        Route::NotFound => {
-            html! { <h1 class="title is-1">{ "Oups… Cette page n'existe pas" }</h1> }
+        Route::NotFound => html! {
+            <div class="container">
+                <h1 class="title is-1">{ "Oups… Cette page n'existe pas" }</h1>
+            </div>
         }
     }
 }
@@ -83,11 +99,9 @@ fn app() -> Html {
     html! {
         <body>
             <TopBar/>
-            <div class="container">
-                <BrowserRouter>
-                    <Switch<Route> render={Switch::render(switch)} />
-                </BrowserRouter>
-            </div>
+            <BrowserRouter>
+                <Switch<Route> render={Switch::render(switch)} />
+            </BrowserRouter>
         </body>
     }
 }
