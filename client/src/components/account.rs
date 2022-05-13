@@ -10,6 +10,8 @@ use uuid::Uuid;
 use yew::prelude::*;
 use yew_agent::{Bridge, Bridged};
 use yew_router::prelude::*;
+use lazy_static::lazy_static;
+use regex::Regex;
 
 use crate::agent::{AccountAgent, AccountMsg};
 use crate::components::{
@@ -276,7 +278,21 @@ impl Component for CreateAccount {
     type Message = CreateAccountMsg;
     type Properties = CreateAccountProps;
 
-    fn create(_ctx: &Context<Self>) -> Self {
+    fn create(ctx: &Context<Self>) -> Self {
+        if let Some(hash) = ctx.link().location().map(|l| l.hash()) {
+            lazy_static! {
+                static ref OLD_ACCOUNT: Regex = Regex::new(r"#!/account/([a-zA-Z0-9_-]+)").unwrap();
+            }
+
+            if let Some(captures) = OLD_ACCOUNT.captures(&hash) {
+                if let Some(account_id) = captures.get(1) {
+                    let account_id = account_id.as_str().to_string();
+                    info!("Redirecting old account_id: {:?}", account_id);
+                    let history = ctx.link().history().unwrap();
+                    history.push(Route::Account { account_id });
+                }
+            }
+        }
         Self {
             creating: false,
             input_name: NodeRef::default(),
