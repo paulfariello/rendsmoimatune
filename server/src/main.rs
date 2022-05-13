@@ -3,6 +3,15 @@ extern crate rocket;
 
 use diesel::PgConnection;
 use rocket_sync_db_pools::database;
+use figment::{Figment, Profile, providers::{Format, Env, Toml}};
+use clap::Parser;
+
+#[derive(Parser, Debug)]
+#[clap(author, version, about)]
+struct Cli {
+    #[clap(short, long, parse(from_os_str))]
+    config: Option<std::path::PathBuf>,
+}
 
 mod account;
 mod balance;
@@ -16,7 +25,17 @@ struct MainDbConn(PgConnection);
 
 #[launch]
 fn rocket() -> _ {
-    rocket::build().attach(MainDbConn::fairing()).mount(
+    let args = Cli::parse();
+    let config_provider = match args.config {
+        Some(path) => {
+            Figment::from(rocket::Config::default())
+            .select(Profile::from_env_or("ROCKET_PROFILE", rocket::Config::DEFAULT_PROFILE))
+            .merge(Toml::file(path).nested())
+            .merge(Env::prefixed("ROCKET_").ignore(&["PROFILE"]).global())
+        }
+        None => rocket::Config::figment(),
+    };
+    rocket::build().configure(config_provider).attach(MainDbConn::fairing()).mount(
         "/",
         routes![
             account::post_account,
