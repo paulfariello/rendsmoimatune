@@ -491,6 +491,12 @@ impl Component for EditRepayment {
             EditRepaymentMsg::Submit
         });
 
+        let history = ctx.link().history().unwrap();
+        let previous = Callback::once(move |event: MouseEvent| {
+            event.prevent_default();
+            history.go(-1)
+        });
+
         let delete_error = ctx.link().callback(|_| EditRepaymentMsg::ClearError);
 
         html! {
@@ -580,7 +586,10 @@ impl Component for EditRepayment {
                                         <input ref={self.input_date.clone()} type="date" class="input is-primary" required=true value={ format!("{}", default.date.format("%Y-%m-%d")) } />
                                     </div>
                                 </div>
-                                <div class="control">
+                                <div class="control buttons">
+                                    <button type="button" class="button is-light" onclick={ previous }>
+                                        { "Annuler" }
+                                    </button>
                                     <button type="submit" class={classes!("button", "is-primary", self.creating.then(|| "is-loading"))}>
                                         if ctx.props().repayment_id.is_some() {
                                             <span class="icon">

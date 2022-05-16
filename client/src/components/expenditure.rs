@@ -480,6 +480,12 @@ impl Component for EditExpenditure {
             EditExpenditureMsg::Submit
         });
 
+        let history = ctx.link().history().unwrap();
+        let previous = Callback::once(move |event: MouseEvent| {
+            event.prevent_default();
+            history.go(-1)
+        });
+
         let delete_error = ctx.link().callback(|_| EditExpenditureMsg::ClearError);
 
         html! {
@@ -566,7 +572,10 @@ impl Component for EditExpenditure {
                                         }).collect::<Html>()
                                     }
                                 </div>
-                                <div class="control">
+                                <div class="control buttons">
+                                    <button type="button" class="button is-light" onclick={ previous }>
+                                        { "Annuler" }
+                                    </button>
                                     <button type="submit" class={classes!("button", "is-primary", self.creating.then(|| "is-loading"))}>
                                         if ctx.props().expenditure_id.is_some() {
                                             <span class="icon">
