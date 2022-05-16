@@ -162,7 +162,7 @@ impl Component for ExpendituresList {
                                     </td>
                                     <td class="is-vcentered">
                                         <Link<Route> to={Route::EditExpenditure { account_id: ctx.props().account_id.clone(), expenditure_id: { expenditure.id } }} classes="button is-primary">
-                                            <i class="fas fa-pencil"></i>
+                                            <i class="fas fa-pencil fa-fw"></i>
                                         </Link<Route>>
                                         <DeleteExpenditure account_id={ expenditure.account_id.clone() } id={ expenditure.id.clone() } />
                                     </td>
@@ -747,7 +747,7 @@ impl Component for DeleteExpenditure {
 
         html! {
             <button aria-label="Supprimer" class={ classes!("button", "is-danger", self.deleting.then(|| "is-loading")) } { onclick }>
-                <i class="fas fa-trash"></i>
+                <i class="fas fa-trash fa-fw"></i>
             </button>
         }
     }

@@ -157,7 +157,7 @@ impl Component for RepaymentsList {
                                     <td class="is-vcentered">
                                         <Link<Route> to={Route::EditRepayment { account_id: ctx.props().account_id.clone(), repayment_id: { repayment.id } }}>
                                             <a aria-label="Éditer" class="button is-primary" href="">
-                                                <i class="fas fa-pencil"></i>
+                                                <i class="fas fa-pencil fa-fw"></i>
                                             </a>
                                         </Link<Route>>
                                         <DeleteRepayment account_id={ repayment.account_id.clone() } id={ repayment.id.clone() } />
@@ -696,7 +696,7 @@ impl Component for DeleteRepayment {
 
         html! {
             <button aria-label="Supprimer" class={ classes!("button", "is-danger", self.deleting.then(|| "is-loading")) } { onclick }>
-                <i class="fas fa-trash"></i>
+                <i class="fas fa-trash fa-fw"></i>
             </button>
         }
     }
