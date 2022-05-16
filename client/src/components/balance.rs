@@ -152,11 +152,16 @@ impl Component for BalancingList {
                                             <td class="is-vcentered has-text-centered is-hidden-touch">{ "à" }</td>
                                             <td class="is-vcentered has-text-centered"><UserName users={ users.clone() } id={ balance.beneficiary_id }/></td>
                                             <td>
-                                                <Link<Route, rmmt::Balancing> to={Route::CreateRepayment { account_id: ctx.props().account_id.clone() } } query={ Some(balance.clone()) } classes="button is-primary">
+                                                <Link<Route, rmmt::Balancing> to={Route::CreateRepayment { account_id: ctx.props().account_id.clone() } } query={ Some(balance.clone()) } classes="button is-primary is-hidden-touch">
                                                     <span class="icon">
                                                         <i class="fas fa-credit-card" />
                                                     </span>
                                                     <span>{ "Rembourser" }</span>
+                                                </Link<Route, rmmt::Balancing>>
+                                                <Link<Route, rmmt::Balancing> to={Route::CreateRepayment { account_id: ctx.props().account_id.clone() } } query={ Some(balance.clone()) } classes="button is-primary is-hidden-desktop">
+                                                    <span class="icon">
+                                                        <i class="fas fa-credit-card" />
+                                                    </span>
                                                 </Link<Route, rmmt::Balancing>>
                                             </td>
                                         </tr>
