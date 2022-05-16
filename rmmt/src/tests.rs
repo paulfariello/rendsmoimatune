@@ -247,3 +247,31 @@ fn multi_balancing() {
         vec![("user2", "user1", 50), ("user3", "user1", 50)],
     );
 }
+
+#[test]
+fn balance_is_stable() {
+    // Given
+    let users = vec![user("alice"), user("bob"), user("charlie"), user("daniel"), user("erwan")];
+    let debts = vec![
+        expenditure("alice", 215, vec![("alice", 1), ("bob", 1), ("charlie", 1), ("daniel", 1), ("erwan", 1)]),
+        expenditure("bob", 215, vec![("alice", 1), ("bob", 1), ("charlie", 1), ("daniel", 1), ("erwan", 1)]),
+    ];
+    let repayments = vec![];
+    let (mut balances, _remaining) = Balance::get_user_balances(users.clone(), debts.clone(), repayments);
+    let (balancing, _) = Balance::get_balancing(&mut balances);
+    assert_balancing(
+        balancing,
+        vec![("charlie", "bob", 86), ("daniel", "alice", 86), ("erwan", "alice", 43), ("erwan", "bob", 43)],
+    );
+
+    // When
+    let repayments = vec![repayment("daniel", "alice", 86)];
+    let (mut balances, _remaining) = Balance::get_user_balances(users, debts, repayments);
+    let (balancing, _) = Balance::get_balancing(&mut balances);
+
+    // Then
+    assert_balancing(
+        balancing,
+        vec![("charlie", "bob", 86), ("erwan", "alice", 43), ("erwan", "bob", 43)],
+    );
+}
