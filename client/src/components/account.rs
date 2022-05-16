@@ -116,21 +116,19 @@ impl Component for Account {
                 <div class="column">
                     <Link<Route> to={Route::Account { account_id: ctx.props().id.clone() }}>
                         <h2 class="title is-1">
-                            <span class="icon-text">
-                                <span class="icon">
-                                    <i class="fas fa-bank"/>
-                                </span>
-                                <span>
-                                {
-                                    match &self.account {
-                                        Some(account) => {
-                                            let account = &*account.borrow();
-                                            account.name.clone()
-                                        }
-                                        None => "Loading...".to_string(),
+                            <span class="icon">
+                                <i class="fas fa-bank"/>
+                            </span>
+                            <span>
+                            {
+                                match &self.account {
+                                    Some(account) => {
+                                        let account = &*account.borrow();
+                                        account.name.clone()
                                     }
+                                    None => "Loading...".to_string(),
                                 }
-                                </span>
+                            }
                             </span>
                         </h2>
                     </Link<Route>>
@@ -140,10 +138,8 @@ impl Component for Account {
                 <div class="tile is-parent">
                     <div class="tile is-child box">
                         <h3 class="subtitle is-3">
-                            <span class="icon-text">
-                                <span class="icon"><i class="fas fa-balance-scale"></i></span>
-                                <span>{ "Balance" }</span>
-                            </span>
+                            <span class="icon"><i class="fas fa-balance-scale"></i></span>
+                            <span>{ "Balance" }</span>
                         </h3>
                         if let (Some(users), Some(balance)) = (self.users.clone(), self.balance.clone()) {
                             <BalanceList { users } { balance } loading={ self.fetching_balance } />
@@ -157,10 +153,8 @@ impl Component for Account {
                 <div class="tile is-parent">
                     <div class="tile is-child box">
                         <h3 class="subtitle is-3">
-                            <span class="icon-text">
-                                <span class="icon"><i class="fas fa-exchange"></i></span>
-                                <span>{ "Équilibrage" }</span>
-                            </span>
+                            <span class="icon"><i class="fas fa-exchange"></i></span>
+                            <span>{ "Équilibrage" }</span>
                         </h3>
                         if let (Some(users), Some(balance)) = (self.users.clone(), self.balance.clone()) {
                             <BalancingList account_id={ ctx.props().id.clone() } { users } { balance } loading={ self.fetching_balance } />
@@ -176,10 +170,8 @@ impl Component for Account {
                     <div class="tile is-child box">
                         <Link<Route> to={Route::Expenditures { account_id: ctx.props().id.clone() }}>
                             <h3 class="subtitle is-3">
-                                <span class="icon-text">
-                                    <span class="icon"><i class="fas fa-credit-card"></i></span>
-                                    <span>{ "Dépenses" }</span>
-                                </span>
+                                <span class="icon"><i class="fas fa-credit-card"></i></span>
+                                <span>{ "Dépenses" }</span>
                             </h3>
                         </Link<Route>>
                         if let (Some(users), Some(expenditures)) = (self.users.clone(), self.expenditures.clone()) {
@@ -196,10 +188,8 @@ impl Component for Account {
                     <div class="tile is-child box">
                         <Link<Route> to={Route::Repayments { account_id: ctx.props().id.clone() }}>
                             <h3 class="subtitle is-3">
-                                <span class="icon-text">
-                                    <span class="icon"><i class="fas fa-exchange"></i></span>
-                                    <span>{ "Remboursements" }</span>
-                                </span>
+                                <span class="icon"><i class="fas fa-exchange"></i></span>
+                                <span>{ "Remboursements" }</span>
                             </h3>
                         </Link<Route>>
                         if let (Some(users), Some(repayments)) = (self.users.clone(), self.repayments.clone()) {
@@ -348,21 +338,19 @@ pub fn account_title(AccountTitleProps { id, account }: &AccountTitleProps) -> H
     html! {
         <Link<Route> to={Route::Account { account_id: id.clone() }}>
             <h2 class="title is-1">
-                <span class="icon-text">
-                    <span class="icon">
-                        <i class="fas fa-bank"/>
-                    </span>
-                    <span>
-                    {
-                        match account {
-                            Some(account) => {
-                                let account = &*account.borrow();
-                                account.name.clone()
-                            }
-                            None => "Loading...".to_string(),
+                <span class="icon">
+                    <i class="fas fa-bank"/>
+                </span>
+                <span>
+                {
+                    match account {
+                        Some(account) => {
+                            let account = &*account.borrow();
+                            account.name.clone()
                         }
+                        None => "Loading...".to_string(),
                     }
-                    </span>
+                }
                 </span>
             </h2>
         </Link<Route>>

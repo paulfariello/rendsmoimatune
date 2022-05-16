@@ -17,93 +17,93 @@ $fa-font-path: "webfonts";
 @import "bulma/bulma";
 
 @font-face {
-	font-family: alfphabet;
-	src: url(fonts/Alfphabet-IV.ttf);
+  font-family: alfphabet;
+  src: url(fonts/Alfphabet-IV.ttf);
 }
 
 .navbar {
-	background-color: $rmmt-blue;
+  background-color: $rmmt-blue;
 
 }
 
 .navbar-brand {
-	.navbar-item {
-		font-family: alfphabet;
-		font-size: 1rem;
-		margin: 0;
-		color: $rmmt-white;
-		text-transform: uppercase;
-		small {
-			color: $rmmt-red;
-		}
-	}
+  .navbar-item {
+    font-family: alfphabet;
+    font-size: 1rem;
+    margin: 0;
+    color: $rmmt-white;
+    text-transform: uppercase;
+    small {
+      color: $rmmt-red;
+    }
+  }
 }
 
 .title {
-	margin-top: 1em;
-	color: $rmmt-blue;
+  margin-top: 1em;
+  color: $rmmt-blue;
 }
 
 .subtitle {
-	color: $rmmt-blue;
-	a {
-		color: $rmmt-blue;
-	}
+  color: $rmmt-blue;
+  a {
+    color: $rmmt-blue;
+  }
 }
 
 .progress-wrapper {
-	position: relative;
+  position: relative;
 
-	.progress-value {
-		position: absolute;
-		top: 0;
-		left: 50%;
-		transform: translateX(-50%);
-		font-size: calc($size-normal / 1.5);
-		line-height: $size-normal;
-		font-weight: bold;
-	}
+  .progress-value {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: calc($size-normal / 1.5);
+    line-height: $size-normal;
+    font-weight: bold;
+  }
 
-	.progress {
-		margin: 0;
-	}
+  .progress {
+    margin: 0;
+  }
 
-	.progress.is-small+.progress-value {
-		font-size: calc($size-small / 1.5);
-		line-height: $size-small;
-	}
+  .progress.is-small+.progress-value {
+    font-size: calc($size-small / 1.5);
+    line-height: $size-small;
+  }
 
-	.progress.is-medium+.progress-value {
-		font-size: calc($size-medium / 1.5);
-		line-height: $size-medium;
-	}
+  .progress.is-medium+.progress-value {
+    font-size: calc($size-medium / 1.5);
+    line-height: $size-medium;
+  }
 
-	.progress.is-large+.progress-value {
-		font-size: calc($size-large / 1.5);
-		line-height: $size-large;
-	}
+  .progress.is-large+.progress-value {
+    font-size: calc($size-large / 1.5);
+    line-height: $size-large;
+  }
 
-	.progress.is-revert {
-		transform: scaleX(-1);
-	}
+  .progress.is-revert {
+    transform: scaleX(-1);
+  }
 }
 
 .cover {
-	width: 100%;
-	margin: 0;
-	padding: 10em 0;
-	background: url(img/7153621661_2c0e057402_o_blurred.jpg) no-repeat 50% fixed;
-	background-size: auto;
-	background-size: cover;
-	color: #fff;
+  width: 100%;
+  margin: 0;
+  padding: 10em 0;
+  background: url(img/7153621661_2c0e057402_o_blurred.jpg) no-repeat 50% fixed;
+  background-size: auto;
+  background-size: cover;
+  color: #fff;
 
-	section {
-		background: rgba(27,27,27,.75) none repeat scroll 0 0;
-	}
+  section {
+    background: rgba(27,27,27,.75) none repeat scroll 0 0;
+  }
 
-	h3 {
-		color: $rmmt-white;
-	}
+  h3 {
+    color: $rmmt-white;
+  }
 }
 
 .loading {
@@ -247,6 +247,39 @@ label.is-checkbox {
     }
     &:first-child:last-child {
       margin-left:calc(-0.575em - #{$button-border-width});
+    }
+  }
+}
+
+// Fix bulma icon on title
+.title {
+  @each $size in $sizes {
+    $i: index($sizes, $size);
+    &.is-#{$i} {
+      .icon {
+        line-height: inherit;
+        height: $size;
+        width: $size;
+        &:not(:last-child) {
+          margin-right: 0.5em;
+        }
+      }
+    }
+  }
+}
+
+.subtitle {
+  @each $size in $sizes {
+    $i: index($sizes, $size);
+    &.is-#{$i} {
+      .icon {
+        line-height: inherit;
+        height: $size;
+        width: $size;
+        &:not(:last-child) {
+          margin-right: 0.5em;
+        }
+      }
     }
   }
 }
