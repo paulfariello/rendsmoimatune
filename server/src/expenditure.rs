@@ -71,8 +71,8 @@ pub(crate) async fn put_expenditure(
             .run(move |c| {
                 c.transaction::<(Expenditure, Vec<Debt>), diesel::result::Error, _>(|| {
                     let expenditure: Expenditure =
-                        diesel::update(rmmt::expenditures::dsl::expenditures)
-                            .set(expenditure)
+                        diesel::update(&expenditure)
+                            .set(&expenditure)
                             .get_result(c)?;
 
                     diesel::delete(

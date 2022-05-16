@@ -44,10 +44,11 @@ pub(crate) async fn put_repayment(
     if account_id != repayment.account_id || repayment_id != repayment.id {
         Err(Error::IdError)
     } else {
+        let repayment = repayment.into_inner();
         let repayment: Repayment = conn
             .run(move |c| {
-                diesel::update(rmmt::repayments::dsl::repayments)
-                    .set(repayment.into_inner())
+                diesel::update(&repayment)
+                    .set(&repayment)
                     .get_result(c)
             })
             .await?;
