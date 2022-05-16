@@ -558,11 +558,14 @@ impl Component for EditExpenditure {
                                     </p>
                                 </div>
 
-                                {
-                                    (&*users.borrow()).iter().map(|(id, user)| html! {
-                                        <DebtorInput name={ user.name.clone() } state_ref={ self.debtors_checkbox.get(&id).clone().unwrap() } share_ref={ self.debtors_input_share.get(&id).clone().unwrap() } debt={ self.debts.as_ref().and_then(|d| d.get(&id).cloned()) }/>
-                                    }).collect::<Html>()
-                                }
+                                <div class="field">
+                                    <label class="label">{ "Bénéficiaires" }</label>
+                                    {
+                                        (&*users.borrow()).iter().map(|(id, user)| html! {
+                                            <DebtorInput name={ user.name.clone() } state_ref={ self.debtors_checkbox.get(&id).clone().unwrap() } share_ref={ self.debtors_input_share.get(&id).clone().unwrap() } debt={ self.debts.as_ref().and_then(|d| d.get(&id).cloned()) }/>
+                                        }).collect::<Html>()
+                                    }
+                                </div>
                                 <div class="control">
                                     <button type="submit" class={classes!("button", "is-primary", self.creating.then(|| "is-loading"))}>
                                         if ctx.props().expenditure_id.is_some() {
