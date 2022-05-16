@@ -124,14 +124,22 @@ pub struct ExpendituresListProps {
     pub loading: bool,
 }
 
-pub struct ExpendituresList;
+pub struct ExpendituresList {
+    sorted: Vec<Uuid>,
+}
 
 impl Component for ExpendituresList {
     type Message = ();
     type Properties = ExpendituresListProps;
 
-    fn create(_ctx: &Context<Self>) -> Self {
-        Self {}
+    fn create(ctx: &Context<Self>) -> Self {
+        let expenditures = ctx.props().expenditures.borrow();
+        let mut sorted = expenditures.keys().cloned().collect::<Vec<_>>();
+        sorted.sort_by(|a, b| expenditures.get(b).unwrap().0.date.partial_cmp(&expenditures.get(a).unwrap().0.date).unwrap());
+
+        Self {
+            sorted,
+        }
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
@@ -147,10 +155,8 @@ impl Component for ExpendituresList {
                 }
                 {
                     if len > 0 {
-                        let map = |(_, (expenditure, debts)): (
-                            &Uuid,
-                            &(rmmt::Expenditure, HashMap<Uuid, rmmt::Debt>),
-                        )| {
+                        let map = |id: &Uuid| {
+                            let (expenditure, debts) = expenditures.get(id).unwrap();
                             html! {
                                 <tr key={ expenditure.id.to_string() }>
                                     <td class="is-vcentered is-hidden-touch">{ &expenditure.date }</td>
@@ -184,8 +190,8 @@ impl Component for ExpendituresList {
                             <tbody>
                             {
                                 match ctx.props().limit {
-                                    None => expenditures.iter().map(map).collect::<Html>(),
-                                    Some(limit) => expenditures.iter().take(limit).map(map).collect::<Html>(),
+                                    None => self.sorted.iter().map(map).collect::<Html>(),
+                                    Some(limit) => self.sorted.iter().take(limit).map(map).collect::<Html>(),
                                 }
                             }
                             </tbody>
