@@ -76,21 +76,19 @@ impl Component for Expenditures {
                 <div class="column">
                     <Link<Route> to={Route::Account { account_id: ctx.props().account_id.clone() }}>
                         <h2 class="title is-1">
-                            <span class="icon-text">
-                                <span class="icon">
-                                    <i class="fas fa-bank"/>
-                                </span>
-                                <span>
-                                {
-                                    match &self.account {
-                                        Some(account) => {
-                                            let account = &*account.borrow();
-                                            account.name.clone()
-                                        }
-                                        None => "Loading...".to_string(),
+                            <span class="icon">
+                                <i class="fas fa-bank"/>
+                            </span>
+                            <span>
+                            {
+                                match &self.account {
+                                    Some(account) => {
+                                        let account = &*account.borrow();
+                                        account.name.clone()
                                     }
+                                    None => "Loading...".to_string(),
                                 }
-                                </span>
+                            }
                             </span>
                         </h2>
                     </Link<Route>>
