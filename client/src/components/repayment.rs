@@ -136,64 +136,79 @@ impl Component for RepaymentsList {
         let repayments = &*ctx.props().repayments.borrow();
         let len = repayments.len();
 
-        if len > 0 {
-            let map = |(_, repayment): (&Uuid, &rmmt::Repayment)| {
-                html! {
-                    <tr>
-                        <td class="is-vcentered">{ &repayment.date }</td>
-                        <td class="is-vcentered"><UserName users={ ctx.props().users.clone() } id={ repayment.payer_id } /></td>
-                        <td class="is-vcentered">{ "a remboursé" }</td>
-                        <td class="is-vcentered"><Amount amount={ repayment.amount as i64 } /></td>
-                        <td class="is-vcentered">{ "à" }</td>
-                        <td class="is-vcentered"><UserName users={ ctx.props().users.clone() } id={ repayment.beneficiary_id } /></td>
-                        <td class="is-vcentered">
-                            <Link<Route> to={Route::EditRepayment { account_id: ctx.props().account_id.clone(), repayment_id: { repayment.id } }}>
-                                <a aria-label="Éditer" class="button is-primary" href="">
-                                    <i class="fas fa-pencil"></i>
-                                </a>
-                            </Link<Route>>
-                            <DeleteRepayment account_id={ repayment.account_id.clone() } id={ repayment.id.clone() } />
-                        </td>
-                    </tr>
+        html! {
+            <div class="is-relative block">
+                if ctx.props().loading {
+                    <div class="loading-overlay">
+                        <Loading />
+                    </div>
                 }
-            };
-            html! {
-                <div class="is-relative block">
-                    if ctx.props().loading {
-                        <div class="loading-overlay">
-                            <Loading />
-                        </div>
-                    }
-                    <table class="table is-fullwidth is-striped is-hoverable">
-                        <thead>
-                            <tr>
-                                <th>{ "Date" }</th>
-                                <th>{ "Payeur" }</th>
-                                <th></th>
-                                <th>{ "Montant" }</th>
-                                <th></th>
-                                <th>{ "Beneficiaire" }</th>
-                                <th>{ "Actions" }</th>
-                            </tr>
-                        </thead>
-                    <tbody>
-                    {
-                        match ctx.props().limit {
-                            Some(limit) => repayments.iter().take(limit).map(map).collect::<Html>(),
-                            None => repayments.iter().map(map).collect::<Html>(),
+                {
+                    if len > 0 {
+                        let map = |(_, repayment): (&Uuid, &rmmt::Repayment)| {
+                            html! {
+                                <tr>
+                                    <td class="is-vcentered is-hidden-touch">{ &repayment.date }</td>
+                                    <td class="is-vcentered"><UserName users={ ctx.props().users.clone() } id={ repayment.payer_id } /></td>
+                                    <td class="is-vcentered is-hidden-touch">{ "a remboursé" }</td>
+                                    <td class="is-vcentered"><Amount amount={ repayment.amount as i64 } /></td>
+                                    <td class="is-vcentered is-hidden-touch">{ "à" }</td>
+                                    <td class="is-vcentered"><UserName users={ ctx.props().users.clone() } id={ repayment.beneficiary_id } /></td>
+                                    <td class="is-vcentered">
+                                        <Link<Route> to={Route::EditRepayment { account_id: ctx.props().account_id.clone(), repayment_id: { repayment.id } }}>
+                                            <a aria-label="Éditer" class="button is-primary" href="">
+                                                <i class="fas fa-pencil"></i>
+                                            </a>
+                                        </Link<Route>>
+                                        <DeleteRepayment account_id={ repayment.account_id.clone() } id={ repayment.id.clone() } />
+                                    </td>
+                                </tr>
+                            }
+                        };
+                        html! {
+                            <table class="table is-fullwidth is-striped is-hoverable">
+                                <thead>
+                                    <tr>
+                                        <th class="is-hidden-touch">{ "Date" }</th>
+                                        <th>{ "Payeur" }</th>
+                                        <th class="is-hidden-touch"></th>
+                                        <th>{ "Montant" }</th>
+                                        <th class="is-hidden-touch"></th>
+                                        <th>{ "Beneficiaire" }</th>
+                                        <th>{ "Actions" }</th>
+                                    </tr>
+                                </thead>
+                            <tbody>
+                            {
+                                match ctx.props().limit {
+                                    Some(limit) => repayments.iter().take(limit).map(map).collect::<Html>(),
+                                    None => repayments.iter().map(map).collect::<Html>(),
+                                }
+                            }
+                            </tbody>
+                            </table>
                         }
+                    } else {
+                        html! {}
                     }
-                    </tbody>
-                    </table>
+                }
+
+                <div class="buttons">
                     if let Some(limit) = ctx.props().limit {
                         if len > limit {
-                            <a href="">{ format!("Et {} autres…", len - limit) }</a>
+                            <Link<Route> to={Route::Repayments { account_id: ctx.props().account_id.clone() }} classes="button is-light">
+                                { format!("Voir les {} autres", len - limit) }
+                            </Link<Route>>
                         }
                     }
+                    <Link<Route> to={Route::CreateRepayment { account_id: ctx.props().account_id.clone() }} classes="button is-primary">
+                        <span class="icon">
+                            <i class="fas fa-plus-circle" />
+                        </span>
+                        <span>{ "Nouveau remboursement" }</span>
+                    </Link<Route>>
                 </div>
-            }
-        } else {
-            html! {}
+            </div>
         }
     }
 }

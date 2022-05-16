@@ -129,26 +129,34 @@ impl Component for BalancingList {
                     </div>
                 } else {
                     <table class="table is-fullwidth is-striped is-hoverable">
+                        <thead>
+                            <tr>
+                                <th>{ "Payeur" }</th>
+                                <th class="is-hidden-touch"></th>
+                                <th>{ "Montant" }</th>
+                                <th class="is-hidden-touch"></th>
+                                <th>{ "Beneficiaire" }</th>
+                                <th>{ "Actions" }</th>
+                            </tr>
+                        </thead>
                         <tbody>
                             {
                                 balance.balancing.iter().map(|balance| {
                                     html! {
                                         <tr>
                                             <td class="is-vcentered has-text-centered"><UserName users={ users.clone() } id={ balance.payer_id }/></td>
-                                            <td class="is-vcentered has-text-centered">{ "doit" }</td>
+                                            <td class="is-vcentered has-text-centered is-hidden-touch">{ "doit" }</td>
                                             <td class="is-vcentered">
                                                 <Amount amount={ balance.amount } />
                                             </td>
-                                            <td class="is-vcentered has-text-centered">{ "à" }</td>
+                                            <td class="is-vcentered has-text-centered is-hidden-touch">{ "à" }</td>
                                             <td class="is-vcentered has-text-centered"><UserName users={ users.clone() } id={ balance.beneficiary_id }/></td>
                                             <td>
-                                                <Link<Route, rmmt::Balancing> to={Route::CreateRepayment { account_id: ctx.props().account_id.clone() } } query={ Some(balance.clone()) }>
-                                                    <button class="button is-primary">
-                                                        <span class="icon">
-                                                            <i class="fas fa-credit-card" />
-                                                        </span>
-                                                        <span>{ "Rembourser" }</span>
-                                                    </button>
+                                                <Link<Route, rmmt::Balancing> to={Route::CreateRepayment { account_id: ctx.props().account_id.clone() } } query={ Some(balance.clone()) } classes="button is-primary">
+                                                    <span class="icon">
+                                                        <i class="fas fa-credit-card" />
+                                                    </span>
+                                                    <span>{ "Rembourser" }</span>
                                                 </Link<Route, rmmt::Balancing>>
                                             </td>
                                         </tr>

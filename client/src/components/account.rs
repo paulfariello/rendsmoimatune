@@ -187,14 +187,6 @@ impl Component for Account {
                         } else {
                             <Loading />
                         }
-                        <Link<Route> to={Route::CreateExpenditure { account_id: ctx.props().id.clone() }}>
-                            <a class="button is-primary" href="">
-                                <span class="icon">
-                                    <i class="fas fa-plus-circle" />
-                                </span>
-                                <span>{ "Nouvelle dépense" }</span>
-                            </a>
-                        </Link<Route>>
                     </div>
                 </div>
             </div>
@@ -215,14 +207,6 @@ impl Component for Account {
                         } else {
                             <Loading />
                         }
-                        <Link<Route> to={Route::CreateRepayment { account_id: ctx.props().id.clone() }}>
-                            <a class="button is-primary" href="">
-                                <span class="icon">
-                                    <i class="fas fa-plus-circle" />
-                                </span>
-                                <span>{ "Nouveau remboursement" }</span>
-                            </a>
-                        </Link<Route>>
                     </div>
                 </div>
             </div>

@@ -138,67 +138,79 @@ impl Component for ExpendituresList {
         let expenditures = &*ctx.props().expenditures.borrow();
         let len = expenditures.len();
 
-        if len > 0 {
-            let map = |(_, (expenditure, debts)): (
-                &Uuid,
-                &(rmmt::Expenditure, HashMap<Uuid, rmmt::Debt>),
-            )| {
-                html! {
-                    <tr key={ expenditure.id.to_string() }>
-                        <td class="is-vcentered">{ &expenditure.date }</td>
-                        <td class="is-vcentered">{ &expenditure.name }</td>
-                        <td class="is-vcentered"><Amount amount={ expenditure.amount as i64} /></td>
-                        <td class="is-vcentered"><UserName users={ ctx.props().users.clone() } id={ expenditure.payer_id }/></td>
-                        <td class="is-vcentered">
-                            <Debtors debts={ debts.clone() } users={ ctx.props().users.clone() } />
-                        </td>
-                        <td class="is-vcentered">
-                            <Link<Route> to={Route::EditExpenditure { account_id: ctx.props().account_id.clone(), expenditure_id: { expenditure.id } }}>
-                                <a aria-label="Éditer" class="button is-primary" href="">
-                                    <i class="fas fa-pencil"></i>
-                                </a>
-                            </Link<Route>>
-                            <DeleteExpenditure account_id={ expenditure.account_id.clone() } id={ expenditure.id.clone() } />
-                        </td>
-                        </tr>
+        html! {
+            <div class="is-relative block">
+                if ctx.props().loading {
+                    <div class="loading-overlay">
+                        <Loading />
+                    </div>
                 }
-            };
-            html! {
-                <div class="is-relative block">
-                    if ctx.props().loading {
-                        <div class="loading-overlay">
-                            <Loading />
-                        </div>
-                    }
-                    <table class="table is-fullwidth is-striped is-hoverable">
-                        <thead>
-                            <tr>
-                                <th>{ "Date" }</th>
-                                <th>{ "Nom" }</th>
-                                <th>{ "Montant" }</th>
-                                <th>{ "Payeur" }</th>
-                                <th>{ "Participants" }</th>
-                                <th>{ "Actions" }</th>
-                            </tr>
-                        </thead>
-                    <tbody>
-                    {
-                        match ctx.props().limit {
-                            None => expenditures.iter().map(map).collect::<Html>(),
-                            Some(limit) => expenditures.iter().take(limit).map(map).collect::<Html>(),
+                {
+                    if len > 0 {
+                        let map = |(_, (expenditure, debts)): (
+                            &Uuid,
+                            &(rmmt::Expenditure, HashMap<Uuid, rmmt::Debt>),
+                        )| {
+                            html! {
+                                <tr key={ expenditure.id.to_string() }>
+                                    <td class="is-vcentered is-hidden-touch">{ &expenditure.date }</td>
+                                    <td class="is-vcentered">{ &expenditure.name }</td>
+                                    <td class="is-vcentered"><Amount amount={ expenditure.amount as i64} /></td>
+                                    <td class="is-vcentered is-hidden-touch"><UserName users={ ctx.props().users.clone() } id={ expenditure.payer_id }/></td>
+                                    <td class="is-vcentered is-hidden-touch">
+                                        <Debtors debts={ debts.clone() } users={ ctx.props().users.clone() } />
+                                    </td>
+                                    <td class="is-vcentered">
+                                        <Link<Route> to={Route::EditExpenditure { account_id: ctx.props().account_id.clone(), expenditure_id: { expenditure.id } }} classes="button is-primary">
+                                            <i class="fas fa-pencil"></i>
+                                        </Link<Route>>
+                                        <DeleteExpenditure account_id={ expenditure.account_id.clone() } id={ expenditure.id.clone() } />
+                                    </td>
+                                </tr>
+                            }
+                        };
+                        html! {
+                            <table class="table is-fullwidth is-striped is-hoverable">
+                                <thead>
+                                    <tr>
+                                        <th class="is-hidden-touch">{ "Date" }</th>
+                                        <th>{ "Nom" }</th>
+                                        <th>{ "Montant" }</th>
+                                        <th class="is-hidden-touch">{ "Payeur" }</th>
+                                        <th class="is-hidden-touch">{ "Participants" }</th>
+                                        <th>{ "Actions" }</th>
+                                    </tr>
+                                </thead>
+                            <tbody>
+                            {
+                                match ctx.props().limit {
+                                    None => expenditures.iter().map(map).collect::<Html>(),
+                                    Some(limit) => expenditures.iter().take(limit).map(map).collect::<Html>(),
+                                }
+                            }
+                            </tbody>
+                            </table>
                         }
+                    } else {
+                        html! {}
                     }
-                    </tbody>
-                    </table>
+                }
+                <div class="buttons">
                     if let Some(limit) = ctx.props().limit {
                         if len > limit {
-                            <a href="">{ format!("Et {} autres…", len - limit) }</a>
+                            <Link<Route> to={ Route::Expenditures { account_id: ctx.props().account_id.clone() } } classes="button is-light">
+                                { format!("Voir les {} autres", len - limit) }
+                            </Link<Route>>
                         }
                     }
+                    <Link<Route> to={Route::CreateExpenditure { account_id: ctx.props().account_id.clone() }} classes="button is-primary">
+                        <span class="icon">
+                            <i class="fas fa-plus-circle" />
+                        </span>
+                        <span>{ "Nouvelle dépense" }</span>
+                    </Link<Route>>
                 </div>
-            }
-        } else {
-            html! {}
+            </div>
         }
     }
 }
