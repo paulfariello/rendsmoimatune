@@ -137,7 +137,7 @@ impl Component for Account {
                 </div>
             </div>
             <div class="tile is-ancestor">
-                <div class="tile is-parent is-6">
+                <div class="tile is-parent">
                     <div class="tile is-child box">
                         <h3 class="subtitle is-3">
                             <span class="icon-text">
@@ -154,7 +154,7 @@ impl Component for Account {
                     </div>
                 </div>
 
-                <div class="tile is-parent is-6">
+                <div class="tile is-parent">
                     <div class="tile is-child box">
                         <h3 class="subtitle is-3">
                             <span class="icon-text">
