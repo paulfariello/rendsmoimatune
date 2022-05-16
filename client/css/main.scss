@@ -22,6 +22,11 @@ $fa-font-path: "webfonts";
   src: url(fonts/Alfphabet-IV.ttf);
 }
 
+@font-face {
+  font-family: Roboto;
+  src: url(fonts/Roboto-Regular.ttf);
+}
+
 .container {
   padding-left: $tile-spacing;
   padding-right: $tile-spacing;
