@@ -190,8 +190,8 @@ impl Component for ExpendituresList {
                             <tbody>
                             {
                                 match ctx.props().limit {
-                                    None => self.sorted.iter().map(map).collect::<Html>(),
                                     Some(limit) => self.sorted.iter().take(limit).map(map).collect::<Html>(),
+                                    None => self.sorted.iter().map(map).collect::<Html>(),
                                 }
                             }
                             </tbody>

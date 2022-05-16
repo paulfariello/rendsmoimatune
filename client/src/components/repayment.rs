@@ -122,14 +122,22 @@ pub struct RepaymentsListProps {
     pub loading: bool,
 }
 
-pub struct RepaymentsList;
+pub struct RepaymentsList {
+    sorted: Vec<Uuid>,
+}
 
 impl Component for RepaymentsList {
     type Message = ();
     type Properties = RepaymentsListProps;
 
-    fn create(_ctx: &Context<Self>) -> Self {
-        Self {}
+    fn create(ctx: &Context<Self>) -> Self {
+        let repayments = ctx.props().repayments.borrow();
+        let mut sorted = repayments.keys().cloned().collect::<Vec<_>>();
+        sorted.sort_by(|a, b| repayments.get(b).unwrap().date.partial_cmp(&repayments.get(a).unwrap().date).unwrap());
+
+        Self {
+            sorted
+        }
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
@@ -145,7 +153,8 @@ impl Component for RepaymentsList {
                 }
                 {
                     if len > 0 {
-                        let map = |(_, repayment): (&Uuid, &rmmt::Repayment)| {
+                        let map = |id: &Uuid| {
+                            let repayment = repayments.get(id).unwrap();
                             html! {
                                 <tr>
                                     <td class="is-vcentered is-hidden-touch">{ &repayment.date }</td>
@@ -181,8 +190,8 @@ impl Component for RepaymentsList {
                             <tbody>
                             {
                                 match ctx.props().limit {
-                                    Some(limit) => repayments.iter().take(limit).map(map).collect::<Html>(),
-                                    None => repayments.iter().map(map).collect::<Html>(),
+                                    Some(limit) => self.sorted.iter().take(limit).map(map).collect::<Html>(),
+                                    None => self.sorted.iter().map(map).collect::<Html>(),
                                 }
                             }
                             </tbody>
