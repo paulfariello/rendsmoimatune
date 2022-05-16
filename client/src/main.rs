@@ -97,12 +97,12 @@ fn switch(routes: &Route) -> Html {
 #[function_component(App)]
 fn app() -> Html {
     html! {
-        <body>
+        <>
             <TopBar/>
             <BrowserRouter>
                 <Switch<Route> render={Switch::render(switch)} />
             </BrowserRouter>
-        </body>
+        </>
     }
 }
 
