@@ -135,11 +135,17 @@ impl Component for ExpendituresList {
     fn create(ctx: &Context<Self>) -> Self {
         let expenditures = ctx.props().expenditures.borrow();
         let mut sorted = expenditures.keys().cloned().collect::<Vec<_>>();
-        sorted.sort_by(|a, b| expenditures.get(b).unwrap().0.date.partial_cmp(&expenditures.get(a).unwrap().0.date).unwrap());
+        sorted.sort_by(|a, b| {
+            expenditures
+                .get(b)
+                .unwrap()
+                .0
+                .date
+                .partial_cmp(&expenditures.get(a).unwrap().0.date)
+                .unwrap()
+        });
 
-        Self {
-            sorted,
-        }
+        Self { sorted }
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {

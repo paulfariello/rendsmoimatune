@@ -3,15 +3,15 @@ use std::collections::HashMap;
 use std::rc::Rc;
 
 use gloo_net::http::Request;
+use lazy_static::lazy_static;
 #[allow(unused_imports)]
 use log::{debug, error, info, warn};
+use regex::Regex;
 use rmmt;
 use uuid::Uuid;
 use yew::prelude::*;
 use yew_agent::{Bridge, Bridged};
 use yew_router::prelude::*;
-use lazy_static::lazy_static;
-use regex::Regex;
 
 use crate::agent::{AccountAgent, AccountMsg};
 use crate::components::{

@@ -90,7 +90,7 @@ fn switch(routes: &Route) -> Html {
             <div class="container">
                 <h1 class="title is-1">{ "Oups… Cette page n'existe pas" }</h1>
             </div>
-        }
+        },
     }
 }
 

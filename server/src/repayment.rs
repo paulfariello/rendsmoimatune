@@ -46,11 +46,7 @@ pub(crate) async fn put_repayment(
     } else {
         let repayment = repayment.into_inner();
         let repayment: Repayment = conn
-            .run(move |c| {
-                diesel::update(&repayment)
-                    .set(&repayment)
-                    .get_result(c)
-            })
+            .run(move |c| diesel::update(&repayment).set(&repayment).get_result(c))
             .await?;
         Ok(Json(repayment))
     }

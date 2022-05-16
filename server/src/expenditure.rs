@@ -70,10 +70,9 @@ pub(crate) async fn put_expenditure(
         let (expenditure, new_debts): (Expenditure, Vec<Debt>) = conn
             .run(move |c| {
                 c.transaction::<(Expenditure, Vec<Debt>), diesel::result::Error, _>(|| {
-                    let expenditure: Expenditure =
-                        diesel::update(&expenditure)
-                            .set(&expenditure)
-                            .get_result(c)?;
+                    let expenditure: Expenditure = diesel::update(&expenditure)
+                        .set(&expenditure)
+                        .get_result(c)?;
 
                     diesel::delete(
                         rmmt::debts::dsl::debts

@@ -133,11 +133,16 @@ impl Component for RepaymentsList {
     fn create(ctx: &Context<Self>) -> Self {
         let repayments = ctx.props().repayments.borrow();
         let mut sorted = repayments.keys().cloned().collect::<Vec<_>>();
-        sorted.sort_by(|a, b| repayments.get(b).unwrap().date.partial_cmp(&repayments.get(a).unwrap().date).unwrap());
+        sorted.sort_by(|a, b| {
+            repayments
+                .get(b)
+                .unwrap()
+                .date
+                .partial_cmp(&repayments.get(a).unwrap().date)
+                .unwrap()
+        });
 
-        Self {
-            sorted
-        }
+        Self { sorted }
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
