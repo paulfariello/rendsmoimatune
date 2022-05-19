@@ -25,6 +25,8 @@ pub struct UsernameProps {
     pub account_id: String,
     pub users: Rc<RefCell<HashMap<Uuid, rmmt::User>>>,
     pub id: Uuid,
+    #[prop_or_else(|| "primary".to_string())]
+    pub color: String,
 }
 
 #[function_component(UserName)]
@@ -33,12 +35,14 @@ pub fn user_name(
         account_id,
         users,
         id,
+        color,
     }: &UsernameProps,
 ) -> Html {
     let users = &*users.borrow();
+    let text_color = format!("has-text-{}", color);
     if let Some(user) = users.get(&id) {
         html! {
-            <Link<Route> to={Route::User { account_id: account_id.clone(), user_id: id.clone() } } classes="has-text-primary">
+            <Link<Route> to={Route::User { account_id: account_id.clone(), user_id: id.clone() } } classes={ classes!(text_color) }>
                 { &user.name }
             </Link<Route>>
         }

@@ -179,7 +179,7 @@ impl Component for BalancingList {
                             {
                                 balance.balancing_remaining.iter().map(|balance| html!{
                                     <li>
-                                        <UserName account_id={ ctx.props().account_id.clone() } users={ users.clone() } id={ balance.user_id }/>
+                                        <UserName account_id={ ctx.props().account_id.clone() } users={ users.clone() } id={ balance.user_id } color="white" />
                                         if balance.amount > 0 {
                                             { " à perdu " }
                                         } else {
