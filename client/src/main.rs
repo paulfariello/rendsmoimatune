@@ -1,7 +1,12 @@
+extern crate wee_alloc;
+
 use uuid::Uuid;
 use wasm_logger;
 use yew::prelude::*;
 use yew_router::prelude::*;
+
+#[global_allocator]
+static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
 
 mod agent;
 mod components;
