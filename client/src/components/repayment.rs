@@ -73,16 +73,16 @@ impl Component for Repayments {
             <>
             <AccountTitle id={ ctx.props().account_id.clone() } account={ self.account.clone() } />
             <div class="box">
-                <Link<Route> to={Route::Repayments { account_id: ctx.props().account_id.clone() }}>
                 <h3 class="subtitle is-3">
-                    <span class="icon-text">
-                        <span class="icon"><i class="fas fa-exchange"></i></span>
-                        <span>{ "Remboursements" }</span>
-                    </span>
+                    <Link<Route> to={Route::Repayments { account_id: ctx.props().account_id.clone() }}>
+                        <span class="icon-text">
+                            <span class="icon"><i class="fas fa-exchange"></i></span>
+                            <span>{ "Remboursements" }</span>
+                        </span>
+                    </Link<Route>>
                 </h3>
-                </Link<Route>>
                 if let (Some(users), Some(repayments)) = (self.users.clone(), self.repayments.clone()) {
-                    <RepaymentsList account_id={ ctx.props().account_id.clone() } { repayments } { users } loading=false />
+                    <RepaymentsList account_id={ ctx.props().account_id.clone() } { repayments } { users } />
                 } else {
                     <Loading />
                 }
@@ -98,7 +98,10 @@ pub struct RepaymentsListProps {
     pub limit: Option<usize>,
     pub users: Rc<RefCell<HashMap<Uuid, rmmt::User>>>,
     pub repayments: Rc<RefCell<HashMap<Uuid, rmmt::Repayment>>>,
+    #[prop_or_default]
     pub loading: bool,
+    #[prop_or_default]
+    pub buttons: bool,
 }
 
 pub struct RepaymentsList;
@@ -178,7 +181,11 @@ impl Component for RepaymentsList {
                             </table>
                         }
                     } else {
-                        html! {}
+                        html! {
+                            <div class="notification is-info is-light">
+                                { "Aucune remboursement" }
+                            </div>
+                        }
                     }
                 }
 
@@ -190,12 +197,14 @@ impl Component for RepaymentsList {
                             </Link<Route>>
                         }
                     }
-                    <Link<Route> to={Route::CreateRepayment { account_id: ctx.props().account_id.clone() }} classes="button is-primary">
-                        <span class="icon">
-                            <i class="fas fa-plus-circle" />
-                        </span>
-                        <span>{ "Nouveau remboursement" }</span>
-                    </Link<Route>>
+                    if ctx.props().buttons {
+                        <Link<Route> to={Route::CreateRepayment { account_id: ctx.props().account_id.clone() }} classes="button is-primary">
+                            <span class="icon">
+                                <i class="fas fa-plus-circle" />
+                            </span>
+                            <span>{ "Nouveau remboursement" }</span>
+                        </Link<Route>>
+                    }
                 </div>
             </div>
         }
@@ -493,23 +502,23 @@ impl Component for EditRepayment {
             <AccountTitle id={ ctx.props().account_id.clone() } account={ self.account.clone() } />
             <div class="box">
                 if let Some(repayment_id) = ctx.props().repayment_id.clone() {
-                    <Link<Route> to={Route::EditRepayment { account_id: ctx.props().account_id.clone(), repayment_id }}>
-                        <h3 class="subtitle is-3">
+                    <h3 class="subtitle is-3">
+                        <Link<Route> to={Route::EditRepayment { account_id: ctx.props().account_id.clone(), repayment_id }}>
                             <span class="icon-text">
                                 <span class="icon"><i class="fas fa-exchange"></i></span>
                                 <span>{ "Remboursement" }</span>
                             </span>
-                        </h3>
-                    </Link<Route>>
+                        </Link<Route>>
+                    </h3>
                 } else {
-                    <Link<Route> to={Route::CreateRepayment { account_id: ctx.props().account_id.clone() }}>
-                        <h3 class="subtitle is-3">
+                    <h3 class="subtitle is-3">
+                        <Link<Route> to={Route::CreateRepayment { account_id: ctx.props().account_id.clone() }}>
                             <span class="icon-text">
                                 <span class="icon"><i class="fas fa-exchange"></i></span>
                                 <span>{ "Nouveau remboursement" }</span>
                             </span>
-                        </h3>
-                    </Link<Route>>
+                        </Link<Route>>
+                    </h3>
                 }
                 if let Some(error) = self.error.as_ref() {
                     <div class="notification is-danger">

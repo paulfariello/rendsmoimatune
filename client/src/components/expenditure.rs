@@ -75,16 +75,16 @@ impl Component for Expenditures {
             <>
             <AccountTitle id={ ctx.props().account_id.clone() } account={ self.account.clone() } />
             <div class="box">
-                <Link<Route> to={Route::Expenditures { account_id: ctx.props().account_id.clone() }}>
-                    <h3 class="subtitle is-3">
+                <h3 class="subtitle is-3">
+                    <Link<Route> to={Route::Expenditures { account_id: ctx.props().account_id.clone() }}>
                         <span class="icon-text">
                             <span class="icon"><i class="fas fa-credit-card"></i></span>
                             <span>{ "Dépenses" }</span>
                         </span>
-                    </h3>
-                </Link<Route>>
+                    </Link<Route>>
+                </h3>
                 if let (Some(users), Some(expenditures)) = (self.users.clone(), self.expenditures.clone()) {
-                    <ExpendituresList account_id={ ctx.props().account_id.clone() } { expenditures } { users } loading=false />
+                    <ExpendituresList account_id={ ctx.props().account_id.clone() } { expenditures } { users } />
                 } else {
                     <Loading />
                 }
@@ -100,7 +100,10 @@ pub struct ExpendituresListProps {
     pub expenditures: Rc<RefCell<HashMap<Uuid, (rmmt::Expenditure, HashMap<Uuid, rmmt::Debt>)>>>,
     pub users: Rc<RefCell<HashMap<Uuid, rmmt::User>>>,
     pub limit: Option<usize>,
+    #[prop_or_default]
     pub loading: bool,
+    #[prop_or_default]
+    pub buttons: bool,
 }
 
 pub struct ExpendituresList;
@@ -179,7 +182,11 @@ impl Component for ExpendituresList {
                             </table>
                         }
                     } else {
-                        html! {}
+                        html! {
+                            <div class="notification is-info is-light">
+                                { "Aucune dépense" }
+                            </div>
+                        }
                     }
                 }
                 <div class="buttons">
@@ -190,12 +197,14 @@ impl Component for ExpendituresList {
                             </Link<Route>>
                         }
                     }
-                    <Link<Route> to={Route::CreateExpenditure { account_id: ctx.props().account_id.clone() }} classes="button is-primary">
-                        <span class="icon">
-                            <i class="fas fa-plus-circle" />
-                        </span>
-                        <span>{ "Nouvelle dépense" }</span>
-                    </Link<Route>>
+                    if ctx.props().buttons {
+                        <Link<Route> to={Route::CreateExpenditure { account_id: ctx.props().account_id.clone() }} classes="button is-primary">
+                            <span class="icon">
+                                <i class="fas fa-plus-circle" />
+                            </span>
+                            <span>{ "Nouvelle dépense" }</span>
+                        </Link<Route>>
+                    }
                 </div>
             </div>
         }
@@ -480,23 +489,23 @@ impl Component for EditExpenditure {
             <AccountTitle id={ ctx.props().account_id.clone() } account={ self.account.clone() } />
             <div class="box">
                 if let Some(expenditure_id) = ctx.props().expenditure_id.clone() {
-                    <Link<Route> to={Route::EditExpenditure { account_id: ctx.props().account_id.clone(), expenditure_id }}>
-                        <h3 class="subtitle is-3">
+                    <h3 class="subtitle is-3">
+                        <Link<Route> to={Route::EditExpenditure { account_id: ctx.props().account_id.clone(), expenditure_id }}>
                             <span class="icon-text">
                                 <span class="icon"><i class="fas fa-exchange"></i></span>
                                 <span>{ "Dépense" }</span>
                             </span>
-                        </h3>
-                    </Link<Route>>
+                        </Link<Route>>
+                    </h3>
                 } else {
-                    <Link<Route> to={Route::CreateExpenditure { account_id: ctx.props().account_id.clone() }}>
-                        <h3 class="subtitle is-3">
+                    <h3 class="subtitle is-3">
+                        <Link<Route> to={Route::CreateExpenditure { account_id: ctx.props().account_id.clone() }}>
                             <span class="icon-text">
                                 <span class="icon"><i class="fas fa-exchange"></i></span>
                                 <span>{ "Nouvelle dépense" }</span>
                             </span>
-                        </h3>
-                    </Link<Route>>
+                        </Link<Route>>
+                    </h3>
                 }
                 if let Some(error) = self.error.as_ref() {
                     <div class="notification is-danger">

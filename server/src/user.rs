@@ -1,6 +1,7 @@
 use diesel::prelude::*;
 use rmmt::{self, prelude::*, NewUser, User};
 use rocket::serde::json::Json;
+use uuid::Uuid;
 
 use crate::error::Error;
 use crate::MainDbConn;
@@ -20,6 +21,25 @@ pub(crate) async fn post_user(
                     .values(user.into_inner())
                     .get_result(c)
             })
+            .await?;
+        Ok(Json(user))
+    }
+}
+
+#[put("/api/account/<account_id>/users/<user_id>", format = "json", data = "<user>")]
+pub(crate) async fn put_user(
+    conn: MainDbConn,
+    account_id: UniqId,
+    user_id: Uuid,
+    user: Json<User>,
+) -> Result<Json<User>, Error> {
+    let user = user.into_inner();
+
+    if account_id != user.account_id || user_id != user.id {
+        Err(Error::IdError)
+    } else {
+        let user: User = conn
+            .run(move |c| diesel::update(&user).set(&user).get_result(c))
             .await?;
         Ok(Json(user))
     }

@@ -42,6 +42,9 @@ $fa-font-path: "webfonts";
 .title {
   margin-top: 1em;
   color: $rmmt-blue;
+  a {
+    color: $rmmt-blue;
+  }
 }
 
 .subtitle {

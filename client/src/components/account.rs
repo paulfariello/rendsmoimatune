@@ -151,12 +151,12 @@ impl Component for Account {
             <div class="tile is-ancestor">
                 <div class="tile is-parent">
                     <div class="tile is-child box">
-                        <Link<Route> to={Route::Expenditures { account_id: ctx.props().id.clone() }}>
-                            <h3 class="subtitle is-3">
+                        <h3 class="subtitle is-3">
+                            <Link<Route> to={Route::Expenditures { account_id: ctx.props().id.clone() }}>
                                 <span class="icon"><i class="fas fa-credit-card"></i></span>
                                 <span>{ "Dépenses" }</span>
-                            </h3>
-                        </Link<Route>>
+                            </Link<Route>>
+                        </h3>
                         if let (Some(users), Some(expenditures)) = (self.users.clone(), self.expenditures.clone()) {
                             <ExpendituresList account_id={ ctx.props().id.clone() } { expenditures } { users } limit=10 loading={ self.fetching_expenditures } />
                         } else {
@@ -169,14 +169,14 @@ impl Component for Account {
             <div class="tile is-ancestor">
                 <div class="tile is-parent">
                     <div class="tile is-child box">
-                        <Link<Route> to={Route::Repayments { account_id: ctx.props().id.clone() }}>
-                            <h3 class="subtitle is-3">
+                        <h3 class="subtitle is-3">
+                            <Link<Route> to={Route::Repayments { account_id: ctx.props().id.clone() }}>
                                 <span class="icon"><i class="fas fa-exchange"></i></span>
                                 <span>{ "Remboursements" }</span>
-                            </h3>
-                        </Link<Route>>
+                            </Link<Route>>
+                        </h3>
                         if let (Some(users), Some(repayments)) = (self.users.clone(), self.repayments.clone()) {
-                            <RepaymentsList account_id={ ctx.props().id.clone() } { users } { repayments } limit=10 loading={ self.fetching_repayments } />
+                            <RepaymentsList account_id={ ctx.props().id.clone() } { users } { repayments } limit=10 loading={ self.fetching_repayments } buttons=true />
                         } else {
                             <Loading />
                         }
@@ -319,8 +319,8 @@ pub struct AccountTitleProps {
 #[function_component(AccountTitle)]
 pub fn account_title(AccountTitleProps { id, account }: &AccountTitleProps) -> Html {
     html! {
-        <Link<Route> to={Route::Account { account_id: id.clone() }}>
-            <h2 class="title is-1 mt-1 mb-4">
+        <h2 class="title is-1">
+            <Link<Route> to={Route::Account { account_id: id.clone() }}>
                 <span class="icon">
                     <i class="fas fa-bank"/>
                 </span>
@@ -335,7 +335,7 @@ pub fn account_title(AccountTitleProps { id, account }: &AccountTitleProps) -> H
                     }
                 }
                 </span>
-            </h2>
-        </Link<Route>>
+            </Link<Route>>
+        </h2>
     }
 }

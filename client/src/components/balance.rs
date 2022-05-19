@@ -125,7 +125,7 @@ impl Component for BalancingList {
                     </div>
                 }
                 if balance.balancing.is_empty() {
-                    <div class="notification is-success">
+                    <div class="notification is-success is-light">
                         { "Bien joué, personne de doit rien à personne." }
                     </div>
                 } else {

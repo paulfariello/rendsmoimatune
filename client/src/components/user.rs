@@ -161,8 +161,14 @@ pub struct UserProps {
     pub user_id: Uuid,
 }
 
+pub enum UserMsg {
+    AccountMsg(AccountMsg),
+    Edit,
+    Edited { user: rmmt::User },
+}
+
 pub struct User {
-    _agent: Box<dyn Bridge<AccountAgent>>,
+    agent: Box<dyn Bridge<AccountAgent>>,
     account: Option<Rc<RefCell<rmmt::Account>>>,
     expenditures:
         Option<Rc<RefCell<HashMap<Uuid, (rmmt::Expenditure, HashMap<Uuid, rmmt::Debt>)>>>>,
@@ -170,55 +176,117 @@ pub struct User {
     users: Option<Rc<RefCell<HashMap<Uuid, rmmt::User>>>>,
     balance: Option<Rc<RefCell<rmmt::Balance>>>,
     editing: bool,
+    input_name: NodeRef,
+}
+
+impl User {
+    fn edit_user(&mut self, ctx: &Context<Self>) {
+        self.editing = true;
+
+        let input_name = self.input_name.cast::<web_sys::HtmlInputElement>().unwrap();
+        let name = input_name.value();
+
+        let account_id: UniqId = ctx.props().account_id.clone().try_into().unwrap();
+        let user = rmmt::User {
+            id: ctx.props().user_id.clone(),
+            account_id: account_id.into(),
+            name,
+        };
+        let url = format!("/api/account/{}/users/{}", ctx.props().account_id, user.id);
+        ctx.link().send_future(async move {
+            let edited_user: rmmt::User = Request::put(&url)
+                .json(&user)
+                .unwrap()
+                .send()
+                .await
+                .unwrap()
+                .json()
+                .await
+                .unwrap();
+            UserMsg::Edited { user: edited_user }
+        });
+    }
+
+    fn clear(&mut self) {
+        self.editing = false;
+        let input_name = self.input_name.cast::<web_sys::HtmlInputElement>().unwrap();
+        input_name.set_value("");
+    }
 }
 
 impl Component for User {
-    type Message = AccountMsg;
+    type Message = UserMsg;
     type Properties = UserProps;
 
     fn create(ctx: &Context<Self>) -> Self {
-        let mut agent = AccountAgent::bridge(ctx.link().callback(|msg| msg));
+        let mut agent = AccountAgent::bridge(ctx.link().callback(|msg| UserMsg::AccountMsg(msg)));
 
         agent.send(AccountMsg::LoadAccount(ctx.props().account_id.clone()));
 
         Self {
-            _agent: agent,
+            agent: agent,
             account: None,
             expenditures: None,
             repayments: None,
             balance: None,
             users: None,
             editing: false,
+            input_name: NodeRef::default(),
         }
     }
 
-    fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
+    fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
-            AccountMsg::UpdateAccount(account) => {
-                self.account = Some(account);
+            UserMsg::AccountMsg(msg) => match msg {
+                AccountMsg::UpdateAccount(account) => {
+                    self.account = Some(account);
+                    true
+                }
+                AccountMsg::UpdateUsers(users) => {
+                    self.users = Some(users);
+                    true
+                }
+                AccountMsg::UpdateExpenditures(expenditures) => {
+                    self.expenditures = Some(expenditures);
+                    true
+                }
+                AccountMsg::UpdateRepayments(repayments) => {
+                    self.repayments = Some(repayments);
+                    true
+                }
+                AccountMsg::UpdateBalance(balance) => {
+                    self.balance = Some(balance);
+                    true
+                }
+                _ => false,
+            },
+            UserMsg::Edit => {
+                if self.editing {
+                    false
+                } else {
+                    self.edit_user(ctx);
+                    true
+                }
+            },
+            UserMsg::Edited { user: _ } => {
+                self.agent.send(AccountMsg::ChangedUsers);
+                self.clear();
                 true
-            }
-            AccountMsg::UpdateUsers(users) => {
-                self.users = Some(users);
-                true
-            }
-            AccountMsg::UpdateExpenditures(expenditures) => {
-                self.expenditures = Some(expenditures);
-                true
-            }
-            AccountMsg::UpdateRepayments(repayments) => {
-                self.repayments = Some(repayments);
-                true
-            }
-            AccountMsg::UpdateBalance(balance) => {
-                self.balance = Some(balance);
-                true
-            }
-            _ => false,
+            },
         }
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
+        let edit = ctx.link().callback(|event: FocusEvent| {
+            event.prevent_default();
+            UserMsg::Edit
+        });
+
+        let user_name = match self.users.as_ref() {
+            Some(users) => users.borrow().get(&ctx.props().user_id).unwrap().name.clone(),
+            None => String::new(),
+        };
+
         let payed_expenditures = match self.expenditures.as_ref() {
             Some(expenditures) => {
                 let expenditures = expenditures.borrow();
@@ -325,10 +393,10 @@ impl Component for User {
                                 <Loading />
                             }
                         </h3>
-                        <form>
+                        <form onsubmit={ edit }>
                             <div class="field has-addons">
                                 <div class={classes!("control", self.editing.then(|| "is-loading"))}>
-                                    <input type="text" class="input is-primary" name="name" required=true value={ "todo" } />
+                                    <input ref={self.input_name.clone()} type="text" class="input is-primary" name="name" required=true placeholder={ user_name } />
                                 </div>
                                 <div class="control">
                                     <button type="submit" class={classes!("button", "is-primary", self.editing.then(|| "is-loading"))}>
@@ -338,14 +406,6 @@ impl Component for User {
                                         <span>{ "Éditer" }</span>
                                     </button>
                                 </div>
-                            </div>
-                            <div class="field">
-                                <button type="button" class={classes!("button", "is-danger")}>
-                                    <span class="icon">
-                                        <i class="fas fa-trash" />
-                                    </span>
-                                    <span>{ "Supprimer" }</span>
-                                </button>
                             </div>
                         </form>
                     </div>
@@ -423,20 +483,14 @@ impl Component for User {
             <div class="tile is-ancestor">
                 <div class="tile is-parent">
                     <div class="tile is-child box">
-                        <Link<Route> to={Route::Expenditures { account_id: ctx.props().account_id.clone() }}>
-                            <h3 class="subtitle is-3">
+                        <h3 class="subtitle is-3">
+                            <Link<Route> to={Route::Expenditures { account_id: ctx.props().account_id.clone() }}>
                                 <span class="icon"><i class="fas fa-credit-card"></i></span>
                                 <span>{ "Dépenses payées" }</span>
-                            </h3>
-                        </Link<Route>>
+                            </Link<Route>>
+                        </h3>
                         if let (Some(users), Some(expenditures)) = (self.users.clone(), payed_expenditures) {
-                            if expenditures.borrow().len() > 0 {
-                                <ExpendituresList account_id={ ctx.props().account_id.clone() } { expenditures } { users } limit=10 loading=false />
-                            } else {
-                                <div class="notification is-info">
-                                    { "Aucune dépense" }
-                                </div>
-                            }
+                            <ExpendituresList account_id={ ctx.props().account_id.clone() } { expenditures } { users } limit=10 loading=false />
                         } else {
                             <Loading />
                         }
@@ -447,20 +501,14 @@ impl Component for User {
             <div class="tile is-ancestor">
                 <div class="tile is-parent">
                     <div class="tile is-child box">
-                        <Link<Route> to={Route::Expenditures { account_id: ctx.props().account_id.clone() }}>
-                            <h3 class="subtitle is-3">
+                        <h3 class="subtitle is-3">
+                            <Link<Route> to={Route::Expenditures { account_id: ctx.props().account_id.clone() }}>
                                 <span class="icon"><i class="fas fa-credit-card"></i></span>
                                 <span>{ "Dépenses concernées" }</span>
-                            </h3>
-                        </Link<Route>>
+                            </Link<Route>>
+                        </h3>
                         if let (Some(users), Some(expenditures)) = (self.users.clone(), concerned_expenditures) {
-                            if expenditures.borrow().len() > 0 {
-                                <ExpendituresList account_id={ ctx.props().account_id.clone() } { expenditures } { users } limit=10 loading=false />
-                            } else {
-                                <div class="notification is-info">
-                                    { "Aucune dépense" }
-                                </div>
-                            }
+                            <ExpendituresList account_id={ ctx.props().account_id.clone() } { expenditures } { users } limit=10 loading=false />
                         } else {
                             <Loading />
                         }
@@ -471,12 +519,12 @@ impl Component for User {
             <div class="tile is-ancestor">
                 <div class="tile is-parent">
                     <div class="tile is-child box">
-                        <Link<Route> to={Route::Expenditures { account_id: ctx.props().account_id.clone() }}>
-                            <h3 class="subtitle is-3">
+                        <h3 class="subtitle is-3">
+                            <Link<Route> to={Route::Expenditures { account_id: ctx.props().account_id.clone() }}>
                                 <span class="icon"><i class="fas fa-credit-card"></i></span>
                                 <span>{ "Remboursements" }</span>
-                            </h3>
-                        </Link<Route>>
+                            </Link<Route>>
+                        </h3>
                         if let (Some(users), Some(repayments)) = (self.users.clone(), concerned_repayments) {
                             <RepaymentsList account_id={ ctx.props().account_id.clone() } { repayments } { users } limit=10 loading=false />
                         } else {
