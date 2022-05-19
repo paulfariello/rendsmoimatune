@@ -26,7 +26,11 @@ pub(crate) async fn post_user(
     }
 }
 
-#[put("/api/account/<account_id>/users/<user_id>", format = "json", data = "<user>")]
+#[put(
+    "/api/account/<account_id>/users/<user_id>",
+    format = "json",
+    data = "<user>"
+)]
 pub(crate) async fn put_user(
     conn: MainDbConn,
     account_id: UniqId,

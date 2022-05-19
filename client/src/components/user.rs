@@ -267,12 +267,12 @@ impl Component for User {
                     self.edit_user(ctx);
                     true
                 }
-            },
+            }
             UserMsg::Edited { user: _ } => {
                 self.agent.send(AccountMsg::ChangedUsers);
                 self.clear();
                 true
-            },
+            }
         }
     }
 
@@ -283,7 +283,12 @@ impl Component for User {
         });
 
         let user_name = match self.users.as_ref() {
-            Some(users) => users.borrow().get(&ctx.props().user_id).unwrap().name.clone(),
+            Some(users) => users
+                .borrow()
+                .get(&ctx.props().user_id)
+                .unwrap()
+                .name
+                .clone(),
             None => String::new(),
         };
 
@@ -357,7 +362,9 @@ impl Component for User {
                 for (expenditure, debts) in expenditures.borrow().values() {
                     if let Some(debt) = debts.get(user_id) {
                         let share_sum: i32 = debts.values().map(|d| d.share).sum();
-                        total_debt += (expenditure.amount as f64 * (debt.share as f64 / share_sum as f64)) as i64;
+                        total_debt += (expenditure.amount as f64
+                            * (debt.share as f64 / share_sum as f64))
+                            as i64;
                     }
 
                     if &expenditure.payer_id == user_id {
@@ -378,7 +385,7 @@ impl Component for User {
                 info!("payed repayments {}", total_payed);
 
                 (Some(total_payed), Some(total_debt))
-            },
+            }
             _ => (None, None),
         };
 
