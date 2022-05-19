@@ -70,43 +70,24 @@ impl Component for Repayments {
 
     fn view(&self, ctx: &Context<Self>) -> Html {
         html! {
-            <div class="columns">
-                <div class="column">
-                    <Link<Route> to={Route::Account { account_id: ctx.props().account_id.clone() }}>
-                        <h2 class="title is-1">
-                            <span class="icon">
-                                <i class="fas fa-bank"/>
-                            </span>
-                            <span>
-                            {
-                                match &self.account {
-                                    Some(account) => {
-                                        let account = &*account.borrow();
-                                        account.name.clone()
-                                    }
-                                    None => "Loading...".to_string(),
-                                }
-                            }
-                            </span>
-                        </h2>
-                    </Link<Route>>
-                    <div class="box">
-                        <Link<Route> to={Route::Repayments { account_id: ctx.props().account_id.clone() }}>
-                        <h3 class="subtitle is-3">
-                            <span class="icon-text">
-                                <span class="icon"><i class="fas fa-exchange"></i></span>
-                                <span>{ "Remboursements" }</span>
-                            </span>
-                        </h3>
-                        </Link<Route>>
-                        if let (Some(users), Some(repayments)) = (self.users.clone(), self.repayments.clone()) {
-                            <RepaymentsList account_id={ ctx.props().account_id.clone() } { repayments } { users } loading=false />
-                        } else {
-                            <Loading />
-                        }
-                    </div>
-                </div>
+            <>
+            <AccountTitle id={ ctx.props().account_id.clone() } account={ self.account.clone() } />
+            <div class="box">
+                <Link<Route> to={Route::Repayments { account_id: ctx.props().account_id.clone() }}>
+                <h3 class="subtitle is-3">
+                    <span class="icon-text">
+                        <span class="icon"><i class="fas fa-exchange"></i></span>
+                        <span>{ "Remboursements" }</span>
+                    </span>
+                </h3>
+                </Link<Route>>
+                if let (Some(users), Some(repayments)) = (self.users.clone(), self.repayments.clone()) {
+                    <RepaymentsList account_id={ ctx.props().account_id.clone() } { repayments } { users } loading=false />
+                } else {
+                    <Loading />
+                }
             </div>
+            </>
         }
     }
 }
@@ -120,15 +101,17 @@ pub struct RepaymentsListProps {
     pub loading: bool,
 }
 
-pub struct RepaymentsList {
-    sorted: Vec<Uuid>,
-}
+pub struct RepaymentsList;
 
 impl Component for RepaymentsList {
     type Message = ();
     type Properties = RepaymentsListProps;
 
-    fn create(ctx: &Context<Self>) -> Self {
+    fn create(_ctx: &Context<Self>) -> Self {
+        Self
+    }
+
+    fn view(&self, ctx: &Context<Self>) -> Html {
         let repayments = ctx.props().repayments.borrow();
         let mut sorted = repayments.keys().cloned().collect::<Vec<_>>();
         sorted.sort_by(|a, b| {
@@ -139,12 +122,6 @@ impl Component for RepaymentsList {
                 .partial_cmp(&repayments.get(a).unwrap().date)
                 .unwrap()
         });
-
-        Self { sorted }
-    }
-
-    fn view(&self, ctx: &Context<Self>) -> Html {
-        let repayments = &*ctx.props().repayments.borrow();
         let len = repayments.len();
 
         html! {
@@ -161,11 +138,11 @@ impl Component for RepaymentsList {
                             html! {
                                 <tr>
                                     <td class="is-vcentered is-hidden-touch">{ &repayment.date }</td>
-                                    <td class="is-vcentered"><UserName users={ ctx.props().users.clone() } id={ repayment.payer_id } /></td>
+                                    <td class="is-vcentered"><UserName account_id={ ctx.props().account_id.clone() } users={ ctx.props().users.clone() } id={ repayment.payer_id } /></td>
                                     <td class="is-vcentered is-hidden-touch">{ "a remboursé" }</td>
                                     <td class="is-vcentered"><Amount amount={ repayment.amount as i64 } /></td>
                                     <td class="is-vcentered is-hidden-touch">{ "à" }</td>
-                                    <td class="is-vcentered"><UserName users={ ctx.props().users.clone() } id={ repayment.beneficiary_id } /></td>
+                                    <td class="is-vcentered"><UserName account_id={ ctx.props().account_id.clone() } users={ ctx.props().users.clone() } id={ repayment.beneficiary_id } /></td>
                                     <td class="is-vcentered">
                                         <Link<Route> to={Route::EditRepayment { account_id: ctx.props().account_id.clone(), repayment_id: { repayment.id } }}>
                                             <a aria-label="Éditer" class="button is-primary" href="">
@@ -193,8 +170,8 @@ impl Component for RepaymentsList {
                             <tbody>
                             {
                                 match ctx.props().limit {
-                                    Some(limit) => self.sorted.iter().take(limit).map(map).collect::<Html>(),
-                                    None => self.sorted.iter().map(map).collect::<Html>(),
+                                    Some(limit) => sorted.iter().take(limit).map(map).collect::<Html>(),
+                                    None => sorted.iter().map(map).collect::<Html>(),
                                 }
                             }
                             </tbody>
@@ -512,117 +489,115 @@ impl Component for EditRepayment {
         let delete_error = ctx.link().callback(|_| EditRepaymentMsg::ClearError);
 
         html! {
-            <div class="columns">
-                <div class="column">
-                    <AccountTitle id={ ctx.props().account_id.clone() } account={ self.account.clone() } />
-                    <div class="box">
-                        if let Some(repayment_id) = ctx.props().repayment_id.clone() {
-                            <Link<Route> to={Route::EditRepayment { account_id: ctx.props().account_id.clone(), repayment_id }}>
-                                <h3 class="subtitle is-3">
-                                    <span class="icon-text">
-                                        <span class="icon"><i class="fas fa-exchange"></i></span>
-                                        <span>{ "Remboursement" }</span>
-                                    </span>
-                                </h3>
-                            </Link<Route>>
-                        } else {
-                            <Link<Route> to={Route::CreateRepayment { account_id: ctx.props().account_id.clone() }}>
-                                <h3 class="subtitle is-3">
-                                    <span class="icon-text">
-                                        <span class="icon"><i class="fas fa-exchange"></i></span>
-                                        <span>{ "Nouveau remboursement" }</span>
-                                    </span>
-                                </h3>
-                            </Link<Route>>
-                        }
-                        if let Some(error) = self.error.as_ref() {
-                            <div class="notification is-danger">
-                              <button class="delete" onclick={delete_error}></button>
-                              { error }
-                            </div>
-                        }
-                        if let Some(users) = self.users.clone() {
-                            <form {onsubmit}>
-                                <div class="field is-horizontal">
-                                    <div class="field-body">
-                                        <div class="field">
-                                            <p class="control is-expanded has-icons-left">
-                                                <div class="select is-fullwidth is-primary">
-                                                    <select ref={ self.select_payer.clone() } required=true>
-                                                    {
-                                                        (&*users.borrow()).iter().map(|(_, user)| html! {
-                                                            <option value={ user.id.to_string() } selected={ default.payer_id == Some(user.id) }>{ &user.name }</option>
-                                                        }).collect::<Html>()
-                                                    }
-                                                    </select>
-                                                </div>
-                                                <span class="icon is-small is-left">
-                                                    <i class="fas fa-user"></i>
-                                                </span>
-                                            </p>
+            <>
+            <AccountTitle id={ ctx.props().account_id.clone() } account={ self.account.clone() } />
+            <div class="box">
+                if let Some(repayment_id) = ctx.props().repayment_id.clone() {
+                    <Link<Route> to={Route::EditRepayment { account_id: ctx.props().account_id.clone(), repayment_id }}>
+                        <h3 class="subtitle is-3">
+                            <span class="icon-text">
+                                <span class="icon"><i class="fas fa-exchange"></i></span>
+                                <span>{ "Remboursement" }</span>
+                            </span>
+                        </h3>
+                    </Link<Route>>
+                } else {
+                    <Link<Route> to={Route::CreateRepayment { account_id: ctx.props().account_id.clone() }}>
+                        <h3 class="subtitle is-3">
+                            <span class="icon-text">
+                                <span class="icon"><i class="fas fa-exchange"></i></span>
+                                <span>{ "Nouveau remboursement" }</span>
+                            </span>
+                        </h3>
+                    </Link<Route>>
+                }
+                if let Some(error) = self.error.as_ref() {
+                    <div class="notification is-danger">
+                      <button class="delete" onclick={delete_error}></button>
+                      { error }
+                    </div>
+                }
+                if let Some(users) = self.users.clone() {
+                    <form {onsubmit}>
+                        <div class="field is-horizontal">
+                            <div class="field-body">
+                                <div class="field">
+                                    <p class="control is-expanded has-icons-left">
+                                        <div class="select is-fullwidth is-primary">
+                                            <select ref={ self.select_payer.clone() } required=true>
+                                            {
+                                                (&*users.borrow()).iter().map(|(_, user)| html! {
+                                                    <option value={ user.id.to_string() } selected={ default.payer_id == Some(user.id) }>{ &user.name }</option>
+                                                }).collect::<Html>()
+                                            }
+                                            </select>
                                         </div>
-                                        <div class="field">
-                                            <label class="label is-large">{ "rembourse" }</label>
-                                        </div>
-                                        <div class="field has-addons">
-                                            <div class="control is-expanded">
-                                            <input ref={ self.input_amount.clone() } type="number" min="0" step="0.01" class="input is-primary" required=true placeholder="montant" value={ (default.amount as f64 / 100f64).to_string() } />
-                                            </div>
-                                            <div class="control">
-                                                <p class="button is-static">{ "€" }</p>
-                                            </div>
-                                        </div>
-                                        <div class="field">
-                                            <label class="label is-large">{ "à" }</label>
-                                        </div>
-                                        <div class="field">
-                                            <p class="control is-expanded has-icons-left">
-                                                <div class="select is-fullwidth is-primary">
-                                                    <select ref={ self.select_beneficiary.clone() } required=true>
-                                                    {
-                                                        (&*users.borrow()).iter().map(|(_, user)| html! {
-                                                            <option value={ user.id.to_string() } selected={ default.beneficiary_id == Some(user.id) }>{ &user.name }</option>
-                                                        }).collect::<Html>()
-                                                    }
-                                                    </select>
-                                                </div>
-                                                <span class="icon is-small is-left">
-                                                    <i class="fas fa-user"></i>
-                                                </span>
-                                            </p>
-                                        </div>
+                                        <span class="icon is-small is-left">
+                                            <i class="fas fa-user"></i>
+                                        </span>
+                                    </p>
+                                </div>
+                                <div class="field">
+                                    <label class="label is-large">{ "rembourse" }</label>
+                                </div>
+                                <div class="field has-addons">
+                                    <div class="control is-expanded">
+                                    <input ref={ self.input_amount.clone() } type="number" min="0" step="0.01" class="input is-primary" required=true placeholder="montant" value={ (default.amount as f64 / 100f64).to_string() } />
+                                    </div>
+                                    <div class="control">
+                                        <p class="button is-static">{ "€" }</p>
                                     </div>
                                 </div>
                                 <div class="field">
-                                    <div class="control">
-                                        <input ref={self.input_date.clone()} type="date" class="input is-primary" required=true value={ format!("{}", default.date.format("%Y-%m-%d")) } />
-                                    </div>
+                                    <label class="label is-large">{ "à" }</label>
                                 </div>
-                                <div class="control buttons">
-                                    <button type="button" class="button is-light" onclick={ previous }>
-                                        { "Annuler" }
-                                    </button>
-                                    <button type="submit" class={classes!("button", "is-primary", self.creating.then(|| "is-loading"))}>
-                                        if ctx.props().repayment_id.is_some() {
-                                            <span class="icon">
-                                                <i class="fas fa-save" />
-                                            </span>
-                                            <span>{ "Enregistrer" }</span>
-                                        } else {
-                                            <span class="icon">
-                                                <i class="fas fa-plus" />
-                                            </span>
-                                            <span>{ "Ajouter" }</span>
-                                        }
-                                    </button>
+                                <div class="field">
+                                    <p class="control is-expanded has-icons-left">
+                                        <div class="select is-fullwidth is-primary">
+                                            <select ref={ self.select_beneficiary.clone() } required=true>
+                                            {
+                                                (&*users.borrow()).iter().map(|(_, user)| html! {
+                                                    <option value={ user.id.to_string() } selected={ default.beneficiary_id == Some(user.id) }>{ &user.name }</option>
+                                                }).collect::<Html>()
+                                            }
+                                            </select>
+                                        </div>
+                                        <span class="icon is-small is-left">
+                                            <i class="fas fa-user"></i>
+                                        </span>
+                                    </p>
                                 </div>
-                            </form>
-                        } else {
-                            <Loading />
-                        }
-                    </div>
-                </div>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <div class="control">
+                                <input ref={self.input_date.clone()} type="date" class="input is-primary" required=true value={ format!("{}", default.date.format("%Y-%m-%d")) } />
+                            </div>
+                        </div>
+                        <div class="control buttons">
+                            <button type="button" class="button is-light" onclick={ previous }>
+                                { "Annuler" }
+                            </button>
+                            <button type="submit" class={classes!("button", "is-primary", self.creating.then(|| "is-loading"))}>
+                                if ctx.props().repayment_id.is_some() {
+                                    <span class="icon">
+                                        <i class="fas fa-save" />
+                                    </span>
+                                    <span>{ "Enregistrer" }</span>
+                                } else {
+                                    <span class="icon">
+                                        <i class="fas fa-plus" />
+                                    </span>
+                                    <span>{ "Ajouter" }</span>
+                                }
+                            </button>
+                        </div>
+                    </form>
+                } else {
+                    <Loading />
+                }
             </div>
+            </>
         }
     }
 }

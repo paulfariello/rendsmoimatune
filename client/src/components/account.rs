@@ -114,24 +114,7 @@ impl Component for Account {
             <>
             <div class="columns">
                 <div class="column">
-                    <Link<Route> to={Route::Account { account_id: ctx.props().id.clone() }}>
-                        <h2 class="title is-1">
-                            <span class="icon">
-                                <i class="fas fa-bank"/>
-                            </span>
-                            <span>
-                            {
-                                match &self.account {
-                                    Some(account) => {
-                                        let account = &*account.borrow();
-                                        account.name.clone()
-                                    }
-                                    None => "Loading...".to_string(),
-                                }
-                            }
-                            </span>
-                        </h2>
-                    </Link<Route>>
+                    <AccountTitle id={ ctx.props().id.clone() } account={ self.account.clone() } />
                 </div>
             </div>
             <div class="tile is-ancestor">
@@ -142,7 +125,7 @@ impl Component for Account {
                             <span>{ "Balance" }</span>
                         </h3>
                         if let (Some(users), Some(balance)) = (self.users.clone(), self.balance.clone()) {
-                            <BalanceList { users } { balance } loading={ self.fetching_balance } />
+                            <BalanceList account_id={ ctx.props().id.clone() } { users } { balance } loading={ self.fetching_balance } />
                         } else {
                             <Loading />
                         }
@@ -337,7 +320,7 @@ pub struct AccountTitleProps {
 pub fn account_title(AccountTitleProps { id, account }: &AccountTitleProps) -> Html {
     html! {
         <Link<Route> to={Route::Account { account_id: id.clone() }}>
-            <h2 class="title is-1">
+            <h2 class="title is-1 mt-1 mb-4">
                 <span class="icon">
                     <i class="fas fa-bank"/>
                 </span>

@@ -17,6 +17,7 @@ use crate::components::{
 
 #[derive(Properties, PartialEq)]
 pub struct BalanceListProps {
+    pub account_id: String,
     pub users: Rc<RefCell<HashMap<Uuid, rmmt::User>>>,
     pub balance: Rc<RefCell<rmmt::Balance>>,
     pub loading: bool,
@@ -67,7 +68,7 @@ impl Component for BalanceList {
                                             </div>
                                         }
                                         </td>
-                                        <td class="is-vcentered has-text-centered"><UserName users={ users.clone() } id={ balance.user_id }/></td>
+                                        <td class="is-vcentered has-text-centered"><UserName account_id={ ctx.props().account_id.clone() } users={ users.clone() } id={ balance.user_id }/></td>
                                         <td class="is-vcentered">
                                         if balance.amount > 0 {
                                             <div class="progress-wrapper">
@@ -144,13 +145,13 @@ impl Component for BalancingList {
                                 balance.balancing.iter().map(|balance| {
                                     html! {
                                         <tr>
-                                            <td class="is-vcentered has-text-centered"><UserName users={ users.clone() } id={ balance.payer_id }/></td>
+                                            <td class="is-vcentered has-text-centered"><UserName account_id={ ctx.props().account_id.clone() } users={ users.clone() } id={ balance.payer_id }/></td>
                                             <td class="is-vcentered has-text-centered is-hidden-touch">{ "doit" }</td>
                                             <td class="is-vcentered">
                                                 <Amount amount={ balance.amount } />
                                             </td>
                                             <td class="is-vcentered has-text-centered is-hidden-touch">{ "à" }</td>
-                                            <td class="is-vcentered has-text-centered"><UserName users={ users.clone() } id={ balance.beneficiary_id }/></td>
+                                            <td class="is-vcentered has-text-centered"><UserName account_id={ ctx.props().account_id.clone() } users={ users.clone() } id={ balance.beneficiary_id }/></td>
                                             <td>
                                                 <Link<Route, rmmt::Balancing> to={Route::CreateRepayment { account_id: ctx.props().account_id.clone() } } query={ Some(balance.clone()) } classes="button is-primary is-hidden-touch">
                                                     <span class="icon">
@@ -178,7 +179,7 @@ impl Component for BalancingList {
                             {
                                 balance.balancing_remaining.iter().map(|balance| html!{
                                     <li>
-                                        <UserName users={ users.clone() } id={ balance.user_id }/>
+                                        <UserName account_id={ ctx.props().account_id.clone() } users={ users.clone() } id={ balance.user_id }/>
                                         if balance.amount > 0 {
                                             { " à perdu " }
                                         } else {

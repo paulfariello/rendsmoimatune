@@ -10,7 +10,8 @@ use components::{
     account::{Account, CreateAccount},
     expenditure::{EditExpenditure, Expenditures},
     repayment::{EditRepayment, Repayments},
-    utils::TopBar,
+    user::User,
+    utils::{Breadcrumb, TopBar},
 };
 
 #[derive(Clone, Routable, PartialEq)]
@@ -37,36 +38,43 @@ enum Route {
         account_id: String,
         expenditure_id: Uuid,
     },
+    #[at("/account/:account_id/users/:user_id")]
+    User { account_id: String, user_id: Uuid },
     #[not_found]
     #[at("/404")]
     NotFound,
 }
 
-fn switch(routes: &Route) -> Html {
-    match routes {
+fn switch(route: &Route) -> Html {
+    match route {
         Route::Home => html! { <CreateAccount /> },
         Route::Account { account_id } => html! {
             <div class="container">
+                <Breadcrumb route={ route.clone() } />
                 <Account id={ account_id.clone() } />
             </div>
         },
         Route::Expenditures { account_id } => html! {
             <div class="container">
+                <Breadcrumb route={ route.clone() } />
                 <Expenditures account_id={ account_id.clone() } />
             </div>
         },
         Route::CreateExpenditure { account_id } => html! {
             <div class="container">
+                <Breadcrumb route={ route.clone() } />
                 <EditExpenditure account_id={ account_id.clone() } />
             </div>
         },
         Route::Repayments { account_id } => html! {
             <div class="container">
+                <Breadcrumb route={ route.clone() } />
                 <Repayments account_id={ account_id.clone() } />
             </div>
         },
         Route::CreateRepayment { account_id } => html! {
             <div class="container">
+                <Breadcrumb route={ route.clone() } />
                 <EditRepayment account_id={ account_id.clone() } />
             </div>
         },
@@ -75,6 +83,7 @@ fn switch(routes: &Route) -> Html {
             repayment_id,
         } => html! {
             <div class="container">
+                <Breadcrumb route={ route.clone() } />
                 <EditRepayment account_id={ account_id.clone() } repayment_id={ repayment_id.clone() } />
             </div>
         },
@@ -83,7 +92,17 @@ fn switch(routes: &Route) -> Html {
             expenditure_id,
         } => html! {
             <div class="container">
+                <Breadcrumb route={ route.clone() } />
                 <EditExpenditure account_id={ account_id.clone() } expenditure_id={ expenditure_id.clone() } />
+            </div>
+        },
+        Route::User {
+            account_id,
+            user_id,
+        } => html! {
+            <div class="container">
+                <Breadcrumb route={ route.clone() } />
+                <User account_id={ account_id.clone() } user_id={ user_id.clone() } />
             </div>
         },
         Route::NotFound => html! {

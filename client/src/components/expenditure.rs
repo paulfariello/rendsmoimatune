@@ -72,43 +72,24 @@ impl Component for Expenditures {
 
     fn view(&self, ctx: &Context<Self>) -> Html {
         html! {
-            <div class="columns">
-                <div class="column">
-                    <Link<Route> to={Route::Account { account_id: ctx.props().account_id.clone() }}>
-                        <h2 class="title is-1">
-                            <span class="icon">
-                                <i class="fas fa-bank"/>
-                            </span>
-                            <span>
-                            {
-                                match &self.account {
-                                    Some(account) => {
-                                        let account = &*account.borrow();
-                                        account.name.clone()
-                                    }
-                                    None => "Loading...".to_string(),
-                                }
-                            }
-                            </span>
-                        </h2>
-                    </Link<Route>>
-                    <div class="box">
-                        <Link<Route> to={Route::Expenditures { account_id: ctx.props().account_id.clone() }}>
-                            <h3 class="subtitle is-3">
-                                <span class="icon-text">
-                                    <span class="icon"><i class="fas fa-credit-card"></i></span>
-                                    <span>{ "Dépenses" }</span>
-                                </span>
-                            </h3>
-                        </Link<Route>>
-                        if let (Some(users), Some(expenditures)) = (self.users.clone(), self.expenditures.clone()) {
-                            <ExpendituresList account_id={ ctx.props().account_id.clone() } { expenditures } { users } loading=false />
-                        } else {
-                            <Loading />
-                        }
-                    </div>
-                </div>
+            <>
+            <AccountTitle id={ ctx.props().account_id.clone() } account={ self.account.clone() } />
+            <div class="box">
+                <Link<Route> to={Route::Expenditures { account_id: ctx.props().account_id.clone() }}>
+                    <h3 class="subtitle is-3">
+                        <span class="icon-text">
+                            <span class="icon"><i class="fas fa-credit-card"></i></span>
+                            <span>{ "Dépenses" }</span>
+                        </span>
+                    </h3>
+                </Link<Route>>
+                if let (Some(users), Some(expenditures)) = (self.users.clone(), self.expenditures.clone()) {
+                    <ExpendituresList account_id={ ctx.props().account_id.clone() } { expenditures } { users } loading=false />
+                } else {
+                    <Loading />
+                }
             </div>
+            </>
         }
     }
 }
@@ -122,15 +103,17 @@ pub struct ExpendituresListProps {
     pub loading: bool,
 }
 
-pub struct ExpendituresList {
-    sorted: Vec<Uuid>,
-}
+pub struct ExpendituresList;
 
 impl Component for ExpendituresList {
     type Message = ();
     type Properties = ExpendituresListProps;
 
-    fn create(ctx: &Context<Self>) -> Self {
+    fn create(_ctx: &Context<Self>) -> Self {
+        Self
+    }
+
+    fn view(&self, ctx: &Context<Self>) -> Html {
         let expenditures = ctx.props().expenditures.borrow();
         let mut sorted = expenditures.keys().cloned().collect::<Vec<_>>();
         sorted.sort_by(|a, b| {
@@ -142,12 +125,6 @@ impl Component for ExpendituresList {
                 .partial_cmp(&expenditures.get(a).unwrap().0.date)
                 .unwrap()
         });
-
-        Self { sorted }
-    }
-
-    fn view(&self, ctx: &Context<Self>) -> Html {
-        let expenditures = &*ctx.props().expenditures.borrow();
         let len = expenditures.len();
 
         html! {
@@ -166,7 +143,7 @@ impl Component for ExpendituresList {
                                     <td class="is-vcentered is-hidden-touch">{ &expenditure.date }</td>
                                     <td class="is-vcentered">{ &expenditure.name }</td>
                                     <td class="is-vcentered"><Amount amount={ expenditure.amount as i64} /></td>
-                                    <td class="is-vcentered is-hidden-touch"><UserName users={ ctx.props().users.clone() } id={ expenditure.payer_id }/></td>
+                                    <td class="is-vcentered is-hidden-touch"><UserName account_id={ ctx.props().account_id.clone() } users={ ctx.props().users.clone() } id={ expenditure.payer_id }/></td>
                                     <td class="is-vcentered is-hidden-touch">
                                         <Debtors debts={ debts.clone() } users={ ctx.props().users.clone() } />
                                     </td>
@@ -194,8 +171,8 @@ impl Component for ExpendituresList {
                             <tbody>
                             {
                                 match ctx.props().limit {
-                                    Some(limit) => self.sorted.iter().take(limit).map(map).collect::<Html>(),
-                                    None => self.sorted.iter().map(map).collect::<Html>(),
+                                    Some(limit) => sorted.iter().take(limit).map(map).collect::<Html>(),
+                                    None => sorted.iter().map(map).collect::<Html>(),
                                 }
                             }
                             </tbody>
@@ -499,114 +476,112 @@ impl Component for EditExpenditure {
         let delete_error = ctx.link().callback(|_| EditExpenditureMsg::ClearError);
 
         html! {
-            <div class="columns">
-                <div class="column">
-                    <AccountTitle id={ ctx.props().account_id.clone() } account={ self.account.clone() } />
-                    <div class="box">
-                        if let Some(expenditure_id) = ctx.props().expenditure_id.clone() {
-                            <Link<Route> to={Route::EditExpenditure { account_id: ctx.props().account_id.clone(), expenditure_id }}>
-                                <h3 class="subtitle is-3">
-                                    <span class="icon-text">
-                                        <span class="icon"><i class="fas fa-exchange"></i></span>
-                                        <span>{ "Dépense" }</span>
-                                    </span>
-                                </h3>
-                            </Link<Route>>
-                        } else {
-                            <Link<Route> to={Route::CreateExpenditure { account_id: ctx.props().account_id.clone() }}>
-                                <h3 class="subtitle is-3">
-                                    <span class="icon-text">
-                                        <span class="icon"><i class="fas fa-exchange"></i></span>
-                                        <span>{ "Nouvelle dépense" }</span>
-                                    </span>
-                                </h3>
-                            </Link<Route>>
-                        }
-                        if let Some(error) = self.error.as_ref() {
-                            <div class="notification is-danger">
-                              <button class="delete" onclick={delete_error}></button>
-                              { error }
+            <>
+            <AccountTitle id={ ctx.props().account_id.clone() } account={ self.account.clone() } />
+            <div class="box">
+                if let Some(expenditure_id) = ctx.props().expenditure_id.clone() {
+                    <Link<Route> to={Route::EditExpenditure { account_id: ctx.props().account_id.clone(), expenditure_id }}>
+                        <h3 class="subtitle is-3">
+                            <span class="icon-text">
+                                <span class="icon"><i class="fas fa-exchange"></i></span>
+                                <span>{ "Dépense" }</span>
+                            </span>
+                        </h3>
+                    </Link<Route>>
+                } else {
+                    <Link<Route> to={Route::CreateExpenditure { account_id: ctx.props().account_id.clone() }}>
+                        <h3 class="subtitle is-3">
+                            <span class="icon-text">
+                                <span class="icon"><i class="fas fa-exchange"></i></span>
+                                <span>{ "Nouvelle dépense" }</span>
+                            </span>
+                        </h3>
+                    </Link<Route>>
+                }
+                if let Some(error) = self.error.as_ref() {
+                    <div class="notification is-danger">
+                      <button class="delete" onclick={delete_error}></button>
+                      { error }
+                    </div>
+                }
+                if let Some(users) = self.users.clone() {
+                    <form {onsubmit}>
+                        <div class="field">
+                            <label class="label">{ "Nom" }</label>
+                            <div class="control">
+                                <input ref={ self.input_name.clone() } class="input is-primary" type="text" placeholder="Baguette de pain" required=true value={ self.expenditure.as_ref().map(|e| e.name.clone()) }/>
                             </div>
-                        }
-                        if let Some(users) = self.users.clone() {
-                            <form {onsubmit}>
-                                <div class="field">
-                                    <label class="label">{ "Nom" }</label>
-                                    <div class="control">
-                                        <input ref={ self.input_name.clone() } class="input is-primary" type="text" placeholder="Baguette de pain" required=true value={ self.expenditure.as_ref().map(|e| e.name.clone()) }/>
-                                    </div>
-                                </div>
+                        </div>
 
-                                <div class="field">
-                                    <label class="label">{ "Montant" }</label>
-                                    <div class="field has-addons">
-                                        <div class="control is-expanded">
-                                            <input ref={ self.input_amount.clone() } type="number" min="0" step="0.01" class="input is-primary" required=true placeholder="montant" value={ self.expenditure.as_ref().map(|e| (e.amount as f64 / 100f64).to_string()) }/>
-                                        </div>
-                                        <div class="control">
-                                            <p class="button is-static">{ "€" }</p>
-                                        </div>
-                                    </div>
+                        <div class="field">
+                            <label class="label">{ "Montant" }</label>
+                            <div class="field has-addons">
+                                <div class="control is-expanded">
+                                    <input ref={ self.input_amount.clone() } type="number" min="0" step="0.01" class="input is-primary" required=true placeholder="montant" value={ self.expenditure.as_ref().map(|e| (e.amount as f64 / 100f64).to_string()) }/>
                                 </div>
-
-                                <div class="field">
-                                    <label class="label">{ "Date" }</label>
-                                    <div class="control">
-                                        <input ref={self.input_date.clone()} type="date" class="input is-primary" required=true value={ format!("{}", self.expenditure.as_ref().map(|e| e.date).unwrap_or(Local::today().naive_local()).format("%Y-%m-%d")) } />
-                                    </div>
+                                <div class="control">
+                                    <p class="button is-static">{ "€" }</p>
                                 </div>
+                            </div>
+                        </div>
 
-                                <div class="field">
-                                    <label class="label">{ "Payeur" }</label>
-                                    <p class="control is-expanded has-icons-left">
-                                        <div class="select is-fullwidth is-primary">
-                                            <select ref={ self.select_payer.clone() } required=true>
-                                            {
-                                                (&*users.borrow()).iter().map(|(_, user)| html! {
-                                                    <option value={ user.id.to_string() } selected={ self.expenditure.as_ref().map(|e| e.payer_id) == Some(user.id) }>{ &user.name }</option>
-                                                }).collect::<Html>()
-                                            }
-                                            </select>
-                                        </div>
-                                        <span class="icon is-small is-left">
-                                            <i class="fas fa-user"></i>
-                                        </span>
-                                    </p>
-                                </div>
+                        <div class="field">
+                            <label class="label">{ "Date" }</label>
+                            <div class="control">
+                                <input ref={self.input_date.clone()} type="date" class="input is-primary" required=true value={ format!("{}", self.expenditure.as_ref().map(|e| e.date).unwrap_or(Local::today().naive_local()).format("%Y-%m-%d")) } />
+                            </div>
+                        </div>
 
-                                <div class="field">
-                                    <label class="label">{ "Bénéficiaires" }</label>
+                        <div class="field">
+                            <label class="label">{ "Payeur" }</label>
+                            <p class="control is-expanded has-icons-left">
+                                <div class="select is-fullwidth is-primary">
+                                    <select ref={ self.select_payer.clone() } required=true>
                                     {
-                                        (&*users.borrow()).iter().map(|(id, user)| html! {
-                                            <DebtorInput name={ user.name.clone() } state_ref={ self.debtors_checkbox.get(&id).clone().unwrap() } share_ref={ self.debtors_input_share.get(&id).clone().unwrap() } debt={ self.debts.as_ref().and_then(|d| d.get(&id).cloned()) }/>
+                                        (&*users.borrow()).iter().map(|(_, user)| html! {
+                                            <option value={ user.id.to_string() } selected={ self.expenditure.as_ref().map(|e| e.payer_id) == Some(user.id) }>{ &user.name }</option>
                                         }).collect::<Html>()
                                     }
+                                    </select>
                                 </div>
-                                <div class="control buttons">
-                                    <button type="button" class="button is-light" onclick={ previous }>
-                                        { "Annuler" }
-                                    </button>
-                                    <button type="submit" class={classes!("button", "is-primary", self.creating.then(|| "is-loading"))}>
-                                        if ctx.props().expenditure_id.is_some() {
-                                            <span class="icon">
-                                                <i class="fas fa-save" />
-                                            </span>
-                                            <span>{ "Enregistrer" }</span>
-                                        } else {
-                                            <span class="icon">
-                                                <i class="fas fa-plus" />
-                                            </span>
-                                            <span>{ "Ajouter" }</span>
-                                        }
-                                    </button>
-                                </div>
-                            </form>
-                        } else {
-                            <Loading />
-                        }
-                    </div>
-                </div>
+                                <span class="icon is-small is-left">
+                                    <i class="fas fa-user"></i>
+                                </span>
+                            </p>
+                        </div>
+
+                        <div class="field">
+                            <label class="label">{ "Bénéficiaires" }</label>
+                            {
+                                (&*users.borrow()).iter().map(|(id, user)| html! {
+                                    <DebtorInput name={ user.name.clone() } state_ref={ self.debtors_checkbox.get(&id).clone().unwrap() } share_ref={ self.debtors_input_share.get(&id).clone().unwrap() } debt={ self.debts.as_ref().and_then(|d| d.get(&id).cloned()) }/>
+                                }).collect::<Html>()
+                            }
+                        </div>
+                        <div class="control buttons">
+                            <button type="button" class="button is-light" onclick={ previous }>
+                                { "Annuler" }
+                            </button>
+                            <button type="submit" class={classes!("button", "is-primary", self.creating.then(|| "is-loading"))}>
+                                if ctx.props().expenditure_id.is_some() {
+                                    <span class="icon">
+                                        <i class="fas fa-save" />
+                                    </span>
+                                    <span>{ "Enregistrer" }</span>
+                                } else {
+                                    <span class="icon">
+                                        <i class="fas fa-plus" />
+                                    </span>
+                                    <span>{ "Ajouter" }</span>
+                                }
+                            </button>
+                        </div>
+                    </form>
+                } else {
+                    <Loading />
+                }
             </div>
+            </>
         }
     }
 }
