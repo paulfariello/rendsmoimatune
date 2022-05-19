@@ -348,23 +348,24 @@ impl Component for User {
             None => None,
         };
 
-        let (total_payed, total_debt) = match (&concerned_expenditures, &concerned_repayments) {
+        let (total_payed, total_debt) = match (&self.expenditures, &self.repayments) {
             (Some(expenditures), Some(repayments)) => {
                 let user_id = &ctx.props().user_id;
                 let mut total_payed = 0i64;
                 let mut total_debt = 0i64;
 
                 for (expenditure, debts) in expenditures.borrow().values() {
-                    let share = debts.get(user_id).unwrap().share;
-                    if share > 0 {
+                    if let Some(debt) = debts.get(user_id) {
                         let share_sum: i32 = debts.values().map(|d| d.share).sum();
-                        total_debt += (expenditure.amount as f64 * (share as f64 / share_sum as f64)) as i64;
+                        total_debt += (expenditure.amount as f64 * (debt.share as f64 / share_sum as f64)) as i64;
                     }
 
                     if &expenditure.payer_id == user_id {
                         total_payed += expenditure.amount as i64;
                     }
                 }
+                info!("expenditures debt {}", total_debt);
+                info!("payed expenditures {}", total_payed);
 
                 for repayment in repayments.borrow().values() {
                     if &repayment.payer_id == user_id {
@@ -373,6 +374,8 @@ impl Component for User {
                         total_debt += repayment.amount as i64;
                     }
                 }
+                info!("repayment debt {}", total_debt);
+                info!("payed repayments {}", total_payed);
 
                 (Some(total_payed), Some(total_debt))
             },
@@ -484,13 +487,18 @@ impl Component for User {
                 <div class="tile is-parent">
                     <div class="tile is-child box">
                         <h3 class="subtitle is-3">
-                            <Link<Route> to={Route::Expenditures { account_id: ctx.props().account_id.clone() }}>
-                                <span class="icon"><i class="fas fa-credit-card"></i></span>
-                                <span>{ "Dépenses payées" }</span>
-                            </Link<Route>>
+                            <span class="icon"><i class="fas fa-credit-card"></i></span>
+                            <span>
+                                if let Some(expenditures) = payed_expenditures.as_ref() {
+                                    { expenditures.borrow().len().to_string() }
+                                    { " dépenses payées" }
+                                } else {
+                                    { "Dépenses payées" }
+                                }
+                            </span>
                         </h3>
                         if let (Some(users), Some(expenditures)) = (self.users.clone(), payed_expenditures) {
-                            <ExpendituresList account_id={ ctx.props().account_id.clone() } { expenditures } { users } limit=10 loading=false />
+                            <ExpendituresList account_id={ ctx.props().account_id.clone() } { expenditures } { users } />
                         } else {
                             <Loading />
                         }
@@ -502,13 +510,18 @@ impl Component for User {
                 <div class="tile is-parent">
                     <div class="tile is-child box">
                         <h3 class="subtitle is-3">
-                            <Link<Route> to={Route::Expenditures { account_id: ctx.props().account_id.clone() }}>
-                                <span class="icon"><i class="fas fa-credit-card"></i></span>
-                                <span>{ "Dépenses concernées" }</span>
-                            </Link<Route>>
+                            <span class="icon"><i class="fas fa-credit-card"></i></span>
+                            <span>
+                                if let Some(expenditures) = concerned_expenditures.as_ref() {
+                                    { expenditures.borrow().len().to_string() }
+                                    { " dépenses concernées" }
+                                } else {
+                                    { "Dépenses concernées" }
+                                }
+                            </span>
                         </h3>
                         if let (Some(users), Some(expenditures)) = (self.users.clone(), concerned_expenditures) {
-                            <ExpendituresList account_id={ ctx.props().account_id.clone() } { expenditures } { users } limit=10 loading=false />
+                            <ExpendituresList account_id={ ctx.props().account_id.clone() } { expenditures } { users } />
                         } else {
                             <Loading />
                         }
@@ -520,13 +533,18 @@ impl Component for User {
                 <div class="tile is-parent">
                     <div class="tile is-child box">
                         <h3 class="subtitle is-3">
-                            <Link<Route> to={Route::Expenditures { account_id: ctx.props().account_id.clone() }}>
-                                <span class="icon"><i class="fas fa-credit-card"></i></span>
-                                <span>{ "Remboursements" }</span>
-                            </Link<Route>>
+                            <span class="icon"><i class="fas fa-credit-card"></i></span>
+                            <span>
+                                if let Some(repayments) = concerned_repayments.as_ref() {
+                                    { repayments.borrow().len().to_string() }
+                                    { " remboursements" }
+                                } else {
+                                    { "Remboursements" }
+                                }
+                            </span>
                         </h3>
                         if let (Some(users), Some(repayments)) = (self.users.clone(), concerned_repayments) {
-                            <RepaymentsList account_id={ ctx.props().account_id.clone() } { repayments } { users } limit=10 loading=false />
+                            <RepaymentsList account_id={ ctx.props().account_id.clone() } { repayments } { users } />
                         } else {
                             <Loading />
                         }

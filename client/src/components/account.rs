@@ -112,11 +112,7 @@ impl Component for Account {
     fn view(&self, ctx: &Context<Self>) -> Html {
         html! {
             <>
-            <div class="columns">
-                <div class="column">
-                    <AccountTitle id={ ctx.props().id.clone() } account={ self.account.clone() } />
-                </div>
-            </div>
+            <AccountTitle id={ ctx.props().id.clone() } account={ self.account.clone() } />
             <div class="tile is-ancestor">
                 <div class="tile is-parent">
                     <div class="tile is-child box">
