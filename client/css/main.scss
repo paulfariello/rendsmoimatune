@@ -8,6 +8,7 @@ $font-family-base: 'Roboto';
 // Set bulma settings
 $family-sans-serif: $font-family-base;
 $primary: $rmmt-blue;
+$link: $rmmt-blue;
 
 // Set font-awesome settings
 $fa-font-path: "webfonts";
@@ -35,7 +36,8 @@ $fa-font-path: "webfonts";
 }
 
 .title {
-  margin-top: 1em;
+  margin-left: 0.5rem;
+  margin-top: 1rem;
   color: $rmmt-blue;
   a {
     color: $rmmt-blue;
@@ -47,6 +49,11 @@ $fa-font-path: "webfonts";
   a {
     color: $rmmt-blue;
   }
+}
+
+.breadcrumb {
+  margin-top: 1rem;
+  margin-left: 0.5rem;
 }
 
 .progress-wrapper {

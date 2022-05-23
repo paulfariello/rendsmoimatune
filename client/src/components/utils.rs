@@ -313,7 +313,7 @@ pub(crate) fn breadcrumb(BreadcrumpProps { route }: &BreadcrumpProps) -> Html {
 
     if let Some(components) = components {
         html! {
-            <nav class="breadcrumb mt-4" aria-label="breadcrumbs">
+            <nav class="breadcrumb" aria-label="breadcrumbs">
               <ul>
                   {
                       components.into_iter().map(|component| html! {
