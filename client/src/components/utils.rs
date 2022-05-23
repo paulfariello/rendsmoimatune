@@ -1,5 +1,6 @@
 use yew::prelude::*;
 use yew_router::prelude::*;
+use yew_router::scope_ext::HistoryHandle;
 
 use crate::Route;
 
@@ -9,52 +10,94 @@ pub(crate) struct NavBarProps {
     pub account_id: Option<String>,
 }
 
-#[function_component(NavBar)]
-pub(crate) fn navbar(NavBarProps { account_id }: &NavBarProps) -> Html {
-    html! {
-        <nav class="navbar is-primary" role="navigation" aria-label="main navigation">
-            <div class="navbar-brand">
-                <a class="navbar-item" href="/">{ "Rends-moi ma thune" }<small>{ "beta" }</small></a>
+pub(crate) enum NavBarMsg {
+    Toogle,
+    Hide,
+}
 
-                if account_id.is_some() {
-                    <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbar" href="">
-                        <span aria-hidden="true"></span>
-                        <span aria-hidden="true"></span>
-                        <span aria-hidden="true"></span>
-                    </a>
-                }
-            </div>
+pub(crate) struct NavBar {
+    _listener: HistoryHandle,
+    menu_visible: bool,
+}
 
-            if let Some(account_id) = account_id {
-                <div class="navbar-menu" id="navbar">
-                    <div class="navbar-start">
-                        <Link<Route> to={ Route::Account { account_id: account_id.clone() } } classes="navbar-item">
-                            { "Compte" }
-                        </Link<Route>>
-                        <div class="navbar-item has-dropdown is-hoverable">
-                            <Link<Route> to={ Route::Expenditures { account_id: account_id.clone() } } classes="navbar-link">
-                                { "Dépenses" }
+impl Component for NavBar {
+    type Message = NavBarMsg;
+    type Properties = NavBarProps;
+
+    fn create(ctx: &Context<Self>) -> Self {
+        let listener = ctx.link().add_history_listener(ctx.link().callback(|_| {
+            NavBarMsg::Hide
+        })).unwrap();
+
+        Self {
+            _listener: listener,
+            menu_visible: false,
+        }
+    }
+
+    fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
+        match msg {
+            NavBarMsg::Toogle => {
+                self.menu_visible = !self.menu_visible;
+                true
+            }
+            NavBarMsg::Hide => {
+                self.menu_visible = false;
+                true
+            }
+        }
+    }
+
+    fn view(&self, ctx: &Context<Self>) -> Html {
+        let click_burger = ctx.link().callback(|event: MouseEvent| {
+            event.prevent_default();
+            NavBarMsg::Toogle
+        });
+        html! {
+            <nav class="navbar is-primary" role="navigation" aria-label="main navigation">
+                <div class="navbar-brand">
+                    <a class="navbar-item" href="/">{ "Rends-moi ma thune" }<small>{ "beta" }</small></a>
+
+                    if ctx.props().account_id.is_some() {
+                        <a role="button" class={ classes!("navbar-burger", self.menu_visible.then_some("is-active")) } aria-label="menu" aria-expanded="false" data-target="navbar" onclick={ click_burger } href="">
+                            <span aria-hidden="true"></span>
+                            <span aria-hidden="true"></span>
+                            <span aria-hidden="true"></span>
+                        </a>
+                    }
+                </div>
+
+                if let Some(account_id) = ctx.props().account_id.as_ref() {
+                    <div class={ classes!("navbar-menu", self.menu_visible.then_some("is-active")) } id="navbar">
+                        <div class="navbar-start">
+                            <Link<Route> to={ Route::Account { account_id: account_id.clone() } } classes="navbar-item">
+                                { "Compte" }
                             </Link<Route>>
-                            <div class="navbar-dropdown">
-                                <Link<Route> to={ Route::CreateExpenditure { account_id: account_id.clone() } } classes="navbar-item">
-                                    { "Ajouter" }
+                            <div class="navbar-item has-dropdown is-hoverable">
+                                <Link<Route> to={ Route::Expenditures { account_id: account_id.clone() } } classes="navbar-link">
+                                    { "Dépenses" }
                                 </Link<Route>>
+                                <div class="navbar-dropdown">
+                                    <Link<Route> to={ Route::CreateExpenditure { account_id: account_id.clone() } } classes="navbar-item">
+                                        { "Ajouter" }
+                                    </Link<Route>>
+                                </div>
                             </div>
-                        </div>
-                        <div class="navbar-item has-dropdown is-hoverable">
-                            <Link<Route> to={ Route::Repayments { account_id: account_id.clone() } } classes="navbar-link">
-                                { "Remboursements" }
-                            </Link<Route>>
-                            <div class="navbar-dropdown">
-                                <Link<Route> to={ Route::CreateRepayment { account_id: account_id.clone() } } classes="navbar-item">
-                                    { "Ajouter" }
+                            <div class="navbar-item has-dropdown is-hoverable">
+                                <Link<Route> to={ Route::Repayments { account_id: account_id.clone() } } classes="navbar-link">
+                                    { "Remboursements" }
                                 </Link<Route>>
+                                <div class="navbar-dropdown">
+                                    <Link<Route> to={ Route::CreateRepayment { account_id: account_id.clone() } } classes="navbar-item">
+                                        { "Ajouter" }
+                                    </Link<Route>>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            }
-        </nav>
+                }
+            </nav>
+        }
     }
 }
 
