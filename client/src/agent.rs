@@ -3,6 +3,7 @@ use std::collections::HashMap;
 use std::collections::HashSet;
 use std::rc::Rc;
 
+use gloo;
 use gloo_net::http::Request;
 #[allow(unused_imports)]
 use log::{debug, error, info, warn};
@@ -203,7 +204,11 @@ impl Agent for AccountAgent {
 
     fn update(&mut self, msg: Self::Message) {
         match &msg {
-            AccountMsg::UpdateAccount(account) => self.account = Some(account.clone()),
+            AccountMsg::UpdateAccount(account) => {
+                self.account = Some(account.clone());
+                let title = format!("{} – Rends-moi ma thune", (&*(self.account.as_ref().unwrap().borrow())).name);
+                gloo::utils::document().set_title(&title);
+            },
             AccountMsg::UpdateUsers(users) => self.users = Some(users.clone()),
             AccountMsg::UpdateBalance(balance) => self.balance = Some(balance.clone()),
             AccountMsg::UpdateExpenditures(expenditures) => {
