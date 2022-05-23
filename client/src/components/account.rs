@@ -290,7 +290,7 @@ impl Component for CreateAccount {
                                 <form {onsubmit}>
                                     <div class="field has-addons">
                                         <div class={classes!("control", self.creating.then(|| "is-loading"))}>
-                                            <input ref={self.input_name.clone()} class="input is-primary" type="text" placeholder="Nom" name="name" required=true />
+                                            <input ref={self.input_name.clone()} class="input is-primary" type="text" placeholder="Week-end à Barcelone" name="name" required=true />
                                         </div>
                                         <button type="submit" class={classes!("button", "is-primary", self.creating.then(|| "is-loading"))}>
                                             <span>{ "Créer" }</span>

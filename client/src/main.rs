@@ -16,7 +16,7 @@ use components::{
     expenditure::{EditExpenditure, Expenditures},
     repayment::{EditRepayment, Repayments},
     user::User,
-    utils::{Breadcrumb, TopBar},
+    utils::{Breadcrumb, NavBar},
 };
 
 #[derive(Clone, Routable, PartialEq)]
@@ -52,68 +52,100 @@ enum Route {
 
 fn switch(route: &Route) -> Html {
     match route {
-        Route::Home => html! { <CreateAccount /> },
+        Route::Home => html! {
+            <>
+            <NavBar />
+            <CreateAccount />
+            </>
+        },
         Route::Account { account_id } => html! {
+            <>
+            <NavBar account_id={ account_id.clone() } />
             <div class="container">
                 <Breadcrumb route={ route.clone() } />
                 <Account id={ account_id.clone() } />
             </div>
+            </>
         },
         Route::Expenditures { account_id } => html! {
+            <>
+            <NavBar account_id={ account_id.clone() } />
             <div class="container">
                 <Breadcrumb route={ route.clone() } />
                 <Expenditures account_id={ account_id.clone() } />
             </div>
+            </>
         },
         Route::CreateExpenditure { account_id } => html! {
+            <>
+            <NavBar account_id={ account_id.clone() } />
             <div class="container">
                 <Breadcrumb route={ route.clone() } />
                 <EditExpenditure account_id={ account_id.clone() } />
             </div>
+            </>
         },
         Route::Repayments { account_id } => html! {
+            <>
+            <NavBar account_id={ account_id.clone() } />
             <div class="container">
                 <Breadcrumb route={ route.clone() } />
                 <Repayments account_id={ account_id.clone() } />
             </div>
+            </>
         },
         Route::CreateRepayment { account_id } => html! {
+            <>
+            <NavBar account_id={ account_id.clone() } />
             <div class="container">
                 <Breadcrumb route={ route.clone() } />
                 <EditRepayment account_id={ account_id.clone() } />
             </div>
+            </>
         },
         Route::EditRepayment {
             account_id,
             repayment_id,
         } => html! {
+            <>
+            <NavBar account_id={ account_id.clone() } />
             <div class="container">
                 <Breadcrumb route={ route.clone() } />
                 <EditRepayment account_id={ account_id.clone() } repayment_id={ repayment_id.clone() } />
             </div>
+            </>
         },
         Route::EditExpenditure {
             account_id,
             expenditure_id,
         } => html! {
+            <>
+            <NavBar account_id={ account_id.clone() } />
             <div class="container">
                 <Breadcrumb route={ route.clone() } />
                 <EditExpenditure account_id={ account_id.clone() } expenditure_id={ expenditure_id.clone() } />
             </div>
+            </>
         },
         Route::User {
             account_id,
             user_id,
         } => html! {
+            <>
+            <NavBar account_id={ account_id.clone() } />
             <div class="container">
                 <Breadcrumb route={ route.clone() } />
                 <User account_id={ account_id.clone() } user_id={ user_id.clone() } />
             </div>
+            </>
         },
         Route::NotFound => html! {
+            <>
+            <NavBar />
             <div class="container">
                 <h1 class="title is-1">{ "Oups… Cette page n'existe pas" }</h1>
             </div>
+            </>
         },
     }
 }
@@ -122,7 +154,6 @@ fn switch(route: &Route) -> Html {
 fn app() -> Html {
     html! {
         <>
-            <TopBar/>
             <BrowserRouter>
                 <Switch<Route> render={Switch::render(switch)} />
             </BrowserRouter>
