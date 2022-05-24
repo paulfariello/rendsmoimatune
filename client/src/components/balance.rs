@@ -132,12 +132,16 @@ impl Component for BalancingList {
                     <table class="table is-fullwidth is-striped is-hoverable">
                         <thead>
                             <tr>
-                                <th>{ "Payeur" }</th>
+                                <th class="is-hidden-touch">{ "Payeur" }</th>
+                                <th class="is-hidden-desktop">{ "De" }</th>
                                 <th class="is-hidden-touch"></th>
-                                <th>{ "Montant" }</th>
+                                <th class="is-hidden-touch">{ "Montant" }</th>
+                                <th class="is-hidden-desktop"></th>
                                 <th class="is-hidden-touch"></th>
-                                <th>{ "Beneficiaire" }</th>
-                                <th>{ "Actions" }</th>
+                                <th class="is-hidden-touch">{ "Beneficiaire" }</th>
+                                <th class="is-hidden-desktop">{ "À" }</th>
+                                <th class="is-hidden-touch">{ "Actions" }</th>
+                                <th class="is-hidden-desktop"></th>
                             </tr>
                         </thead>
                         <tbody>
