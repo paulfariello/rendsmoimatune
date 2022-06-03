@@ -115,15 +115,15 @@ $fa-font-path: "webfonts";
   color: #fff;
 
   @include mobile {
-    background: url(img/background-mobile.webp) no-repeat 50% fixed;
+    background: url(img/background-mobile.webp) no-repeat 50% 0 fixed;
   }
 
   @include tablet-only {
-    background: url(img/background-tablet.webp) no-repeat 50% fixed;
+    background: url(img/background-tablet.webp) no-repeat 50% 0 fixed;
   }
 
   @include desktop {
-    background: url(img/background-large.webp) no-repeat 50% fixed;
+    background: url(img/background-large.webp) no-repeat 50% 0 fixed;
   }
 
   section {
