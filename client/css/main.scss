@@ -20,11 +20,13 @@ $fa-font-path: "webfonts";
 @font-face {
   font-family: alfphabet;
   src: url(fonts/Alfphabet-IV.ttf);
+  font-display: swap;
 }
 
 @font-face {
   font-family: Roboto;
   src: url(fonts/Roboto-Regular.ttf);
+  font-display: swap;
 }
 
 .container {
