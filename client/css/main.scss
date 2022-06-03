@@ -110,10 +110,21 @@ $fa-font-path: "webfonts";
   width: 100%;
   margin: 0;
   padding: 10em 0;
-  background: url(img/7153621661_2c0e057402_o_blurred.webp) no-repeat 50% fixed;
   background-size: auto;
   background-size: cover;
   color: #fff;
+
+  @include mobile {
+    background: url(img/background-mobile.webp) no-repeat 50% fixed;
+  }
+
+  @include tablet-only {
+    background: url(img/background-tablet.webp) no-repeat 50% fixed;
+  }
+
+  @include desktop {
+    background: url(img/background-large.webp) no-repeat 50% fixed;
+  }
 
   section {
     background: rgba(27,27,27,.75) none repeat scroll 0 0;

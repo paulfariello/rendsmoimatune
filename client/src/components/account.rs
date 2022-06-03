@@ -3,10 +3,8 @@ use std::collections::HashMap;
 use std::rc::Rc;
 
 use gloo_net::http::Request;
-use lazy_static::lazy_static;
 #[allow(unused_imports)]
 use log::{debug, error, info, warn};
-use regex::Regex;
 use rmmt;
 use uuid::Uuid;
 use yew::prelude::*;
@@ -233,13 +231,14 @@ impl Component for CreateAccount {
 
     fn create(ctx: &Context<Self>) -> Self {
         if let Some(hash) = ctx.link().location().map(|l| l.hash()) {
-            lazy_static! {
-                static ref OLD_ACCOUNT: Regex = Regex::new(r"#!/account/([a-zA-Z0-9_-]+)").unwrap();
-            }
+            if hash.starts_with("#!/account/") {
+                debug!("ahah old account");
+                if let Some(mut captures) = hash.strip_prefix("#!/account/") {
+                    if let Some(end) = captures.find("/") {
+                        captures = &captures[1..end];
+                    }
 
-            if let Some(captures) = OLD_ACCOUNT.captures(&hash) {
-                if let Some(account_id) = captures.get(1) {
-                    let account_id = account_id.as_str().to_string();
+                    let account_id = captures.to_string();
                     info!("Redirecting old account_id: {:?}", account_id);
                     let history = ctx.link().history().unwrap();
                     history.push(Route::Account { account_id });

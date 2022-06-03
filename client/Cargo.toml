@@ -22,8 +22,6 @@ yew = "0.19"
 yew-agent = "0.1"
 yew-router = "0.16"
 yewtil = "0.4"
-lazy_static = "*"
-regex = "*"
 wee_alloc = "*"
 
 [profile.release]
