@@ -288,18 +288,19 @@ impl Balance {
             }
         }
 
+        let mut balances: HashMap<Uuid, UserBalance> =
+            balances.into_iter().map(|(k, v)| (k, v.into())).collect::<HashMap<_, _>>();
+
         for repayment in repayments {
             let balance = Self::get_balance(&mut balances, &repayment.payer_id);
-            balance.credit += repayment.amount as i64;
+            balance.amount += repayment.amount as i64;
 
             let balance = Self::get_balance(&mut balances, &repayment.beneficiary_id);
-            balance
-                .debts
-                .push(Rational64::new(repayment.amount as i64, 1i64));
+            balance.amount -= repayment.amount as i64;
         }
 
         let balances: Vec<UserBalance> =
-            balances.into_values().map(|b| b.into()).collect::<Vec<_>>();
+            balances.into_values().collect::<Vec<_>>();
 
         let remaining: i64 = balances.iter().map(|b| b.amount).sum();
 
@@ -307,10 +308,10 @@ impl Balance {
     }
 
     #[inline]
-    fn get_balance<'a>(
-        balances: &'a mut HashMap<Uuid, TmpBalance>,
+    fn get_balance<'a, T>(
+        balances: &'a mut HashMap<Uuid, T>,
         id: &Uuid,
-    ) -> &'a mut TmpBalance {
+    ) -> &'a mut T {
         balances
             .get_mut(id)
             .expect(&format!("Corrupted db? Missing user {} in balances", id))
