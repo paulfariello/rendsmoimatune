@@ -1,8 +1,9 @@
 use super::*;
 use test_log::test;
 
-fn uuid(name: &str) -> Uuid {
-    Uuid::new_v5(&Uuid::NAMESPACE_X500, name.as_bytes())
+fn uuid(name_or_uuid: &str) -> Uuid {
+    Uuid::parse_str(name_or_uuid)
+        .unwrap_or(Uuid::new_v5(&Uuid::NAMESPACE_X500, name_or_uuid.as_bytes()))
 }
 
 fn user(name: &str) -> User {
@@ -57,11 +58,6 @@ fn assert_balance(
         .iter()
         .map(|b| (b.user_id.clone(), b))
         .collect::<HashMap<_, _>>();
-    assert_eq!(
-        remaining, remaining_ref,
-        "balance remaining mismatch {} (expected {})",
-        remaining, remaining_ref,
-    );
     for (user, amount) in reference {
         let balance = map_balances.get(&uuid(user)).unwrap();
         assert_eq!(
@@ -70,6 +66,11 @@ fn assert_balance(
             balance.amount, amount, user
         );
     }
+    assert_eq!(
+        remaining, remaining_ref,
+        "balance remaining mismatch {} (expected {})",
+        remaining, remaining_ref,
+    );
 }
 
 fn user_balance(user: &str, amount: i64) -> UserBalance {
@@ -308,6 +309,212 @@ fn balance_is_stable() {
             ("charlie", "bob", 86),
             ("erwan", "alice", 43),
             ("erwan", "bob", 43),
+        ],
+    );
+}
+
+#[test]
+fn non_reg() {
+    // Given
+    let users = vec![
+        user("1720536c-9a51-46d4-952f-202544b914a1"),
+        user("46106d30-b41a-4e3e-bb2a-81e3bff8978f"),
+        user("9535f524-291f-48e7-b6a9-4be24fa06c7f"),
+        user("b5535a59-94d8-4885-8cef-6418ec5c7e58"),
+        user("cf99aaff-8f7e-43b6-86bf-cb6026ed08a5"),
+    ];
+    let debts = vec![
+        expenditure(
+            "b5535a59-94d8-4885-8cef-6418ec5c7e58",
+            2300,
+            vec![
+                ("9535f524-291f-48e7-b6a9-4be24fa06c7f", 1),
+                ("b5535a59-94d8-4885-8cef-6418ec5c7e58", 1),
+                ("cf99aaff-8f7e-43b6-86bf-cb6026ed08a5", 1),
+            ],
+        ),
+        expenditure(
+            "1720536c-9a51-46d4-952f-202544b914a1",
+            42288,
+            vec![
+                ("1720536c-9a51-46d4-952f-202544b914a1", 1),
+                ("46106d30-b41a-4e3e-bb2a-81e3bff8978f", 1),
+                ("9535f524-291f-48e7-b6a9-4be24fa06c7f", 1),
+                ("b5535a59-94d8-4885-8cef-6418ec5c7e58", 1),
+                ("cf99aaff-8f7e-43b6-86bf-cb6026ed08a5", 1),
+            ],
+        ),
+        expenditure(
+            "9535f524-291f-48e7-b6a9-4be24fa06c7f",
+            3600,
+            vec![
+                ("9535f524-291f-48e7-b6a9-4be24fa06c7f", 1),
+                ("b5535a59-94d8-4885-8cef-6418ec5c7e58", 1),
+                ("cf99aaff-8f7e-43b6-86bf-cb6026ed08a5", 1),
+            ],
+        ),
+        expenditure(
+            "cf99aaff-8f7e-43b6-86bf-cb6026ed08a5",
+            3500,
+            vec![
+                ("46106d30-b41a-4e3e-bb2a-81e3bff8978f", 1),
+                ("9535f524-291f-48e7-b6a9-4be24fa06c7f", 1),
+                ("b5535a59-94d8-4885-8cef-6418ec5c7e58", 1),
+                ("cf99aaff-8f7e-43b6-86bf-cb6026ed08a5", 1),
+            ],
+        ),
+        expenditure(
+            "9535f524-291f-48e7-b6a9-4be24fa06c7f",
+            4100,
+            vec![
+                ("1720536c-9a51-46d4-952f-202544b914a1", 1),
+                ("9535f524-291f-48e7-b6a9-4be24fa06c7f", 1),
+            ],
+        ),
+        expenditure(
+            "46106d30-b41a-4e3e-bb2a-81e3bff8978f",
+            10300,
+            vec![
+                ("1720536c-9a51-46d4-952f-202544b914a1", 1),
+                ("46106d30-b41a-4e3e-bb2a-81e3bff8978f", 1),
+                ("9535f524-291f-48e7-b6a9-4be24fa06c7f", 1),
+                ("b5535a59-94d8-4885-8cef-6418ec5c7e58", 1),
+                ("cf99aaff-8f7e-43b6-86bf-cb6026ed08a5", 1),
+            ],
+        ),
+        expenditure(
+            "cf99aaff-8f7e-43b6-86bf-cb6026ed08a5",
+            6425,
+            vec![
+                ("1720536c-9a51-46d4-952f-202544b914a1", 1),
+                ("46106d30-b41a-4e3e-bb2a-81e3bff8978f", 1),
+                ("9535f524-291f-48e7-b6a9-4be24fa06c7f", 1),
+                ("b5535a59-94d8-4885-8cef-6418ec5c7e58", 1),
+                ("cf99aaff-8f7e-43b6-86bf-cb6026ed08a5", 1),
+            ],
+        ),
+        expenditure(
+            "cf99aaff-8f7e-43b6-86bf-cb6026ed08a5",
+            27600,
+            vec![
+                ("46106d30-b41a-4e3e-bb2a-81e3bff8978f", 1),
+                ("b5535a59-94d8-4885-8cef-6418ec5c7e58", 1),
+                ("cf99aaff-8f7e-43b6-86bf-cb6026ed08a5", 1),
+            ],
+        ),
+        expenditure(
+            "b5535a59-94d8-4885-8cef-6418ec5c7e58",
+            10300,
+            vec![
+                ("1720536c-9a51-46d4-952f-202544b914a1", 1),
+                ("46106d30-b41a-4e3e-bb2a-81e3bff8978f", 1),
+                ("9535f524-291f-48e7-b6a9-4be24fa06c7f", 1),
+                ("b5535a59-94d8-4885-8cef-6418ec5c7e58", 1),
+                ("cf99aaff-8f7e-43b6-86bf-cb6026ed08a5", 1),
+            ],
+        ),
+        expenditure(
+            "b5535a59-94d8-4885-8cef-6418ec5c7e58",
+            2980,
+            vec![
+                ("1720536c-9a51-46d4-952f-202544b914a1", 1),
+                ("46106d30-b41a-4e3e-bb2a-81e3bff8978f", 1),
+                ("9535f524-291f-48e7-b6a9-4be24fa06c7f", 1),
+                ("cf99aaff-8f7e-43b6-86bf-cb6026ed08a5", 1),
+            ],
+        ),
+        expenditure(
+            "46106d30-b41a-4e3e-bb2a-81e3bff8978f",
+            30900,
+            vec![
+                ("46106d30-b41a-4e3e-bb2a-81e3bff8978f", 1),
+                ("b5535a59-94d8-4885-8cef-6418ec5c7e58", 1),
+                ("cf99aaff-8f7e-43b6-86bf-cb6026ed08a5", 1),
+            ],
+        ),
+    ];
+    let repayments = vec![];
+    let (mut balances, remaining) =
+        Balance::get_user_balances(users.clone(), debts.clone(), repayments);
+    assert_balance(
+        balances.clone(),
+        vec![
+            ("1720536c-9a51-46d4-952f-202544b914a1", 25631),
+            ("46106d30-b41a-4e3e-bb2a-81e3bff8978f", 6218),
+            ("9535f524-291f-48e7-b6a9-4be24fa06c7f", -11800),
+            ("b5535a59-94d8-4885-8cef-6418ec5c7e58", -20625),
+            ("cf99aaff-8f7e-43b6-86bf-cb6026ed08a5", 576),
+        ],
+        remaining,
+        0,
+    );
+    let (balancing, _) = Balance::get_balancing(&mut balances);
+    assert_balancing(
+        balancing,
+        vec![
+            (
+                "9535f524-291f-48e7-b6a9-4be24fa06c7f",
+                "1720536c-9a51-46d4-952f-202544b914a1",
+                11800,
+            ),
+            (
+                "b5535a59-94d8-4885-8cef-6418ec5c7e58",
+                "cf99aaff-8f7e-43b6-86bf-cb6026ed08a5",
+                576,
+            ),
+            (
+                "b5535a59-94d8-4885-8cef-6418ec5c7e58",
+                "46106d30-b41a-4e3e-bb2a-81e3bff8978f",
+                6218,
+            ),
+            (
+                "b5535a59-94d8-4885-8cef-6418ec5c7e58",
+                "1720536c-9a51-46d4-952f-202544b914a1",
+                13831,
+            ),
+        ],
+    );
+
+    // When
+    let repayments = vec![repayment(
+        "9535f524-291f-48e7-b6a9-4be24fa06c7f",
+        "1720536c-9a51-46d4-952f-202544b914a1",
+        11800,
+    )];
+    let (mut balances, remaining) = Balance::get_user_balances(users, debts, repayments);
+    assert_balance(
+        balances.clone(),
+        vec![
+            ("1720536c-9a51-46d4-952f-202544b914a1", 13831),
+            ("46106d30-b41a-4e3e-bb2a-81e3bff8978f", 6218),
+            ("9535f524-291f-48e7-b6a9-4be24fa06c7f", 0),
+            ("b5535a59-94d8-4885-8cef-6418ec5c7e58", -20625),
+            ("cf99aaff-8f7e-43b6-86bf-cb6026ed08a5", 576),
+        ],
+        remaining,
+        0,
+    );
+    let (balancing, _) = Balance::get_balancing(&mut balances);
+
+    // Then
+    assert_balancing(
+        balancing,
+        vec![
+            (
+                "b5535a59-94d8-4885-8cef-6418ec5c7e58",
+                "cf99aaff-8f7e-43b6-86bf-cb6026ed08a5",
+                576,
+            ),
+            (
+                "b5535a59-94d8-4885-8cef-6418ec5c7e58",
+                "46106d30-b41a-4e3e-bb2a-81e3bff8978f",
+                6218,
+            ),
+            (
+                "b5535a59-94d8-4885-8cef-6418ec5c7e58",
+                "1720536c-9a51-46d4-952f-202544b914a1",
+                13831,
+            ),
         ],
     );
 }
