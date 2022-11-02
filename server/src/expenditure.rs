@@ -23,11 +23,11 @@ pub(crate) async fn post_expenditure(
     } else {
         let (expenditure, new_debts): (Expenditure, Vec<Debt>) = conn
             .run(move |c| {
-                c.transaction::<(Expenditure, Vec<Debt>), diesel::result::Error, _>(|| {
+                c.transaction::<(Expenditure, Vec<Debt>), diesel::result::Error, _>(|conn| {
                     let expenditure: Expenditure =
                         diesel::insert_into(rmmt::expenditures::dsl::expenditures)
                             .values(expenditure)
-                            .get_result(c)?;
+                            .get_result(conn)?;
 
                     let new_debts = debtors
                         .into_iter()
@@ -40,7 +40,7 @@ pub(crate) async fn post_expenditure(
 
                     let new_debts: Vec<Debt> = diesel::insert_into(rmmt::debts::dsl::debts)
                         .values(new_debts)
-                        .get_results(c)?;
+                        .get_results(conn)?;
 
                     Ok((expenditure, new_debts))
                 })
@@ -69,16 +69,16 @@ pub(crate) async fn put_expenditure(
     } else {
         let (expenditure, new_debts): (Expenditure, Vec<Debt>) = conn
             .run(move |c| {
-                c.transaction::<(Expenditure, Vec<Debt>), diesel::result::Error, _>(|| {
+                c.transaction::<(Expenditure, Vec<Debt>), diesel::result::Error, _>(|conn| {
                     let expenditure: Expenditure = diesel::update(&expenditure)
                         .set(&expenditure)
-                        .get_result(c)?;
+                        .get_result(conn)?;
 
                     diesel::delete(
                         rmmt::debts::dsl::debts
                             .filter(rmmt::debts::dsl::expenditure_id.eq(expenditure_id)),
                     )
-                    .execute(c)?;
+                    .execute(conn)?;
 
                     let new_debts = debtors
                         .into_iter()
@@ -92,7 +92,7 @@ pub(crate) async fn put_expenditure(
 
                     let new_debts: Vec<Debt> = diesel::insert_into(rmmt::debts::dsl::debts)
                         .values(new_debts)
-                        .get_results(c)?;
+                        .get_results(conn)?;
 
                     Ok((expenditure, new_debts))
                 })

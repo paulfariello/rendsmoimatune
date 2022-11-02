@@ -7,12 +7,14 @@ edition = "2021"
 
 [dependencies]
 chrono = "*"
-diesel = { version = "1.4.8", features = ["postgres", "uuid", "chrono"] }
+diesel = { version = "^2", features = ["postgres", "uuid", "chrono"] }
 dotenv = "0.15.0"
 rmmt = { path = "../rmmt", features = ["db", "rocket"] }
-rocket = { version = "=0.5.0-rc.1", features = ["json", "uuid"] }
-rocket_sync_db_pools = { version = "=0.1.0-rc.1", features = ["diesel_postgres_pool"] }
-uuid = "0.8.2"
+# waiting for release of 5.0 of rocket
+# currently waiting for support of diesel 2.0 (commit f0d678d464e776aaaf5d7d5f1d30df3422d362f9)
+rocket = { git = "https://github.com/SergioBenitez/Rocket", branch = "master", features = ["json", "uuid"] }
+rocket_sync_db_pools = { git = "https://github.com/SergioBenitez/Rocket", branch = "master", features = ["diesel_postgres_pool"] }
+uuid = "1"
 serde = { version = "*", features = ["derive"] }
 figment = { version = "^0.10.4", features = ["env", "toml"] }
 clap = { version = "*", features = ["derive"] }

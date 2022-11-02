@@ -20,7 +20,7 @@ pub use schema::{accounts, debts, expenditures, repayments, users};
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 #[cfg_attr(feature = "db", derive(Identifiable, Queryable))]
-#[cfg_attr(feature = "db", table_name = "accounts")]
+#[cfg_attr(feature = "db", diesel(table_name = accounts))]
 pub struct Account {
     pub id: Uuid,
     pub name: String,
@@ -28,7 +28,7 @@ pub struct Account {
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 #[cfg_attr(feature = "db", derive(Insertable))]
-#[cfg_attr(feature = "db", table_name = "accounts")]
+#[cfg_attr(feature = "db", diesel(table_name = accounts))]
 pub struct NewAccount {
     pub name: String,
 }
@@ -38,8 +38,8 @@ pub struct NewAccount {
     feature = "db",
     derive(Identifiable, Queryable, Associations, AsChangeset)
 )]
-#[cfg_attr(feature = "db", belongs_to(Account))]
-#[cfg_attr(feature = "db", table_name = "users")]
+#[cfg_attr(feature = "db", diesel(belongs_to(Account)))]
+#[cfg_attr(feature = "db", diesel(table_name = users))]
 pub struct User {
     pub id: Uuid,
     pub account_id: Uuid,
@@ -48,7 +48,7 @@ pub struct User {
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 #[cfg_attr(feature = "db", derive(Insertable))]
-#[cfg_attr(feature = "db", table_name = "users")]
+#[cfg_attr(feature = "db", diesel(table_name = users))]
 pub struct NewUser {
     pub account_id: Uuid,
     pub name: String,
@@ -59,8 +59,8 @@ pub struct NewUser {
     feature = "db",
     derive(Identifiable, Queryable, Associations, AsChangeset)
 )]
-#[cfg_attr(feature = "db", belongs_to(Account))]
-#[cfg_attr(feature = "db", table_name = "expenditures")]
+#[cfg_attr(feature = "db", diesel(belongs_to(Account)))]
+#[cfg_attr(feature = "db", diesel(table_name = expenditures))]
 pub struct Expenditure {
     pub id: Uuid,
     pub account_id: Uuid,
@@ -72,7 +72,7 @@ pub struct Expenditure {
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 #[cfg_attr(feature = "db", derive(Insertable))]
-#[cfg_attr(feature = "db", table_name = "expenditures")]
+#[cfg_attr(feature = "db", diesel(table_name = expenditures))]
 pub struct NewExpenditure {
     pub account_id: Uuid,
     pub name: String,
@@ -86,8 +86,8 @@ pub struct NewExpenditure {
     feature = "db",
     derive(Identifiable, Queryable, Associations, AsChangeset)
 )]
-#[cfg_attr(feature = "db", belongs_to(Account))]
-#[cfg_attr(feature = "db", table_name = "repayments")]
+#[cfg_attr(feature = "db", diesel(belongs_to(Account)))]
+#[cfg_attr(feature = "db", diesel(table_name = repayments))]
 pub struct Repayment {
     pub id: Uuid,
     pub account_id: Uuid,
@@ -99,7 +99,7 @@ pub struct Repayment {
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 #[cfg_attr(feature = "db", derive(Insertable))]
-#[cfg_attr(feature = "db", table_name = "repayments")]
+#[cfg_attr(feature = "db", diesel(table_name = repayments))]
 pub struct NewRepayment {
     pub account_id: Uuid,
     pub date: NaiveDate,
@@ -110,9 +110,9 @@ pub struct NewRepayment {
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 #[cfg_attr(feature = "db", derive(Identifiable, Queryable, Associations))]
-#[cfg_attr(feature = "db", belongs_to(Expenditure))]
-#[cfg_attr(feature = "db", belongs_to(User, foreign_key = "debtor_id"))]
-#[cfg_attr(feature = "db", table_name = "debts")]
+#[cfg_attr(feature = "db", diesel(belongs_to(Expenditure)))]
+#[cfg_attr(feature = "db", diesel(belongs_to(User, foreign_key = debtor_id)))]
+#[cfg_attr(feature = "db", diesel(table_name = debts))]
 pub struct Debt {
     pub id: Uuid,
     pub debtor_id: Uuid,
@@ -122,7 +122,7 @@ pub struct Debt {
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 #[cfg_attr(feature = "db", derive(Insertable))]
-#[cfg_attr(feature = "db", table_name = "debts")]
+#[cfg_attr(feature = "db", diesel(table_name = debts))]
 pub struct NewDebt {
     pub debtor_id: Uuid,
     pub expenditure_id: Uuid,
