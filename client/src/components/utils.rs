@@ -1,13 +1,13 @@
 use yew::prelude::*;
 use yew_router::prelude::*;
-use yew_router::scope_ext::HistoryHandle;
+use uuid::Uuid;
 
 use crate::Route;
 
 #[derive(Properties, PartialEq)]
 pub(crate) struct NavBarProps {
     #[prop_or_default]
-    pub account_id: Option<String>,
+    pub account_id: Option<Uuid>,
 }
 
 pub(crate) enum NavBarMsg {
@@ -16,7 +16,7 @@ pub(crate) enum NavBarMsg {
 }
 
 pub(crate) struct NavBar {
-    _listener: HistoryHandle,
+    _listener: LocationHandle,
     menu_visible: bool,
 }
 
@@ -25,9 +25,10 @@ impl Component for NavBar {
     type Properties = NavBarProps;
 
     fn create(ctx: &Context<Self>) -> Self {
-        let listener = ctx.link().add_history_listener(ctx.link().callback(|_| {
-            NavBarMsg::Hide
-        })).unwrap();
+        let listener = ctx
+            .link()
+            .add_location_listener(ctx.link().callback(|_| NavBarMsg::Hide))
+            .unwrap();
 
         Self {
             _listener: listener,
@@ -70,25 +71,25 @@ impl Component for NavBar {
                 if let Some(account_id) = ctx.props().account_id.as_ref() {
                     <div class={ classes!("navbar-menu", self.menu_visible.then_some("is-active")) } id="navbar">
                         <div class="navbar-start">
-                            <Link<Route> to={ Route::Account { account_id: account_id.clone() } } classes="navbar-item">
+                            <Link<Route> to={ Route::Account { account_id: account_id.to_string() } } classes="navbar-item">
                                 { "Compte" }
                             </Link<Route>>
                             <div class="navbar-item has-dropdown is-hoverable">
-                                <Link<Route> to={ Route::Expenditures { account_id: account_id.clone() } } classes="navbar-link">
+                                <Link<Route> to={ Route::Expenditures { account_id: account_id.to_string() } } classes="navbar-link">
                                     { "Dépenses" }
                                 </Link<Route>>
                                 <div class="navbar-dropdown">
-                                    <Link<Route> to={ Route::CreateExpenditure { account_id: account_id.clone() } } classes="navbar-item">
+                                    <Link<Route> to={ Route::CreateExpenditure { account_id: account_id.to_string() } } classes="navbar-item">
                                         { "Ajouter" }
                                     </Link<Route>>
                                 </div>
                             </div>
                             <div class="navbar-item has-dropdown is-hoverable">
-                                <Link<Route> to={ Route::Repayments { account_id: account_id.clone() } } classes="navbar-link">
+                                <Link<Route> to={ Route::Repayments { account_id: account_id.to_string() } } classes="navbar-link">
                                     { "Remboursements" }
                                 </Link<Route>>
                                 <div class="navbar-dropdown">
-                                    <Link<Route> to={ Route::CreateRepayment { account_id: account_id.clone() } } classes="navbar-item">
+                                    <Link<Route> to={ Route::CreateRepayment { account_id: account_id.to_string() } } classes="navbar-item">
                                         { "Ajouter" }
                                     </Link<Route>>
                                 </div>

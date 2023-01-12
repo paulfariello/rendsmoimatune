@@ -13,15 +13,14 @@ itertools = "*"
 log = "*"
 rmmt = { path = "../rmmt" }
 serde = { version = "1.0", features = ["derive"] }
-uuid = "0.8.2"
+uuid = "1"
 wasm-bindgen = "*"
 wasm-bindgen-futures = "0.4"
 wasm-logger = "*"
 web-sys = { version = "*", features = ["HtmlFormElement"] }
-yew = "0.19"
-yew-agent = "0.1"
-yew-router = "0.16"
-yewtil = "0.4"
+yew = { version = "0.20", features = ["csr"] }
+yew-agent = "0.2"
+yew-router = "0.17"
 wee_alloc = "*"
 
 [profile.release]

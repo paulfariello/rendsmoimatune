@@ -1,186 +1,97 @@
 use std::cell::RefCell;
 use std::collections::HashMap;
 use std::rc::Rc;
+use std::str::FromStr;
 
 use gloo_net::http::Request;
-#[allow(unused_imports)]
-use log::{debug, error, info, warn};
+use log;
 use rmmt;
+use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 use yew::prelude::*;
-use yew_agent::{Bridge, Bridged};
+use yew::suspense::{use_future, UseFutureHandle};
 use yew_router::prelude::*;
 
-use crate::agent::{AccountAgent, AccountMsg};
-use crate::components::{
-    balance::{BalanceList, BalancingList},
-    expenditure::ExpendituresList,
-    repayment::RepaymentsList,
-    user::CreateUser,
-    utils::Loading,
-};
+use crate::components::utils::{Breadcrumb, NavBar};
 use crate::Route;
+
+#[derive(Clone, PartialEq)]
+struct AccountCtx {
+    account: rmmt::Account,
+    users: HashMap<Uuid, rmmt::User>,
+    balance: rmmt::Balance,
+    expenditures: HashMap<Uuid, (rmmt::Expenditure, HashMap<Uuid, rmmt::Debt>)>,
+    repayments: HashMap<Uuid, rmmt::Repayment>,
+}
 
 #[derive(Properties, PartialEq)]
 pub struct AccountProps {
     pub id: String,
+    pub route: Route,
 }
 
-pub struct Account {
-    account: Option<Rc<RefCell<rmmt::Account>>>,
-    users: Option<Rc<RefCell<HashMap<Uuid, rmmt::User>>>>,
-    balance: Option<Rc<RefCell<rmmt::Balance>>>,
-    expenditures:
-        Option<Rc<RefCell<HashMap<Uuid, (rmmt::Expenditure, HashMap<Uuid, rmmt::Debt>)>>>>,
-    repayments: Option<Rc<RefCell<HashMap<Uuid, rmmt::Repayment>>>>,
-    fetching_users: bool,
-    fetching_expenditures: bool,
-    fetching_repayments: bool,
-    fetching_balance: bool,
-    _agent: Box<dyn Bridge<AccountAgent>>,
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub enum AccountMsg {
+    LoadAccount(String),
+    //UpdateAccount(Rc<RefCell<rmmt::Account>>),
+    //LoadExpenditure {
+    //    account_id: String,
+    //    expenditure_id: Uuid,
+    //},
+    //UpdateExpenditure(rmmt::Expenditure, HashMap<Uuid, rmmt::Debt>),
+    //LoadRepayment {
+    //    account_id: String,
+    //    repayment_id: Uuid,
+    //},
+    //UpdateRepayment(rmmt::Repayment),
+    //ChangedUsers,
+    //UpdateUsers(Rc<RefCell<HashMap<Uuid, rmmt::User>>>),
+    //UpdateBalance(Rc<RefCell<rmmt::Balance>>),
+    //ChangedExpenditures,
+    //UpdateExpenditures(Rc<RefCell<HashMap<Uuid, (rmmt::Expenditure, HashMap<Uuid, rmmt::Debt>)>>>),
+    //ChangedRepayments,
+    //UpdateRepayments(Rc<RefCell<HashMap<Uuid, rmmt::Repayment>>>),
 }
 
-impl Component for Account {
-    type Message = AccountMsg;
-    type Properties = AccountProps;
+#[function_component(Account)]
+pub fn account(props: &AccountProps) -> HtmlResult {
+    let account_id = props.id.clone();
+    let res: UseFutureHandle<Result<rmmt::Account, _>> = use_future(|| async move {
+            Request::get(&format!("/api/account/{}", account_id))
+                .send()
+                .await?
+                .json()
+                .await
+    })?;
 
-    fn create(ctx: &Context<Self>) -> Self {
-        let id = ctx.props().id.clone();
-        let mut agent = AccountAgent::bridge(ctx.link().callback(|msg| msg));
-        agent.send(AccountMsg::LoadAccount(id.clone()));
-        Self {
-            account: None,
-            users: None,
-            balance: None,
-            expenditures: None,
-            repayments: None,
-            fetching_users: false,
-            fetching_expenditures: false,
-            fetching_repayments: false,
-            fetching_balance: false,
-            _agent: agent,
-        }
-    }
+    let account: rmmt::Account = res.as_ref().unwrap().clone();
 
-    fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
-        match msg {
-            AccountMsg::UpdateAccount(account) => {
-                self.account = Some(account);
-                true
-            }
-            AccountMsg::ChangedUsers => {
-                self.fetching_users = true;
-                self.fetching_balance = true;
-                true
-            }
-            AccountMsg::ChangedExpenditures => {
-                self.fetching_expenditures = true;
-                self.fetching_balance = true;
-                true
-            }
-            AccountMsg::ChangedRepayments => {
-                self.fetching_repayments = true;
-                self.fetching_balance = true;
-                true
-            }
-            AccountMsg::UpdateUsers(users) => {
-                self.fetching_users = false;
-                self.users = Some(users);
-                true
-            }
-            AccountMsg::UpdateBalance(balance) => {
-                self.fetching_balance = false;
-                self.balance = Some(balance);
-                true
-            }
-            AccountMsg::UpdateExpenditures(expenditures) => {
-                self.fetching_expenditures = false;
-                self.expenditures = Some(expenditures);
-                true
-            }
-            AccountMsg::UpdateRepayments(repayments) => {
-                self.fetching_repayments = false;
-                self.repayments = Some(repayments);
-                true
-            }
-            _ => false,
-        }
-    }
-
-    fn view(&self, ctx: &Context<Self>) -> Html {
-        html! {
-            <>
-            <AccountTitle id={ ctx.props().id.clone() } account={ self.account.clone() } />
-            <div class="tile is-ancestor">
-                <div class="tile is-parent">
-                    <div class="tile is-child box">
-                        <h3 class="subtitle is-3">
-                            <span class="icon"><i class="fas fa-balance-scale"></i></span>
-                            <span>{ "Balance" }</span>
-                        </h3>
-                        if let (Some(users), Some(balance)) = (self.users.clone(), self.balance.clone()) {
-                            <BalanceList account_id={ ctx.props().id.clone() } { users } { balance } loading={ self.fetching_balance } />
-                        } else {
-                            <Loading />
-                        }
-                        <CreateUser account_id={ ctx.props().id.clone() } />
-                    </div>
-                </div>
-
-                <div class="tile is-parent">
-                    <div class="tile is-child box">
-                        <h3 class="subtitle is-3">
-                            <span class="icon"><i class="fas fa-exchange"></i></span>
-                            <span>{ "Équilibrage" }</span>
-                        </h3>
-                        if let (Some(users), Some(balance)) = (self.users.clone(), self.balance.clone()) {
-                            <BalancingList account_id={ ctx.props().id.clone() } { users } { balance } loading={ self.fetching_balance } />
-                        } else {
-                            <Loading />
-                        }
-                    </div>
-                </div>
-            </div>
-
-            <div class="tile is-ancestor">
-                <div class="tile is-parent">
-                    <div class="tile is-child box">
-                        <h3 class="subtitle is-3">
-                            <Link<Route> to={Route::Expenditures { account_id: ctx.props().id.clone() }}>
-                                <span class="icon"><i class="fas fa-credit-card"></i></span>
-                                <span>{ "Dépenses" }</span>
-                            </Link<Route>>
-                        </h3>
-                        if let (Some(users), Some(expenditures)) = (self.users.clone(), self.expenditures.clone()) {
-                            <ExpendituresList account_id={ ctx.props().id.clone() } { expenditures } { users } limit=10 loading={ self.fetching_expenditures } buttons=true />
-                        } else {
-                            <Loading />
-                        }
-                    </div>
-                </div>
-            </div>
-
-            <div class="tile is-ancestor">
-                <div class="tile is-parent">
-                    <div class="tile is-child box">
-                        <h3 class="subtitle is-3">
-                            <Link<Route> to={Route::Repayments { account_id: ctx.props().id.clone() }}>
-                                <span class="icon"><i class="fas fa-exchange"></i></span>
-                                <span>{ "Remboursements" }</span>
-                            </Link<Route>>
-                        </h3>
-                        if let (Some(users), Some(repayments)) = (self.users.clone(), self.repayments.clone()) {
-                            <RepaymentsList account_id={ ctx.props().id.clone() } { users } { repayments } limit=10 loading={ self.fetching_repayments } buttons=true />
-                        } else {
-                            <Loading />
-                        }
-                    </div>
-                </div>
-            </div>
-            </>
-        }
-    }
+    Ok(html! {<div>{"Hello, "}{account.name}</div>})
 }
+
+//pub struct BaseAccount;
+//
+//impl Component for BaseAccount {
+//    type Message = AccountMsg;
+//    type Properties = AccountProps;
+//
+//    fn create(_ctx: &Context<Self>) -> Self {
+//        Self
+//    }
+//
+//    fn view(&self, ctx: &Context<Self>) -> Html {
+//        // <Breadcrumb route={ ctx.props().route.clone() } />
+//        html! {
+//            <ContextProvider<Rc<AccountCtx>> context={ctx.props().account.clone()}>
+//                <NavBar account_id={ Some(ctx.props().account.id.clone()) } />
+//                <div class="container">
+//                </div>
+//            </ContextProvider<Rc<AccountCtx>>>
+//        }
+//    }
+//}
+//
+//pub type Account = WithAccount<BaseAccount>;
 
 #[derive(PartialEq, Properties)]
 pub struct CreateAccountProps;
@@ -229,22 +140,22 @@ impl Component for CreateAccount {
     type Message = CreateAccountMsg;
     type Properties = CreateAccountProps;
 
-    fn create(ctx: &Context<Self>) -> Self {
-        if let Some(hash) = ctx.link().location().map(|l| l.hash()) {
-            if hash.starts_with("#!/account/") {
-                debug!("ahah old account");
-                if let Some(mut captures) = hash.strip_prefix("#!/account/") {
-                    if let Some(end) = captures.find("/") {
-                        captures = &captures[1..end];
-                    }
+    fn create(_ctx: &Context<Self>) -> Self {
+        //if let Some(hash) = ctx.link().location().map(|l| l.hash()) {
+        //    if hash.starts_with("#!/account/") {
+        //        log::debug!("ahah old account");
+        //        if let Some(mut captures) = hash.strip_prefix("#!/account/") {
+        //            if let Some(end) = captures.find("/") {
+        //                captures = &captures[1..end];
+        //            }
 
-                    let account_id = captures.to_string();
-                    info!("Redirecting old account_id: {:?}", account_id);
-                    let history = ctx.link().history().unwrap();
-                    history.push(Route::Account { account_id });
-                }
-            }
-        }
+        //            let account_id = captures.to_string();
+        //            log::info!("Redirecting old account_id: {:?}", account_id);
+        //            let navigator = ctx.link().navigator().unwrap();
+        //            navigator.push(&Route::Account { account_id });
+        //        }
+        //    }
+        //}
         Self {
             creating: false,
             input_name: NodeRef::default(),
@@ -262,17 +173,17 @@ impl Component for CreateAccount {
                 }
             }
             CreateAccountMsg::Created { id } => {
-                info!("Created account: {}", id);
+                log::info!("Created account: {}", id);
                 self.clear();
-                let history = ctx.link().history().unwrap();
-                history.push(Route::Account { account_id: id });
+                let navigator = ctx.link().navigator().unwrap();
+                navigator.push(&Route::Account { account_id: id });
                 false
             }
         }
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
-        let onsubmit = ctx.link().callback(|event: FocusEvent| {
+        let onsubmit = ctx.link().callback(|event: SubmitEvent| {
             event.prevent_default();
             CreateAccountMsg::Submit
         });

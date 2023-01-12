@@ -2,16 +2,18 @@ use std::cell::RefCell;
 use std::collections::HashMap;
 use std::collections::HashSet;
 use std::rc::Rc;
+use std::future::Future;
 
 use gloo;
 use gloo_net::http::Request;
 #[allow(unused_imports)]
 use log::{debug, error, info, warn};
 use rmmt;
+use serde::{Deserialize, Serialize};
 use uuid::Uuid;
-use yew_agent::{Agent, AgentLink, Context as AgentContext, HandlerId};
+use yew_agent::{HandlerId, Public, Worker, WorkerLink};
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum AccountMsg {
     LoadAccount(String),
     UpdateAccount(Rc<RefCell<rmmt::Account>>),
@@ -35,7 +37,7 @@ pub enum AccountMsg {
 }
 
 pub struct AccountAgent {
-    link: AgentLink<Self>,
+    link: WorkerLink<Self>,
     subscribers: HashSet<HandlerId>,
     account_id: Option<String>,
     account: Option<Rc<RefCell<rmmt::Account>>>,
@@ -47,11 +49,20 @@ pub struct AccountAgent {
 }
 
 impl AccountAgent {
+    fn send_future<F>(&self, future: F) where F: Future<Output=AccountMsg> + 'static {
+        let link: WorkerLink<Self>  = self.link.clone();
+        let js_future = async move{
+            let message: AccountMsg = future.await;
+            link.send_message(message);
+        };
+        wasm_bindgen_futures::spawn_local(js_future);
+    }
+
     fn fetch_account(&mut self, account_id: String) {
         info!("Fetching account: {}", account_id);
         self.account_id = Some(account_id);
         let account_id = self.account_id.clone().unwrap();
-        self.link.send_future(async move {
+        self.send_future(async move {
             let account: rmmt::Account = Request::get(&format!("/api/account/{}", account_id))
                 .send()
                 .await
@@ -68,7 +79,7 @@ impl AccountAgent {
             Some(account_id) => {
                 info!("Fetching users for account: {}", account_id);
                 let account_id = account_id.clone();
-                self.link.send_future(async move {
+                self.send_future(async move {
                     let users: Vec<rmmt::User> =
                         Request::get(&format!("/api/account/{}/users", account_id))
                             .send()
@@ -91,7 +102,7 @@ impl AccountAgent {
             Some(account_id) => {
                 info!("Fetching balance for account: {}", account_id);
                 let account_id = account_id.clone();
-                self.link.send_future(async move {
+                self.send_future(async move {
                     let mut balance: rmmt::Balance =
                         Request::get(&format!("/api/account/{}/balance", account_id))
                             .send()
@@ -119,7 +130,7 @@ impl AccountAgent {
             Some(account_id) => {
                 info!("Fetching expenditures for account: {}", account_id);
                 let account_id = account_id.clone();
-                self.link.send_future(async move {
+                self.send_future(async move {
                     let expenditures: Vec<(rmmt::Expenditure, Vec<rmmt::Debt>)> =
                         Request::get(&format!("/api/account/{}/expenditures", account_id))
                             .send()
@@ -154,7 +165,7 @@ impl AccountAgent {
             Some(account_id) => {
                 info!("Fetching repayments for account: {}", account_id);
                 let account_id = account_id.clone();
-                self.link.send_future(async move {
+                self.send_future(async move {
                     let repayments: Vec<rmmt::Repayment> =
                         Request::get(&format!("/api/account/{}/repayments", account_id))
                             .send()
@@ -176,20 +187,20 @@ impl AccountAgent {
         }
     }
 
-    fn broadcast(&self, msg: <Self as Agent>::Output) {
+    fn broadcast(&self, msg: <Self as Worker>::Output) {
         for sub in self.subscribers.iter() {
             self.link.respond(*sub, msg.clone());
         }
     }
 }
 
-impl Agent for AccountAgent {
-    type Reach = AgentContext<Self>;
+impl Worker for AccountAgent {
+    type Reach = Public<Self>;
     type Message = AccountMsg;
     type Input = AccountMsg;
     type Output = AccountMsg;
 
-    fn create(link: AgentLink<Self>) -> Self {
+    fn create(link: WorkerLink<Self>) -> Self {
         Self {
             link,
             subscribers: HashSet::new(),
@@ -206,9 +217,12 @@ impl Agent for AccountAgent {
         match &msg {
             AccountMsg::UpdateAccount(account) => {
                 self.account = Some(account.clone());
-                let title = format!("{} – Rends-moi ma thune", (&*(self.account.as_ref().unwrap().borrow())).name);
+                let title = format!(
+                    "{} – Rends-moi ma thune",
+                    (&*(self.account.as_ref().unwrap().borrow())).name
+                );
                 gloo::utils::document().set_title(&title);
-            },
+            }
             AccountMsg::UpdateUsers(users) => self.users = Some(users.clone()),
             AccountMsg::UpdateBalance(balance) => self.balance = Some(balance.clone()),
             AccountMsg::UpdateExpenditures(expenditures) => {
