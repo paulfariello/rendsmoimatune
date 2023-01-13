@@ -7,7 +7,7 @@ use crate::Route;
 #[derive(Properties, PartialEq)]
 pub(crate) struct NavBarProps {
     #[prop_or_default]
-    pub account_id: Option<Uuid>,
+    pub account_id: Option<String>,
 }
 
 pub(crate) enum NavBarMsg {
@@ -71,25 +71,25 @@ impl Component for NavBar {
                 if let Some(account_id) = ctx.props().account_id.as_ref() {
                     <div class={ classes!("navbar-menu", self.menu_visible.then_some("is-active")) } id="navbar">
                         <div class="navbar-start">
-                            <Link<Route> to={ Route::Account { account_id: account_id.to_string() } } classes="navbar-item">
+                            <Link<Route> to={ Route::Account { account_id: account_id.clone() } } classes="navbar-item">
                                 { "Compte" }
                             </Link<Route>>
                             <div class="navbar-item has-dropdown is-hoverable">
-                                <Link<Route> to={ Route::Expenditures { account_id: account_id.to_string() } } classes="navbar-link">
+                                <Link<Route> to={ Route::Expenditures { account_id: account_id.clone() } } classes="navbar-link">
                                     { "Dépenses" }
                                 </Link<Route>>
                                 <div class="navbar-dropdown">
-                                    <Link<Route> to={ Route::CreateExpenditure { account_id: account_id.to_string() } } classes="navbar-item">
+                                    <Link<Route> to={ Route::CreateExpenditure { account_id: account_id.clone() } } classes="navbar-item">
                                         { "Ajouter" }
                                     </Link<Route>>
                                 </div>
                             </div>
                             <div class="navbar-item has-dropdown is-hoverable">
-                                <Link<Route> to={ Route::Repayments { account_id: account_id.to_string() } } classes="navbar-link">
+                                <Link<Route> to={ Route::Repayments { account_id: account_id.clone() } } classes="navbar-link">
                                     { "Remboursements" }
                                 </Link<Route>>
                                 <div class="navbar-dropdown">
-                                    <Link<Route> to={ Route::CreateRepayment { account_id: account_id.to_string() } } classes="navbar-item">
+                                    <Link<Route> to={ Route::CreateRepayment { account_id: account_id.clone() } } classes="navbar-item">
                                         { "Ajouter" }
                                     </Link<Route>>
                                 </div>

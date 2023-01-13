@@ -61,9 +61,12 @@ fn switch(route: Route) -> Html {
             </>
         },
         Route::Account { account_id } => html! {
+            <>
+            <NavBar account_id={ account_id.clone() } />
             <Suspense {fallback}>
                 <Account id={ account_id.clone() } route={ cloned_route }/>
             </Suspense>
+            </>
         },
         //Route::Expenditures { account_id } => html! {
         //    <>

@@ -12,7 +12,13 @@ use yew::prelude::*;
 use yew::suspense::{use_future, UseFutureHandle};
 use yew_router::prelude::*;
 
-use crate::components::utils::{Breadcrumb, NavBar};
+use crate::components::{
+    balance::{BalanceList, BalancingList},
+    expenditure::ExpendituresList,
+    repayment::RepaymentsList,
+    user::CreateUser,
+    utils::Loading,
+};
 use crate::Route;
 
 #[derive(Clone, PartialEq)]
@@ -33,24 +39,24 @@ pub struct AccountProps {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum AccountMsg {
     LoadAccount(String),
-    //UpdateAccount(Rc<RefCell<rmmt::Account>>),
-    //LoadExpenditure {
-    //    account_id: String,
-    //    expenditure_id: Uuid,
-    //},
-    //UpdateExpenditure(rmmt::Expenditure, HashMap<Uuid, rmmt::Debt>),
-    //LoadRepayment {
-    //    account_id: String,
-    //    repayment_id: Uuid,
-    //},
-    //UpdateRepayment(rmmt::Repayment),
-    //ChangedUsers,
-    //UpdateUsers(Rc<RefCell<HashMap<Uuid, rmmt::User>>>),
-    //UpdateBalance(Rc<RefCell<rmmt::Balance>>),
-    //ChangedExpenditures,
-    //UpdateExpenditures(Rc<RefCell<HashMap<Uuid, (rmmt::Expenditure, HashMap<Uuid, rmmt::Debt>)>>>),
-    //ChangedRepayments,
-    //UpdateRepayments(Rc<RefCell<HashMap<Uuid, rmmt::Repayment>>>),
+    UpdateAccount(Rc<RefCell<rmmt::Account>>),
+    LoadExpenditure {
+        account_id: String,
+        expenditure_id: Uuid,
+    },
+    UpdateExpenditure(rmmt::Expenditure, HashMap<Uuid, rmmt::Debt>),
+    LoadRepayment {
+        account_id: String,
+        repayment_id: Uuid,
+    },
+    UpdateRepayment(rmmt::Repayment),
+    ChangedUsers,
+    UpdateUsers(Rc<RefCell<HashMap<Uuid, rmmt::User>>>),
+    UpdateBalance(Rc<RefCell<rmmt::Balance>>),
+    ChangedExpenditures,
+    UpdateExpenditures(Rc<RefCell<HashMap<Uuid, (rmmt::Expenditure, HashMap<Uuid, rmmt::Debt>)>>>),
+    ChangedRepayments,
+    UpdateRepayments(Rc<RefCell<HashMap<Uuid, rmmt::Repayment>>>),
 }
 
 #[function_component(Account)]
@@ -66,7 +72,77 @@ pub fn account(props: &AccountProps) -> HtmlResult {
 
     let account: rmmt::Account = res.as_ref().unwrap().clone();
 
-    Ok(html! {<div>{"Hello, "}{account.name}</div>})
+    Ok(html! {
+        <>
+        <AccountTitle id={ props.id.clone() } account={ self.account.clone() } />
+        <div class="tile is-ancestor">
+            <div class="tile is-parent">
+                <div class="tile is-child box">
+                    <h3 class="subtitle is-3">
+                        <span class="icon"><i class="fas fa-balance-scale"></i></span>
+                        <span>{ "Balance" }</span>
+                    </h3>
+                    if let (Some(users), Some(balance)) = (self.users.clone(), self.balance.clone()) {
+                        <BalanceList account_id={ props.id.clone() } { users } { balance } loading={ self.fetching_balance } />
+                    } else {
+                        <Loading />
+                    }
+                    <CreateUser account_id={ props.id.clone() } />
+                </div>
+            </div>
+
+            <div class="tile is-parent">
+                <div class="tile is-child box">
+                    <h3 class="subtitle is-3">
+                        <span class="icon"><i class="fas fa-exchange"></i></span>
+                        <span>{ "Équilibrage" }</span>
+                    </h3>
+                    if let (Some(users), Some(balance)) = (self.users.clone(), self.balance.clone()) {
+                        <BalancingList account_id={ props.id.clone() } { users } { balance } loading={ self.fetching_balance } />
+                    } else {
+                        <Loading />
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="tile is-ancestor">
+            <div class="tile is-parent">
+                <div class="tile is-child box">
+                    <h3 class="subtitle is-3">
+                        <Link<Route> to={Route::Expenditures { account_id: props.id.clone() }}>
+                            <span class="icon"><i class="fas fa-credit-card"></i></span>
+                            <span>{ "Dépenses" }</span>
+                        </Link<Route>>
+                    </h3>
+                    if let (Some(users), Some(expenditures)) = (self.users.clone(), self.expenditures.clone()) {
+                        <ExpendituresList account_id={ props.id.clone() } { expenditures } { users } limit=10 loading={ self.fetching_expenditures } buttons=true />
+                    } else {
+                        <Loading />
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="tile is-ancestor">
+            <div class="tile is-parent">
+                <div class="tile is-child box">
+                    <h3 class="subtitle is-3">
+                        <Link<Route> to={Route::Repayments { account_id: props.id.clone() }}>
+                            <span class="icon"><i class="fas fa-exchange"></i></span>
+                            <span>{ "Remboursements" }</span>
+                        </Link<Route>>
+                    </h3>
+                    if let (Some(users), Some(repayments)) = (self.users.clone(), self.repayments.clone()) {
+                        <RepaymentsList account_id={ props.id.clone() } { users } { repayments } limit=10 loading={ self.fetching_repayments } buttons=true />
+                    } else {
+                        <Loading />
+                    }
+                </div>
+            </div>
+        </div>
+        </>
+    })
 }
 
 //pub struct BaseAccount;

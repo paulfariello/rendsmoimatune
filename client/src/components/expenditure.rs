@@ -14,9 +14,8 @@ use yew::prelude::*;
 use yew_agent::{Bridge, Bridged, Dispatched, Dispatcher};
 use yew_router::prelude::*;
 
-use crate::agent::{AccountAgent, AccountMsg};
 use crate::components::{
-    account::AccountTitle,
+    account::{AccountTitle, AccountMsg},
     user::UserName,
     utils::{Amount, Loading},
 };
@@ -32,7 +31,6 @@ pub struct Expenditures {
     expenditures:
         Option<Rc<RefCell<HashMap<Uuid, (rmmt::Expenditure, HashMap<Uuid, rmmt::Debt>)>>>>,
     users: Option<Rc<RefCell<HashMap<Uuid, rmmt::User>>>>,
-    _agent: Box<dyn Bridge<AccountAgent>>,
 }
 
 impl Component for Expenditures {
@@ -40,15 +38,10 @@ impl Component for Expenditures {
     type Properties = ExpendituresProps;
 
     fn create(ctx: &Context<Self>) -> Self {
-        let mut agent = AccountAgent::bridge(ctx.link().callback(|msg| msg));
-
-        agent.send(AccountMsg::LoadAccount(ctx.props().account_id.clone()));
-
         Self {
             account: None,
             expenditures: None,
             users: None,
-            _agent: agent,
         }
     }
 
@@ -242,7 +235,6 @@ pub struct EditExpenditure {
     debtors_input_share: HashMap<Uuid, NodeRef>,
     creating: bool,
     error: Option<String>,
-    agent: Box<dyn Bridge<AccountAgent>>,
 }
 
 impl EditExpenditure {
@@ -375,16 +367,6 @@ impl Component for EditExpenditure {
     type Properties = EditExpenditureProps;
 
     fn create(ctx: &Context<Self>) -> Self {
-        let mut agent = AccountAgent::bridge(ctx.link().callback(EditExpenditureMsg::AccountMsg));
-
-        agent.send(AccountMsg::LoadAccount(ctx.props().account_id.clone()));
-        if let Some(expenditure_id) = ctx.props().expenditure_id.clone() {
-            agent.send(AccountMsg::LoadExpenditure {
-                account_id: ctx.props().account_id.clone(),
-                expenditure_id,
-            });
-        }
-
         Self {
             account: None,
             users: None,
@@ -398,7 +380,6 @@ impl Component for EditExpenditure {
             debtors_input_share: HashMap::new(),
             creating: false,
             error: None,
-            agent,
         }
     }
 
@@ -447,7 +428,6 @@ impl Component for EditExpenditure {
                     "Edited expenditure: {:?} with debts: {:?}",
                     expenditure, debts
                 );
-                self.agent.send(AccountMsg::ChangedExpenditures);
                 self.clear();
 
                 let history = ctx.link().history().unwrap();
@@ -677,7 +657,6 @@ pub enum DeleteExpenditureMsg {
 
 struct DeleteExpenditure {
     deleting: bool,
-    agent: Dispatcher<AccountAgent>,
     error: Option<String>,
 }
 
@@ -719,7 +698,6 @@ impl Component for DeleteExpenditure {
         Self {
             deleting: false,
             error: None,
-            agent: AccountAgent::dispatcher(),
         }
     }
 
@@ -736,7 +714,6 @@ impl Component for DeleteExpenditure {
             }
             DeleteExpenditureMsg::Deleted => {
                 self.deleting = false;
-                self.agent.send(AccountMsg::ChangedExpenditures);
                 true
             }
             DeleteExpenditureMsg::Error(error) => {

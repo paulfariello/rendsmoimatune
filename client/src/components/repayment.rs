@@ -13,9 +13,8 @@ use yew::prelude::*;
 use yew_agent::{Bridge, Bridged, Dispatched, Dispatcher};
 use yew_router::prelude::*;
 
-use crate::agent::{AccountAgent, AccountMsg};
 use crate::components::{
-    account::AccountTitle,
+    account::{AccountTitle, AccountMsg},
     user::UserName,
     utils::{Amount, Loading},
 };
@@ -30,7 +29,6 @@ pub struct Repayments {
     account: Option<Rc<RefCell<rmmt::Account>>>,
     repayments: Option<Rc<RefCell<HashMap<Uuid, rmmt::Repayment>>>>,
     users: Option<Rc<RefCell<HashMap<Uuid, rmmt::User>>>>,
-    _agent: Box<dyn Bridge<AccountAgent>>,
 }
 
 impl Component for Repayments {
@@ -38,15 +36,10 @@ impl Component for Repayments {
     type Properties = RepaymentsProps;
 
     fn create(ctx: &Context<Self>) -> Self {
-        let mut agent = AccountAgent::bridge(ctx.link().callback(|msg| msg));
-
-        agent.send(AccountMsg::LoadAccount(ctx.props().account_id.clone()));
-
         Self {
             account: None,
             repayments: None,
             users: None,
-            _agent: agent,
         }
     }
 
@@ -281,7 +274,6 @@ pub struct EditRepayment {
     input_date: NodeRef,
     creating: bool,
     error: Option<String>,
-    agent: Box<dyn Bridge<AccountAgent>>,
 }
 
 impl EditRepayment {
@@ -396,16 +388,6 @@ impl Component for EditRepayment {
     type Properties = EditRepaymentProps;
 
     fn create(ctx: &Context<Self>) -> Self {
-        let mut agent = AccountAgent::bridge(ctx.link().callback(EditRepaymentMsg::AccountMsg));
-
-        agent.send(AccountMsg::LoadAccount(ctx.props().account_id.clone()));
-        if let Some(repayment_id) = ctx.props().repayment_id.clone() {
-            agent.send(AccountMsg::LoadRepayment {
-                account_id: ctx.props().account_id.clone(),
-                repayment_id,
-            });
-        }
-
         Self {
             account: None,
             users: None,
@@ -416,7 +398,6 @@ impl Component for EditRepayment {
             input_date: NodeRef::default(),
             creating: false,
             error: None,
-            agent,
         }
     }
 
@@ -451,7 +432,6 @@ impl Component for EditRepayment {
             }
             EditRepaymentMsg::Edited { repayment } => {
                 info!("Edited repayment: {:?}", repayment);
-                self.agent.send(AccountMsg::ChangedRepayments);
                 self.clear();
 
                 let history = ctx.link().history().unwrap();
@@ -629,7 +609,6 @@ pub enum DeleteRepaymentMsg {
 
 struct DeleteRepayment {
     deleting: bool,
-    agent: Dispatcher<AccountAgent>,
     error: Option<String>,
 }
 
@@ -671,7 +650,6 @@ impl Component for DeleteRepayment {
         Self {
             deleting: false,
             error: None,
-            agent: AccountAgent::dispatcher(),
         }
     }
 
@@ -688,7 +666,6 @@ impl Component for DeleteRepayment {
             }
             DeleteRepaymentMsg::Deleted => {
                 self.deleting = false;
-                self.agent.send(AccountMsg::ChangedRepayments);
                 true
             }
             DeleteRepaymentMsg::Error(error) => {

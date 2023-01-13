@@ -11,9 +11,8 @@ use yew::prelude::*;
 use yew_agent::{Bridge, Bridged, Dispatched, Dispatcher};
 use yew_router::prelude::*;
 
-use crate::agent::{AccountAgent, AccountMsg};
 use crate::components::{
-    account::AccountTitle,
+    account::{AccountTitle, AccountMsg},
     expenditure::ExpendituresList,
     repayment::RepaymentsList,
     utils::{Amount, Loading},
@@ -65,7 +64,6 @@ pub enum CreateUserMsg {
 pub struct CreateUser {
     creating: bool,
     input_name: NodeRef,
-    agent: Dispatcher<AccountAgent>,
 }
 
 impl CreateUser {
@@ -110,7 +108,6 @@ impl Component for CreateUser {
         Self {
             creating: false,
             input_name: NodeRef::default(),
-            agent: AccountAgent::dispatcher(),
         }
     }
 
@@ -126,7 +123,6 @@ impl Component for CreateUser {
             }
             CreateUserMsg::Created { user } => {
                 info!("Created user: {}", user.name);
-                self.agent.send(AccountMsg::ChangedUsers);
                 self.clear();
                 true
             }
@@ -172,7 +168,6 @@ pub enum UserMsg {
 }
 
 pub struct User {
-    agent: Box<dyn Bridge<AccountAgent>>,
     account: Option<Rc<RefCell<rmmt::Account>>>,
     expenditures:
         Option<Rc<RefCell<HashMap<Uuid, (rmmt::Expenditure, HashMap<Uuid, rmmt::Debt>)>>>>,
@@ -223,12 +218,7 @@ impl Component for User {
     type Properties = UserProps;
 
     fn create(ctx: &Context<Self>) -> Self {
-        let mut agent = AccountAgent::bridge(ctx.link().callback(|msg| UserMsg::AccountMsg(msg)));
-
-        agent.send(AccountMsg::LoadAccount(ctx.props().account_id.clone()));
-
         Self {
-            agent: agent,
             account: None,
             expenditures: None,
             repayments: None,
@@ -273,7 +263,6 @@ impl Component for User {
                 }
             }
             UserMsg::Edited { user: _ } => {
-                self.agent.send(AccountMsg::ChangedUsers);
                 self.clear();
                 true
             }
