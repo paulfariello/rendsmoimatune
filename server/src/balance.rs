@@ -36,5 +36,5 @@ pub(crate) async fn get_balance(conn: MainDbConn, uniq_id: UniqId) -> Result<Jso
         })
         .await?;
 
-    Ok(Json(Balance::from_account(users, debts, repayments)))
+    Ok(Json(Balance::from_account(&users, &debts, &repayments)))
 }

@@ -1,6 +1,5 @@
 use yew::prelude::*;
 use yew_router::prelude::*;
-use uuid::Uuid;
 
 use crate::Route;
 

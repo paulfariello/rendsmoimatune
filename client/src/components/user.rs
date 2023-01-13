@@ -8,7 +8,6 @@ use log::{debug, error, info, warn};
 use rmmt::{self, prelude::*};
 use uuid::Uuid;
 use yew::prelude::*;
-use yew_agent::{Bridge, Bridged, Dispatched, Dispatcher};
 use yew_router::prelude::*;
 
 use crate::components::{
@@ -232,24 +231,19 @@ impl Component for User {
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
             UserMsg::AccountMsg(msg) => match msg {
-                AccountMsg::UpdateAccount(account) => {
-                    self.account = Some(account);
+                AccountMsg::UpdateAccount => {
                     true
                 }
-                AccountMsg::UpdateUsers(users) => {
-                    self.users = Some(users);
+                AccountMsg::UpdateUsers => {
                     true
                 }
-                AccountMsg::UpdateExpenditures(expenditures) => {
-                    self.expenditures = Some(expenditures);
+                AccountMsg::UpdateExpenditures => {
                     true
                 }
-                AccountMsg::UpdateRepayments(repayments) => {
-                    self.repayments = Some(repayments);
+                AccountMsg::UpdateRepayments => {
                     true
                 }
-                AccountMsg::UpdateBalance(balance) => {
-                    self.balance = Some(balance);
+                AccountMsg::UpdateBalance => {
                     true
                 }
                 _ => false,

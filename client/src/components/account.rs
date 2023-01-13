@@ -39,42 +39,36 @@ pub struct AccountProps {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum AccountMsg {
     LoadAccount(String),
-    UpdateAccount(Rc<RefCell<rmmt::Account>>),
-    LoadExpenditure {
-        account_id: String,
-        expenditure_id: Uuid,
-    },
-    UpdateExpenditure(rmmt::Expenditure, HashMap<Uuid, rmmt::Debt>),
-    LoadRepayment {
-        account_id: String,
-        repayment_id: Uuid,
-    },
-    UpdateRepayment(rmmt::Repayment),
+    UpdateAccount,
+    LoadExpenditure,
+    UpdateExpenditure,
+    LoadRepayment,
+    UpdateRepayment,
     ChangedUsers,
-    UpdateUsers(Rc<RefCell<HashMap<Uuid, rmmt::User>>>),
-    UpdateBalance(Rc<RefCell<rmmt::Balance>>),
+    UpdateUsers,
+    UpdateBalance,
     ChangedExpenditures,
-    UpdateExpenditures(Rc<RefCell<HashMap<Uuid, (rmmt::Expenditure, HashMap<Uuid, rmmt::Debt>)>>>),
+    UpdateExpenditures,
     ChangedRepayments,
-    UpdateRepayments(Rc<RefCell<HashMap<Uuid, rmmt::Repayment>>>),
+    UpdateRepayments,
 }
 
 #[function_component(Account)]
 pub fn account(props: &AccountProps) -> HtmlResult {
     let account_id = props.id.clone();
-    let res: UseFutureHandle<Result<rmmt::Account, _>> = use_future(|| async move {
-            Request::get(&format!("/api/account/{}", account_id))
+    let res: UseFutureHandle<Result<rmmt::FullAccount, _>> = use_future(|| async move {
+            Request::get(&format!("/api/full_account/{}", account_id))
                 .send()
                 .await?
                 .json()
                 .await
     })?;
 
-    let account: rmmt::Account = res.as_ref().unwrap().clone();
+    let account: rmmt::FullAccount = res.as_ref().unwrap().clone();
 
     Ok(html! {
         <>
-        <AccountTitle id={ props.id.clone() } account={ self.account.clone() } />
+        <AccountTitle id={ props.id.clone() } account={ account.account.clone() } />
         <div class="tile is-ancestor">
             <div class="tile is-parent">
                 <div class="tile is-child box">
@@ -82,7 +76,7 @@ pub fn account(props: &AccountProps) -> HtmlResult {
                         <span class="icon"><i class="fas fa-balance-scale"></i></span>
                         <span>{ "Balance" }</span>
                     </h3>
-                    if let (Some(users), Some(balance)) = (self.users.clone(), self.balance.clone()) {
+                    if let (Some(users), Some(balance)) = (account.users.clone(), account.balance.clone()) {
                         <BalanceList account_id={ props.id.clone() } { users } { balance } loading={ self.fetching_balance } />
                     } else {
                         <Loading />
@@ -97,7 +91,7 @@ pub fn account(props: &AccountProps) -> HtmlResult {
                         <span class="icon"><i class="fas fa-exchange"></i></span>
                         <span>{ "Équilibrage" }</span>
                     </h3>
-                    if let (Some(users), Some(balance)) = (self.users.clone(), self.balance.clone()) {
+                    if let (Some(users), Some(balance)) = (account.users.clone(), account.balance.clone()) {
                         <BalancingList account_id={ props.id.clone() } { users } { balance } loading={ self.fetching_balance } />
                     } else {
                         <Loading />
@@ -115,7 +109,7 @@ pub fn account(props: &AccountProps) -> HtmlResult {
                             <span>{ "Dépenses" }</span>
                         </Link<Route>>
                     </h3>
-                    if let (Some(users), Some(expenditures)) = (self.users.clone(), self.expenditures.clone()) {
+                    if let (Some(users), Some(expenditures)) = (account.users.clone(), account.expenditures.clone()) {
                         <ExpendituresList account_id={ props.id.clone() } { expenditures } { users } limit=10 loading={ self.fetching_expenditures } buttons=true />
                     } else {
                         <Loading />
@@ -133,7 +127,7 @@ pub fn account(props: &AccountProps) -> HtmlResult {
                             <span>{ "Remboursements" }</span>
                         </Link<Route>>
                     </h3>
-                    if let (Some(users), Some(repayments)) = (self.users.clone(), self.repayments.clone()) {
+                    if let (Some(users), Some(repayments)) = (account.users.clone(), self.repayments.clone()) {
                         <RepaymentsList account_id={ props.id.clone() } { users } { repayments } limit=10 loading={ self.fetching_repayments } buttons=true />
                     } else {
                         <Loading />

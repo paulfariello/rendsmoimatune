@@ -47,6 +47,7 @@ fn rocket() -> _ {
             routes![
                 account::post_account,
                 account::get_account,
+                account::get_full_account,
                 expenditure::post_expenditure,
                 expenditure::get_expenditures,
                 expenditure::del_expenditure,

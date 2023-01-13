@@ -187,9 +187,9 @@ pub struct Balance {
 
 impl Balance {
     pub fn from_account(
-        users: Vec<User>,
-        debts: Vec<(Expenditure, Vec<Debt>)>,
-        repayments: Vec<Repayment>,
+        users: &Vec<User>,
+        debts: &Vec<(Expenditure, Vec<Debt>)>,
+        repayments: &Vec<Repayment>,
     ) -> Self {
         let (mut user_balances, account_remaining) =
             Self::get_user_balances(users, debts, repayments);
@@ -253,9 +253,9 @@ impl Balance {
 
     /// Compute balance for each user.
     fn get_user_balances(
-        users: Vec<User>,
-        debts: Vec<(Expenditure, Vec<Debt>)>,
-        repayments: Vec<Repayment>,
+        users: &Vec<User>,
+        debts: &Vec<(Expenditure, Vec<Debt>)>,
+        repayments: &Vec<Repayment>,
     ) -> (Vec<UserBalance>, i64) {
         let mut balances: HashMap<Uuid, TmpBalance> = users
             .iter()
@@ -279,7 +279,7 @@ impl Balance {
             // Update deptors balances
             let share_sum: i32 = debts.iter().map(|d| d.share).sum();
 
-            for debt in &debts {
+            for debt in debts {
                 let balance = Self::get_balance(&mut balances, &debt.debtor_id);
                 balance.debts.push(Rational64::new(
                     expenditure.amount as i64 * debt.share as i64,
@@ -316,6 +316,15 @@ impl Balance {
             .get_mut(id)
             .expect(&format!("Corrupted db? Missing user {} in balances", id))
     }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+pub struct FullAccount {
+    pub account: Account,
+    pub users: Vec<User>,
+    pub expenditures: Vec<(Expenditure, Vec<Debt>)>,
+    pub repayments: Vec<Repayment>,
+    pub balance: Balance,
 }
 
 #[cfg(test)]
