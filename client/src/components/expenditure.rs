@@ -1,6 +1,4 @@
-use std::cell::RefCell;
 use std::collections::HashMap;
-use std::rc::Rc;
 
 use chrono::naive::NaiveDate;
 use chrono::Local;
@@ -14,47 +12,35 @@ use yew::prelude::*;
 use yew_router::prelude::*;
 
 use crate::components::{
-    account::{AccountTitle, AccountMsg},
+    account::{AccountMsg, AccountTitle},
     user::UserName,
-    utils::{Amount, Loading},
+    utils::Amount,
 };
 use crate::Route;
 
 #[derive(Properties, PartialEq)]
 pub struct ExpendituresProps {
     pub account_id: String,
+    pub account: rmmt::Account,
+    pub expenditures: HashMap<Uuid, (rmmt::Expenditure, HashMap<Uuid, rmmt::Debt>)>,
+    pub users: HashMap<Uuid, rmmt::User>,
 }
 
-pub struct Expenditures {
-    account: Option<Rc<RefCell<rmmt::Account>>>,
-    expenditures:
-        Option<Rc<RefCell<HashMap<Uuid, (rmmt::Expenditure, HashMap<Uuid, rmmt::Debt>)>>>>,
-    users: Option<Rc<RefCell<HashMap<Uuid, rmmt::User>>>>,
-}
+pub struct Expenditures;
 
 impl Component for Expenditures {
     type Message = AccountMsg;
     type Properties = ExpendituresProps;
 
     fn create(ctx: &Context<Self>) -> Self {
-        Self {
-            account: None,
-            expenditures: None,
-            users: None,
-        }
+        Self
     }
 
     fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
-            AccountMsg::UpdateAccount => {
-                true
-            }
-            AccountMsg::UpdateUsers => {
-                true
-            }
-            AccountMsg::UpdateExpenditures => {
-                true
-            }
+            AccountMsg::UpdateAccount => true,
+            AccountMsg::UpdateUsers => true,
+            AccountMsg::UpdateExpenditures => true,
             _ => false,
         }
     }
@@ -62,7 +48,7 @@ impl Component for Expenditures {
     fn view(&self, ctx: &Context<Self>) -> Html {
         html! {
             <>
-            <AccountTitle id={ ctx.props().account_id.clone() } account={ self.account.clone() } />
+            <AccountTitle id={ ctx.props().account_id.clone() } name={ ctx.props().account.name.clone() } />
             <div class="box">
                 <h3 class="subtitle is-3">
                     <Link<Route> to={Route::Expenditures { account_id: ctx.props().account_id.clone() }}>
@@ -72,11 +58,7 @@ impl Component for Expenditures {
                         </span>
                     </Link<Route>>
                 </h3>
-                if let (Some(users), Some(expenditures)) = (self.users.clone(), self.expenditures.clone()) {
-                    <ExpendituresList account_id={ ctx.props().account_id.clone() } { expenditures } { users } />
-                } else {
-                    <Loading />
-                }
+                <ExpendituresList account_id={ ctx.props().account_id.clone() } expenditures={ ctx.props().expenditures.clone() } users={ ctx.props().users.clone() } />
             </div>
             </>
         }
@@ -86,11 +68,9 @@ impl Component for Expenditures {
 #[derive(Properties, PartialEq)]
 pub struct ExpendituresListProps {
     pub account_id: String,
-    pub expenditures: Rc<RefCell<HashMap<Uuid, (rmmt::Expenditure, HashMap<Uuid, rmmt::Debt>)>>>,
-    pub users: Rc<RefCell<HashMap<Uuid, rmmt::User>>>,
+    pub expenditures: HashMap<Uuid, (rmmt::Expenditure, HashMap<Uuid, rmmt::Debt>)>,
+    pub users: HashMap<Uuid, rmmt::User>,
     pub limit: Option<usize>,
-    #[prop_or_default]
-    pub loading: bool,
     #[prop_or_default]
     pub buttons: bool,
 }
@@ -106,7 +86,7 @@ impl Component for ExpendituresList {
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
-        let expenditures = ctx.props().expenditures.borrow();
+        let expenditures = &ctx.props().expenditures;
         let mut sorted = expenditures.keys().cloned().collect::<Vec<_>>();
         sorted.sort_by(|a, b| {
             expenditures
@@ -121,11 +101,6 @@ impl Component for ExpendituresList {
 
         html! {
             <div class="is-relative block">
-                if ctx.props().loading {
-                    <div class="loading-overlay">
-                        <Loading />
-                    </div>
-                }
                 {
                     if len > 0 {
                         let map = |id: &Uuid| {
@@ -205,6 +180,10 @@ pub struct EditExpenditureProps {
     pub account_id: String,
     #[prop_or_default]
     pub expenditure_id: Option<Uuid>,
+    pub account: rmmt::Account,
+    pub users: HashMap<Uuid, rmmt::User>,
+    pub expenditure: Option<rmmt::Expenditure>,
+    pub debts: Option<HashMap<Uuid, rmmt::Debt>>,
 }
 
 pub enum EditExpenditureMsg {
@@ -219,10 +198,6 @@ pub enum EditExpenditureMsg {
 }
 
 pub struct EditExpenditure {
-    account: Option<Rc<RefCell<rmmt::Account>>>,
-    users: Option<Rc<RefCell<HashMap<Uuid, rmmt::User>>>>,
-    expenditure: Option<rmmt::Expenditure>,
-    debts: Option<HashMap<Uuid, rmmt::Debt>>,
     input_name: NodeRef,
     input_date: NodeRef,
     input_amount: NodeRef,
@@ -259,7 +234,7 @@ impl EditExpenditure {
         let account_id: UniqId = ctx.props().account_id.clone().try_into().unwrap();
 
         let mut debtors = Vec::new();
-        for (id, user) in (&*self.users.as_ref().unwrap().borrow()).iter() {
+        for (id, user) in ctx.props().users.iter() {
             let checkbox = self.debtors_checkbox.get(id).unwrap();
             let enabled = checkbox
                 .cast::<web_sys::HtmlInputElement>()
@@ -364,10 +339,6 @@ impl Component for EditExpenditure {
 
     fn create(ctx: &Context<Self>) -> Self {
         Self {
-            account: None,
-            users: None,
-            expenditure: None,
-            debts: None,
             input_name: NodeRef::default(),
             input_date: NodeRef::default(),
             input_amount: NodeRef::default(),
@@ -382,32 +353,23 @@ impl Component for EditExpenditure {
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
             EditExpenditureMsg::AccountMsg(msg) => match msg {
-                AccountMsg::UpdateAccount(account) => {
-                    self.account = Some(account);
-                    true
-                }
-                AccountMsg::UpdateUsers(users) => {
-                    self.users = Some(users);
-                    self.debtors_checkbox = (&*self.users.as_ref().unwrap().borrow())
+                AccountMsg::UpdateAccount => true,
+                AccountMsg::UpdateUsers => {
+                    self.debtors_checkbox = ctx
+                        .props()
+                        .users
                         .iter()
                         .map(|(id, _)| (id.clone(), NodeRef::default()))
                         .collect();
-                    self.debtors_input_share = (&*self.users.as_ref().unwrap().borrow())
+                    self.debtors_input_share = ctx
+                        .props()
+                        .users
                         .iter()
                         .map(|(id, _)| (id.clone(), NodeRef::default()))
                         .collect();
                     true
                 }
-                AccountMsg::UpdateExpenditure(expenditure, debts) => {
-                    info!("Fetched expenditure from cache: {:?}", expenditure);
-                    if Some(expenditure.id) == ctx.props().expenditure_id {
-                        self.expenditure = Some(expenditure);
-                        self.debts = Some(debts);
-                        true
-                    } else {
-                        false
-                    }
-                }
+                AccountMsg::UpdateExpenditure => true,
                 _ => false,
             },
             EditExpenditureMsg::Submit => {
@@ -426,8 +388,8 @@ impl Component for EditExpenditure {
                 );
                 self.clear();
 
-                let history = ctx.link().history().unwrap();
-                history.push(Route::Account {
+                let navigator = ctx.link().navigator().unwrap();
+                navigator.push(&Route::Account {
                     account_id: ctx.props().account_id.clone(),
                 });
 
@@ -447,22 +409,22 @@ impl Component for EditExpenditure {
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
-        let onsubmit = ctx.link().callback(|event: FocusEvent| {
+        let onsubmit = ctx.link().callback(|event: SubmitEvent| {
             event.prevent_default();
             EditExpenditureMsg::Submit
         });
 
-        let history = ctx.link().history().unwrap();
-        let previous = Callback::once(move |event: MouseEvent| {
+        let navigator = ctx.link().navigator().unwrap();
+        let previous = Callback::from(move |event: MouseEvent| {
             event.prevent_default();
-            history.go(-1)
+            navigator.back()
         });
 
         let delete_error = ctx.link().callback(|_| EditExpenditureMsg::ClearError);
 
         html! {
             <>
-            <AccountTitle id={ ctx.props().account_id.clone() } account={ self.account.clone() } />
+            <AccountTitle id={ ctx.props().account_id.clone() } name={ ctx.props().account.name.clone() } />
             <div class="box">
                 if let Some(expenditure_id) = ctx.props().expenditure_id.clone() {
                     <h3 class="subtitle is-3">
@@ -489,82 +451,78 @@ impl Component for EditExpenditure {
                       { error }
                     </div>
                 }
-                if let Some(users) = self.users.clone() {
-                    <form {onsubmit}>
-                        <div class="field">
-                            <label class="label">{ "Nom" }</label>
+                <form {onsubmit}>
+                    <div class="field">
+                        <label class="label">{ "Nom" }</label>
+                        <div class="control">
+                            <input ref={ self.input_name.clone() } class="input is-primary" type="text" placeholder="Baguette de pain" required=true value={ ctx.props().expenditure.map(|e| e.name.clone()) }/>
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label class="label">{ "Montant" }</label>
+                        <div class="field has-addons">
+                            <div class="control is-expanded">
+                                <input ref={ self.input_amount.clone() } type="number" min="0" step="0.01" class="input is-primary" required=true placeholder="montant" value={ ctx.props().expenditure.map(|e| (e.amount as f64 / 100f64).to_string()) }/>
+                            </div>
                             <div class="control">
-                                <input ref={ self.input_name.clone() } class="input is-primary" type="text" placeholder="Baguette de pain" required=true value={ self.expenditure.as_ref().map(|e| e.name.clone()) }/>
+                                <p class="button is-static">{ "€" }</p>
                             </div>
                         </div>
+                    </div>
 
-                        <div class="field">
-                            <label class="label">{ "Montant" }</label>
-                            <div class="field has-addons">
-                                <div class="control is-expanded">
-                                    <input ref={ self.input_amount.clone() } type="number" min="0" step="0.01" class="input is-primary" required=true placeholder="montant" value={ self.expenditure.as_ref().map(|e| (e.amount as f64 / 100f64).to_string()) }/>
-                                </div>
-                                <div class="control">
-                                    <p class="button is-static">{ "€" }</p>
-                                </div>
-                            </div>
+                    <div class="field">
+                        <label class="label">{ "Date" }</label>
+                        <div class="control">
+                            <input ref={self.input_date.clone()} type="date" class="input is-primary" required=true value={ format!("{}", ctx.props().expenditure.map(|e| e.date).unwrap_or(Local::today().naive_local()).format("%Y-%m-%d")) } />
                         </div>
+                    </div>
 
-                        <div class="field">
-                            <label class="label">{ "Date" }</label>
-                            <div class="control">
-                                <input ref={self.input_date.clone()} type="date" class="input is-primary" required=true value={ format!("{}", self.expenditure.as_ref().map(|e| e.date).unwrap_or(Local::today().naive_local()).format("%Y-%m-%d")) } />
-                            </div>
-                        </div>
-
-                        <div class="field">
-                            <label class="label">{ "Payeur" }</label>
-                            <p class="control is-expanded has-icons-left">
-                                <div class="select is-fullwidth is-primary">
-                                    <select ref={ self.select_payer.clone() } required=true>
-                                    {
-                                        (&*users.borrow()).iter().map(|(_, user)| html! {
-                                            <option value={ user.id.to_string() } selected={ self.expenditure.as_ref().map(|e| e.payer_id) == Some(user.id) }>{ &user.name }</option>
-                                        }).collect::<Html>()
-                                    }
-                                    </select>
-                                </div>
-                                <span class="icon is-small is-left">
-                                    <i class="fas fa-user"></i>
-                                </span>
-                            </p>
-                        </div>
-
-                        <div class="field">
-                            <label class="label">{ "Bénéficiaires" }</label>
-                            {
-                                (&*users.borrow()).iter().map(|(id, user)| html! {
-                                    <DebtorInput name={ user.name.clone() } state_ref={ self.debtors_checkbox.get(&id).clone().unwrap() } share_ref={ self.debtors_input_share.get(&id).clone().unwrap() } debt={ self.debts.as_ref().and_then(|d| d.get(&id).cloned()) }/>
-                                }).collect::<Html>()
-                            }
-                        </div>
-                        <div class="control buttons">
-                            <button type="button" class="button is-light" onclick={ previous }>
-                                { "Annuler" }
-                            </button>
-                            <button type="submit" class={classes!("button", "is-primary", self.creating.then(|| "is-loading"))}>
-                                if ctx.props().expenditure_id.is_some() {
-                                    <span class="icon">
-                                        <i class="fas fa-save" />
-                                    </span>
-                                    <span>{ "Enregistrer" }</span>
-                                } else {
-                                    <span class="icon">
-                                        <i class="fas fa-plus" />
-                                    </span>
-                                    <span>{ "Ajouter" }</span>
+                    <div class="field">
+                        <label class="label">{ "Payeur" }</label>
+                        <p class="control is-expanded has-icons-left">
+                            <div class="select is-fullwidth is-primary">
+                                <select ref={ self.select_payer.clone() } required=true>
+                                {
+                                    ctx.props().users.iter().map(|(_, user)| html! {
+                                        <option value={ user.id.to_string() } selected={ ctx.props().expenditure.map(|e| e.payer_id) == Some(user.id) }>{ &user.name }</option>
+                                    }).collect::<Html>()
                                 }
-                            </button>
-                        </div>
-                    </form>
-                } else {
-                    <Loading />
-                }
+                                </select>
+                            </div>
+                            <span class="icon is-small is-left">
+                                <i class="fas fa-user"></i>
+                            </span>
+                        </p>
+                    </div>
+
+                    <div class="field">
+                        <label class="label">{ "Bénéficiaires" }</label>
+                        {
+                            ctx.props().users.iter().map(|(id, user)| html! {
+                                <DebtorInput name={ user.name.clone() } state_ref={ self.debtors_checkbox.get(&id).clone().unwrap() } share_ref={ self.debtors_input_share.get(&id).clone().unwrap() } debt={ ctx.props().debts.and_then(|d| d.get(&id).cloned()) }/>
+                            }).collect::<Html>()
+                        }
+                    </div>
+                    <div class="control buttons">
+                        <button type="button" class="button is-light" onclick={ previous }>
+                            { "Annuler" }
+                        </button>
+                        <button type="submit" class={classes!("button", "is-primary", self.creating.then(|| "is-loading"))}>
+                            if ctx.props().expenditure_id.is_some() {
+                                <span class="icon">
+                                    <i class="fas fa-save" />
+                                </span>
+                                <span>{ "Enregistrer" }</span>
+                            } else {
+                                <span class="icon">
+                                    <i class="fas fa-plus" />
+                                </span>
+                                <span>{ "Ajouter" }</span>
+                            }
+                        </button>
+                    </div>
+                </form>
             </div>
             </>
         }
@@ -631,7 +589,7 @@ impl Component for DebtorInput {
                 </div>
                 if self.checked {
                     <div class="control">
-                        <input ref={ ctx.props().share_ref.clone() } type="number" min="0" step="1" class="input is-primary" value={ ctx.props().debt.as_ref().map(|d| d.share.to_string()).or(Some(1.to_string())) } />
+                        <input ref={ ctx.props().share_ref.clone() } type="number" min="0" step="1" class="input is-primary" value={ ctx.props().debt.map(|d| d.share.to_string()).or(Some(1.to_string())) } />
                     </div>
                 }
             </div>
@@ -734,14 +692,14 @@ impl Component for DeleteExpenditure {
 
 #[derive(Properties, PartialEq)]
 pub struct DebtorsProps {
-    pub users: Rc<RefCell<HashMap<Uuid, rmmt::User>>>,
+    pub users: HashMap<Uuid, rmmt::User>,
     pub debts: HashMap<Uuid, rmmt::Debt>,
 }
 
 #[function_component(Debtors)]
 fn debtors(props: &DebtorsProps) -> Html {
     let debts_count = props.debts.len();
-    let users_count = props.users.borrow().len();
+    let users_count = props.users.len();
     html! {
         if debts_count == users_count {
             { "Tous" }
@@ -749,9 +707,9 @@ fn debtors(props: &DebtorsProps) -> Html {
             { "Personne" }
         } else if debts_count > users_count / 2 {
             { "Tous sauf " }
-            { props.users.borrow().iter().filter(|(id, _)| !props.debts.contains_key(id)).map(|(_, u)| &u.name).join(", ") }
+            { props.users.iter().filter(|(id, _)| !props.debts.contains_key(id)).map(|(_, u)| &u.name).join(", ") }
         } else {
-            { props.users.borrow().iter().filter(|(id, _)| props.debts.contains_key(id)).map(|(_, u)| &u.name).join(", ") }
+            { props.users.iter().filter(|(id, _)| props.debts.contains_key(id)).map(|(_, u)| &u.name).join(", ") }
         }
     }
 }

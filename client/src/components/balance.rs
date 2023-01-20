@@ -1,6 +1,4 @@
-use std::cell::RefCell;
 use std::collections::HashMap;
-use std::rc::Rc;
 
 #[allow(unused_imports)]
 use log::{debug, error, info, warn};
@@ -10,17 +8,13 @@ use yew_router::prelude::*;
 
 use crate::Route;
 
-use crate::components::{
-    user::UserName,
-    utils::{Amount, Loading},
-};
+use crate::components::{user::UserName, utils::Amount};
 
 #[derive(Properties, PartialEq)]
 pub struct BalanceListProps {
     pub account_id: String,
-    pub users: Rc<RefCell<HashMap<Uuid, rmmt::User>>>,
-    pub balance: Rc<RefCell<rmmt::Balance>>,
-    pub loading: bool,
+    pub users: HashMap<Uuid, rmmt::User>,
+    pub balance: rmmt::Balance,
 }
 
 pub struct BalanceList;
@@ -34,7 +28,7 @@ impl Component for BalanceList {
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
-        let balance = &*ctx.props().balance.borrow();
+        let balance = &ctx.props().balance;
         let users = &ctx.props().users;
 
         let max = balance
@@ -47,11 +41,6 @@ impl Component for BalanceList {
 
         html! {
             <div class="balance is-relative block">
-                if ctx.props().loading {
-                    <div class="loading-overlay">
-                        <Loading />
-                    </div>
-                }
                 <table class="table is-fullwidth is-striped is-hoverable">
                     <tbody>
                         {
@@ -98,9 +87,8 @@ impl Component for BalanceList {
 #[derive(Properties, PartialEq)]
 pub struct BalancingListProps {
     pub account_id: String,
-    pub users: Rc<RefCell<HashMap<Uuid, rmmt::User>>>,
-    pub balance: Rc<RefCell<rmmt::Balance>>,
-    pub loading: bool,
+    pub users: HashMap<Uuid, rmmt::User>,
+    pub balance: rmmt::Balance,
 }
 
 pub struct BalancingList;
@@ -114,16 +102,11 @@ impl Component for BalancingList {
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
-        let balance = &*ctx.props().balance.borrow();
+        let balance = &ctx.props().balance;
         let users = &ctx.props().users;
 
         html! {
             <div class="balancing is-relative block">
-                if ctx.props().loading {
-                    <div class="loading-overlay">
-                        <Loading />
-                    </div>
-                }
                 if balance.balancing.is_empty() {
                     <div class="notification is-success is-light">
                         { "Bien joué, personne de doit rien à personne." }

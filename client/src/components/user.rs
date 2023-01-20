@@ -11,17 +11,17 @@ use yew::prelude::*;
 use yew_router::prelude::*;
 
 use crate::components::{
-    account::{AccountTitle, AccountMsg},
+    account::{AccountMsg, AccountTitle},
     expenditure::ExpendituresList,
     repayment::RepaymentsList,
-    utils::{Amount, Loading},
+    utils::Amount,
 };
 use crate::Route;
 
 #[derive(Properties, PartialEq)]
 pub struct UsernameProps {
     pub account_id: String,
-    pub users: Rc<RefCell<HashMap<Uuid, rmmt::User>>>,
+    pub users: HashMap<Uuid, rmmt::User>,
     pub id: Uuid,
     #[prop_or_else(|| "primary".to_string())]
     pub color: String,
@@ -36,7 +36,6 @@ pub fn user_name(
         color,
     }: &UsernameProps,
 ) -> Html {
-    let users = &*users.borrow();
     let text_color = format!("has-text-{}", color);
     if let Some(user) = users.get(&id) {
         html! {
@@ -129,7 +128,7 @@ impl Component for CreateUser {
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
-        let onsubmit = ctx.link().callback(|event: FocusEvent| {
+        let onsubmit = ctx.link().callback(|event: SubmitEvent| {
             event.prevent_default();
             CreateUserMsg::Submit
         });
@@ -158,6 +157,11 @@ impl Component for CreateUser {
 pub struct UserProps {
     pub account_id: String,
     pub user_id: Uuid,
+    pub account: rmmt::Account,
+    pub expenditures: HashMap<Uuid, (rmmt::Expenditure, HashMap<Uuid, rmmt::Debt>)>,
+    pub repayments: HashMap<Uuid, rmmt::Repayment>,
+    pub users: HashMap<Uuid, rmmt::User>,
+    pub balance: rmmt::Balance,
 }
 
 pub enum UserMsg {
@@ -167,12 +171,6 @@ pub enum UserMsg {
 }
 
 pub struct User {
-    account: Option<Rc<RefCell<rmmt::Account>>>,
-    expenditures:
-        Option<Rc<RefCell<HashMap<Uuid, (rmmt::Expenditure, HashMap<Uuid, rmmt::Debt>)>>>>,
-    repayments: Option<Rc<RefCell<HashMap<Uuid, rmmt::Repayment>>>>,
-    users: Option<Rc<RefCell<HashMap<Uuid, rmmt::User>>>>,
-    balance: Option<Rc<RefCell<rmmt::Balance>>>,
     editing: bool,
     input_name: NodeRef,
 }
@@ -218,11 +216,6 @@ impl Component for User {
 
     fn create(ctx: &Context<Self>) -> Self {
         Self {
-            account: None,
-            expenditures: None,
-            repayments: None,
-            balance: None,
-            users: None,
             editing: false,
             input_name: NodeRef::default(),
         }
@@ -231,21 +224,11 @@ impl Component for User {
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
             UserMsg::AccountMsg(msg) => match msg {
-                AccountMsg::UpdateAccount => {
-                    true
-                }
-                AccountMsg::UpdateUsers => {
-                    true
-                }
-                AccountMsg::UpdateExpenditures => {
-                    true
-                }
-                AccountMsg::UpdateRepayments => {
-                    true
-                }
-                AccountMsg::UpdateBalance => {
-                    true
-                }
+                AccountMsg::UpdateAccount => true,
+                AccountMsg::UpdateUsers => true,
+                AccountMsg::UpdateExpenditures => true,
+                AccountMsg::UpdateRepayments => true,
+                AccountMsg::UpdateBalance => true,
                 _ => false,
             },
             UserMsg::Edit => {
@@ -264,131 +247,96 @@ impl Component for User {
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
-        let edit = ctx.link().callback(|event: FocusEvent| {
+        let edit = ctx.link().callback(|event: SubmitEvent| {
             event.prevent_default();
             UserMsg::Edit
         });
 
-        let user_name = match self.users.as_ref() {
-            Some(users) => users
-                .borrow()
-                .get(&ctx.props().user_id)
-                .unwrap()
-                .name
-                .clone(),
-            None => String::new(),
-        };
+        let user_name = ctx
+            .props()
+            .users
+            .get(&ctx.props().user_id)
+            .unwrap()
+            .name
+            .clone();
 
-        let payed_expenditures = match self.expenditures.as_ref() {
-            Some(expenditures) => {
-                let expenditures = expenditures.borrow();
-                Some(Rc::new(RefCell::new(
-                    expenditures
-                        .clone()
-                        .into_iter()
-                        .filter(|e| e.1 .0.payer_id == ctx.props().user_id)
-                        .collect::<HashMap<_, _>>(),
-                )))
-            }
-            None => None,
-        };
+        let payed_expenditures = ctx
+            .props()
+            .expenditures
+            .clone()
+            .into_iter()
+            .filter(|e| e.1 .0.payer_id == ctx.props().user_id)
+            .collect::<HashMap<_, _>>();
 
-        let concerned_expenditures = match self.expenditures.as_ref() {
-            Some(expenditures) => {
-                let expenditures = expenditures.borrow();
-                Some(Rc::new(RefCell::new(
-                    expenditures
-                        .clone()
-                        .into_iter()
-                        .filter(|e| e.1 .1.iter().any(|d| d.1.debtor_id == ctx.props().user_id))
-                        .collect::<HashMap<_, _>>(),
-                )))
-            }
-            None => None,
-        };
+        let concerned_expenditures = ctx
+            .props()
+            .expenditures
+            .clone()
+            .into_iter()
+            .filter(|e| e.1 .1.iter().any(|d| d.1.debtor_id == ctx.props().user_id))
+            .collect::<HashMap<_, _>>();
 
-        let concerned_repayments = match self.repayments.as_ref() {
-            Some(repayments) => {
-                let repayments = repayments.borrow();
-                Some(Rc::new(RefCell::new(
-                    repayments
-                        .clone()
-                        .into_iter()
-                        .filter(|e| {
-                            e.1.payer_id == ctx.props().user_id
-                                || e.1.beneficiary_id == ctx.props().user_id
-                        })
-                        .collect::<HashMap<_, _>>(),
-                )))
-            }
-            None => None,
-        };
+        let concerned_repayments = ctx
+            .props()
+            .repayments
+            .clone()
+            .into_iter()
+            .filter(|e| {
+                e.1.payer_id == ctx.props().user_id || e.1.beneficiary_id == ctx.props().user_id
+            })
+            .collect::<HashMap<_, _>>();
 
-        let concerned_balance = match self.balance.as_ref() {
-            Some(balance) => {
-                let balance = balance.borrow();
-                Some(
-                    balance
-                        .user_balances
-                        .clone()
-                        .into_iter()
-                        .filter(|e| e.user_id == ctx.props().user_id)
-                        .next()
-                        .unwrap(),
-                )
-            }
-            None => None,
-        };
+        let concerned_balance = ctx
+            .props()
+            .balance
+            .user_balances
+            .clone()
+            .into_iter()
+            .filter(|e| e.user_id == ctx.props().user_id)
+            .next()
+            .unwrap();
 
-        let (total_payed, total_debt) = match (&self.expenditures, &self.repayments) {
-            (Some(expenditures), Some(repayments)) => {
-                let user_id = &ctx.props().user_id;
-                let mut total_payed = 0i64;
-                let mut total_debt = 0i64;
+        let (total_payed, total_debt) = {
+            let user_id = &ctx.props().user_id;
+            let mut total_payed = 0i64;
+            let mut total_debt = 0i64;
 
-                for (expenditure, debts) in expenditures.borrow().values() {
-                    if let Some(debt) = debts.get(user_id) {
-                        let share_sum: i32 = debts.values().map(|d| d.share).sum();
-                        total_debt += (expenditure.amount as f64
-                            * (debt.share as f64 / share_sum as f64))
-                            as i64;
-                    }
-
-                    if &expenditure.payer_id == user_id {
-                        total_payed += expenditure.amount as i64;
-                    }
+            for (expenditure, debts) in ctx.props().expenditures.values() {
+                if let Some(debt) = debts.get(user_id) {
+                    let share_sum: i32 = debts.values().map(|d| d.share).sum();
+                    total_debt +=
+                        (expenditure.amount as f64 * (debt.share as f64 / share_sum as f64)) as i64;
                 }
-                info!("expenditures debt {}", total_debt);
-                info!("payed expenditures {}", total_payed);
 
-                for repayment in repayments.borrow().values() {
-                    if &repayment.payer_id == user_id {
-                        total_payed += repayment.amount as i64;
-                    } else if &repayment.beneficiary_id == user_id {
-                        total_debt += repayment.amount as i64;
-                    }
+                if &expenditure.payer_id == user_id {
+                    total_payed += expenditure.amount as i64;
                 }
-                info!("repayment debt {}", total_debt);
-                info!("payed repayments {}", total_payed);
-
-                (Some(total_payed), Some(total_debt))
             }
-            _ => (None, None),
+            info!("expenditures debt {}", total_debt);
+            info!("payed expenditures {}", total_payed);
+
+            for repayment in ctx.props().repayments.values() {
+                if &repayment.payer_id == user_id {
+                    total_payed += repayment.amount as i64;
+                } else if &repayment.beneficiary_id == user_id {
+                    total_debt += repayment.amount as i64;
+                }
+            }
+            info!("repayment debt {}", total_debt);
+            info!("payed repayments {}", total_payed);
+
+            (Some(total_payed), Some(total_debt))
         };
 
         html! {
             <>
-            <AccountTitle id={ ctx.props().account_id.clone() } account={ self.account.clone() } />
+            <AccountTitle id={ ctx.props().account_id.clone() } name={ ctx.props().account.name.clone() } />
             <div class="tile is-ancestor">
                 <div class="tile is-parent">
                     <div class="tile is-child box">
                         <h3 class="subtitle is-3">
                             <span class="icon"><i class="fas fa-user"></i></span>
-                            if let Some(users) = self.users.clone() {
-                                <span><UserName account_id={ ctx.props().account_id.clone() } { users } id={ ctx.props().user_id.clone() }/></span>
-                            } else {
-                                <Loading />
-                            }
+                            <span><UserName account_id={ ctx.props().account_id.clone() } users={ ctx.props().users } id={ ctx.props().user_id.clone() }/></span>
                         </h3>
                         <form onsubmit={ edit }>
                             <div class="field has-addons">
@@ -444,33 +392,29 @@ impl Component for User {
                                             </td>
                                         </tr>
                                     }
-                                    if let Some(balance) = concerned_balance.clone() {
-                                        <tr>
-                                            <td class="is-vcentered">
-                                            if balance.amount < 0 {
-                                                <div class="progress-wrapper">
-                                                    <progress class="progress is-large is-danger is-revert" value={ balance.amount.abs().to_string() } max={ balance.amount.abs().to_string() }>
-                                                        <Amount amount={ balance.amount } />
-                                                    </progress>
-                                                    <p class="progress-value has-text-white"><Amount amount={ balance.amount } /></p>
-                                                </div>
-                                            }
-                                            </td>
-                                            <td class="is-vcentered has-text-centered">{ "Total" }</td>
-                                            <td class="is-vcentered">
-                                            if balance.amount > 0 {
-                                                <div class="progress-wrapper">
-                                                    <progress class="progress is-large is-success" value={ balance.amount.abs().to_string() } max={ balance.amount.abs().to_string() }>
-                                                        <Amount amount={ balance.amount } />
-                                                    </progress>
-                                                    <p class="progress-value has-text-white"><Amount amount={ balance.amount } /></p>
-                                                </div>
-                                            }
-                                            </td>
-                                        </tr>
-                                    } else {
-                                        <Loading />
-                                    }
+                                    <tr>
+                                        <td class="is-vcentered">
+                                        if concerned_balance.amount < 0 {
+                                            <div class="progress-wrapper">
+                                                <progress class="progress is-large is-danger is-revert" value={ concerned_balance.amount.abs().to_string() } max={ concerned_balance.amount.abs().to_string() }>
+                                                    <Amount amount={ concerned_balance.amount } />
+                                                </progress>
+                                                <p class="progress-value has-text-white"><Amount amount={ concerned_balance.amount } /></p>
+                                            </div>
+                                        }
+                                        </td>
+                                        <td class="is-vcentered has-text-centered">{ "Total" }</td>
+                                        <td class="is-vcentered">
+                                        if concerned_balance.amount > 0 {
+                                            <div class="progress-wrapper">
+                                                <progress class="progress is-large is-success" value={ concerned_balance.amount.abs().to_string() } max={ concerned_balance.amount.abs().to_string() }>
+                                                    <Amount amount={ concerned_balance.amount } />
+                                                </progress>
+                                                <p class="progress-value has-text-white"><Amount amount={ concerned_balance.amount } /></p>
+                                            </div>
+                                        }
+                                        </td>
+                                    </tr>
                                 </tbody>
                             </table>
                     </div>
@@ -483,19 +427,11 @@ impl Component for User {
                         <h3 class="subtitle is-3">
                             <span class="icon"><i class="fas fa-credit-card"></i></span>
                             <span>
-                                if let Some(expenditures) = payed_expenditures.as_ref() {
-                                    { expenditures.borrow().len().to_string() }
-                                    { " dépenses payées" }
-                                } else {
-                                    { "Dépenses payées" }
-                                }
+                                { payed_expenditures.len().to_string() }
+                                { " dépenses payées" }
                             </span>
                         </h3>
-                        if let (Some(users), Some(expenditures)) = (self.users.clone(), payed_expenditures) {
-                            <ExpendituresList account_id={ ctx.props().account_id.clone() } { expenditures } { users } />
-                        } else {
-                            <Loading />
-                        }
+                        <ExpendituresList account_id={ ctx.props().account_id.clone() } expenditures={ ctx.props().expenditures } users={ ctx.props().users } />
                     </div>
                 </div>
             </div>
@@ -506,19 +442,11 @@ impl Component for User {
                         <h3 class="subtitle is-3">
                             <span class="icon"><i class="fas fa-credit-card"></i></span>
                             <span>
-                                if let Some(expenditures) = concerned_expenditures.as_ref() {
-                                    { expenditures.borrow().len().to_string() }
-                                    { " dépenses concernées" }
-                                } else {
-                                    { "Dépenses concernées" }
-                                }
+                                { concerned_expenditures.len().to_string() }
+                                { " dépenses concernées" }
                             </span>
                         </h3>
-                        if let (Some(users), Some(expenditures)) = (self.users.clone(), concerned_expenditures) {
-                            <ExpendituresList account_id={ ctx.props().account_id.clone() } { expenditures } { users } />
-                        } else {
-                            <Loading />
-                        }
+                        <ExpendituresList account_id={ ctx.props().account_id.clone() } expenditures={ ctx.props().expenditures } users={ ctx.props().users } />
                     </div>
                 </div>
             </div>
@@ -529,19 +457,11 @@ impl Component for User {
                         <h3 class="subtitle is-3">
                             <span class="icon"><i class="fas fa-credit-card"></i></span>
                             <span>
-                                if let Some(repayments) = concerned_repayments.as_ref() {
-                                    { repayments.borrow().len().to_string() }
-                                    { " remboursements" }
-                                } else {
-                                    { "Remboursements" }
-                                }
+                                { concerned_repayments.len().to_string() }
+                                { " remboursements" }
                             </span>
                         </h3>
-                        if let (Some(users), Some(repayments)) = (self.users.clone(), concerned_repayments) {
-                            <RepaymentsList account_id={ ctx.props().account_id.clone() } { repayments } { users } />
-                        } else {
-                            <Loading />
-                        }
+                        <RepaymentsList account_id={ ctx.props().account_id.clone() } repayments={ ctx.props().repayments } users={ ctx.props().users } />
                     </div>
                 </div>
             </div>
