@@ -13,7 +13,7 @@ use yew_router::prelude::*;
 use crate::components::{
     account::{AccountMsg, AccountTitle},
     user::UserName,
-    utils::{Amount, Loading},
+    utils::Amount,
 };
 use crate::Route;
 
@@ -57,7 +57,7 @@ impl Component for Repayments {
                         </span>
                     </Link<Route>>
                 </h3>
-                    <RepaymentsList account_id={ ctx.props().account_id.clone() } repayments={ ctx.props().repayments } users={ ctx.props().users } />
+                    <RepaymentsList account_id={ ctx.props().account_id.clone() } repayments={ ctx.props().repayments.clone() } users={ ctx.props().users.clone() } />
             </div>
             </>
         }
@@ -181,7 +181,7 @@ impl Component for RepaymentsList {
 }
 
 #[derive(Debug, Clone, PartialEq)]
-struct DefaultRepayment {
+pub struct DefaultRepayment {
     payer_id: Option<Uuid>,
     beneficiary_id: Option<Uuid>,
     amount: i32,

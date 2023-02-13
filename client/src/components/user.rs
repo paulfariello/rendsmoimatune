@@ -1,6 +1,4 @@
-use std::cell::RefCell;
 use std::collections::HashMap;
-use std::rc::Rc;
 
 use gloo_net::http::Request;
 #[allow(unused_imports)]
@@ -336,7 +334,7 @@ impl Component for User {
                     <div class="tile is-child box">
                         <h3 class="subtitle is-3">
                             <span class="icon"><i class="fas fa-user"></i></span>
-                            <span><UserName account_id={ ctx.props().account_id.clone() } users={ ctx.props().users } id={ ctx.props().user_id.clone() }/></span>
+                            <span><UserName account_id={ ctx.props().account_id.clone() } users={ ctx.props().users.clone() } id={ ctx.props().user_id.clone() }/></span>
                         </h3>
                         <form onsubmit={ edit }>
                             <div class="field has-addons">
@@ -431,7 +429,7 @@ impl Component for User {
                                 { " dépenses payées" }
                             </span>
                         </h3>
-                        <ExpendituresList account_id={ ctx.props().account_id.clone() } expenditures={ ctx.props().expenditures } users={ ctx.props().users } />
+                        <ExpendituresList account_id={ ctx.props().account_id.clone() } expenditures={ ctx.props().expenditures.clone() } users={ ctx.props().users.clone() } />
                     </div>
                 </div>
             </div>
@@ -446,7 +444,7 @@ impl Component for User {
                                 { " dépenses concernées" }
                             </span>
                         </h3>
-                        <ExpendituresList account_id={ ctx.props().account_id.clone() } expenditures={ ctx.props().expenditures } users={ ctx.props().users } />
+                        <ExpendituresList account_id={ ctx.props().account_id.clone() } expenditures={ ctx.props().expenditures.clone() } users={ ctx.props().users.clone() } />
                     </div>
                 </div>
             </div>
@@ -461,7 +459,7 @@ impl Component for User {
                                 { " remboursements" }
                             </span>
                         </h3>
-                        <RepaymentsList account_id={ ctx.props().account_id.clone() } repayments={ ctx.props().repayments } users={ ctx.props().users } />
+                        <RepaymentsList account_id={ ctx.props().account_id.clone() } repayments={ ctx.props().repayments.clone() } users={ ctx.props().users.clone() } />
                     </div>
                 </div>
             </div>

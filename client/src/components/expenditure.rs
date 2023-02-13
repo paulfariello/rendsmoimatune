@@ -455,7 +455,7 @@ impl Component for EditExpenditure {
                     <div class="field">
                         <label class="label">{ "Nom" }</label>
                         <div class="control">
-                            <input ref={ self.input_name.clone() } class="input is-primary" type="text" placeholder="Baguette de pain" required=true value={ ctx.props().expenditure.map(|e| e.name.clone()) }/>
+                            <input ref={ self.input_name.clone() } class="input is-primary" type="text" placeholder="Baguette de pain" required=true value={ ctx.props().expenditure.as_ref().map(|e| e.name.clone()) }/>
                         </div>
                     </div>
 
@@ -463,7 +463,7 @@ impl Component for EditExpenditure {
                         <label class="label">{ "Montant" }</label>
                         <div class="field has-addons">
                             <div class="control is-expanded">
-                                <input ref={ self.input_amount.clone() } type="number" min="0" step="0.01" class="input is-primary" required=true placeholder="montant" value={ ctx.props().expenditure.map(|e| (e.amount as f64 / 100f64).to_string()) }/>
+                                <input ref={ self.input_amount.clone() } type="number" min="0" step="0.01" class="input is-primary" required=true placeholder="montant" value={ ctx.props().expenditure.as_ref().map(|e| (e.amount as f64 / 100f64).to_string()) }/>
                             </div>
                             <div class="control">
                                 <p class="button is-static">{ "€" }</p>
@@ -474,7 +474,7 @@ impl Component for EditExpenditure {
                     <div class="field">
                         <label class="label">{ "Date" }</label>
                         <div class="control">
-                            <input ref={self.input_date.clone()} type="date" class="input is-primary" required=true value={ format!("{}", ctx.props().expenditure.map(|e| e.date).unwrap_or(Local::today().naive_local()).format("%Y-%m-%d")) } />
+                            <input ref={self.input_date.clone()} type="date" class="input is-primary" required=true value={ format!("{}", ctx.props().expenditure.as_ref().map(|e| e.date).unwrap_or(Local::today().naive_local()).format("%Y-%m-%d")) } />
                         </div>
                     </div>
 
@@ -485,7 +485,7 @@ impl Component for EditExpenditure {
                                 <select ref={ self.select_payer.clone() } required=true>
                                 {
                                     ctx.props().users.iter().map(|(_, user)| html! {
-                                        <option value={ user.id.to_string() } selected={ ctx.props().expenditure.map(|e| e.payer_id) == Some(user.id) }>{ &user.name }</option>
+                                        <option value={ user.id.to_string() } selected={ ctx.props().expenditure.as_ref().map(|e| e.payer_id) == Some(user.id) }>{ &user.name }</option>
                                     }).collect::<Html>()
                                 }
                                 </select>
@@ -500,7 +500,7 @@ impl Component for EditExpenditure {
                         <label class="label">{ "Bénéficiaires" }</label>
                         {
                             ctx.props().users.iter().map(|(id, user)| html! {
-                                <DebtorInput name={ user.name.clone() } state_ref={ self.debtors_checkbox.get(&id).clone().unwrap() } share_ref={ self.debtors_input_share.get(&id).clone().unwrap() } debt={ ctx.props().debts.and_then(|d| d.get(&id).cloned()) }/>
+                                <DebtorInput name={ user.name.clone() } state_ref={ self.debtors_checkbox.get(&id).clone().unwrap() } share_ref={ self.debtors_input_share.get(&id).clone().unwrap() } debt={ ctx.props().debts.as_ref().and_then(|d| d.get(&id).cloned()) }/>
                             }).collect::<Html>()
                         }
                     </div>
@@ -589,7 +589,7 @@ impl Component for DebtorInput {
                 </div>
                 if self.checked {
                     <div class="control">
-                        <input ref={ ctx.props().share_ref.clone() } type="number" min="0" step="1" class="input is-primary" value={ ctx.props().debt.map(|d| d.share.to_string()).or(Some(1.to_string())) } />
+                        <input ref={ ctx.props().share_ref.clone() } type="number" min="0" step="1" class="input is-primary" value={ ctx.props().debt.as_ref().map(|d| d.share.to_string()).or(Some(1.to_string())) } />
                     </div>
                 }
             </div>
