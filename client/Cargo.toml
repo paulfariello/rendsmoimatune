@@ -6,9 +6,10 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+anyhow = "1"
 chrono = { version = "*", features = ["wasmbind"] }
 gloo = "0.7"
-gloo-net = "0.2"
+gloo-net = "0.2.6"
 itertools = "*"
 log = "*"
 rmmt = { path = "../rmmt" }

@@ -52,19 +52,33 @@ pub(crate) async fn put_repayment(
     }
 }
 
-#[get("/api/account/<account_id>/repayments")]
+#[get("/api/account/<account_id>/repayments?<user_id>")]
 pub(crate) async fn get_repayments(
     conn: MainDbConn,
     account_id: UniqId,
+    user_id: Option<uuid::Uuid>,
 ) -> Result<Json<Vec<Repayment>>, Error> {
     let uuid: uuid::Uuid = account_id.into();
-    let account_repayments: Vec<Repayment> = conn
-        .run(move |c| {
+    let account_repayments: Vec<Repayment> = if let Some(user_id) = user_id {
+        conn.run(move |c| {
+            rmmt::repayments::dsl::repayments
+                .filter(rmmt::repayments::dsl::account_id.eq(uuid))
+                .filter(
+                    rmmt::repayments::dsl::payer_id
+                        .eq(user_id)
+                        .or(rmmt::repayments::dsl::beneficiary_id.eq(user_id)),
+                )
+                .load(c)
+        })
+        .await?
+    } else {
+        conn.run(move |c| {
             rmmt::repayments::dsl::repayments
                 .filter(rmmt::repayments::dsl::account_id.eq(uuid))
                 .load(c)
         })
-        .await?;
+        .await?
+    };
 
     Ok(Json(account_repayments))
 }
@@ -87,4 +101,23 @@ pub(crate) async fn del_repayment(
     .await?;
 
     Ok(())
+}
+
+#[get("/api/account/<account_id>/repayments/<repayment_id>")]
+pub(crate) async fn get_repayment(
+    conn: MainDbConn,
+    account_id: UniqId,
+    repayment_id: uuid::Uuid,
+) -> Result<Json<Repayment>, Error> {
+    let uuid: uuid::Uuid = account_id.into();
+    let account_repayment: Repayment = conn
+        .run(move |c| {
+            rmmt::repayments::dsl::repayments
+                .filter(rmmt::repayments::dsl::id.eq(repayment_id))
+                .filter(rmmt::repayments::dsl::account_id.eq(uuid))
+                .first(c)
+        })
+        .await?;
+
+    Ok(Json(account_repayment))
 }

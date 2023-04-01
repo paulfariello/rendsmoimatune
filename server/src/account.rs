@@ -1,5 +1,7 @@
 use diesel::prelude::*;
-use rmmt::{prelude::*, Account, NewAccount, FullAccount, User, Expenditure, Debt, Repayment, Balance};
+use rmmt::{
+    prelude::*, Account, Balance, Debt, Expenditure, FullAccount, NewAccount, Repayment, User,
+};
 use rocket::serde::json::Json;
 
 use crate::error::Error;
@@ -73,6 +75,6 @@ pub(crate) async fn get_full_account(
         users,
         expenditures,
         repayments,
-        balance
+        balance,
     }))
 }

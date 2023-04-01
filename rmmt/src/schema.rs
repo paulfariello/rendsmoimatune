@@ -1,11 +1,13 @@
-table! {
+// @generated automatically by Diesel CLI.
+
+diesel::table! {
     accounts (id) {
         id -> Uuid,
         name -> Varchar,
     }
 }
 
-table! {
+diesel::table! {
     debts (id) {
         id -> Uuid,
         debtor_id -> Uuid,
@@ -14,7 +16,7 @@ table! {
     }
 }
 
-table! {
+diesel::table! {
     expenditures (id) {
         id -> Uuid,
         account_id -> Uuid,
@@ -25,7 +27,7 @@ table! {
     }
 }
 
-table! {
+diesel::table! {
     repayments (id) {
         id -> Uuid,
         account_id -> Uuid,
@@ -36,7 +38,7 @@ table! {
     }
 }
 
-table! {
+diesel::table! {
     users (id) {
         id -> Uuid,
         account_id -> Uuid,
@@ -44,14 +46,14 @@ table! {
     }
 }
 
-joinable!(debts -> expenditures (expenditure_id));
-joinable!(debts -> users (debtor_id));
-joinable!(expenditures -> accounts (account_id));
-joinable!(expenditures -> users (payer_id));
-joinable!(repayments -> accounts (account_id));
-joinable!(users -> accounts (account_id));
+diesel::joinable!(debts -> expenditures (expenditure_id));
+diesel::joinable!(debts -> users (debtor_id));
+diesel::joinable!(expenditures -> accounts (account_id));
+diesel::joinable!(expenditures -> users (payer_id));
+diesel::joinable!(repayments -> accounts (account_id));
+diesel::joinable!(users -> accounts (account_id));
 
-allow_tables_to_appear_in_same_query!(
+diesel::allow_tables_to_appear_in_same_query!(
     accounts,
     debts,
     expenditures,

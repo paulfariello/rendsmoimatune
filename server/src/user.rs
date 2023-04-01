@@ -65,3 +65,22 @@ pub(crate) async fn get_users(
 
     Ok(Json(account_users))
 }
+
+#[get("/api/account/<account_id>/users/<user_id>")]
+pub(crate) async fn get_user(
+    conn: MainDbConn,
+    account_id: UniqId,
+    user_id: Uuid,
+) -> Result<Json<User>, Error> {
+    let uuid: uuid::Uuid = account_id.into();
+    let user: User = conn
+        .run(move |c| {
+            rmmt::users::dsl::users
+                .filter(rmmt::users::dsl::account_id.eq(uuid))
+                .filter(rmmt::users::dsl::id.eq(user_id))
+                .first(c)
+        })
+        .await?;
+
+    Ok(Json(user))
+}

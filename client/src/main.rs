@@ -8,14 +8,14 @@ use yew_router::prelude::*;
 #[global_allocator]
 static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
 
-//mod agent;
 mod components;
+mod utils;
 
 use components::{
     account::{Account, CreateAccount},
-    //    expenditure::{EditExpenditure, Expenditures},
-    //    repayment::{EditRepayment, Repayments},
-    //    user::User,
+    expenditure::{EditExpenditure, Expenditures},
+    repayment::{EditRepayment, Repayments},
+    user::User,
     utils::NavBar,
 };
 
@@ -52,7 +52,6 @@ pub enum Route {
 
 fn switch(route: Route) -> Html {
     let cloned_route = route.clone();
-    let fallback = html! {<div>{"Loading..."}</div>};
     match route {
         Route::Home => html! {
             <>
@@ -63,93 +62,104 @@ fn switch(route: Route) -> Html {
         Route::Account { account_id } => html! {
             <>
             <NavBar account_id={ account_id.clone() } />
-            <Suspense {fallback}>
+            <Suspense fallback={utils::loading()}>
                 <Account id={ account_id.clone() } route={ cloned_route }/>
             </Suspense>
             </>
         },
-        //Route::Expenditures { account_id } => html! {
-        //    <>
-        //    <NavBar account_id={ account_id.clone() } />
-        //    <div class="container">
-        //        <Breadcrumb route={ route.clone() } />
-        //        <Expenditures account_id={ account_id.clone() } />
-        //    </div>
-        //    </>
-        //},
-        //Route::CreateExpenditure { account_id } => html! {
-        //    <>
-        //    <NavBar account_id={ account_id.clone() } />
-        //    <div class="container">
-        //        <Breadcrumb route={ route.clone() } />
-        //        <EditExpenditure account_id={ account_id.clone() } />
-        //    </div>
-        //    </>
-        //},
-        //Route::Repayments { account_id } => html! {
-        //    <>
-        //    <NavBar account_id={ account_id.clone() } />
-        //    <div class="container">
-        //        <Breadcrumb route={ route.clone() } />
-        //        <Repayments account_id={ account_id.clone() } />
-        //    </div>
-        //    </>
-        //},
-        //Route::CreateRepayment { account_id } => html! {
-        //    <>
-        //    <NavBar account_id={ account_id.clone() } />
-        //    <div class="container">
-        //        <Breadcrumb route={ route.clone() } />
-        //        <EditRepayment account_id={ account_id.clone() } />
-        //    </div>
-        //    </>
-        //},
-        //Route::EditRepayment {
-        //    account_id,
-        //    repayment_id,
-        //} => html! {
-        //    <>
-        //    <NavBar account_id={ account_id.clone() } />
-        //    <div class="container">
-        //        <Breadcrumb route={ route.clone() } />
-        //        <EditRepayment account_id={ account_id.clone() } repayment_id={ repayment_id.clone() } />
-        //    </div>
-        //    </>
-        //},
-        //Route::EditExpenditure {
-        //    account_id,
-        //    expenditure_id,
-        //} => html! {
-        //    <>
-        //    <NavBar account_id={ account_id.clone() } />
-        //    <div class="container">
-        //        <Breadcrumb route={ route.clone() } />
-        //        <EditExpenditure account_id={ account_id.clone() } expenditure_id={ expenditure_id.clone() } />
-        //    </div>
-        //    </>
-        //},
-        //Route::User {
-        //    account_id,
-        //    user_id,
-        //} => html! {
-        //    <>
-        //    <NavBar account_id={ account_id.clone() } />
-        //    <div class="container">
-        //        <Breadcrumb route={ route.clone() } />
-        //        <User account_id={ account_id.clone() } user_id={ user_id.clone() } />
-        //    </div>
-        //    </>
-        //},
-        //Route::NotFound => html! {
-        //    <>
-        //    <NavBar />
-        //    <div class="container">
-        //        <h1 class="title is-1">{ "Oups… Cette page n'existe pas" }</h1>
-        //    </div>
-        //    </>
-        //},
-        _ => html! {
-            <p>{ "todo" }</p>
+        Route::Expenditures { account_id } => html! {
+            <>
+            <NavBar account_id={ account_id.clone() } />
+            <div class="container">
+                //<Breadcrumb route={ route.clone() } />
+                <Suspense fallback={ utils::loading() }>
+                    <Expenditures account_id={ account_id.clone() } />
+                </Suspense>
+            </div>
+            </>
+        },
+        Route::CreateExpenditure { account_id } => html! {
+            <>
+            <NavBar account_id={ account_id.clone() } />
+            <div class="container">
+                //<Breadcrumb route={ route.clone() } />
+                <Suspense fallback={ utils::loading() }>
+                    <EditExpenditure account_id={ account_id.clone() } />
+                </Suspense>
+            </div>
+            </>
+        },
+        Route::Repayments { account_id } => html! {
+            <>
+            <NavBar account_id={ account_id.clone() } />
+            <div class="container">
+                //<Breadcrumb route={ route.clone() } />
+                <Suspense fallback={ utils::loading() }>
+                    <Repayments account_id={ account_id.clone() } />
+                </Suspense>
+            </div>
+            </>
+        },
+        Route::CreateRepayment { account_id } => html! {
+            <>
+            <NavBar account_id={ account_id.clone() } />
+            <div class="container">
+                //<Breadcrumb route={ route.clone() } />
+                <Suspense fallback={ utils::loading() }>
+                    <EditRepayment account_id={ account_id.clone() } />
+                </Suspense>
+            </div>
+            </>
+        },
+        Route::EditRepayment {
+            account_id,
+            repayment_id,
+        } => html! {
+            <>
+            <NavBar account_id={ account_id.clone() } />
+            <div class="container">
+                //<Breadcrumb route={ route.clone() } />
+                <Suspense fallback={ utils::loading() }>
+                    <EditRepayment account_id={ account_id.clone() } repayment_id={ repayment_id.clone() } />
+                </Suspense>
+            </div>
+            </>
+        },
+        Route::EditExpenditure {
+            account_id,
+            expenditure_id,
+        } => html! {
+            <>
+            <NavBar account_id={ account_id.clone() } />
+            <div class="container">
+                //<Breadcrumb route={ route.clone() } />
+                <Suspense fallback={ utils::loading() }>
+                    <EditExpenditure account_id={ account_id.clone() } expenditure_id={ expenditure_id.clone() } />
+                </Suspense>
+            </div>
+            </>
+        },
+        Route::User {
+            account_id,
+            user_id,
+        } => html! {
+            <>
+            <NavBar account_id={ account_id.clone() } />
+            <div class="container">
+                //<Breadcrumb route={ route.clone() } />
+                <Suspense fallback={ utils::loading() }>
+                    <User account_id={ account_id.clone() } user_id={ user_id.clone() } />
+                </Suspense>
+            </div>
+            </>
+        },
+        Route::NotFound => html! {
+            <>
+            <NavBar />
+            <div class="container">
+                <h1 class="title is-1">{ "Oups… Cette page n'existe pas" }</h1>
+            </div>
+            </>
         },
     }
 }

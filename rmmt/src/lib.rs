@@ -133,6 +133,8 @@ pub struct NewDebt {
 pub struct UserBalance {
     pub user_id: Uuid,
     pub amount: i64,
+    pub credit: i64,
+    pub debit: i64,
 }
 
 struct TmpBalance {
@@ -142,7 +144,7 @@ struct TmpBalance {
 }
 
 impl TmpBalance {
-    fn result(&self) -> i64 {
+    fn result(&self) -> (i64, i64) {
         // round debts in order to favor the ones who advanced money
         let debts = self.debts.iter().sum::<Rational64>();
         let debts = if Rational64::new(self.credit, 1) > debts {
@@ -151,16 +153,18 @@ impl TmpBalance {
             debts.ceil().to_integer()
         };
 
-        self.credit - debts
+        (self.credit, debts)
     }
 }
 
 impl From<TmpBalance> for UserBalance {
     fn from(tmp: TmpBalance) -> UserBalance {
-        let result = tmp.result();
+        let (credit, debit) = tmp.result();
         UserBalance {
             user_id: tmp.user_id,
-            amount: result,
+            amount: credit - debit,
+            credit,
+            debit,
         }
     }
 }
@@ -288,8 +292,10 @@ impl Balance {
             }
         }
 
-        let mut balances: HashMap<Uuid, UserBalance> =
-            balances.into_iter().map(|(k, v)| (k, v.into())).collect::<HashMap<_, _>>();
+        let mut balances: HashMap<Uuid, UserBalance> = balances
+            .into_iter()
+            .map(|(k, v)| (k, v.into()))
+            .collect::<HashMap<_, _>>();
 
         for repayment in repayments {
             let balance = Self::get_balance(&mut balances, &repayment.payer_id);
@@ -299,8 +305,7 @@ impl Balance {
             balance.amount -= repayment.amount as i64;
         }
 
-        let balances: Vec<UserBalance> =
-            balances.into_values().collect::<Vec<_>>();
+        let balances: Vec<UserBalance> = balances.into_values().collect::<Vec<_>>();
 
         let remaining: i64 = balances.iter().map(|b| b.amount).sum();
 
@@ -308,10 +313,7 @@ impl Balance {
     }
 
     #[inline]
-    fn get_balance<'a, T>(
-        balances: &'a mut HashMap<Uuid, T>,
-        id: &Uuid,
-    ) -> &'a mut T {
+    fn get_balance<'a, T>(balances: &'a mut HashMap<Uuid, T>, id: &Uuid) -> &'a mut T {
         balances
             .get_mut(id)
             .expect(&format!("Corrupted db? Missing user {} in balances", id))

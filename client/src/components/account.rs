@@ -1,9 +1,8 @@
 use std::collections::HashMap;
 
-use gloo_net::http::Request;
+use anyhow::{Context as _, Error, Result};
 use log;
 use rmmt;
-use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 use yew::prelude::*;
 use yew::suspense::{use_future, UseFutureHandle};
@@ -14,17 +13,10 @@ use crate::components::{
     expenditure::ExpendituresList,
     repayment::RepaymentsList,
     user::CreateUser,
+    utils::FetchError,
 };
+use crate::utils;
 use crate::Route;
-
-#[derive(Clone, PartialEq)]
-struct AccountCtx {
-    account: rmmt::Account,
-    users: HashMap<Uuid, rmmt::User>,
-    balance: rmmt::Balance,
-    expenditures: HashMap<Uuid, (rmmt::Expenditure, HashMap<Uuid, rmmt::Debt>)>,
-    repayments: HashMap<Uuid, rmmt::Repayment>,
-}
 
 #[derive(Properties, PartialEq)]
 pub struct AccountProps {
@@ -32,42 +24,35 @@ pub struct AccountProps {
     pub route: Route,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub enum AccountMsg {
-    LoadAccount(String),
-    UpdateAccount,
-    LoadExpenditure,
-    UpdateExpenditure,
-    LoadRepayment,
-    UpdateRepayment,
-    ChangedUsers,
-    UpdateUsers,
-    UpdateBalance,
-    ChangedExpenditures,
-    UpdateExpenditures,
-    ChangedRepayments,
-    UpdateRepayments,
-}
-
 #[function_component(Account)]
 pub fn account(props: &AccountProps) -> HtmlResult {
-    let account_id = props.id.clone();
-    let res: UseFutureHandle<Result<rmmt::FullAccount, _>> = use_future(|| async move {
-        Request::get(&format!("/api/full_account/{}", account_id))
-            .send()
-            .await?
-            .json()
-            .await
-    })?;
+    let account_url = format!("/api/account/{}", props.id);
+    let account: UseFutureHandle<Result<rmmt::Account, _>> =
+        use_future(|| async move { utils::get(&account_url).await })?;
+    let account: &rmmt::Account = match *account {
+        Ok(ref res) => res,
+        Err(ref error) => return Ok(html! { <FetchError error={ format!("{:?}", error) } /> }),
+    };
 
-    let account: rmmt::FullAccount = res.as_ref().unwrap().clone();
-    let users: HashMap<Uuid, rmmt::User> = todo!();
-    let expenditures: HashMap<Uuid, (rmmt::Expenditure, HashMap<Uuid, rmmt::Debt>)> = todo!();
-    let repayments: HashMap<Uuid, rmmt::Repayment> = todo!();
+    let users_url = format!("/api/account/{}/users", props.id);
+    let users: UseFutureHandle<Result<Vec<rmmt::User>, _>> =
+        use_future(|| async move { utils::get(&users_url).await })?;
+    let users: HashMap<Uuid, rmmt::User> = match *users {
+        Ok(ref res) => res.iter().cloned().map(|u| (u.id.clone(), u)).collect(),
+        Err(ref error) => return Ok(html! { <FetchError error={ format!("{:?}", error) } /> }),
+    };
+
+    let balance_url = format!("/api/account/{}/balance", props.id);
+    let balance: UseFutureHandle<Result<rmmt::Balance, _>> =
+        use_future(|| async move { utils::get(&balance_url).await })?;
+    let balance: &rmmt::Balance = match *balance {
+        Ok(ref res) => res,
+        Err(ref error) => return Ok(html! { <FetchError error={ format!("{:?}", error) } /> }),
+    };
 
     Ok(html! {
         <>
-        <AccountTitle id={ props.id.clone() } name={ account.account.name.clone() } />
+        <AccountTitle id={ props.id.clone() } name={ account.name.clone() } />
         <div class="tile is-ancestor">
             <div class="tile is-parent">
                 <div class="tile is-child box">
@@ -75,7 +60,7 @@ pub fn account(props: &AccountProps) -> HtmlResult {
                         <span class="icon"><i class="fas fa-balance-scale"></i></span>
                         <span>{ "Balance" }</span>
                     </h3>
-                    <BalanceList account_id={ props.id.clone() } users={ users.clone() } balance={ account.balance.clone() } />
+                    <BalanceList account_id={ props.id.clone() } users={ users.clone() } balance={ balance.clone() } />
                     <CreateUser account_id={ props.id.clone() } />
                 </div>
             </div>
@@ -86,7 +71,7 @@ pub fn account(props: &AccountProps) -> HtmlResult {
                         <span class="icon"><i class="fas fa-exchange"></i></span>
                         <span>{ "Équilibrage" }</span>
                     </h3>
-                    <BalancingList account_id={ props.id.clone() } users={ users.clone() } balance={ account.balance.clone() } />
+                    <BalancingList account_id={ props.id.clone() } users={ users.clone() } balance={ balance.clone() } />
                 </div>
             </div>
         </div>
@@ -100,7 +85,10 @@ pub fn account(props: &AccountProps) -> HtmlResult {
                             <span>{ "Dépenses" }</span>
                         </Link<Route>>
                     </h3>
-                    <ExpendituresList account_id={ props.id.clone() } { expenditures } users={ users.clone() } limit=10 buttons=true />
+                    <Suspense fallback={utils::loading()}>
+                        // TODO avoid cloning users
+                        <ExpendituresList account_id={ props.id.clone() } users={ users.clone() } limit=10 buttons=true />
+                    </Suspense>
                 </div>
             </div>
         </div>
@@ -114,7 +102,10 @@ pub fn account(props: &AccountProps) -> HtmlResult {
                             <span>{ "Remboursements" }</span>
                         </Link<Route>>
                     </h3>
-                    <RepaymentsList account_id={ props.id.clone() } users={ users.clone() } { repayments } limit=10 buttons=true />
+                    <Suspense fallback={utils::loading()}>
+                        // TODO avoid cloning users
+                        <RepaymentsList account_id={ props.id.clone() } users={ users.clone() } limit=10 buttons=true />
+                    </Suspense>
                 </div>
             </div>
         </div>
@@ -122,45 +113,23 @@ pub fn account(props: &AccountProps) -> HtmlResult {
     })
 }
 
-//pub struct BaseAccount;
-//
-//impl Component for BaseAccount {
-//    type Message = AccountMsg;
-//    type Properties = AccountProps;
-//
-//    fn create(_ctx: &Context<Self>) -> Self {
-//        Self
-//    }
-//
-//    fn view(&self, ctx: &Context<Self>) -> Html {
-//        // <Breadcrumb route={ ctx.props().route.clone() } />
-//        html! {
-//            <ContextProvider<Rc<AccountCtx>> context={ctx.props().account.clone()}>
-//                <NavBar account_id={ Some(ctx.props().account.id.clone()) } />
-//                <div class="container">
-//                </div>
-//            </ContextProvider<Rc<AccountCtx>>>
-//        }
-//    }
-//}
-//
-//pub type Account = WithAccount<BaseAccount>;
-
 #[derive(PartialEq, Properties)]
 pub struct CreateAccountProps;
 
 pub enum CreateAccountMsg {
     Submit,
     Created { id: String },
+    Error(Error),
 }
 
 pub struct CreateAccount {
     creating: bool,
     input_name: NodeRef,
+    error: Option<Error>,
 }
 
 impl CreateAccount {
-    fn create_account(&mut self, ctx: &Context<Self>) {
+    fn create_account(&mut self, ctx: &Context<Self>) -> Result<()> {
         self.creating = true;
 
         let input_name = self.input_name.cast::<web_sys::HtmlInputElement>().unwrap();
@@ -168,22 +137,21 @@ impl CreateAccount {
 
         let account = rmmt::NewAccount { name };
         ctx.link().send_future(async move {
-            let created_account: String = Request::post("/api/account/")
-                .json(&account)
-                .unwrap()
-                .send()
+            let res: Result<String, _> = utils::post("/api/account/", &account)
                 .await
-                .unwrap()
-                .json()
-                .await
-                .unwrap();
-            CreateAccountMsg::Created {
-                id: created_account,
+                .context("Can't create account");
+            match res {
+                Ok(id) => CreateAccountMsg::Created { id },
+                Err(error) => CreateAccountMsg::Error(error),
             }
         });
+
+        Ok(())
     }
 
     fn clear(&mut self) {
+        self.creating = false;
+        self.error = None;
         let input_name = self.input_name.cast::<web_sys::HtmlInputElement>().unwrap();
         input_name.set_value("");
     }
@@ -212,6 +180,7 @@ impl Component for CreateAccount {
         Self {
             creating: false,
             input_name: NodeRef::default(),
+            error: None,
         }
     }
 
@@ -221,7 +190,9 @@ impl Component for CreateAccount {
                 if self.creating {
                     false
                 } else {
-                    self.create_account(ctx);
+                    if let Err(error) = self.create_account(ctx) {
+                        self.error = Some(error);
+                    }
                     true
                 }
             }
@@ -231,6 +202,12 @@ impl Component for CreateAccount {
                 let navigator = ctx.link().navigator().unwrap();
                 navigator.push(&Route::Account { account_id: id });
                 false
+            }
+            CreateAccountMsg::Error(error) => {
+                log::info!("Creation error: {}", error);
+                self.error = Some(error);
+                self.creating = false;
+                true
             }
         }
     }
@@ -250,6 +227,9 @@ impl Component for CreateAccount {
                                 <h3 class="subtitle is-3">
                                     { "Créer un nouveau compte" }
                                 </h3>
+                                if let Some(error) = self.error.as_ref() {
+                                    <FetchError error={ format!("{:?}", error) } />
+                                }
                                 <form {onsubmit}>
                                     <div class="field has-addons">
                                         <div class={classes!("control", self.creating.then(|| "is-loading"))}>

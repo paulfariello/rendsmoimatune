@@ -334,3 +334,17 @@ pub(crate) fn breadcrumb(BreadcrumpProps { route }: &BreadcrumpProps) -> Html {
         html! {}
     }
 }
+
+#[derive(Properties, PartialEq)]
+pub struct FetchErrorProps {
+    pub error: String,
+}
+
+#[function_component(FetchError)]
+pub fn fetch_error(props: &FetchErrorProps) -> HtmlResult {
+    Ok(html! {
+        <div class={ classes!("notification", "is-error", "is-light") }>
+            <pre>{ props.error.clone() }</pre>
+        </div>
+    })
+}

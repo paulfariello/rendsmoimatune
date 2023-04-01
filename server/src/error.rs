@@ -1,6 +1,6 @@
 use diesel;
 use rocket::{
-    http::ContentType,
+    http::{ContentType, Status},
     request::Request,
     response::{self, Responder, Response},
 };
@@ -22,6 +22,7 @@ impl<'r> Responder<'r, 'static> for Error {
     fn respond_to(self, _: &'r Request<'_>) -> response::Result<'static> {
         let resp = format!("{:?}", self);
         Response::build()
+            .status(Status::InternalServerError)
             .header(ContentType::Plain)
             .sized_body(resp.len(), Cursor::new(resp))
             .ok()

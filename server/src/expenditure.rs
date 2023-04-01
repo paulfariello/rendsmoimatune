@@ -103,14 +103,49 @@ pub(crate) async fn put_expenditure(
     }
 }
 
-#[get("/api/account/<account_id>/expenditures")]
+#[get("/api/account/<account_id>/expenditures?<payer_id>&<debtor_id>")]
 pub(crate) async fn get_expenditures(
     conn: MainDbConn,
     account_id: UniqId,
+    payer_id: Option<uuid::Uuid>,
+    debtor_id: Option<uuid::Uuid>,
 ) -> Result<Json<Vec<(Expenditure, Vec<Debt>)>>, Error> {
     let account_uuid: uuid::Uuid = account_id.into();
-    let expenditures: Vec<(Expenditure, Vec<Debt>)> = conn
-        .run::<_, Result<_, diesel::result::Error>>(move |c| {
+    let expenditures: Vec<(Expenditure, Vec<Debt>)> = if let Some(payer_id) = payer_id {
+        conn.run::<_, Result<_, diesel::result::Error>>(move |c| {
+            let expenditures: Vec<Expenditure> = rmmt::expenditures::dsl::expenditures
+                .filter(rmmt::expenditures::dsl::account_id.eq(account_uuid))
+                .filter(rmmt::expenditures::dsl::payer_id.eq(payer_id))
+                .load(c)?;
+            let debts = Debt::belonging_to(&expenditures)
+                .load(c)?
+                .grouped_by(&expenditures);
+            Ok(expenditures.into_iter().zip(debts).collect())
+        })
+        .await?
+    } else if let Some(debtor_id) = debtor_id {
+        conn.run::<_, Result<_, diesel::result::Error>>(move |c| {
+            let expenditures: Vec<Expenditure> = rmmt::expenditures::dsl::expenditures
+                .inner_join(rmmt::debts::dsl::debts)
+                .select((
+                    rmmt::expenditures::dsl::id,
+                    rmmt::expenditures::dsl::account_id,
+                    rmmt::expenditures::dsl::name,
+                    rmmt::expenditures::dsl::date,
+                    rmmt::expenditures::dsl::amount,
+                    rmmt::expenditures::dsl::payer_id,
+                ))
+                .filter(rmmt::expenditures::dsl::account_id.eq(account_uuid))
+                .filter(rmmt::debts::dsl::debtor_id.eq(debtor_id))
+                .load::<Expenditure>(c)?;
+            let debts = Debt::belonging_to(&expenditures)
+                .load(c)?
+                .grouped_by(&expenditures);
+            Ok(expenditures.into_iter().zip(debts).collect())
+        })
+        .await?
+    } else {
+        conn.run::<_, Result<_, diesel::result::Error>>(move |c| {
             let expenditures: Vec<Expenditure> = rmmt::expenditures::dsl::expenditures
                 .filter(rmmt::expenditures::dsl::account_id.eq(account_uuid))
                 .load(c)?;
@@ -119,7 +154,8 @@ pub(crate) async fn get_expenditures(
                 .grouped_by(&expenditures);
             Ok(expenditures.into_iter().zip(debts).collect())
         })
-        .await?;
+        .await?
+    };
 
     Ok(Json(expenditures))
 }
@@ -142,4 +178,25 @@ pub(crate) async fn del_expenditure(
     .await?;
 
     Ok(())
+}
+
+#[get("/api/account/<account_id>/expenditures/<expenditure_id>")]
+pub(crate) async fn get_expenditure(
+    conn: MainDbConn,
+    account_id: UniqId,
+    expenditure_id: uuid::Uuid,
+) -> Result<Json<(Expenditure, Vec<Debt>)>, Error> {
+    let account_uuid: uuid::Uuid = account_id.into();
+    let expenditure: (Expenditure, Vec<Debt>) = conn
+        .run::<_, Result<_, diesel::result::Error>>(move |c| {
+            let expenditure: Expenditure = rmmt::expenditures::dsl::expenditures
+                .filter(rmmt::expenditures::dsl::id.eq(expenditure_id))
+                .filter(rmmt::expenditures::dsl::account_id.eq(account_uuid))
+                .first(c)?;
+            let debts = Debt::belonging_to(&expenditure).load(c)?;
+            Ok((expenditure, debts))
+        })
+        .await?;
+
+    Ok(Json(expenditure))
 }
