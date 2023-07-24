@@ -13,6 +13,7 @@ mod utils;
 
 use components::{
     account::{Account, CreateAccount},
+    ctx::AccountProvider,
     expenditure::{EditExpenditure, Expenditures},
     repayment::{EditRepayment, Repayments},
     user::User,
@@ -62,53 +63,55 @@ fn switch(route: Route) -> Html {
         Route::Account { account_id } => html! {
             <>
             <NavBar account_id={ account_id.clone() } />
-            <Suspense fallback={utils::loading()}>
-                <Account id={ account_id.clone() } route={ cloned_route }/>
-            </Suspense>
+            <AccountProvider id={ account_id.clone() }>
+                <Suspense fallback={ utils::loading() }>
+                    <Account />
+                </Suspense>
+            </AccountProvider>
             </>
         },
         Route::Expenditures { account_id } => html! {
             <>
             <NavBar account_id={ account_id.clone() } />
-            <div class="container">
+            <AccountProvider id={ account_id.clone() }>
                 //<Breadcrumb route={ route.clone() } />
                 <Suspense fallback={ utils::loading() }>
-                    <Expenditures account_id={ account_id.clone() } />
+                    <Expenditures />
                 </Suspense>
-            </div>
+            </AccountProvider>
             </>
         },
         Route::CreateExpenditure { account_id } => html! {
             <>
             <NavBar account_id={ account_id.clone() } />
-            <div class="container">
+            <AccountProvider id={ account_id.clone() }>
                 //<Breadcrumb route={ route.clone() } />
                 <Suspense fallback={ utils::loading() }>
-                    <EditExpenditure account_id={ account_id.clone() } />
+                    <EditExpenditure />
                 </Suspense>
-            </div>
+            </AccountProvider>
             </>
         },
         Route::Repayments { account_id } => html! {
             <>
             <NavBar account_id={ account_id.clone() } />
-            <div class="container">
+            <AccountProvider id={ account_id.clone() }>
                 //<Breadcrumb route={ route.clone() } />
                 <Suspense fallback={ utils::loading() }>
-                    <Repayments account_id={ account_id.clone() } />
+                    <Repayments />
                 </Suspense>
-            </div>
+            </AccountProvider>
             </>
         },
         Route::CreateRepayment { account_id } => html! {
             <>
             <NavBar account_id={ account_id.clone() } />
-            <div class="container">
+            <AccountProvider id={ account_id.clone() }>
                 //<Breadcrumb route={ route.clone() } />
                 <Suspense fallback={ utils::loading() }>
-                    <EditRepayment account_id={ account_id.clone() } />
+                    <EditRepayment />
                 </Suspense>
-            </div>
+            </AccountProvider>
             </>
         },
         Route::EditRepayment {
@@ -117,12 +120,12 @@ fn switch(route: Route) -> Html {
         } => html! {
             <>
             <NavBar account_id={ account_id.clone() } />
-            <div class="container">
+            <AccountProvider id={ account_id.clone() }>
                 //<Breadcrumb route={ route.clone() } />
                 <Suspense fallback={ utils::loading() }>
-                    <EditRepayment account_id={ account_id.clone() } repayment_id={ repayment_id.clone() } />
+                    <EditRepayment repayment_id={ repayment_id.clone() } />
                 </Suspense>
-            </div>
+            </AccountProvider>
             </>
         },
         Route::EditExpenditure {
@@ -131,12 +134,12 @@ fn switch(route: Route) -> Html {
         } => html! {
             <>
             <NavBar account_id={ account_id.clone() } />
-            <div class="container">
+            <AccountProvider id={ account_id.clone() }>
                 //<Breadcrumb route={ route.clone() } />
                 <Suspense fallback={ utils::loading() }>
-                    <EditExpenditure account_id={ account_id.clone() } expenditure_id={ expenditure_id.clone() } />
+                    <EditExpenditure expenditure_id={ expenditure_id.clone() } />
                 </Suspense>
-            </div>
+            </AccountProvider>
             </>
         },
         Route::User {
@@ -145,12 +148,12 @@ fn switch(route: Route) -> Html {
         } => html! {
             <>
             <NavBar account_id={ account_id.clone() } />
-            <div class="container">
+            <AccountProvider id={ account_id.clone() }>
                 //<Breadcrumb route={ route.clone() } />
                 <Suspense fallback={ utils::loading() }>
-                    <User account_id={ account_id.clone() } user_id={ user_id.clone() } />
+                    <User user_id={ user_id.clone() } />
                 </Suspense>
-            </div>
+            </AccountProvider>
             </>
         },
         Route::NotFound => html! {

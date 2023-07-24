@@ -1,8 +1,8 @@
 use std::collections::HashMap;
+use std::rc::Rc;
 
 use anyhow::{Context as _, Error, Result};
-#[allow(unused_imports)]
-use log::{debug, error, info, warn};
+use log;
 use rmmt::{self, prelude::*};
 use uuid::Uuid;
 use yew::prelude::*;
@@ -11,6 +11,7 @@ use yew_router::prelude::*;
 
 use crate::components::{
     account::AccountTitle,
+    ctx::{AccountAction, AccountCtx},
     expenditure::ExpendituresList,
     repayment::RepaymentsList,
     utils::{Amount, FetchError},
@@ -21,7 +22,7 @@ use crate::Route;
 #[derive(Properties, PartialEq)]
 pub struct UsernameProps {
     pub account_id: String,
-    pub users: HashMap<Uuid, rmmt::User>,
+    pub users: Rc<HashMap<Uuid, rmmt::User>>,
     pub id: Uuid,
     #[prop_or_else(|| "primary".to_string())]
     pub color: String,
@@ -44,7 +45,7 @@ pub fn user_name(
             </Link<Route>>
         }
     } else {
-        error!("Unknown user {}", id);
+        log::error!("Unknown user {}", id);
         html! {}
     }
 }
@@ -56,7 +57,12 @@ pub struct CreateUserProps {
 
 pub enum CreateUserMsg {
     Submit,
-    Created { user: rmmt::User },
+    Created(rmmt::User),
+    Reloaded {
+        users: HashMap<Uuid, rmmt::User>,
+        balance: rmmt::Balance,
+    },
+    AccountCtxUpdated(AccountCtx),
     Error(Error),
 }
 
@@ -82,8 +88,33 @@ impl CreateUser {
         ctx.link().send_future(async move {
             let created_user: Result<rmmt::User> = utils::post(&url, &user).await;
             match created_user {
-                Ok(user) => CreateUserMsg::Created { user },
+                Ok(user) => CreateUserMsg::Created(user),
                 Err(error) => CreateUserMsg::Error(error),
+            }
+        });
+    }
+
+    fn reload_users(&mut self, ctx: &Context<Self>) {
+        self.creating = true;
+
+        let users_url = format!("/api/account/{}/users", ctx.props().account_id);
+        let balance_url = format!("/api/account/{}/balance", ctx.props().account_id);
+        ctx.link().send_future(async move {
+            // TODO parallelize
+            let users: Result<Vec<rmmt::User>> = utils::get(&users_url).await;
+            let balance: Result<rmmt::Balance> = utils::get(&balance_url).await;
+            match (users, balance) {
+                (Ok(users), Ok(balance)) => CreateUserMsg::Reloaded {
+                    users: users
+                        .iter()
+                        .cloned()
+                        .map(|u| (u.id.clone(), u))
+                        .collect::<HashMap<_, _>>(),
+                    balance,
+                },
+                (Ok(_), Err(error)) => CreateUserMsg::Error(error),
+                (Err(error), Ok(_)) => CreateUserMsg::Error(error),
+                (Err(error), Err(_)) => CreateUserMsg::Error(error),
             }
         });
     }
@@ -118,8 +149,20 @@ impl Component for CreateUser {
                     true
                 }
             }
-            CreateUserMsg::Created { user } => {
-                info!("Created user: {}", user.name);
+            CreateUserMsg::Created(user) => {
+                log::info!("Created user: {}", user.name);
+                self.reload_users(ctx);
+                false
+            }
+            CreateUserMsg::Reloaded { users, balance } => {
+                let (account_ctx, _) = ctx
+                    .link()
+                    .context::<AccountCtx>(ctx.link().callback(CreateUserMsg::AccountCtxUpdated))
+                    .unwrap();
+                log::info!("Reloaded users: {:?}", users);
+                account_ctx.dispatch(AccountAction::UpdateUsers(users));
+                log::info!("Reloaded balance: {:?}", balance);
+                account_ctx.dispatch(AccountAction::UpdateBalance(balance));
                 self.clear();
                 true
             }
@@ -128,6 +171,7 @@ impl Component for CreateUser {
                 self.error = Some(error);
                 true
             }
+            CreateUserMsg::AccountCtxUpdated(_) => false,
         }
     }
 
@@ -167,7 +211,7 @@ pub struct BaseUserProps {
     pub account_id: String,
     pub account: rmmt::Account,
     pub user_id: Uuid,
-    pub users: HashMap<Uuid, rmmt::User>,
+    pub users: Rc<HashMap<Uuid, rmmt::User>>,
     pub balance: rmmt::UserBalance,
 }
 
@@ -398,32 +442,32 @@ impl Component for BaseUser {
 
 #[derive(Properties, PartialEq)]
 pub struct UserProps {
-    pub account_id: String,
     pub user_id: Uuid,
 }
 
 #[function_component(User)]
 pub fn user(props: &UserProps) -> HtmlResult {
-    let account_url = format!("/api/account/{}", props.account_id);
+    let account_ctx = use_context::<AccountCtx>().unwrap();
+
+    let account_url = format!("/api/account/{}", account_ctx.id);
     let account: UseFutureHandle<Result<rmmt::Account, _>> =
         use_future(|| async move { utils::get(&account_url).await })?;
     let account: &rmmt::Account = match *account {
         Ok(ref res) => res,
         Err(ref error) => return Ok(html! { <FetchError error={ format!("{:?}", error) } /> }),
     };
+    account_ctx.dispatch(AccountAction::UpdateName(account.name.clone()));
 
-    let users_url = format!("/api/account/{}/users", props.account_id);
+    let users_url = format!("/api/account/{}/users", account_ctx.id);
     let users: UseFutureHandle<Result<Vec<rmmt::User>, _>> =
         use_future(|| async move { utils::get(&users_url).await })?;
     let users: HashMap<Uuid, rmmt::User> = match *users {
         Ok(ref res) => res.iter().cloned().map(|u| (u.id.clone(), u)).collect(),
         Err(ref error) => return Ok(html! { <FetchError error={ format!("{:?}", error) } /> }),
     };
+    account_ctx.dispatch(AccountAction::UpdateUsers(users));
 
-    let balance_url = format!(
-        "/api/account/{}/balances/{}",
-        props.account_id, props.user_id
-    );
+    let balance_url = format!("/api/account/{}/balances/{}", account_ctx.id, props.user_id);
     let balance: UseFutureHandle<Result<rmmt::UserBalance, _>> =
         use_future(|| async move { utils::get(&balance_url).await })?;
     let balance: &rmmt::UserBalance = match *balance {
@@ -432,6 +476,6 @@ pub fn user(props: &UserProps) -> HtmlResult {
     };
 
     Ok(
-        html! {<BaseUser account_id={ props.account_id.clone() } account={ account.clone() } user_id={ props.user_id.clone() } users={ users.clone() } balance={ balance.clone() } />},
+        html! {<BaseUser account_id={ account_ctx.id.clone() } account={ account.clone() } user_id={ props.user_id.clone() } users={ account_ctx.users.clone() } balance={ balance.clone() } />},
     )
 }

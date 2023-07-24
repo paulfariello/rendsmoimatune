@@ -1,44 +1,78 @@
-#[derive(Properties, PartialEq)]
-pub struct AccountCtxProps {
+use std::collections::HashMap;
+use std::rc::Rc;
+
+use log;
+use rmmt;
+use uuid::Uuid;
+use yew::prelude::*;
+
+#[derive(Debug, PartialEq, Clone)]
+pub struct Account {
     pub id: String,
-    pub route: Route,
+    pub name: String,
+    pub users: Rc<HashMap<Uuid, rmmt::User>>,
+    pub balance: Rc<rmmt::Balance>,
 }
 
-#[function_component(AccountCtx)]
-pub fn account_ctx<T>(props: &AccountCtxProps) -> HtmlResult {
-    let account_url = format!("/api/account/{}", props.id);
-    let account: UseFutureHandle<Result<rmmt::Account, _>> =
-        use_future(|| async move { utils::get(&account_url).await })?;
-    let account: &rmmt::Account = match *account {
-        Ok(ref res) => res,
-        Err(ref error) => return Ok(html! { <FetchError error={ format!("{:?}", error) } /> }),
-    };
+#[derive(Debug, PartialEq, Clone)]
+pub enum AccountAction {
+    UpdateName(String),
+    UpdateUsers(HashMap<Uuid, rmmt::User>),
+    UpdateBalance(rmmt::Balance),
+}
 
-    let users_url = format!("/api/account/{}/users", props.id);
-    let users: UseFutureHandle<Result<Vec<rmmt::User>, _>> =
-        use_future(|| async move { utils::get(&users_url).await })?;
-    let users: HashMap<Uuid, rmmt::User> = match *users {
-        Ok(ref res) => res.iter().cloned().map(|u| (u.id.clone(), u)).collect(),
-        Err(ref error) => return Ok(html! { <FetchError error={ format!("{:?}", error) } /> }),
-    };
+impl Reducible for Account {
+    type Action = AccountAction;
 
-    let balance_url = format!("/api/account/{}/balance", props.id);
-    let balance: UseFutureHandle<Result<rmmt::Balance, _>> =
-        use_future(|| async move { utils::get(&balance_url).await })?;
-    let balance: &rmmt::Balance = match *balance {
-        Ok(ref res) => res,
-        Err(ref error) => return Ok(html! { <FetchError error={ format!("{:?}", error) } /> }),
-    };
+    fn reduce(self: Rc<Self>, action: Self::Action) -> Rc<Self> {
+        log::info!("Update account ctx with {:?}", action);
+        match action {
+            AccountAction::UpdateName(name) => Self {
+                id: self.id.clone(),
+                name,
+                users: self.users.clone(),
+                balance: self.balance.clone(),
+            },
+            AccountAction::UpdateUsers(users) => Self {
+                id: self.id.clone(),
+                name: self.name.clone(),
+                users: Rc::new(users),
+                balance: self.balance.clone(),
+            },
+            AccountAction::UpdateBalance(balance) => Self {
+                id: self.id.clone(),
+                name: self.name.clone(),
+                users: self.users.clone(),
+                balance: Rc::new(balance),
+            },
+        }
+        .into()
+    }
+}
 
-    let update_users = callback!(async move || {
-        let users_url = format!("/api/account/{}/users", props.id);
-        let users: Result<Vec<rmmt::User>, _> =
-            use_future(|| async move { utils::get(&users_url).await })?;
-        todo!("update user");
+pub type AccountCtx = UseReducerHandle<Account>;
+
+#[derive(Properties, PartialEq)]
+pub struct AccountProviderProps {
+    pub id: String,
+    #[prop_or_default]
+    pub children: Children,
+}
+
+#[function_component(AccountProvider)]
+pub fn account_provider(props: &AccountProviderProps) -> HtmlResult {
+    let account_ctx = use_reducer(|| Account {
+        id: props.id.clone(),
+        name: String::new(),
+        users: Rc::new(HashMap::new()),
+        balance: Rc::new(rmmt::Balance::default()),
     });
-    let update_balance = callback!();
 
     Ok(html! {
-        <T {account} {users} {balance} {update_users} {update_balance} />
+        <div class="container">
+             <ContextProvider<AccountCtx> context={account_ctx}>
+                {props.children.clone()}
+            </ContextProvider<AccountCtx>>
+        </div>
     })
 }

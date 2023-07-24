@@ -1,7 +1,7 @@
 use std::collections::HashMap;
+use std::rc::Rc;
 
-#[allow(unused_imports)]
-use log::{debug, error, info, warn};
+use log;
 use uuid::Uuid;
 use yew::prelude::*;
 use yew_router::prelude::*;
@@ -13,8 +13,8 @@ use crate::components::{user::UserName, utils::Amount};
 #[derive(Properties, PartialEq)]
 pub struct BalanceListProps {
     pub account_id: String,
-    pub users: HashMap<Uuid, rmmt::User>,
-    pub balance: rmmt::Balance,
+    pub users: Rc<HashMap<Uuid, rmmt::User>>,
+    pub balance: Rc<rmmt::Balance>,
 }
 
 #[function_component(BalanceList)]
@@ -29,6 +29,8 @@ pub fn balance_list(props: &BalanceListProps) -> HtmlResult {
         .max()
         .unwrap_or(0)
         .to_string();
+
+    log::debug!("Rerender balance list: {:?}", props.balance);
 
     Ok(html! {
         <div class="balance is-relative block">
@@ -77,8 +79,8 @@ pub fn balance_list(props: &BalanceListProps) -> HtmlResult {
 #[derive(Properties, PartialEq)]
 pub struct BalancingListProps {
     pub account_id: String,
-    pub users: HashMap<Uuid, rmmt::User>,
-    pub balance: rmmt::Balance,
+    pub users: Rc<HashMap<Uuid, rmmt::User>>,
+    pub balance: Rc<rmmt::Balance>,
 }
 
 #[function_component(BalancingList)]

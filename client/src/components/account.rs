@@ -10,6 +10,7 @@ use yew_router::prelude::*;
 
 use crate::components::{
     balance::{BalanceList, BalancingList},
+    ctx::{AccountAction, AccountCtx},
     expenditure::ExpendituresList,
     repayment::RepaymentsList,
     user::CreateUser,
@@ -18,41 +19,44 @@ use crate::components::{
 use crate::utils;
 use crate::Route;
 
-#[derive(Properties, PartialEq)]
-pub struct AccountProps {
-    pub id: String,
-    pub route: Route,
-}
-
 #[function_component(Account)]
-pub fn account(props: &AccountProps) -> HtmlResult {
-    let account_url = format!("/api/account/{}", props.id);
+pub fn account() -> HtmlResult {
+    log::debug!("Rerendering account");
+
+    let account_ctx = use_context::<AccountCtx>().unwrap();
+
+    let account_url = format!("/api/account/{}", account_ctx.id);
     let account: UseFutureHandle<Result<rmmt::Account, _>> =
         use_future(|| async move { utils::get(&account_url).await })?;
     let account: &rmmt::Account = match *account {
         Ok(ref res) => res,
         Err(ref error) => return Ok(html! { <FetchError error={ format!("{:?}", error) } /> }),
     };
+    account_ctx.dispatch(AccountAction::UpdateName(account.name.clone()));
 
-    let users_url = format!("/api/account/{}/users", props.id);
+    let users_url = format!("/api/account/{}/users", account_ctx.id);
     let users: UseFutureHandle<Result<Vec<rmmt::User>, _>> =
         use_future(|| async move { utils::get(&users_url).await })?;
     let users: HashMap<Uuid, rmmt::User> = match *users {
         Ok(ref res) => res.iter().cloned().map(|u| (u.id.clone(), u)).collect(),
         Err(ref error) => return Ok(html! { <FetchError error={ format!("{:?}", error) } /> }),
     };
+    account_ctx.dispatch(AccountAction::UpdateUsers(users));
 
-    let balance_url = format!("/api/account/{}/balance", props.id);
+    let balance_url = format!("/api/account/{}/balance", account_ctx.id);
     let balance: UseFutureHandle<Result<rmmt::Balance, _>> =
         use_future(|| async move { utils::get(&balance_url).await })?;
     let balance: &rmmt::Balance = match *balance {
         Ok(ref res) => res,
         Err(ref error) => return Ok(html! { <FetchError error={ format!("{:?}", error) } /> }),
     };
+    account_ctx.dispatch(AccountAction::UpdateBalance(balance.clone()));
+
+    log::debug!("Rerendered account");
 
     Ok(html! {
         <>
-        <AccountTitle id={ props.id.clone() } name={ account.name.clone() } />
+        <AccountTitle id={ account_ctx.id.clone() } name={ account_ctx.name.clone() } />
         <div class="tile is-ancestor">
             <div class="tile is-parent">
                 <div class="tile is-child box">
@@ -60,8 +64,8 @@ pub fn account(props: &AccountProps) -> HtmlResult {
                         <span class="icon"><i class="fas fa-balance-scale"></i></span>
                         <span>{ "Balance" }</span>
                     </h3>
-                    <BalanceList account_id={ props.id.clone() } users={ users.clone() } balance={ balance.clone() } />
-                    <CreateUser account_id={ props.id.clone() } />
+                    <BalanceList account_id={ account_ctx.id.clone() } users={ account_ctx.users.clone() } balance={ account_ctx.balance.clone() } />
+                    <CreateUser account_id={ account_ctx.id.clone() } />
                 </div>
             </div>
 
@@ -71,7 +75,7 @@ pub fn account(props: &AccountProps) -> HtmlResult {
                         <span class="icon"><i class="fas fa-exchange"></i></span>
                         <span>{ "Équilibrage" }</span>
                     </h3>
-                    <BalancingList account_id={ props.id.clone() } users={ users.clone() } balance={ balance.clone() } />
+                    <BalancingList account_id={ account_ctx.id.clone() } users={ account_ctx.users.clone() } balance={ account_ctx.balance.clone() } />
                 </div>
             </div>
         </div>
@@ -80,14 +84,14 @@ pub fn account(props: &AccountProps) -> HtmlResult {
             <div class="tile is-parent">
                 <div class="tile is-child box">
                     <h3 class="subtitle is-3">
-                        <Link<Route> to={Route::Expenditures { account_id: props.id.clone() }}>
+                        <Link<Route> to={Route::Expenditures { account_id: account_ctx.id.clone() }}>
                             <span class="icon"><i class="fas fa-credit-card"></i></span>
                             <span>{ "Dépenses" }</span>
                         </Link<Route>>
                     </h3>
                     <Suspense fallback={utils::loading()}>
                         // TODO avoid cloning users
-                        <ExpendituresList account_id={ props.id.clone() } users={ users.clone() } limit=10 buttons=true />
+                        <ExpendituresList account_id={ account_ctx.id.clone() } users={ account_ctx.users.clone() } limit=10 buttons=true />
                     </Suspense>
                 </div>
             </div>
@@ -97,14 +101,14 @@ pub fn account(props: &AccountProps) -> HtmlResult {
             <div class="tile is-parent">
                 <div class="tile is-child box">
                     <h3 class="subtitle is-3">
-                        <Link<Route> to={Route::Repayments { account_id: props.id.clone() }}>
+                        <Link<Route> to={Route::Repayments { account_id: account_ctx.id.clone() }}>
                             <span class="icon"><i class="fas fa-exchange"></i></span>
                             <span>{ "Remboursements" }</span>
                         </Link<Route>>
                     </h3>
                     <Suspense fallback={utils::loading()}>
                         // TODO avoid cloning users
-                        <RepaymentsList account_id={ props.id.clone() } users={ users.clone() } limit=10 buttons=true />
+                        <RepaymentsList account_id={ account_ctx.id.clone() } users={ account_ctx.users.clone() } limit=10 buttons=true />
                     </Suspense>
                 </div>
             </div>

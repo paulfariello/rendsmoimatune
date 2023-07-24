@@ -4,6 +4,7 @@ extern crate diesel;
 
 use std::cmp;
 use std::collections::HashMap;
+use std::default::Default;
 
 use chrono::NaiveDate;
 use num::rational::Rational64;
@@ -176,7 +177,7 @@ pub struct Balancing {
     pub amount: i64,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Default)]
 pub struct Balance {
     /// Represent each user own balance.
     pub user_balances: Vec<UserBalance>,

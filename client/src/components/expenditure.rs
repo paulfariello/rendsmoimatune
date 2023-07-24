@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::rc::Rc;
 
 use anyhow::{Context as _, Error, Result};
 use chrono::naive::NaiveDate;
@@ -15,40 +16,40 @@ use yew_router::prelude::*;
 
 use crate::components::{
     account::AccountTitle,
+    ctx::{AccountAction, AccountCtx},
     user::UserName,
     utils::{Amount, FetchError},
 };
 use crate::{utils, Route};
 
-#[derive(Properties, PartialEq)]
-pub struct ExpendituresProps {
-    pub account_id: String, // To avoid account.id (uuid) conversion everywhere
-}
-
 #[function_component(Expenditures)]
-pub fn expenditures(props: &ExpendituresProps) -> HtmlResult {
-    let account_url = format!("/api/account/{}", props.account_id);
+pub fn expenditures() -> HtmlResult {
+    let account_ctx = use_context::<AccountCtx>().unwrap();
+
+    let account_url = format!("/api/account/{}", account_ctx.id);
     let account: UseFutureHandle<Result<rmmt::Account, _>> =
         use_future(|| async move { utils::get(&account_url).await })?;
     let account: &rmmt::Account = match *account {
         Ok(ref res) => res,
         Err(ref error) => return Ok(html! { <FetchError error={ format!("{:?}", error) } /> }),
     };
+    account_ctx.dispatch(AccountAction::UpdateName(account.name.clone()));
 
-    let users_url = format!("/api/account/{}/users", props.account_id);
+    let users_url = format!("/api/account/{}/users", account_ctx.id);
     let users: UseFutureHandle<Result<Vec<rmmt::User>, _>> =
         use_future(|| async move { utils::get(&users_url).await })?;
     let users: HashMap<Uuid, rmmt::User> = match *users {
         Ok(ref res) => res.iter().cloned().map(|u| (u.id.clone(), u)).collect(),
         Err(ref error) => return Ok(html! { <FetchError error={ format!("{:?}", error) } /> }),
     };
+    account_ctx.dispatch(AccountAction::UpdateUsers(users));
 
     Ok(html! {
         <>
-        <AccountTitle id={ props.account_id.clone() } name={ account.name.clone() } />
+        <AccountTitle id={ account_ctx.id.clone() } name={ account.name.clone() } />
         <div class="box">
             <h3 class="subtitle is-3">
-                <Link<Route> to={Route::Expenditures { account_id: props.account_id.clone() }}>
+                <Link<Route> to={Route::Expenditures { account_id: account_ctx.id.clone() }}>
                     <span class="icon-text">
                         <span class="icon"><i class="fas fa-credit-card"></i></span>
                         <span>{ "Dépenses" }</span>
@@ -56,7 +57,7 @@ pub fn expenditures(props: &ExpendituresProps) -> HtmlResult {
                 </Link<Route>>
             </h3>
             <Suspense fallback={utils::loading()}>
-                <ExpendituresList account_id={ props.account_id.clone() } users={ users.clone() } />
+                <ExpendituresList account_id={ account_ctx.id.clone() } users={ account_ctx.users.clone() } />
             </Suspense>
         </div>
         </>
@@ -66,7 +67,7 @@ pub fn expenditures(props: &ExpendituresProps) -> HtmlResult {
 #[derive(Properties, PartialEq)]
 pub struct ExpendituresListProps {
     pub account_id: String,
-    pub users: HashMap<Uuid, rmmt::User>,
+    pub users: Rc<HashMap<Uuid, rmmt::User>>,
     #[prop_or_default]
     pub limit: Option<usize>,
     #[prop_or_default]
@@ -183,7 +184,7 @@ pub fn expenditures_list(props: &ExpendituresListProps) -> HtmlResult {
 pub struct BaseEditExpenditureProps {
     pub account_id: String,
     pub account: rmmt::Account,
-    pub users: HashMap<Uuid, rmmt::User>,
+    pub users: Rc<HashMap<Uuid, rmmt::User>>,
     #[prop_or_default]
     pub expenditure_id: Option<Uuid>,
     pub expenditure: Option<rmmt::Expenditure>,
@@ -540,7 +541,7 @@ impl Component for BaseEditExpenditure {
 pub struct EditExistingExpenditureProps {
     pub account_id: String,
     pub account: rmmt::Account,
-    pub users: HashMap<Uuid, rmmt::User>,
+    pub users: Rc<HashMap<Uuid, rmmt::User>>,
     #[prop_or_default]
     pub expenditure_id: Uuid,
 }
@@ -565,36 +566,39 @@ pub fn edit_existing_expenditure(props: &EditExistingExpenditureProps) -> HtmlRe
 
 #[derive(Properties, PartialEq)]
 pub struct EditExpenditureProps {
-    pub account_id: String,
     #[prop_or_default]
     pub expenditure_id: Option<Uuid>,
 }
 
 #[function_component(EditExpenditure)]
 pub fn edit_expenditure_with_account_and_users(props: &EditExpenditureProps) -> HtmlResult {
-    let account_url = format!("/api/account/{}", props.account_id);
+    let account_ctx = use_context::<AccountCtx>().unwrap();
+
+    let account_url = format!("/api/account/{}", account_ctx.id);
     let account: UseFutureHandle<Result<rmmt::Account, _>> =
         use_future(|| async move { utils::get(&account_url).await })?;
     let account: &rmmt::Account = match *account {
         Ok(ref res) => res,
         Err(ref error) => return Ok(html! { <FetchError error={ format!("{:?}", error) } /> }),
     };
+    account_ctx.dispatch(AccountAction::UpdateName(account.name.clone()));
 
-    let users_url = format!("/api/account/{}/users", props.account_id);
+    let users_url = format!("/api/account/{}/users", account_ctx.id);
     let users: UseFutureHandle<Result<Vec<rmmt::User>, _>> =
         use_future(|| async move { utils::get(&users_url).await })?;
     let users: HashMap<Uuid, rmmt::User> = match *users {
         Ok(ref res) => res.iter().cloned().map(|u| (u.id.clone(), u)).collect(),
         Err(ref error) => return Ok(html! { <FetchError error={ format!("{:?}", error) } /> }),
     };
+    account_ctx.dispatch(AccountAction::UpdateUsers(users));
 
     if let Some(expenditure_id) = props.expenditure_id {
         Ok(
-            html! {<EditExistingExpenditure account_id={ props.account_id.clone() } account={ account.clone() } users={ users.clone() } expenditure_id={ expenditure_id } />},
+            html! {<EditExistingExpenditure account_id={ account_ctx.id.clone() } account={ account.clone() } users={ account_ctx.users.clone() } expenditure_id={ expenditure_id } />},
         )
     } else {
         Ok(
-            html! {<BaseEditExpenditure account_id={ props.account_id.clone() } account={ account.clone() } users={ users.clone() } expenditure_id={ props.expenditure_id } />},
+            html! {<BaseEditExpenditure account_id={ account_ctx.id.clone() } account={ account.clone() } users={ account_ctx.users.clone() } expenditure_id={ props.expenditure_id } />},
         )
     }
 }
@@ -762,7 +766,7 @@ impl Component for DeleteExpenditure {
 
 #[derive(Properties, PartialEq)]
 pub struct DebtorsProps {
-    pub users: HashMap<Uuid, rmmt::User>,
+    pub users: Rc<HashMap<Uuid, rmmt::User>>,
     pub debts: Vec<rmmt::Debt>,
 }
 

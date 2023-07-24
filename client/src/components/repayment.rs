@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::rc::Rc;
 
 use anyhow::{Context as _, Error, Result};
 use chrono::naive::NaiveDate;
@@ -14,41 +15,41 @@ use yew_router::prelude::*;
 
 use crate::components::{
     account::AccountTitle,
+    ctx::{AccountAction, AccountCtx},
     user::UserName,
     utils::{Amount, FetchError},
 };
 use crate::utils;
 use crate::Route;
 
-#[derive(Properties, PartialEq)]
-pub struct RepaymentsProps {
-    pub account_id: String,
-}
-
 #[function_component(Repayments)]
-pub fn repayments(props: &RepaymentsProps) -> HtmlResult {
-    let account_url = format!("/api/account/{}", props.account_id);
+pub fn repayments() -> HtmlResult {
+    let account_ctx = use_context::<AccountCtx>().unwrap();
+
+    let account_url = format!("/api/account/{}", account_ctx.id);
     let account: UseFutureHandle<Result<rmmt::Account, _>> =
         use_future(|| async move { utils::get(&account_url).await })?;
     let account: &rmmt::Account = match *account {
         Ok(ref res) => res,
         Err(ref error) => return Ok(html! { <FetchError error={ format!("{:?}", error) } /> }),
     };
+    account_ctx.dispatch(AccountAction::UpdateName(account.name.clone()));
 
-    let users_url = format!("/api/account/{}/users", props.account_id);
+    let users_url = format!("/api/account/{}/users", account_ctx.id);
     let users: UseFutureHandle<Result<Vec<rmmt::User>, _>> =
         use_future(|| async move { utils::get(&users_url).await })?;
     let users: HashMap<Uuid, rmmt::User> = match *users {
         Ok(ref res) => res.iter().cloned().map(|u| (u.id.clone(), u)).collect(),
         Err(ref error) => return Ok(html! { <FetchError error={ format!("{:?}", error) } /> }),
     };
+    account_ctx.dispatch(AccountAction::UpdateUsers(users));
 
     Ok(html! {
         <>
-        <AccountTitle id={ props.account_id.clone() } name={ account.name.clone() } />
+        <AccountTitle id={ account_ctx.id.clone() } name={ account.name.clone() } />
         <div class="box">
             <h3 class="subtitle is-3">
-                <Link<Route> to={Route::Repayments { account_id: props.account_id.clone() }}>
+                <Link<Route> to={Route::Repayments { account_id: account_ctx.id.clone() }}>
                     <span class="icon-text">
                         <span class="icon"><i class="fas fa-exchange"></i></span>
                         <span>{ "Remboursements" }</span>
@@ -56,7 +57,7 @@ pub fn repayments(props: &RepaymentsProps) -> HtmlResult {
                 </Link<Route>>
             </h3>
             <Suspense fallback={utils::loading()}>
-                <RepaymentsList account_id={ props.account_id.clone() } users={ users.clone() } />
+                <RepaymentsList account_id={ account_ctx.id.clone() } users={ account_ctx.users.clone() } />
             </Suspense>
         </div>
         </>
@@ -66,7 +67,7 @@ pub fn repayments(props: &RepaymentsProps) -> HtmlResult {
 #[derive(Properties, PartialEq)]
 pub struct RepaymentsListProps {
     pub account_id: String,
-    pub users: HashMap<Uuid, rmmt::User>,
+    pub users: Rc<HashMap<Uuid, rmmt::User>>,
     #[prop_or_default]
     pub limit: Option<usize>,
     #[prop_or_default]
@@ -221,7 +222,7 @@ pub struct BaseEditRepaymentProps {
     pub account: rmmt::Account,
     #[prop_or_default]
     pub repayment_id: Option<Uuid>,
-    pub users: HashMap<Uuid, rmmt::User>,
+    pub users: Rc<HashMap<Uuid, rmmt::User>>,
     pub repayment: Option<rmmt::Repayment>,
     pub default: Option<DefaultRepayment>,
 }
@@ -539,7 +540,7 @@ impl Component for BaseEditRepayment {
 pub struct EditExistingRepaymentProps {
     pub account_id: String,
     pub account: rmmt::Account,
-    pub users: HashMap<Uuid, rmmt::User>,
+    pub users: Rc<HashMap<Uuid, rmmt::User>>,
     #[prop_or_default]
     pub repayment_id: Uuid,
 }
@@ -564,36 +565,39 @@ pub fn edit_existing_repayment(props: &EditExistingRepaymentProps) -> HtmlResult
 
 #[derive(Properties, PartialEq)]
 pub struct EditRepaymentProps {
-    pub account_id: String,
     #[prop_or_default]
     pub repayment_id: Option<Uuid>,
 }
 
 #[function_component(EditRepayment)]
 pub fn edit_repayment_with_account_and_users(props: &EditRepaymentProps) -> HtmlResult {
-    let account_url = format!("/api/account/{}", props.account_id);
+    let account_ctx = use_context::<AccountCtx>().unwrap();
+
+    let account_url = format!("/api/account/{}", account_ctx.id);
     let account: UseFutureHandle<Result<rmmt::Account, _>> =
         use_future(|| async move { utils::get(&account_url).await })?;
     let account: &rmmt::Account = match *account {
         Ok(ref res) => res,
         Err(ref error) => return Ok(html! { <FetchError error={ format!("{:?}", error) } /> }),
     };
+    account_ctx.dispatch(AccountAction::UpdateName(account.name.clone()));
 
-    let users_url = format!("/api/account/{}/users", props.account_id);
+    let users_url = format!("/api/account/{}/users", account_ctx.id);
     let users: UseFutureHandle<Result<Vec<rmmt::User>, _>> =
         use_future(|| async move { utils::get(&users_url).await })?;
     let users: HashMap<Uuid, rmmt::User> = match *users {
         Ok(ref res) => res.iter().cloned().map(|u| (u.id.clone(), u)).collect(),
         Err(ref error) => return Ok(html! { <FetchError error={ format!("{:?}", error) } /> }),
     };
+    account_ctx.dispatch(AccountAction::UpdateUsers(users));
 
     if let Some(repayment_id) = props.repayment_id {
         Ok(
-            html! {<EditExistingRepayment account_id={ props.account_id.clone() } account={ account.clone() } users={ users.clone() } repayment_id={ repayment_id } />},
+            html! {<EditExistingRepayment account_id={ account_ctx.id.clone() } account={ account.clone() } users={ account_ctx.users.clone() } repayment_id={ repayment_id } />},
         )
     } else {
         Ok(
-            html! {<BaseEditRepayment account_id={ props.account_id.clone() } account={ account.clone() } users={ users.clone() } repayment_id={ props.repayment_id } />},
+            html! {<BaseEditRepayment account_id={ account_ctx.id.clone() } account={ account.clone() } users={ account_ctx.users.clone() } repayment_id={ props.repayment_id } />},
         )
     }
 }
