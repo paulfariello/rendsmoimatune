@@ -1,10 +1,18 @@
 use std::collections::HashMap;
 use std::rc::Rc;
 
+use async_trait::async_trait;
+use bounce::{
+    query::{Query, QueryResult},
+    BounceStates,
+};
 use log;
 use rmmt;
 use uuid::Uuid;
 use yew::prelude::*;
+
+use crate::utils;
+use crate::utils::Error;
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct Account {
@@ -75,4 +83,27 @@ pub fn account_provider(props: &AccountProviderProps) -> HtmlResult {
             </ContextProvider<AccountCtx>>
         </div>
     })
+}
+
+#[derive(Debug, PartialEq)]
+pub struct AccountQuery {
+    pub id: Rc<String>,
+    pub inner: rmmt::Account,
+}
+
+#[async_trait(?Send)]
+impl Query for AccountQuery {
+    type Input = String;
+    type Error = Error;
+
+    async fn query(_states: &BounceStates, input: Rc<String>) -> QueryResult<Self> {
+        let account_url = format!("/api/account/{}", input);
+        let account: rmmt::Account = utils::get(&account_url).await?;
+
+        Ok(AccountQuery {
+            id: input.clone(),
+            inner: account,
+        }
+        .into())
+    }
 }

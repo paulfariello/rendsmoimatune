@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use std::rc::Rc;
 
-use anyhow::{Context as _, Error, Result};
+use anyhow::{Context as _};
 use log;
 use rmmt::{self, prelude::*};
 use uuid::Uuid;
@@ -63,13 +63,13 @@ pub enum CreateUserMsg {
         balance: rmmt::Balance,
     },
     AccountCtxUpdated(AccountCtx),
-    Error(Error),
+    Error(utils::Error),
 }
 
 pub struct CreateUser {
     creating: bool,
     input_name: NodeRef,
-    error: Option<Error>,
+    error: Option<utils::Error>,
 }
 
 impl CreateUser {
@@ -86,7 +86,7 @@ impl CreateUser {
         };
         let url = format!("/api/account/{}/users", ctx.props().account_id);
         ctx.link().send_future(async move {
-            let created_user: Result<rmmt::User> = utils::post(&url, &user).await;
+            let created_user: Result<rmmt::User, _> = utils::post(&url, &user).await;
             match created_user {
                 Ok(user) => CreateUserMsg::Created(user),
                 Err(error) => CreateUserMsg::Error(error),
@@ -101,8 +101,8 @@ impl CreateUser {
         let balance_url = format!("/api/account/{}/balance", ctx.props().account_id);
         ctx.link().send_future(async move {
             // TODO parallelize
-            let users: Result<Vec<rmmt::User>> = utils::get(&users_url).await;
-            let balance: Result<rmmt::Balance> = utils::get(&balance_url).await;
+            let users: Result<Vec<rmmt::User>, _> = utils::get(&users_url).await;
+            let balance: Result<rmmt::Balance, _> = utils::get(&balance_url).await;
             match (users, balance) {
                 (Ok(users), Ok(balance)) => CreateUserMsg::Reloaded {
                     users: users
@@ -218,13 +218,13 @@ pub struct BaseUserProps {
 pub enum UserMsg {
     Edit,
     Edited { user: rmmt::User },
-    Error(Error),
+    Error(utils::Error),
 }
 
 pub struct BaseUser {
     editing: bool,
     input_name: NodeRef,
-    error: Option<Error>,
+    error: Option<utils::Error>,
 }
 
 impl BaseUser {
@@ -242,7 +242,7 @@ impl BaseUser {
         };
         let url = format!("/api/account/{}/users/{}", ctx.props().account_id, user.id);
         ctx.link().send_future(async move {
-            let edited_user: Result<rmmt::User> = utils::put(&url, &user).await;
+            let edited_user: Result<rmmt::User, _> = utils::put(&url, &user).await;
             match edited_user {
                 Ok(user) => UserMsg::Edited { user },
                 Err(error) => UserMsg::Error(error),

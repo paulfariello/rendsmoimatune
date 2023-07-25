@@ -23,6 +23,9 @@ yew = { version = "0.20", features = ["csr"] }
 yew-agent = "0.2"
 yew-router = "0.17"
 wee_alloc = "*"
+bounce = { version = "0.7.0", features = ["query", "gloo"] }
+async-trait = "0.1.72"
+thiserror = "1.0.44"
 
 [profile.release]
 # less code to include into binary

@@ -12,7 +12,7 @@ use crate::components::{user::UserName, utils::Amount};
 
 #[derive(Properties, PartialEq)]
 pub struct BalanceListProps {
-    pub account_id: String,
+    pub account_id: String, // TODO Rc<String>
     pub users: Rc<HashMap<Uuid, rmmt::User>>,
     pub balance: Rc<rmmt::Balance>,
 }
