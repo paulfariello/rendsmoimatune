@@ -1,5 +1,7 @@
 extern crate wee_alloc;
 
+use bounce::prelude::*;
+use bounce::BounceRoot;
 use uuid::Uuid;
 use wasm_logger;
 use yew::prelude::*;
@@ -63,11 +65,11 @@ fn switch(route: Route) -> Html {
         Route::Account { account_id } => html! {
             <>
             <NavBar account_id={ account_id.clone() } />
-            <AccountProvider id={ account_id.clone() }>
+            <BounceRoot>
                 <Suspense fallback={ utils::loading() }>
-                    <Account />
+                    <Account id={ account_id.clone() } />
                 </Suspense>
-            </AccountProvider>
+            </BounceRoot>
             </>
         },
         Route::Expenditures { account_id } => html! {

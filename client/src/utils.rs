@@ -3,6 +3,14 @@ use gloo_net::http::Request;
 use serde::{de::DeserializeOwned, Serialize};
 use yew::prelude::*;
 
+#[derive(Error, Display, Debug)]
+enum Error {
+    #[error("Network error: {0}")]
+    NetworkError(#[from] gloo_net::Error),
+    #[error("Error: {0}")]
+    ServerError(String),
+}
+
 // Wait for async trait to impl
 // pub trait RequestResult {
 //     async fn result<R>(&self) -> anyhow::Result<R>
@@ -88,21 +96,15 @@ where
     }
 }
 
-pub async fn get<R>(url: &str) -> anyhow::Result<R>
+pub async fn get<R>(url: &str) -> Result<R, Error>
 where
     R: DeserializeOwned,
 {
     let response = Request::get(url).send().await?;
     if response.ok() {
-        match response.json().await {
-            Ok(ret) => Ok(ret),
-            Err(err) => Err(anyhow::Error::new(err)),
-        }
+        Ok(response.json().await?)
     } else {
-        match response.text().await {
-            Ok(text) => Err(anyhow::anyhow!(text)),
-            Err(err) => Err(anyhow::Error::new(err)),
-        }
+        Err(Error::ServerError(response.text().await?))
     }
 }
 
