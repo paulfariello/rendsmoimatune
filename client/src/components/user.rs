@@ -1,7 +1,6 @@
 use std::collections::HashMap;
 use std::rc::Rc;
 
-use anyhow::{Context as _, Error, Result};
 use log;
 use rmmt::{self, prelude::*};
 use uuid::Uuid;
@@ -11,17 +10,17 @@ use yew_router::prelude::*;
 
 use crate::components::{
     account::AccountTitle,
-    ctx::{AccountAction, AccountCtx},
     expenditure::ExpendituresList,
     repayment::RepaymentsList,
     utils::{Amount, FetchError},
 };
+use crate::ctx::{AccountAction, AccountCtx};
 use crate::utils;
 use crate::Route;
 
 #[derive(Properties, PartialEq)]
 pub struct UsernameProps {
-    pub account_id: String,
+    pub account_id: Rc<String>,
     pub users: Rc<HashMap<Uuid, rmmt::User>>,
     pub id: Uuid,
     #[prop_or_else(|| "primary".to_string())]
@@ -40,7 +39,7 @@ pub fn user_name(
     let text_color = format!("has-text-{}", color);
     if let Some(user) = users.get(&id) {
         html! {
-            <Link<Route> to={Route::User { account_id: account_id.clone(), user_id: id.clone() } } classes={ classes!(text_color) }>
+            <Link<Route> to={Route::User { account_id: account_id.to_string(), user_id: id.clone() } } classes={ classes!(text_color) }>
                 { &user.name }
             </Link<Route>>
         }
@@ -52,7 +51,7 @@ pub fn user_name(
 
 #[derive(PartialEq, Properties)]
 pub struct CreateUserProps {
-    pub account_id: String,
+    pub account_id: Rc<String>,
 }
 
 pub enum CreateUserMsg {
@@ -63,13 +62,13 @@ pub enum CreateUserMsg {
         balance: rmmt::Balance,
     },
     AccountCtxUpdated(AccountCtx),
-    Error(Error),
+    Error(utils::Error),
 }
 
 pub struct CreateUser {
     creating: bool,
     input_name: NodeRef,
-    error: Option<Error>,
+    error: Option<utils::Error>,
 }
 
 impl CreateUser {
@@ -86,7 +85,7 @@ impl CreateUser {
         };
         let url = format!("/api/account/{}/users", ctx.props().account_id);
         ctx.link().send_future(async move {
-            let created_user: Result<rmmt::User> = utils::post(&url, &user).await;
+            let created_user: Result<rmmt::User, utils::Error> = utils::post(&url, &user).await;
             match created_user {
                 Ok(user) => CreateUserMsg::Created(user),
                 Err(error) => CreateUserMsg::Error(error),
@@ -101,8 +100,8 @@ impl CreateUser {
         let balance_url = format!("/api/account/{}/balance", ctx.props().account_id);
         ctx.link().send_future(async move {
             // TODO parallelize
-            let users: Result<Vec<rmmt::User>> = utils::get(&users_url).await;
-            let balance: Result<rmmt::Balance> = utils::get(&balance_url).await;
+            let users: Result<Vec<rmmt::User>, utils::Error> = utils::get(&users_url).await;
+            let balance: Result<rmmt::Balance, utils::Error> = utils::get(&balance_url).await;
             match (users, balance) {
                 (Ok(users), Ok(balance)) => CreateUserMsg::Reloaded {
                     users: users
@@ -208,7 +207,7 @@ impl Component for CreateUser {
 
 #[derive(PartialEq, Properties)]
 pub struct BaseUserProps {
-    pub account_id: String,
+    pub account_id: Rc<String>,
     pub account: rmmt::Account,
     pub user_id: Uuid,
     pub users: Rc<HashMap<Uuid, rmmt::User>>,
@@ -218,13 +217,13 @@ pub struct BaseUserProps {
 pub enum UserMsg {
     Edit,
     Edited { user: rmmt::User },
-    Error(Error),
+    Error(utils::Error),
 }
 
 pub struct BaseUser {
     editing: bool,
     input_name: NodeRef,
-    error: Option<Error>,
+    error: Option<utils::Error>,
 }
 
 impl BaseUser {
@@ -242,7 +241,7 @@ impl BaseUser {
         };
         let url = format!("/api/account/{}/users/{}", ctx.props().account_id, user.id);
         ctx.link().send_future(async move {
-            let edited_user: Result<rmmt::User> = utils::put(&url, &user).await;
+            let edited_user: Result<rmmt::User, utils::Error> = utils::put(&url, &user).await;
             match edited_user {
                 Ok(user) => UserMsg::Edited { user },
                 Err(error) => UserMsg::Error(error),
@@ -300,7 +299,7 @@ impl Component for BaseUser {
 
         html! {
             <>
-            <AccountTitle id={ ctx.props().account_id.clone() } name={ ctx.props().account.name.clone() } />
+            <AccountTitle id={ ctx.props().account_id.clone() } name={ Rc::new(ctx.props().account.name.clone()) } />
             <div class="tile is-ancestor">
                 <div class="tile is-parent">
                     <div class="tile is-child box">
@@ -476,6 +475,6 @@ pub fn user(props: &UserProps) -> HtmlResult {
     };
 
     Ok(
-        html! {<BaseUser account_id={ account_ctx.id.clone() } account={ account.clone() } user_id={ props.user_id.clone() } users={ account_ctx.users.clone() } balance={ balance.clone() } />},
+        html! {<BaseUser account_id={ Rc::new(account_ctx.id.clone()) } account={ account.clone() } user_id={ props.user_id.clone() } users={ account_ctx.users.clone() } balance={ balance.clone() } />},
     )
 }

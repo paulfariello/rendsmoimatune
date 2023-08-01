@@ -16,10 +16,10 @@ use yew_router::prelude::*;
 
 use crate::components::{
     account::AccountTitle,
-    ctx::{AccountAction, AccountCtx},
     user::UserName,
     utils::{Amount, FetchError},
 };
+use crate::ctx::{AccountAction, AccountCtx};
 use crate::{utils, Route};
 
 #[function_component(Expenditures)]
@@ -46,7 +46,7 @@ pub fn expenditures() -> HtmlResult {
 
     Ok(html! {
         <>
-        <AccountTitle id={ account_ctx.id.clone() } name={ account.name.clone() } />
+        <AccountTitle id={ Rc::new(account_ctx.id.clone()) } name={ Rc::new(account.name.clone()) } />
         <div class="box">
             <h3 class="subtitle is-3">
                 <Link<Route> to={Route::Expenditures { account_id: account_ctx.id.clone() }}>
@@ -57,7 +57,7 @@ pub fn expenditures() -> HtmlResult {
                 </Link<Route>>
             </h3>
             <Suspense fallback={utils::loading()}>
-                <ExpendituresList account_id={ account_ctx.id.clone() } users={ account_ctx.users.clone() } />
+                <ExpendituresList account_id={ Rc::new(account_ctx.id.clone()) } users={ account_ctx.users.clone() } />
             </Suspense>
         </div>
         </>
@@ -66,7 +66,7 @@ pub fn expenditures() -> HtmlResult {
 
 #[derive(Properties, PartialEq)]
 pub struct ExpendituresListProps {
-    pub account_id: String,
+    pub account_id: Rc<String>,
     pub users: Rc<HashMap<Uuid, rmmt::User>>,
     #[prop_or_default]
     pub limit: Option<usize>,
@@ -121,7 +121,7 @@ pub fn expenditures_list(props: &ExpendituresListProps) -> HtmlResult {
                                     <Debtors debts={ debts.clone() } users={ props.users.clone() } />
                                 </td>
                                 <td class="is-vcentered">
-                                    <Link<Route> to={Route::EditExpenditure { account_id: props.account_id.clone(), expenditure_id: { expenditure.id } }} classes="button is-primary">
+                                    <Link<Route> to={Route::EditExpenditure { account_id: props.account_id.to_string(), expenditure_id: { expenditure.id } }} classes="button is-primary">
                                         <i class="fas fa-pencil fa-fw"></i>
                                     </Link<Route>>
                                     <DeleteExpenditure account_id={ expenditure.account_id.clone() } id={ expenditure.id.clone() } />
@@ -162,13 +162,13 @@ pub fn expenditures_list(props: &ExpendituresListProps) -> HtmlResult {
             <div class="buttons">
                 if let Some(limit) = props.limit {
                     if len > limit {
-                        <Link<Route> to={ Route::Expenditures { account_id: props.account_id.clone() } } classes="button is-light">
+                        <Link<Route> to={ Route::Expenditures { account_id: props.account_id.to_string() } } classes="button is-light">
                             { format!("Voir les {} autres", len - limit) }
                         </Link<Route>>
                     }
                 }
                 if props.buttons {
-                    <Link<Route> to={Route::CreateExpenditure { account_id: props.account_id.clone() }} classes="button is-primary">
+                    <Link<Route> to={Route::CreateExpenditure { account_id: props.account_id.to_string() }} classes="button is-primary">
                         <span class="icon">
                             <i class="fas fa-plus-circle" />
                         </span>
@@ -182,7 +182,7 @@ pub fn expenditures_list(props: &ExpendituresListProps) -> HtmlResult {
 
 #[derive(Properties, PartialEq)]
 pub struct BaseEditExpenditureProps {
-    pub account_id: String,
+    pub account_id: Rc<String>,
     pub account: rmmt::Account,
     pub users: Rc<HashMap<Uuid, rmmt::User>>,
     #[prop_or_default]
@@ -387,7 +387,7 @@ impl Component for BaseEditExpenditure {
 
                 let navigator = ctx.link().navigator().unwrap();
                 navigator.push(&Route::Account {
-                    account_id: ctx.props().account_id.clone(),
+                    account_id: ctx.props().account_id.to_string(),
                 });
 
                 false
@@ -432,11 +432,11 @@ impl Component for BaseEditExpenditure {
 
         html! {
             <>
-            <AccountTitle id={ ctx.props().account_id.clone() } name={ ctx.props().account.name.clone() } />
+            <AccountTitle id={ ctx.props().account_id.clone() } name={ Rc::new(ctx.props().account.name.clone()) } />
             <div class="box">
                 if let Some(expenditure_id) = ctx.props().expenditure_id.clone() {
                     <h3 class="subtitle is-3">
-                        <Link<Route> to={Route::EditExpenditure { account_id: ctx.props().account_id.clone(), expenditure_id }}>
+                        <Link<Route> to={Route::EditExpenditure { account_id: ctx.props().account_id.to_string(), expenditure_id }}>
                             <span class="icon-text">
                                 <span class="icon"><i class="fas fa-exchange"></i></span>
                                 <span>{ "Dépense" }</span>
@@ -445,7 +445,7 @@ impl Component for BaseEditExpenditure {
                     </h3>
                 } else {
                     <h3 class="subtitle is-3">
-                        <Link<Route> to={Route::CreateExpenditure { account_id: ctx.props().account_id.clone() }}>
+                        <Link<Route> to={Route::CreateExpenditure { account_id: ctx.props().account_id.to_string() }}>
                             <span class="icon-text">
                                 <span class="icon"><i class="fas fa-exchange"></i></span>
                                 <span>{ "Nouvelle dépense" }</span>
@@ -539,7 +539,7 @@ impl Component for BaseEditExpenditure {
 
 #[derive(Properties, PartialEq)]
 pub struct EditExistingExpenditureProps {
-    pub account_id: String,
+    pub account_id: Rc<String>,
     pub account: rmmt::Account,
     pub users: Rc<HashMap<Uuid, rmmt::User>>,
     #[prop_or_default]
@@ -594,11 +594,11 @@ pub fn edit_expenditure_with_account_and_users(props: &EditExpenditureProps) -> 
 
     if let Some(expenditure_id) = props.expenditure_id {
         Ok(
-            html! {<EditExistingExpenditure account_id={ account_ctx.id.clone() } account={ account.clone() } users={ account_ctx.users.clone() } expenditure_id={ expenditure_id } />},
+            html! {<EditExistingExpenditure account_id={ Rc::new(account_ctx.id.clone()) } account={ account.clone() } users={ account_ctx.users.clone() } expenditure_id={ expenditure_id } />},
         )
     } else {
         Ok(
-            html! {<BaseEditExpenditure account_id={ account_ctx.id.clone() } account={ account.clone() } users={ account_ctx.users.clone() } expenditure_id={ props.expenditure_id } />},
+            html! {<BaseEditExpenditure account_id={ Rc::new(account_ctx.id.clone()) } account={ account.clone() } users={ account_ctx.users.clone() } expenditure_id={ props.expenditure_id } />},
         )
     }
 }

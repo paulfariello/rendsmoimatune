@@ -15,10 +15,10 @@ use yew_router::prelude::*;
 
 use crate::components::{
     account::AccountTitle,
-    ctx::{AccountAction, AccountCtx},
     user::UserName,
     utils::{Amount, FetchError},
 };
+use crate::ctx::{AccountAction, AccountCtx};
 use crate::utils;
 use crate::Route;
 
@@ -46,7 +46,7 @@ pub fn repayments() -> HtmlResult {
 
     Ok(html! {
         <>
-        <AccountTitle id={ account_ctx.id.clone() } name={ account.name.clone() } />
+        <AccountTitle id={ Rc::new(account_ctx.id.clone()) } name={ Rc::new(account.name.clone()) } />
         <div class="box">
             <h3 class="subtitle is-3">
                 <Link<Route> to={Route::Repayments { account_id: account_ctx.id.clone() }}>
@@ -57,7 +57,7 @@ pub fn repayments() -> HtmlResult {
                 </Link<Route>>
             </h3>
             <Suspense fallback={utils::loading()}>
-                <RepaymentsList account_id={ account_ctx.id.clone() } users={ account_ctx.users.clone() } />
+                <RepaymentsList account_id={ Rc::new(account_ctx.id.clone()) } users={ account_ctx.users.clone() } />
             </Suspense>
         </div>
         </>
@@ -66,7 +66,7 @@ pub fn repayments() -> HtmlResult {
 
 #[derive(Properties, PartialEq)]
 pub struct RepaymentsListProps {
-    pub account_id: String,
+    pub account_id: Rc<String>,
     pub users: Rc<HashMap<Uuid, rmmt::User>>,
     #[prop_or_default]
     pub limit: Option<usize>,
@@ -108,7 +108,7 @@ pub fn repayments_list(props: &RepaymentsListProps) -> HtmlResult {
                                 <td class="is-vcentered is-hidden-touch">{ "à" }</td>
                                 <td class="is-vcentered"><UserName account_id={ props.account_id.clone() } users={ props.users.clone() } id={ repayment.beneficiary_id } /></td>
                                 <td class="is-vcentered">
-                                    <Link<Route> to={Route::EditRepayment { account_id: props.account_id.clone(), repayment_id: { repayment.id } }}>
+                                    <Link<Route> to={Route::EditRepayment { account_id: props.account_id.to_string(), repayment_id: { repayment.id } }}>
                                         <a aria-label="Éditer" class="button is-primary" href="">
                                             <i class="fas fa-pencil fa-fw"></i>
                                         </a>
@@ -157,13 +157,13 @@ pub fn repayments_list(props: &RepaymentsListProps) -> HtmlResult {
             <div class="buttons">
                 if let Some(limit) = props.limit {
                     if len > limit {
-                        <Link<Route> to={Route::Repayments { account_id: props.account_id.clone() }} classes="button is-light">
+                        <Link<Route> to={Route::Repayments { account_id: props.account_id.to_string() }} classes="button is-light">
                             { format!("Voir les {} autres", len - limit) }
                         </Link<Route>>
                     }
                 }
                 if props.buttons {
-                    <Link<Route> to={Route::CreateRepayment { account_id: props.account_id.clone() }} classes="button is-primary">
+                    <Link<Route> to={Route::CreateRepayment { account_id: props.account_id.to_string() }} classes="button is-primary">
                         <span class="icon">
                             <i class="fas fa-plus-circle" />
                         </span>
@@ -218,7 +218,7 @@ impl Default for DefaultRepayment {
 
 #[derive(Properties, PartialEq)]
 pub struct BaseEditRepaymentProps {
-    pub account_id: String,
+    pub account_id: Rc<String>,
     pub account: rmmt::Account,
     #[prop_or_default]
     pub repayment_id: Option<Uuid>,
@@ -381,7 +381,7 @@ impl Component for BaseEditRepayment {
 
                 let navigator = ctx.link().navigator().unwrap();
                 navigator.push(&Route::Account {
-                    account_id: ctx.props().account_id.clone(),
+                    account_id: ctx.props().account_id.to_string(),
                 });
 
                 false
@@ -428,11 +428,11 @@ impl Component for BaseEditRepayment {
 
         html! {
             <>
-            <AccountTitle id={ ctx.props().account_id.clone() } name={ ctx.props().account.name.clone() } />
+            <AccountTitle id={ ctx.props().account_id.clone() } name={ Rc::new(ctx.props().account.name.clone()) } />
             <div class="box">
                 if let Some(repayment_id) = ctx.props().repayment_id.clone() {
                     <h3 class="subtitle is-3">
-                        <Link<Route> to={Route::EditRepayment { account_id: ctx.props().account_id.clone(), repayment_id }}>
+                        <Link<Route> to={Route::EditRepayment { account_id: ctx.props().account_id.to_string(), repayment_id }}>
                             <span class="icon-text">
                                 <span class="icon"><i class="fas fa-exchange"></i></span>
                                 <span>{ "Remboursement" }</span>
@@ -441,7 +441,7 @@ impl Component for BaseEditRepayment {
                     </h3>
                 } else {
                     <h3 class="subtitle is-3">
-                        <Link<Route> to={Route::CreateRepayment { account_id: ctx.props().account_id.clone() }}>
+                        <Link<Route> to={Route::CreateRepayment { account_id: ctx.props().account_id.to_string() }}>
                             <span class="icon-text">
                                 <span class="icon"><i class="fas fa-exchange"></i></span>
                                 <span>{ "Nouveau remboursement" }</span>
@@ -538,7 +538,7 @@ impl Component for BaseEditRepayment {
 
 #[derive(Properties, PartialEq)]
 pub struct EditExistingRepaymentProps {
-    pub account_id: String,
+    pub account_id: Rc<String>,
     pub account: rmmt::Account,
     pub users: Rc<HashMap<Uuid, rmmt::User>>,
     #[prop_or_default]
@@ -593,11 +593,11 @@ pub fn edit_repayment_with_account_and_users(props: &EditRepaymentProps) -> Html
 
     if let Some(repayment_id) = props.repayment_id {
         Ok(
-            html! {<EditExistingRepayment account_id={ account_ctx.id.clone() } account={ account.clone() } users={ account_ctx.users.clone() } repayment_id={ repayment_id } />},
+            html! {<EditExistingRepayment account_id={ Rc::new(account_ctx.id.clone()) } account={ account.clone() } users={ account_ctx.users.clone() } repayment_id={ repayment_id } />},
         )
     } else {
         Ok(
-            html! {<BaseEditRepayment account_id={ account_ctx.id.clone() } account={ account.clone() } users={ account_ctx.users.clone() } repayment_id={ props.repayment_id } />},
+            html! {<BaseEditRepayment account_id={ Rc::new(account_ctx.id.clone()) } account={ account.clone() } users={ account_ctx.users.clone() } repayment_id={ props.repayment_id } />},
         )
     }
 }

@@ -11,16 +11,18 @@ use yew_router::prelude::*;
 static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
 
 mod components;
+mod ctx;
 mod utils;
 
 use components::{
     account::{Account, CreateAccount},
-    ctx::AccountProvider,
     expenditure::{EditExpenditure, Expenditures},
     repayment::{EditRepayment, Repayments},
     user::User,
     utils::NavBar,
 };
+
+use ctx::AccountProvider;
 
 #[derive(Clone, Routable, PartialEq)]
 pub enum Route {

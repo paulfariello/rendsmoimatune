@@ -12,7 +12,7 @@ use crate::components::{user::UserName, utils::Amount};
 
 #[derive(Properties, PartialEq)]
 pub struct BalanceListProps {
-    pub account_id: String,
+    pub account_id: Rc<String>,
     pub users: Rc<HashMap<Uuid, rmmt::User>>,
     pub balance: Rc<rmmt::Balance>,
 }
@@ -78,7 +78,7 @@ pub fn balance_list(props: &BalanceListProps) -> HtmlResult {
 
 #[derive(Properties, PartialEq)]
 pub struct BalancingListProps {
-    pub account_id: String,
+    pub account_id: Rc<String>,
     pub users: Rc<HashMap<Uuid, rmmt::User>>,
     pub balance: Rc<rmmt::Balance>,
 }
@@ -123,13 +123,13 @@ pub fn balancing_list(props: &BalanceListProps) -> HtmlResult {
                                         <td class="is-vcentered has-text-centered is-hidden-touch">{ "à" }</td>
                                         <td class="is-vcentered has-text-centered"><UserName account_id={ props.account_id.clone() } users={ users.clone() } id={ balance.beneficiary_id }/></td>
                                         <td>
-                                            <Link<Route, rmmt::Balancing> to={Route::CreateRepayment { account_id: props.account_id.clone() } } query={ Some(balance.clone()) } classes="button is-primary is-hidden-touch">
+                                            <Link<Route, rmmt::Balancing> to={Route::CreateRepayment { account_id: props.account_id.to_string() } } query={ Some(balance.clone()) } classes="button is-primary is-hidden-touch">
                                                 <span class="icon">
                                                     <i class="fas fa-credit-card" />
                                                 </span>
                                                 <span>{ "Rembourser" }</span>
                                             </Link<Route, rmmt::Balancing>>
-                                            <Link<Route, rmmt::Balancing> to={Route::CreateRepayment { account_id: props.account_id.clone() } } query={ Some(balance.clone()) } classes="button is-primary is-hidden-desktop">
+                                            <Link<Route, rmmt::Balancing> to={Route::CreateRepayment { account_id: props.account_id.to_string() } } query={ Some(balance.clone()) } classes="button is-primary is-hidden-desktop">
                                                 <span class="icon">
                                                     <i class="fas fa-credit-card" />
                                                 </span>

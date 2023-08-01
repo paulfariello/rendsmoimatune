@@ -1,8 +1,10 @@
+use std::convert::TryFrom;
+use std::fmt;
+use std::rc::Rc;
+
 #[cfg(feature = "rocket")]
 use rocket::request::FromParam;
 use serde::{Deserialize, Serialize};
-use std::convert::TryFrom;
-use std::fmt;
 use uuid::Uuid;
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
@@ -44,6 +46,14 @@ impl TryFrom<&str> for UniqId {
         let uuid = Uuid::from_u128(quad);
 
         Ok(UniqId(uuid))
+    }
+}
+
+impl TryFrom<Rc<String>> for UniqId {
+    type Error = String;
+
+    fn try_from(string: Rc<String>) -> Result<Self, Self::Error> {
+        UniqId::try_from(string.as_str())
     }
 }
 
