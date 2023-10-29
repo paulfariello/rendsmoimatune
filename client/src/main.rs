@@ -1,6 +1,5 @@
 extern crate wee_alloc;
 
-use bounce::prelude::*;
 use bounce::BounceRoot;
 use uuid::Uuid;
 use wasm_logger;
@@ -54,7 +53,6 @@ pub enum Route {
 }
 
 fn switch(route: Route) -> Html {
-    let cloned_route = route.clone();
     match route {
         Route::Home => html! {
             <>

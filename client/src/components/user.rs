@@ -1,7 +1,6 @@
 use std::collections::HashMap;
 use std::rc::Rc;
 
-use anyhow::{Context as _};
 use log;
 use rmmt::{self, prelude::*};
 use uuid::Uuid;
