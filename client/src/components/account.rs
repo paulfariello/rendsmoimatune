@@ -146,7 +146,7 @@ impl CreateAccount {
 
         let account = rmmt::NewAccount { name };
         ctx.link().send_future(async move {
-            let res: Result<String, _> = utils::post("/api/account/", &account)
+            let res: Result<String, _> = utils::post("/api/account", &account)
                 .await
                 .context("Can't create account");
             match res {
