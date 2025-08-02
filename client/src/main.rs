@@ -64,9 +64,11 @@ fn switch(route: Route) -> Html {
             <>
             <NavBar account_id={ account_id.clone() } />
             <BounceRoot>
-                <Suspense fallback={ utils::loading() }>
-                    <Account id={ account_id.clone() } />
-                </Suspense>
+                <AccountProvider id={ account_id.clone() }>
+                    <Suspense fallback={ utils::loading() }>
+                        <Account id={ account_id.clone() } />
+                    </Suspense>
+                </AccountProvider>
             </BounceRoot>
             </>
         },
