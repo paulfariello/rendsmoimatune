@@ -12,7 +12,7 @@ use rocket_sync_db_pools::database;
 #[derive(Parser, Debug)]
 #[clap(author, version, about)]
 struct Cli {
-    #[clap(short, long, parse(from_os_str))]
+    #[clap(short, long)]
     config: Option<std::path::PathBuf>,
 }
 
@@ -39,8 +39,7 @@ fn rocket() -> _ {
             .merge(Env::prefixed("ROCKET_").ignore(&["PROFILE"]).global()),
         None => rocket::Config::figment(),
     };
-    rocket::build()
-        .configure(config_provider)
+    rocket::custom(config_provider)
         .attach(MainDbConn::fairing())
         .mount(
             "/",
