@@ -10,6 +10,7 @@ use yew::prelude::*;
 use yew::suspense::{use_future, UseFutureHandle};
 use yew_router::prelude::*;
 
+use crate::components::ctx::{AccountAction, AccountCtx};
 use crate::components::{
     balance::{BalanceList, BalancingList},
     ctx::AccountQuery,
@@ -29,6 +30,7 @@ pub struct AccountProps {
 #[function_component(Account)]
 pub fn account(props: &AccountProps) -> HtmlResult {
     log::debug!("Rerendering account");
+    let account_ctx = use_context::<AccountCtx>().unwrap();
 
     let account = use_query::<AccountQuery>(Rc::new(props.id.clone()))?;
     let account = match account.as_ref() {
@@ -44,8 +46,7 @@ pub fn account(props: &AccountProps) -> HtmlResult {
         Ok(ref res) => res.iter().cloned().map(|u| (u.id.clone(), u)).collect(),
         Err(ref error) => return Ok(html! { <FetchError error={ format!("{:?}", error) } /> }),
     };
-    let users = Rc::new(users);
-    //account_ctx.dispatch(AccountAction::UpdateUsers(users));
+    account_ctx.dispatch(AccountAction::UpdateUsers(users));
 
     let balance_url = format!("/api/account/{}/balance", props.id);
     let balance: UseFutureHandle<Result<rmmt::Balance, _>> =
@@ -54,14 +55,13 @@ pub fn account(props: &AccountProps) -> HtmlResult {
         Ok(ref res) => res.clone(),
         Err(ref error) => return Ok(html! { <FetchError error={ format!("{:?}", error) } /> }),
     };
-    let balance = Rc::new(balance);
-    //account_ctx.dispatch(AccountAction::UpdateBalance(balance.clone()));
+    account_ctx.dispatch(AccountAction::UpdateBalance(balance.clone()));
 
     log::debug!("Rerendered account");
 
     Ok(html! {
         <>
-        <AccountTitle id={ account.id.as_ref().clone() } name={ account.inner.name.clone() } />
+        <AccountTitle />
         <div class="tile is-ancestor">
             <div class="tile is-parent">
                 <div class="tile is-child box">
@@ -69,8 +69,8 @@ pub fn account(props: &AccountProps) -> HtmlResult {
                         <span class="icon"><i class="fas fa-balance-scale"></i></span>
                         <span>{ "Balance" }</span>
                     </h3>
-                    <BalanceList account_id={ account.id.as_ref().clone() } users={ users.clone() } balance={ balance.clone() } />
-                    <CreateUser account_id={ account.id.as_ref().clone() } />
+                    <BalanceList />
+                    <CreateUser />
                 </div>
             </div>
 
@@ -80,7 +80,7 @@ pub fn account(props: &AccountProps) -> HtmlResult {
                         <span class="icon"><i class="fas fa-exchange"></i></span>
                         <span>{ "Équilibrage" }</span>
                     </h3>
-                    <BalancingList account_id={ account.id.as_ref().clone() } users={ users.clone() } balance={ balance.clone() } />
+                    <BalancingList />
                 </div>
             </div>
         </div>
@@ -95,8 +95,7 @@ pub fn account(props: &AccountProps) -> HtmlResult {
                         </Link<Route>>
                     </h3>
                     <Suspense fallback={utils::loading()}>
-                        // TODO avoid cloning users
-                        <ExpendituresList account_id={ account.id.as_ref().clone() } users={ users.clone() } limit=10 buttons=true />
+                        <ExpendituresList limit=10 buttons=true />
                     </Suspense>
                 </div>
             </div>
@@ -112,8 +111,7 @@ pub fn account(props: &AccountProps) -> HtmlResult {
                         </Link<Route>>
                     </h3>
                     <Suspense fallback={utils::loading()}>
-                        // TODO avoid cloning users
-                        <RepaymentsList account_id={ account.id.as_ref().clone() } users={ users.clone() } limit=10 buttons=true />
+                        <RepaymentsList limit=10 buttons=true />
                     </Suspense>
                 </div>
             </div>
@@ -243,22 +241,17 @@ impl Component for CreateAccount {
     }
 }
 
-#[derive(Properties, PartialEq)]
-pub struct AccountTitleProps {
-    pub id: String, // TODO get Rc<String>
-    pub name: String,
-}
-
 #[function_component(AccountTitle)]
-pub fn account_title(AccountTitleProps { id, name }: &AccountTitleProps) -> Html {
+pub fn account_title() -> Html {
+    let account_ctx = use_context::<AccountCtx>().unwrap();
     html! {
         <h2 class="title is-1">
-            <Link<Route> to={Route::Account { account_id: id.clone() }}>
+            <Link<Route> to={Route::Account { account_id: account_ctx.id.clone() }}>
                 <span class="icon">
                     <i class="fas fa-bank"/>
                 </span>
                 <span>
-                    { name }
+                    { account_ctx.name.clone() }
                 </span>
             </Link<Route>>
         </h2>

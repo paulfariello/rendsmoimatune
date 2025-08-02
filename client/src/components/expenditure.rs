@@ -46,7 +46,7 @@ pub fn expenditures() -> HtmlResult {
 
     Ok(html! {
         <>
-        <AccountTitle id={ account_ctx.id.clone() } name={ account.name.clone() } />
+        <AccountTitle />
         <div class="box">
             <h3 class="subtitle is-3">
                 <Link<Route> to={Route::Expenditures { account_id: account_ctx.id.clone() }}>
@@ -57,7 +57,7 @@ pub fn expenditures() -> HtmlResult {
                 </Link<Route>>
             </h3>
             <Suspense fallback={utils::loading()}>
-                <ExpendituresList account_id={ account_ctx.id.clone() } users={ account_ctx.users.clone() } />
+                <ExpendituresList />
             </Suspense>
         </div>
         </>
@@ -66,8 +66,6 @@ pub fn expenditures() -> HtmlResult {
 
 #[derive(Properties, PartialEq)]
 pub struct ExpendituresListProps {
-    pub account_id: String,
-    pub users: Rc<HashMap<Uuid, rmmt::User>>,
     #[prop_or_default]
     pub limit: Option<usize>,
     #[prop_or_default]
@@ -80,7 +78,9 @@ pub struct ExpendituresListProps {
 
 #[function_component(ExpendituresList)]
 pub fn expenditures_list(props: &ExpendituresListProps) -> HtmlResult {
-    let expenditures_url = format!("/api/account/{}/expenditures", props.account_id);
+    let account_ctx = use_context::<AccountCtx>().unwrap();
+
+    let expenditures_url = format!("/api/account/{}/expenditures", account_ctx.id);
     let mut payer_query: Vec<(&str, String)> = props
         .payer_id
         .iter()
@@ -116,15 +116,15 @@ pub fn expenditures_list(props: &ExpendituresListProps) -> HtmlResult {
                                 <td class="is-vcentered is-hidden-touch">{ &expenditure.date }</td>
                                 <td class="is-vcentered">{ &expenditure.name }</td>
                                 <td class="is-vcentered"><Amount amount={ expenditure.amount as i64} /></td>
-                                <td class="is-vcentered is-hidden-touch"><UserName account_id={ props.account_id.clone() } users={ props.users.clone() } id={ expenditure.payer_id }/></td>
+                                <td class="is-vcentered is-hidden-touch"><UserName id={ expenditure.payer_id }/></td>
                                 <td class="is-vcentered is-hidden-touch">
-                                    <Debtors debts={ debts.clone() } users={ props.users.clone() } />
+                                    <Debtors debts={ debts.clone() } users={ account_ctx.users.clone() } />
                                 </td>
                                 <td class="is-vcentered">
-                                    <Link<Route> to={Route::EditExpenditure { account_id: props.account_id.clone(), expenditure_id: { expenditure.id } }} classes="button is-primary">
+                                    <Link<Route> to={Route::EditExpenditure { account_id: account_ctx.id.clone(), expenditure_id: { expenditure.id } }} classes="button is-primary">
                                         <i class="fas fa-pencil fa-fw"></i>
                                     </Link<Route>>
-                                    <DeleteExpenditure account_id={ expenditure.account_id.clone() } id={ expenditure.id.clone() } />
+                                    <DeleteExpenditure id={ expenditure.id.clone() } />
                                 </td>
                             </tr>
                         }
@@ -162,13 +162,13 @@ pub fn expenditures_list(props: &ExpendituresListProps) -> HtmlResult {
             <div class="buttons">
                 if let Some(limit) = props.limit {
                     if len > limit {
-                        <Link<Route> to={ Route::Expenditures { account_id: props.account_id.clone() } } classes="button is-light">
+                        <Link<Route> to={ Route::Expenditures { account_id: account_ctx.id.clone() } } classes="button is-light">
                             { format!("Voir les {} autres", len - limit) }
                         </Link<Route>>
                     }
                 }
                 if props.buttons {
-                    <Link<Route> to={Route::CreateExpenditure { account_id: props.account_id.clone() }} classes="button is-primary">
+                    <Link<Route> to={Route::CreateExpenditure { account_id: account_ctx.id.clone() }} classes="button is-primary">
                         <span class="icon">
                             <i class="fas fa-plus-circle" />
                         </span>
@@ -182,9 +182,6 @@ pub fn expenditures_list(props: &ExpendituresListProps) -> HtmlResult {
 
 #[derive(Properties, PartialEq)]
 pub struct BaseEditExpenditureProps {
-    pub account_id: String,
-    pub account: rmmt::Account,
-    pub users: Rc<HashMap<Uuid, rmmt::User>>,
     #[prop_or_default]
     pub expenditure_id: Option<Uuid>,
     pub expenditure: Option<rmmt::Expenditure>,
@@ -214,6 +211,7 @@ pub struct BaseEditExpenditure {
 
 impl BaseEditExpenditure {
     fn save_expenditure(&mut self, ctx: &Context<Self>) {
+        let (account_ctx, _) = ctx.link().context::<AccountCtx>(Callback::noop()).unwrap();
         self.creating = true;
 
         let input_name = self.input_name.cast::<web_sys::HtmlInputElement>().unwrap();
@@ -235,10 +233,10 @@ impl BaseEditExpenditure {
             .unwrap();
         let payer_id = Uuid::parse_str(&select_payer.value()).unwrap();
 
-        let account_id: UniqId = ctx.props().account_id.clone().try_into().unwrap();
+        let account_id: UniqId = account_ctx.id.clone().try_into().unwrap();
 
         let mut debtors = Vec::new();
-        for (id, user) in ctx.props().users.iter() {
+        for (id, user) in account_ctx.users.iter() {
             let checkbox = self.debtors_checkbox.get(id).unwrap();
             let enabled = checkbox
                 .cast::<web_sys::HtmlInputElement>()
@@ -269,8 +267,7 @@ impl BaseEditExpenditure {
                 };
                 Request::put(&format!(
                     "/api/account/{}/expenditures/{}",
-                    ctx.props().account_id,
-                    id
+                    account_ctx.id, id
                 ))
                 .json(&(expenditure, debtors))
                 .unwrap()
@@ -283,12 +280,9 @@ impl BaseEditExpenditure {
                     amount,
                     payer_id,
                 };
-                Request::post(&format!(
-                    "/api/account/{}/expenditures",
-                    ctx.props().account_id
-                ))
-                .json(&(expenditure, debtors))
-                .unwrap()
+                Request::post(&format!("/api/account/{}/expenditures", account_ctx.id))
+                    .json(&(expenditure, debtors))
+                    .unwrap()
             }
         };
         ctx.link().send_future(async move {
@@ -331,7 +325,7 @@ impl BaseEditExpenditure {
             .unwrap();
         input_amount.set_value("");
 
-        let today = Local::today();
+        let today = Local::now();
         let input_date = self.input_date.cast::<web_sys::HtmlInputElement>().unwrap();
         input_date.set_value(&format!("{}", today.format("%Y-%m-%d")));
     }
@@ -342,14 +336,13 @@ impl Component for BaseEditExpenditure {
     type Properties = BaseEditExpenditureProps;
 
     fn create(ctx: &Context<Self>) -> Self {
-        let debtors_checkbox = ctx
-            .props()
+        let (account_ctx, _) = ctx.link().context::<AccountCtx>(Callback::noop()).unwrap();
+        let debtors_checkbox = account_ctx
             .users
             .iter()
             .map(|(id, _)| (id.clone(), NodeRef::default()))
             .collect();
-        let debtors_input_share = ctx
-            .props()
+        let debtors_input_share = account_ctx
             .users
             .iter()
             .map(|(id, _)| (id.clone(), NodeRef::default()))
@@ -368,6 +361,7 @@ impl Component for BaseEditExpenditure {
     }
 
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
+        let (account_ctx, _) = ctx.link().context::<AccountCtx>(Callback::noop()).unwrap();
         match msg {
             EditExpenditureMsg::Submit => {
                 if self.creating {
@@ -387,7 +381,7 @@ impl Component for BaseEditExpenditure {
 
                 let navigator = ctx.link().navigator().unwrap();
                 navigator.push(&Route::Account {
-                    account_id: ctx.props().account_id.clone(),
+                    account_id: account_ctx.id.clone(),
                 });
 
                 false
@@ -406,6 +400,7 @@ impl Component for BaseEditExpenditure {
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
+        let (account_ctx, _) = ctx.link().context::<AccountCtx>(Callback::noop()).unwrap();
         let onsubmit = ctx.link().callback(|event: SubmitEvent| {
             event.prevent_default();
             EditExpenditureMsg::Submit
@@ -432,11 +427,11 @@ impl Component for BaseEditExpenditure {
 
         html! {
             <>
-            <AccountTitle id={ ctx.props().account_id.clone() } name={ ctx.props().account.name.clone() } />
+            <AccountTitle />
             <div class="box">
                 if let Some(expenditure_id) = ctx.props().expenditure_id.clone() {
                     <h3 class="subtitle is-3">
-                        <Link<Route> to={Route::EditExpenditure { account_id: ctx.props().account_id.clone(), expenditure_id }}>
+                        <Link<Route> to={Route::EditExpenditure { account_id: account_ctx.id.clone(), expenditure_id }}>
                             <span class="icon-text">
                                 <span class="icon"><i class="fas fa-exchange"></i></span>
                                 <span>{ "Dépense" }</span>
@@ -445,7 +440,7 @@ impl Component for BaseEditExpenditure {
                     </h3>
                 } else {
                     <h3 class="subtitle is-3">
-                        <Link<Route> to={Route::CreateExpenditure { account_id: ctx.props().account_id.clone() }}>
+                        <Link<Route> to={Route::CreateExpenditure { account_id: account_ctx.id.clone() }}>
                             <span class="icon-text">
                                 <span class="icon"><i class="fas fa-exchange"></i></span>
                                 <span>{ "Nouvelle dépense" }</span>
@@ -482,7 +477,7 @@ impl Component for BaseEditExpenditure {
                     <div class="field">
                         <label class="label">{ "Date" }</label>
                         <div class="control">
-                            <input ref={self.input_date.clone()} type="date" class="input is-primary" required=true value={ format!("{}", ctx.props().expenditure.as_ref().map(|e| e.date).unwrap_or(Local::today().naive_local()).format("%Y-%m-%d")) } />
+                            <input ref={self.input_date.clone()} type="date" class="input is-primary" required=true value={ format!("{}", ctx.props().expenditure.as_ref().map(|e| e.date).unwrap_or(Local::now().naive_local().into()).format("%Y-%m-%d")) } />
                         </div>
                     </div>
 
@@ -492,7 +487,7 @@ impl Component for BaseEditExpenditure {
                             <div class="select is-fullwidth is-primary">
                                 <select ref={ self.select_payer.clone() } required=true>
                                 {
-                                    ctx.props().users.iter().map(|(_, user)| html! {
+                                    account_ctx.users.iter().map(|(_, user)| html! {
                                         <option value={ user.id.to_string() } selected={ ctx.props().expenditure.as_ref().map(|e| e.payer_id) == Some(user.id) }>{ &user.name }</option>
                                     }).collect::<Html>()
                                 }
@@ -507,7 +502,7 @@ impl Component for BaseEditExpenditure {
                     <div class="field">
                         <label class="label">{ "Bénéficiaires" }</label>
                         {
-                            ctx.props().users.iter().map(|(id, user)| html! {
+                            account_ctx.users.iter().map(|(id, user)| html! {
                                 <DebtorInput name={ user.name.clone() } state_ref={ self.debtors_checkbox.get(&id).clone().unwrap() } share_ref={ self.debtors_input_share.get(&id).clone().unwrap() } debt={ debts.as_ref().and_then(|debts| debts.get(&id).cloned()) }/>
                             }).collect::<Html>()
                         }
@@ -539,18 +534,16 @@ impl Component for BaseEditExpenditure {
 
 #[derive(Properties, PartialEq)]
 pub struct EditExistingExpenditureProps {
-    pub account_id: String,
-    pub account: rmmt::Account,
-    pub users: Rc<HashMap<Uuid, rmmt::User>>,
     #[prop_or_default]
     pub expenditure_id: Uuid,
 }
 
 #[function_component(EditExistingExpenditure)]
 pub fn edit_existing_expenditure(props: &EditExistingExpenditureProps) -> HtmlResult {
+    let account_ctx = use_context::<AccountCtx>().unwrap();
     let expenditure_url = format!(
         "/api/account/{}/expenditures/{}",
-        props.account_id, props.expenditure_id
+        account_ctx.id, props.expenditure_id
     );
     let expenditure: UseFutureHandle<Result<(rmmt::Expenditure, Vec<rmmt::Debt>), _>> =
         use_future(|| async move { utils::get(&expenditure_url).await })?;
@@ -560,7 +553,7 @@ pub fn edit_existing_expenditure(props: &EditExistingExpenditureProps) -> HtmlRe
     };
 
     Ok(
-        html! {<BaseEditExpenditure account_id={ props.account_id.clone() } account={ props.account.clone() } users={ props.users.clone() } expenditure_id={ props.expenditure_id } expenditure={ Some(expenditure.clone()) } debts={ Some(debts.clone()) } />},
+        html! {<BaseEditExpenditure expenditure_id={ props.expenditure_id } expenditure={ Some(expenditure.clone()) } debts={ Some(debts.clone()) } />},
     )
 }
 
@@ -593,13 +586,9 @@ pub fn edit_expenditure_with_account_and_users(props: &EditExpenditureProps) -> 
     account_ctx.dispatch(AccountAction::UpdateUsers(users));
 
     if let Some(expenditure_id) = props.expenditure_id {
-        Ok(
-            html! {<EditExistingExpenditure account_id={ account_ctx.id.clone() } account={ account.clone() } users={ account_ctx.users.clone() } expenditure_id={ expenditure_id } />},
-        )
+        Ok(html! {<EditExistingExpenditure expenditure_id={ expenditure_id } />})
     } else {
-        Ok(
-            html! {<BaseEditExpenditure account_id={ account_ctx.id.clone() } account={ account.clone() } users={ account_ctx.users.clone() } expenditure_id={ props.expenditure_id } />},
-        )
+        Ok(html! {<BaseEditExpenditure expenditure_id={ props.expenditure_id } />})
     }
 }
 
@@ -673,7 +662,6 @@ impl Component for DebtorInput {
 
 #[derive(Properties, PartialEq)]
 pub struct DeleteExpenditureProps {
-    pub account_id: Uuid,
     pub id: Uuid,
 }
 
@@ -690,11 +678,12 @@ struct DeleteExpenditure {
 
 impl DeleteExpenditure {
     fn delete_expenditure(&mut self, ctx: &Context<Self>) {
+        let (account_ctx, _) = ctx.link().context::<AccountCtx>(Callback::noop()).unwrap();
         self.deleting = true;
 
         let url = format!(
             "/api/account/{}/expenditures/{}",
-            UniqId::from(ctx.props().account_id),
+            account_ctx.id,
             ctx.props().id
         );
         ctx.link().send_future(async move {

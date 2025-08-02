@@ -1,5 +1,4 @@
 use std::collections::HashMap;
-use std::rc::Rc;
 
 use anyhow::Result;
 use chrono::naive::NaiveDate;
@@ -46,7 +45,7 @@ pub fn repayments() -> HtmlResult {
 
     Ok(html! {
         <>
-        <AccountTitle id={ account_ctx.id.clone() } name={ account.name.clone() } />
+        <AccountTitle />
         <div class="box">
             <h3 class="subtitle is-3">
                 <Link<Route> to={Route::Repayments { account_id: account_ctx.id.clone() }}>
@@ -57,7 +56,7 @@ pub fn repayments() -> HtmlResult {
                 </Link<Route>>
             </h3>
             <Suspense fallback={utils::loading()}>
-                <RepaymentsList account_id={ account_ctx.id.clone() } users={ account_ctx.users.clone() } />
+                <RepaymentsList />
             </Suspense>
         </div>
         </>
@@ -66,8 +65,6 @@ pub fn repayments() -> HtmlResult {
 
 #[derive(Properties, PartialEq)]
 pub struct RepaymentsListProps {
-    pub account_id: String,
-    pub users: Rc<HashMap<Uuid, rmmt::User>>,
     #[prop_or_default]
     pub limit: Option<usize>,
     #[prop_or_default]
@@ -78,7 +75,8 @@ pub struct RepaymentsListProps {
 
 #[function_component(RepaymentsList)]
 pub fn repayments_list(props: &RepaymentsListProps) -> HtmlResult {
-    let repayments_url = format!("/api/account/{}/repayments", props.account_id);
+    let account_ctx = use_context::<AccountCtx>().unwrap();
+    let repayments_url = format!("/api/account/{}/repayments", account_ctx.id);
     let query: Vec<(&str, String)> = props
         .user_id
         .iter()
@@ -102,18 +100,18 @@ pub fn repayments_list(props: &RepaymentsListProps) -> HtmlResult {
                         html! {
                             <tr>
                                 <td class="is-vcentered is-hidden-touch">{ &repayment.date }</td>
-                                <td class="is-vcentered"><UserName account_id={ props.account_id.clone() } users={ props.users.clone() } id={ repayment.payer_id } /></td>
+                                <td class="is-vcentered"><UserName id={ repayment.payer_id } /></td>
                                 <td class="is-vcentered is-hidden-touch">{ "a remboursé" }</td>
                                 <td class="is-vcentered"><Amount amount={ repayment.amount as i64 } /></td>
                                 <td class="is-vcentered is-hidden-touch">{ "à" }</td>
-                                <td class="is-vcentered"><UserName account_id={ props.account_id.clone() } users={ props.users.clone() } id={ repayment.beneficiary_id } /></td>
+                                <td class="is-vcentered"><UserName id={ repayment.beneficiary_id } /></td>
                                 <td class="is-vcentered">
-                                    <Link<Route> to={Route::EditRepayment { account_id: props.account_id.clone(), repayment_id: { repayment.id } }}>
+                                    <Link<Route> to={Route::EditRepayment { account_id: account_ctx.id.clone(), repayment_id: { repayment.id } }}>
                                         <a aria-label="Éditer" class="button is-primary" href="">
                                             <i class="fas fa-pencil fa-fw"></i>
                                         </a>
                                     </Link<Route>>
-                                    <DeleteRepayment account_id={ repayment.account_id.clone() } id={ repayment.id.clone() } />
+                                    <DeleteRepayment id={ repayment.id.clone() } />
                                 </td>
                             </tr>
                         }
@@ -157,13 +155,13 @@ pub fn repayments_list(props: &RepaymentsListProps) -> HtmlResult {
             <div class="buttons">
                 if let Some(limit) = props.limit {
                     if len > limit {
-                        <Link<Route> to={Route::Repayments { account_id: props.account_id.clone() }} classes="button is-light">
+                        <Link<Route> to={Route::Repayments { account_id: account_ctx.id.clone() }} classes="button is-light">
                             { format!("Voir les {} autres", len - limit) }
                         </Link<Route>>
                     }
                 }
                 if props.buttons {
-                    <Link<Route> to={Route::CreateRepayment { account_id: props.account_id.clone() }} classes="button is-primary">
+                    <Link<Route> to={Route::CreateRepayment { account_id: account_ctx.id.clone() }} classes="button is-primary">
                         <span class="icon">
                             <i class="fas fa-plus-circle" />
                         </span>
@@ -211,18 +209,15 @@ impl Default for DefaultRepayment {
             payer_id: None,
             beneficiary_id: None,
             amount: 0,
-            date: Local::today().naive_local(),
+            date: Local::now().naive_local().into(),
         }
     }
 }
 
 #[derive(Properties, PartialEq)]
 pub struct BaseEditRepaymentProps {
-    pub account_id: String,
-    pub account: rmmt::Account,
     #[prop_or_default]
     pub repayment_id: Option<Uuid>,
-    pub users: Rc<HashMap<Uuid, rmmt::User>>,
     pub repayment: Option<rmmt::Repayment>,
     pub default: Option<DefaultRepayment>,
 }
@@ -245,6 +240,7 @@ pub struct BaseEditRepayment {
 
 impl BaseEditRepayment {
     fn save_repayment(&mut self, ctx: &Context<Self>) {
+        let (account_ctx, _) = ctx.link().context::<AccountCtx>(Callback::noop()).unwrap();
         self.creating = true;
 
         let select_payer = self
@@ -269,7 +265,7 @@ impl BaseEditRepayment {
         let input_date = self.input_date.cast::<web_sys::HtmlInputElement>().unwrap();
         let date = NaiveDate::parse_from_str(&input_date.value(), "%Y-%m-%d").unwrap();
 
-        let account_id: UniqId = ctx.props().account_id.clone().try_into().unwrap();
+        let account_id: UniqId = account_ctx.id.clone().try_into().unwrap();
         let req = match ctx.props().repayment_id {
             Some(id) => {
                 let repayment = rmmt::Repayment {
@@ -283,8 +279,7 @@ impl BaseEditRepayment {
                 debug!("Update repayment: {:?}", repayment);
                 Request::put(&format!(
                     "/api/account/{}/repayments/{}",
-                    ctx.props().account_id,
-                    id
+                    account_ctx.id, id
                 ))
                 .json(&repayment)
                 .unwrap()
@@ -298,12 +293,9 @@ impl BaseEditRepayment {
                     date,
                 };
                 debug!("Create repayment: {:?}", repayment);
-                Request::post(&format!(
-                    "/api/account/{}/repayments",
-                    ctx.props().account_id
-                ))
-                .json(&repayment)
-                .unwrap()
+                Request::post(&format!("/api/account/{}/repayments", account_ctx.id))
+                    .json(&repayment)
+                    .unwrap()
             }
         };
 
@@ -344,7 +336,7 @@ impl BaseEditRepayment {
             .unwrap();
         input_amount.set_value("0");
 
-        let today = Local::today();
+        let today = Local::now();
         let input_date = self.input_date.cast::<web_sys::HtmlInputElement>().unwrap();
         input_date.set_value(&format!("{}", today.format("%Y-%m-%d")));
     }
@@ -366,6 +358,7 @@ impl Component for BaseEditRepayment {
     }
 
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
+        let (account_ctx, _) = ctx.link().context::<AccountCtx>(Callback::noop()).unwrap();
         match msg {
             EditRepaymentMsg::Submit => {
                 if self.creating {
@@ -381,7 +374,7 @@ impl Component for BaseEditRepayment {
 
                 let navigator = ctx.link().navigator().unwrap();
                 navigator.push(&Route::Account {
-                    account_id: ctx.props().account_id.clone(),
+                    account_id: account_ctx.id.clone(),
                 });
 
                 false
@@ -399,6 +392,7 @@ impl Component for BaseEditRepayment {
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
+        let (account_ctx, _) = ctx.link().context::<AccountCtx>(Callback::noop()).unwrap();
         let default = match ctx.props().default.as_ref() {
             Some(default) => default.clone(),
             None => match ctx.link().location() {
@@ -428,11 +422,11 @@ impl Component for BaseEditRepayment {
 
         html! {
             <>
-            <AccountTitle id={ ctx.props().account_id.clone() } name={ ctx.props().account.name.clone() } />
+            <AccountTitle />
             <div class="box">
                 if let Some(repayment_id) = ctx.props().repayment_id.clone() {
                     <h3 class="subtitle is-3">
-                        <Link<Route> to={Route::EditRepayment { account_id: ctx.props().account_id.clone(), repayment_id }}>
+                        <Link<Route> to={Route::EditRepayment { account_id: account_ctx.id.clone(), repayment_id }}>
                             <span class="icon-text">
                                 <span class="icon"><i class="fas fa-exchange"></i></span>
                                 <span>{ "Remboursement" }</span>
@@ -441,7 +435,7 @@ impl Component for BaseEditRepayment {
                     </h3>
                 } else {
                     <h3 class="subtitle is-3">
-                        <Link<Route> to={Route::CreateRepayment { account_id: ctx.props().account_id.clone() }}>
+                        <Link<Route> to={Route::CreateRepayment { account_id: account_ctx.id.clone() }}>
                             <span class="icon-text">
                                 <span class="icon"><i class="fas fa-exchange"></i></span>
                                 <span>{ "Nouveau remboursement" }</span>
@@ -463,7 +457,7 @@ impl Component for BaseEditRepayment {
                                     <div class="select is-fullwidth is-primary">
                                         <select ref={ self.select_payer.clone() } required=true>
                                         {
-                                            ctx.props().users.iter().map(|(_, user)| html! {
+                                            account_ctx.users.iter().map(|(_, user)| html! {
                                                 <option value={ user.id.to_string() } selected={ default.payer_id == Some(user.id) }>{ &user.name }</option>
                                             }).collect::<Html>()
                                         }
@@ -493,7 +487,7 @@ impl Component for BaseEditRepayment {
                                     <div class="select is-fullwidth is-primary">
                                         <select ref={ self.select_beneficiary.clone() } required=true>
                                         {
-                                            ctx.props().users.iter().map(|(_, user)| html! {
+                                            account_ctx.users.iter().map(|(_, user)| html! {
                                                 <option value={ user.id.to_string() } selected={ default.beneficiary_id == Some(user.id) }>{ &user.name }</option>
                                             }).collect::<Html>()
                                         }
@@ -538,18 +532,16 @@ impl Component for BaseEditRepayment {
 
 #[derive(Properties, PartialEq)]
 pub struct EditExistingRepaymentProps {
-    pub account_id: String,
-    pub account: rmmt::Account,
-    pub users: Rc<HashMap<Uuid, rmmt::User>>,
     #[prop_or_default]
     pub repayment_id: Uuid,
 }
 
 #[function_component(EditExistingRepayment)]
 pub fn edit_existing_repayment(props: &EditExistingRepaymentProps) -> HtmlResult {
+    let account_ctx = use_context::<AccountCtx>().unwrap();
     let repayment_url = format!(
         "/api/account/{}/repayments/{}",
-        props.account_id, props.repayment_id
+        account_ctx.id, props.repayment_id
     );
     let repayment: UseFutureHandle<Result<rmmt::Repayment, _>> =
         use_future(|| async move { utils::get(&repayment_url).await })?;
@@ -559,7 +551,7 @@ pub fn edit_existing_repayment(props: &EditExistingRepaymentProps) -> HtmlResult
     };
 
     Ok(
-        html! {<BaseEditRepayment account_id={ props.account_id.clone() } account={ props.account.clone() } users={ props.users.clone() } repayment_id={ props.repayment_id } repayment={ Some(repayment.clone()) } />},
+        html! {<BaseEditRepayment repayment_id={ props.repayment_id } repayment={ Some(repayment.clone()) } />},
     )
 }
 
@@ -592,19 +584,14 @@ pub fn edit_repayment_with_account_and_users(props: &EditRepaymentProps) -> Html
     account_ctx.dispatch(AccountAction::UpdateUsers(users));
 
     if let Some(repayment_id) = props.repayment_id {
-        Ok(
-            html! {<EditExistingRepayment account_id={ account_ctx.id.clone() } account={ account.clone() } users={ account_ctx.users.clone() } repayment_id={ repayment_id } />},
-        )
+        Ok(html! {<EditExistingRepayment repayment_id={ repayment_id } />})
     } else {
-        Ok(
-            html! {<BaseEditRepayment account_id={ account_ctx.id.clone() } account={ account.clone() } users={ account_ctx.users.clone() } repayment_id={ props.repayment_id } />},
-        )
+        Ok(html! {<BaseEditRepayment repayment_id={ props.repayment_id } />})
     }
 }
 
 #[derive(Properties, PartialEq)]
 pub struct DeleteRepaymentProps {
-    pub account_id: Uuid,
     pub id: Uuid,
 }
 
@@ -621,11 +608,12 @@ struct DeleteRepayment {
 
 impl DeleteRepayment {
     fn delete_repayment(&mut self, ctx: &Context<Self>) {
+        let (account_ctx, _) = ctx.link().context::<AccountCtx>(Callback::noop()).unwrap();
         self.deleting = true;
 
         let url = format!(
             "/api/account/{}/repayments/{}",
-            UniqId::from(ctx.props().account_id),
+            account_ctx.id,
             ctx.props().id
         );
         ctx.link().send_future(async move {

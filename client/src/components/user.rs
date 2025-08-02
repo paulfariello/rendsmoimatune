@@ -1,11 +1,9 @@
 use std::collections::HashMap;
-use std::rc::Rc;
 
 use log;
 use rmmt::{self, prelude::*};
 use uuid::Uuid;
 use yew::prelude::*;
-use yew::suspense::{use_future, UseFutureHandle};
 use yew_router::prelude::*;
 
 use crate::components::{
@@ -20,26 +18,18 @@ use crate::Route;
 
 #[derive(Properties, PartialEq)]
 pub struct UsernameProps {
-    pub account_id: String,
-    pub users: Rc<HashMap<Uuid, rmmt::User>>,
     pub id: Uuid,
     #[prop_or_else(|| "primary".to_string())]
     pub color: String,
 }
 
 #[function_component(UserName)]
-pub fn user_name(
-    UsernameProps {
-        account_id,
-        users,
-        id,
-        color,
-    }: &UsernameProps,
-) -> Html {
+pub fn user_name(UsernameProps { id, color }: &UsernameProps) -> Html {
     let text_color = format!("has-text-{}", color);
-    if let Some(user) = users.get(&id) {
+    let account_ctx = use_context::<AccountCtx>().unwrap();
+    if let Some(user) = account_ctx.users.get(&id) {
         html! {
-            <Link<Route> to={Route::User { account_id: account_id.clone(), user_id: id.clone() } } classes={ classes!(text_color) }>
+            <Link<Route> to={Route::User { account_id: account_ctx.id.clone(), user_id: id.clone() } } classes={ classes!(text_color) }>
                 { &user.name }
             </Link<Route>>
         }
@@ -47,11 +37,6 @@ pub fn user_name(
         log::error!("Unknown user {}", id);
         html! {}
     }
-}
-
-#[derive(PartialEq, Properties)]
-pub struct CreateUserProps {
-    pub account_id: String,
 }
 
 pub enum CreateUserMsg {
@@ -73,17 +58,18 @@ pub struct CreateUser {
 
 impl CreateUser {
     fn create_user(&mut self, ctx: &Context<Self>) {
+        let (account_ctx, _) = ctx.link().context::<AccountCtx>(Callback::noop()).unwrap();
         self.creating = true;
 
         let input_name = self.input_name.cast::<web_sys::HtmlInputElement>().unwrap();
         let name = input_name.value();
 
-        let account_id: UniqId = ctx.props().account_id.clone().try_into().unwrap();
+        let account_id: UniqId = account_ctx.id.clone().try_into().unwrap();
         let user = rmmt::NewUser {
             account_id: account_id.into(),
             name,
         };
-        let url = format!("/api/account/{}/users", ctx.props().account_id);
+        let url = format!("/api/account/{}/users", account_ctx.id);
         ctx.link().send_future(async move {
             let created_user: Result<rmmt::User, _> = utils::post(&url, &user).await;
             match created_user {
@@ -94,10 +80,11 @@ impl CreateUser {
     }
 
     fn reload_users(&mut self, ctx: &Context<Self>) {
+        let (account_ctx, _) = ctx.link().context::<AccountCtx>(Callback::noop()).unwrap();
         self.creating = true;
 
-        let users_url = format!("/api/account/{}/users", ctx.props().account_id);
-        let balance_url = format!("/api/account/{}/balance", ctx.props().account_id);
+        let users_url = format!("/api/account/{}/users", account_ctx.id);
+        let balance_url = format!("/api/account/{}/balance", account_ctx.id);
         ctx.link().send_future(async move {
             // TODO parallelize
             let users: Result<Vec<rmmt::User>, _> = utils::get(&users_url).await;
@@ -128,7 +115,7 @@ impl CreateUser {
 
 impl Component for CreateUser {
     type Message = CreateUserMsg;
-    type Properties = CreateUserProps;
+    type Properties = ();
 
     fn create(_ctx: &Context<Self>) -> Self {
         Self {
@@ -207,11 +194,7 @@ impl Component for CreateUser {
 
 #[derive(PartialEq, Properties)]
 pub struct BaseUserProps {
-    pub account_id: String,
-    pub account: rmmt::Account,
     pub user_id: Uuid,
-    pub users: Rc<HashMap<Uuid, rmmt::User>>,
-    pub balance: rmmt::UserBalance,
 }
 
 pub enum UserMsg {
@@ -228,18 +211,19 @@ pub struct BaseUser {
 
 impl BaseUser {
     fn edit_user(&mut self, ctx: &Context<Self>) {
+        let (account_ctx, _) = ctx.link().context::<AccountCtx>(Callback::noop()).unwrap();
         self.editing = true;
 
         let input_name = self.input_name.cast::<web_sys::HtmlInputElement>().unwrap();
         let name = input_name.value();
 
-        let account_id: UniqId = ctx.props().account_id.clone().try_into().unwrap();
+        let account_id: UniqId = account_ctx.id.clone().try_into().unwrap();
         let user = rmmt::User {
             id: ctx.props().user_id.clone(),
             account_id: account_id.into(),
             name,
         };
-        let url = format!("/api/account/{}/users/{}", ctx.props().account_id, user.id);
+        let url = format!("/api/account/{}/users/{}", account_ctx.id, user.id);
         ctx.link().send_future(async move {
             let edited_user: Result<rmmt::User, _> = utils::put(&url, &user).await;
             match edited_user {
@@ -292,20 +276,29 @@ impl Component for BaseUser {
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
+        let (account_ctx, _) = ctx.link().context::<AccountCtx>(Callback::noop()).unwrap();
+
         let edit = ctx.link().callback(|event: SubmitEvent| {
             event.prevent_default();
             UserMsg::Edit
         });
 
+        let balance = account_ctx
+            .balance
+            .balancing_remaining
+            .iter()
+            .find(|balance| balance.user_id == ctx.props().user_id)
+            .unwrap();
+
         html! {
             <>
-            <AccountTitle id={ ctx.props().account_id.clone() } name={ ctx.props().account.name.clone() } />
+            <AccountTitle />
             <div class="tile is-ancestor">
                 <div class="tile is-parent">
                     <div class="tile is-child box">
                         <h3 class="subtitle is-3">
                             <span class="icon"><i class="fas fa-user"></i></span>
-                            <span><UserName account_id={ ctx.props().account_id.clone() } users={ ctx.props().users.clone() } id={ ctx.props().user_id.clone() }/></span>
+                            <span><UserName id={ ctx.props().user_id.clone() }/></span>
                         </h3>
                         if let Some(error) = self.error.as_ref() {
                             <FetchError error={ format!("{:?}", error) } />
@@ -313,7 +306,7 @@ impl Component for BaseUser {
                         <form onsubmit={ edit }>
                             <div class="field has-addons">
                                 <div class={classes!("control", self.editing.then(|| "is-loading"))}>
-                                    <input ref={self.input_name.clone()} type="text" class="input is-primary" name="name" required=true placeholder={ ctx.props().users.get(&ctx.props().user_id).unwrap().name.clone() } />
+                                    <input ref={self.input_name.clone()} type="text" class="input is-primary" name="name" required=true placeholder={ account_ctx.users.get(&ctx.props().user_id).unwrap().name.clone() } />
                                 </div>
                                 <div class="control">
                                     <button type="submit" class={classes!("button", "is-primary", self.editing.then(|| "is-loading"))}>
@@ -339,10 +332,10 @@ impl Component for BaseUser {
                                     <tr>
                                         <td class="is-vcentered">
                                             <div class="progress-wrapper">
-                                                <progress class="progress is-large is-danger is-revert" value={ ctx.props().balance.debit.to_string() } max={ ctx.props().balance.debit.to_string() }>
-                                                    <Amount amount={ ctx.props().balance.debit } />
+                                                <progress class="progress is-large is-danger is-revert" value={ balance.debit.to_string() } max={ balance.debit.to_string() }>
+                                                    <Amount amount={ balance.debit } />
                                                 </progress>
-                                                <p class="progress-value has-text-white"><Amount amount={ ctx.props().balance.debit } /></p>
+                                                <p class="progress-value has-text-white"><Amount amount={ balance.debit } /></p>
                                             </div>
                                         </td>
                                         <td class="is-vcentered has-text-centered">{ "Dette" }</td>
@@ -355,32 +348,32 @@ impl Component for BaseUser {
                                         <td class="is-vcentered has-text-centered">{ "Avance" }</td>
                                         <td class="is-vcentered">
                                             <div class="progress-wrapper">
-                                                <progress class="progress is-large is-success" value={ ctx.props().balance.credit.to_string() } max={ ctx.props().balance.credit.to_string() }>
-                                                    <Amount amount={ ctx.props().balance.credit } />
+                                                <progress class="progress is-large is-success" value={ balance.credit.to_string() } max={ balance.credit.to_string() }>
+                                                    <Amount amount={ balance.credit } />
                                                 </progress>
-                                                <p class="progress-value has-text-white"><Amount amount={ ctx.props().balance.credit } /></p>
+                                                <p class="progress-value has-text-white"><Amount amount={ balance.credit } /></p>
                                             </div>
                                         </td>
                                     </tr>
                                     <tr>
                                         <td class="is-vcentered">
-                                        if ctx.props().balance.amount < 0 {
+                                        if balance.amount < 0 {
                                             <div class="progress-wrapper">
-                                                <progress class="progress is-large is-danger is-revert" value={ ctx.props().balance.amount.abs().to_string() } max={ ctx.props().balance.amount.abs().to_string() }>
-                                                    <Amount amount={ ctx.props().balance.amount } />
+                                                <progress class="progress is-large is-danger is-revert" value={ balance.amount.abs().to_string() } max={ balance.amount.abs().to_string() }>
+                                                    <Amount amount={ balance.amount } />
                                                 </progress>
-                                                <p class="progress-value has-text-white"><Amount amount={ ctx.props().balance.amount } /></p>
+                                                <p class="progress-value has-text-white"><Amount amount={ balance.amount } /></p>
                                             </div>
                                         }
                                         </td>
                                         <td class="is-vcentered has-text-centered">{ "Total" }</td>
                                         <td class="is-vcentered">
-                                        if ctx.props().balance.amount > 0 {
+                                        if balance.amount > 0 {
                                             <div class="progress-wrapper">
-                                                <progress class="progress is-large is-success" value={ ctx.props().balance.amount.abs().to_string() } max={ ctx.props().balance.amount.abs().to_string() }>
-                                                    <Amount amount={ ctx.props().balance.amount } />
+                                                <progress class="progress is-large is-success" value={ balance.amount.abs().to_string() } max={ balance.amount.abs().to_string() }>
+                                                    <Amount amount={ balance.amount } />
                                                 </progress>
-                                                <p class="progress-value has-text-white"><Amount amount={ ctx.props().balance.amount } /></p>
+                                                <p class="progress-value has-text-white"><Amount amount={ balance.amount } /></p>
                                             </div>
                                         }
                                         </td>
@@ -400,7 +393,7 @@ impl Component for BaseUser {
                                 { "Dépenses payées" }
                             </span>
                         </h3>
-                        <ExpendituresList account_id={ ctx.props().account_id.clone() } payer_id={ Some(ctx.props().user_id.clone()) } users={ ctx.props().users.clone() } />
+                        <ExpendituresList payer_id={ Some(ctx.props().user_id.clone()) } />
                     </div>
                 </div>
             </div>
@@ -414,7 +407,7 @@ impl Component for BaseUser {
                                 { "Dépenses concernées" }
                             </span>
                         </h3>
-                        <ExpendituresList account_id={ ctx.props().account_id.clone() } debtor_id={ Some(ctx.props().user_id.clone()) } users={ ctx.props().users.clone() } />
+                        <ExpendituresList debtor_id={ Some(ctx.props().user_id.clone()) } />
                     </div>
                 </div>
             </div>
@@ -429,7 +422,7 @@ impl Component for BaseUser {
                             </span>
                         </h3>
                         <Suspense fallback={utils::loading()}>
-                            <RepaymentsList account_id={ ctx.props().account_id.clone() } user_id={ Some(ctx.props().user_id.clone()) } users={ ctx.props().users.clone() } />
+                            <RepaymentsList user_id={ Some(ctx.props().user_id.clone()) } />
                         </Suspense>
                     </div>
                 </div>
@@ -446,35 +439,5 @@ pub struct UserProps {
 
 #[function_component(User)]
 pub fn user(props: &UserProps) -> HtmlResult {
-    let account_ctx = use_context::<AccountCtx>().unwrap();
-
-    let account_url = format!("/api/account/{}", account_ctx.id);
-    let account: UseFutureHandle<Result<rmmt::Account, _>> =
-        use_future(|| async move { utils::get(&account_url).await })?;
-    let account: &rmmt::Account = match *account {
-        Ok(ref res) => res,
-        Err(ref error) => return Ok(html! { <FetchError error={ format!("{:?}", error) } /> }),
-    };
-    account_ctx.dispatch(AccountAction::UpdateName(account.name.clone()));
-
-    let users_url = format!("/api/account/{}/users", account_ctx.id);
-    let users: UseFutureHandle<Result<Vec<rmmt::User>, _>> =
-        use_future(|| async move { utils::get(&users_url).await })?;
-    let users: HashMap<Uuid, rmmt::User> = match *users {
-        Ok(ref res) => res.iter().cloned().map(|u| (u.id.clone(), u)).collect(),
-        Err(ref error) => return Ok(html! { <FetchError error={ format!("{:?}", error) } /> }),
-    };
-    account_ctx.dispatch(AccountAction::UpdateUsers(users));
-
-    let balance_url = format!("/api/account/{}/balances/{}", account_ctx.id, props.user_id);
-    let balance: UseFutureHandle<Result<rmmt::UserBalance, _>> =
-        use_future(|| async move { utils::get(&balance_url).await })?;
-    let balance: &rmmt::UserBalance = match *balance {
-        Ok(ref res) => res,
-        Err(ref error) => return Ok(html! { <FetchError error={ format!("{:?}", error) } /> }),
-    };
-
-    Ok(
-        html! {<BaseUser account_id={ account_ctx.id.clone() } account={ account.clone() } user_id={ props.user_id.clone() } users={ account_ctx.users.clone() } balance={ balance.clone() } />},
-    )
+    Ok(html! {<BaseUser user_id={ props.user_id.clone() } />})
 }
