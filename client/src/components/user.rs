@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 use log;
 use rmmt::{self, prelude::*};
 use uuid::Uuid;
@@ -42,11 +40,6 @@ pub fn user_name(UsernameProps { id, color }: &UsernameProps) -> Html {
 pub enum CreateUserMsg {
     Submit,
     Created(rmmt::User),
-    Reloaded {
-        users: HashMap<Uuid, rmmt::User>,
-        balance: rmmt::Balance,
-    },
-    AccountCtxUpdated(AccountCtx),
     Error(utils::Error),
 }
 
@@ -81,28 +74,7 @@ impl CreateUser {
 
     fn reload_users(&mut self, ctx: &Context<Self>) {
         let (account_ctx, _) = ctx.link().context::<AccountCtx>(Callback::noop()).unwrap();
-        self.creating = true;
-
-        let users_url = format!("/api/account/{}/users", account_ctx.id);
-        let balance_url = format!("/api/account/{}/balance", account_ctx.id);
-        ctx.link().send_future(async move {
-            // TODO parallelize
-            let users: Result<Vec<rmmt::User>, _> = utils::get(&users_url).await;
-            let balance: Result<rmmt::Balance, _> = utils::get(&balance_url).await;
-            match (users, balance) {
-                (Ok(users), Ok(balance)) => CreateUserMsg::Reloaded {
-                    users: users
-                        .iter()
-                        .cloned()
-                        .map(|u| (u.id.clone(), u))
-                        .collect::<HashMap<_, _>>(),
-                    balance,
-                },
-                (Ok(_), Err(error)) => CreateUserMsg::Error(error),
-                (Err(error), Ok(_)) => CreateUserMsg::Error(error),
-                (Err(error), Err(_)) => CreateUserMsg::Error(error),
-            }
-        });
+        account_ctx.dispatch(AccountAction::BumpVersion);
     }
 
     fn clear(&mut self) {
@@ -137,19 +109,8 @@ impl Component for CreateUser {
             }
             CreateUserMsg::Created(user) => {
                 log::info!("Created user: {}", user.name);
-                self.reload_users(ctx);
-                false
-            }
-            CreateUserMsg::Reloaded { users, balance } => {
-                let (account_ctx, _) = ctx
-                    .link()
-                    .context::<AccountCtx>(ctx.link().callback(CreateUserMsg::AccountCtxUpdated))
-                    .unwrap();
-                log::info!("Reloaded users: {:?}", users);
-                account_ctx.dispatch(AccountAction::UpdateUsers(users));
-                log::info!("Reloaded balance: {:?}", balance);
-                account_ctx.dispatch(AccountAction::UpdateBalance(balance));
                 self.clear();
+                self.reload_users(ctx);
                 true
             }
             CreateUserMsg::Error(error) => {
@@ -157,11 +118,11 @@ impl Component for CreateUser {
                 self.error = Some(error);
                 true
             }
-            CreateUserMsg::AccountCtxUpdated(_) => false,
         }
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
+        log::debug!("Rerender CreateUser creating = {}", self.creating);
         let onsubmit = ctx.link().callback(|event: SubmitEvent| {
             event.prevent_default();
             CreateUserMsg::Submit
@@ -199,7 +160,7 @@ pub struct BaseUserProps {
 
 pub enum UserMsg {
     Edit,
-    Edited { user: rmmt::User },
+    Edited,
     Error(utils::Error),
 }
 
@@ -227,7 +188,7 @@ impl BaseUser {
         ctx.link().send_future(async move {
             let edited_user: Result<rmmt::User, _> = utils::put(&url, &user).await;
             match edited_user {
-                Ok(user) => UserMsg::Edited { user },
+                Ok(_) => UserMsg::Edited,
                 Err(error) => UserMsg::Error(error),
             }
         });
@@ -263,7 +224,7 @@ impl Component for BaseUser {
                     true
                 }
             }
-            UserMsg::Edited { user: _ } => {
+            UserMsg::Edited  => {
                 self.clear();
                 true
             }

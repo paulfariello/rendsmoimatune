@@ -7,7 +7,7 @@ use log;
 use rmmt;
 use uuid::Uuid;
 use yew::prelude::*;
-use yew::suspense::{use_future, UseFutureHandle};
+use yew::suspense::{use_future_with_deps, UseFutureHandle};
 use yew_router::prelude::*;
 
 use crate::components::ctx::{AccountAction, AccountCtx};
@@ -29,8 +29,8 @@ pub struct AccountProps {
 
 #[function_component(Account)]
 pub fn account(props: &AccountProps) -> HtmlResult {
-    log::debug!("Rerendering account");
     let account_ctx = use_context::<AccountCtx>().unwrap();
+    log::debug!("Rerendering account version = {}", account_ctx.version);
 
     let account = use_query::<AccountQuery>(Rc::new(props.id.clone()))?;
     let account = match account.as_ref() {
@@ -41,7 +41,7 @@ pub fn account(props: &AccountProps) -> HtmlResult {
 
     let users_url = format!("/api/account/{}/users", props.id);
     let users: UseFutureHandle<Result<Vec<rmmt::User>, _>> =
-        use_future(|| async move { utils::get(&users_url).await })?;
+        use_future_with_deps(|_| async move { utils::get(&users_url).await }, account_ctx.version)?;
     let users: HashMap<Uuid, rmmt::User> = match *users {
         Ok(ref res) => res.iter().cloned().map(|u| (u.id.clone(), u)).collect(),
         Err(ref error) => return Ok(html! { <FetchError error={ format!("{:?}", error) } /> }),
@@ -50,11 +50,12 @@ pub fn account(props: &AccountProps) -> HtmlResult {
 
     let balance_url = format!("/api/account/{}/balance", props.id);
     let balance: UseFutureHandle<Result<rmmt::Balance, _>> =
-        use_future(|| async move { utils::get(&balance_url).await })?;
+        use_future_with_deps(|_| async move { utils::get(&balance_url).await }, account_ctx.version)?;
     let balance: rmmt::Balance = match *balance {
         Ok(ref res) => res.clone(),
         Err(ref error) => return Ok(html! { <FetchError error={ format!("{:?}", error) } /> }),
     };
+    // TODO useless rerendering when creating user and fetching cached value
     account_ctx.dispatch(AccountAction::UpdateBalance(balance.clone()));
 
     log::debug!("Rerendered account");

@@ -18,6 +18,7 @@ use crate::utils::Error;
 pub struct Account {
     pub id: String,
     pub name: String,
+    pub version: u32,
     pub users: Rc<HashMap<Uuid, rmmt::User>>,
     pub balance: Rc<rmmt::Balance>,
 }
@@ -27,6 +28,7 @@ pub enum AccountAction {
     UpdateName(String),
     UpdateUsers(HashMap<Uuid, rmmt::User>),
     UpdateBalance(rmmt::Balance),
+    BumpVersion,
 }
 
 impl Reducible for Account {
@@ -37,21 +39,31 @@ impl Reducible for Account {
         match action {
             AccountAction::UpdateName(name) => Self {
                 id: self.id.clone(),
+                version: self.version,
                 name,
                 users: self.users.clone(),
                 balance: self.balance.clone(),
             },
             AccountAction::UpdateUsers(users) => Self {
                 id: self.id.clone(),
+                version: self.version,
                 name: self.name.clone(),
                 users: Rc::new(users),
                 balance: self.balance.clone(),
             },
             AccountAction::UpdateBalance(balance) => Self {
                 id: self.id.clone(),
+                version: self.version,
                 name: self.name.clone(),
                 users: self.users.clone(),
                 balance: Rc::new(balance),
+            },
+            AccountAction::BumpVersion => Self {
+                id: self.id.clone(),
+                version: self.version + 1,
+                name: self.name.clone(),
+                users: self.users.clone(),
+                balance: self.balance.clone(),
             },
         }
         .into()
@@ -71,6 +83,7 @@ pub struct AccountProviderProps {
 pub fn account_provider(props: &AccountProviderProps) -> HtmlResult {
     let account_ctx = use_reducer(|| Account {
         id: props.id.clone(),
+        version: 0,
         name: String::new(),
         users: Rc::new(HashMap::new()),
         balance: Rc::new(rmmt::Balance::default()),
