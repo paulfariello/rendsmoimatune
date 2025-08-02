@@ -171,21 +171,6 @@ impl Component for CreateAccount {
     type Properties = CreateAccountProps;
 
     fn create(_ctx: &Context<Self>) -> Self {
-        //if let Some(hash) = ctx.link().location().map(|l| l.hash()) {
-        //    if hash.starts_with("#!/account/") {
-        //        log::debug!("ahah old account");
-        //        if let Some(mut captures) = hash.strip_prefix("#!/account/") {
-        //            if let Some(end) = captures.find("/") {
-        //                captures = &captures[1..end];
-        //            }
-
-        //            let account_id = captures.to_string();
-        //            log::info!("Redirecting old account_id: {:?}", account_id);
-        //            let navigator = ctx.link().navigator().unwrap();
-        //            navigator.push(&Route::Account { account_id });
-        //        }
-        //    }
-        //}
         Self {
             creating: false,
             input_name: NodeRef::default(),
