@@ -405,14 +405,20 @@ impl Component for BaseEditRepayment {
         let default = match ctx.props().default.as_ref() {
             Some(default) => default.clone(),
             None => match ctx.link().location() {
-                Some(location) => match location.query::<rmmt::Balancing>() {
+                Some(location) if !location.query_str().is_empty() => match location.query::<rmmt::Balancing>() {
                     Err(err) => {
-                        error!("Invalid query: {}", err);
+                        error!("Invalid query: {} \"{}\"", err, location.query_str());
                         Default::default()
                     }
                     Ok(balancing) => balancing.into(),
                 },
-                None => Default::default(),
+                _ => {
+                    let mut default: DefaultRepayment = Default::default();
+                    let mut users = self.account_ctx.users.keys();
+                    default.payer_id = users.next().copied();
+                    default.beneficiary_id = users.next().copied();
+                    default
+                }
             },
         };
 
