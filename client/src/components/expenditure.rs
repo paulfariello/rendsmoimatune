@@ -11,7 +11,7 @@ use log::{debug, error, info, warn};
 use rmmt::{self, prelude::*};
 use uuid::Uuid;
 use yew::prelude::*;
-use yew::suspense::{use_future, UseFutureHandle};
+use yew::suspense::{use_future, use_future_with_deps, UseFutureHandle};
 use yew_router::prelude::*;
 
 use crate::components::{
@@ -79,6 +79,7 @@ pub struct ExpendituresListProps {
 #[function_component(ExpendituresList)]
 pub fn expenditures_list(props: &ExpendituresListProps) -> HtmlResult {
     let account_ctx = use_context::<AccountCtx>().unwrap();
+    log::debug!("Rendering expenditures list version: {}", account_ctx.version);
 
     let expenditures_url = format!("/api/account/{}/expenditures", account_ctx.id);
     let mut payer_query: Vec<(&str, String)> = props
@@ -97,7 +98,7 @@ pub fn expenditures_list(props: &ExpendituresListProps) -> HtmlResult {
     query.append(&mut debtor_query);
 
     let expenditures: UseFutureHandle<Result<Vec<(rmmt::Expenditure, Vec<rmmt::Debt>)>, _>> =
-        use_future(|| async move { utils::get_with_query(&expenditures_url, query).await })?;
+        use_future_with_deps(|_| async move { utils::get_with_query(&expenditures_url, query).await }, account_ctx.version)?;
     let mut expenditures: Vec<(rmmt::Expenditure, Vec<rmmt::Debt>)> = match *expenditures {
         Ok(ref res) => res.iter().cloned().collect(), // TODO avoid clone
         Err(ref error) => return Ok(html! { <FetchError error={ format!("{:?}", error) } /> }),
@@ -749,7 +750,9 @@ impl Component for DeleteExpenditure {
                 }
             }
             DeleteExpenditureMsg::Deleted => {
+                let (account_ctx, _) = ctx.link().context::<AccountCtx>(Callback::noop()).unwrap();
                 self.deleting = false;
+                account_ctx.dispatch(AccountAction::BumpVersion);
                 true
             }
             DeleteExpenditureMsg::Error(error) => {

@@ -9,7 +9,7 @@ use log::{debug, error, info, warn};
 use rmmt::{self, prelude::*};
 use uuid::Uuid;
 use yew::prelude::*;
-use yew::suspense::{use_future, UseFutureHandle};
+use yew::suspense::{use_future, use_future_with_deps, UseFutureHandle};
 use yew_router::prelude::*;
 
 use crate::components::{
@@ -76,6 +76,8 @@ pub struct RepaymentsListProps {
 #[function_component(RepaymentsList)]
 pub fn repayments_list(props: &RepaymentsListProps) -> HtmlResult {
     let account_ctx = use_context::<AccountCtx>().unwrap();
+    log::debug!("Rendering repayments list version: {}", account_ctx.version);
+
     let repayments_url = format!("/api/account/{}/repayments", account_ctx.id);
     let query: Vec<(&str, String)> = props
         .user_id
@@ -83,7 +85,7 @@ pub fn repayments_list(props: &RepaymentsListProps) -> HtmlResult {
         .map(|id| ("user_id", id.hyphenated().to_string()))
         .collect();
     let repayments: UseFutureHandle<Result<Vec<rmmt::Repayment>, _>> =
-        use_future(|| async move { utils::get_with_query(&repayments_url, query).await })?;
+        use_future_with_deps(|_| async move { utils::get_with_query(&repayments_url, query).await }, account_ctx.version)?;
     let mut repayments: Vec<rmmt::Repayment> = match *repayments {
         Ok(ref res) => res.iter().cloned().collect(), // TODO avoid clone
         Err(ref error) => return Ok(html! { <FetchError error={ format!("{:?}", error) } /> }),
@@ -667,7 +669,9 @@ impl Component for DeleteRepayment {
                 }
             }
             DeleteRepaymentMsg::Deleted => {
+                let (account_ctx, _) = ctx.link().context::<AccountCtx>(Callback::noop()).unwrap();
                 self.deleting = false;
+                account_ctx.dispatch(AccountAction::BumpVersion);
                 true
             }
             DeleteRepaymentMsg::Error(error) => {

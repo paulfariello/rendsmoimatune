@@ -30,7 +30,7 @@ pub struct AccountProps {
 #[function_component(Account)]
 pub fn account(props: &AccountProps) -> HtmlResult {
     let account_ctx = use_context::<AccountCtx>().unwrap();
-    log::debug!("Rerendering account version = {}", account_ctx.version);
+    log::debug!("Rendering account version = {}", account_ctx.version);
 
     let account = use_query::<AccountQuery>(Rc::new(props.id.clone()))?;
     let account = match account.as_ref() {
@@ -57,8 +57,6 @@ pub fn account(props: &AccountProps) -> HtmlResult {
     };
     // TODO useless rerendering when creating user and fetching cached value
     account_ctx.dispatch(AccountAction::UpdateBalance(balance.clone()));
-
-    log::debug!("Rerendered account");
 
     Ok(html! {
         <>
