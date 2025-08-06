@@ -227,9 +227,12 @@ pub enum EditRepaymentMsg {
     Edited { repayment: rmmt::Repayment },
     Error(String),
     ClearError,
+    UpdateAccountCtx(AccountCtx),
 }
 
 pub struct BaseEditRepayment {
+    account_ctx: AccountCtx,
+    _ctx_listener: ContextHandle<AccountCtx>,
     select_payer: NodeRef,
     input_amount: NodeRef,
     select_beneficiary: NodeRef,
@@ -240,7 +243,6 @@ pub struct BaseEditRepayment {
 
 impl BaseEditRepayment {
     fn save_repayment(&mut self, ctx: &Context<Self>) {
-        let (account_ctx, _) = ctx.link().context::<AccountCtx>(Callback::noop()).unwrap();
         self.creating = true;
 
         let select_payer = self
@@ -265,7 +267,7 @@ impl BaseEditRepayment {
         let input_date = self.input_date.cast::<web_sys::HtmlInputElement>().unwrap();
         let date = NaiveDate::parse_from_str(&input_date.value(), "%Y-%m-%d").unwrap();
 
-        let account_id: UniqId = account_ctx.id.clone().try_into().unwrap();
+        let account_id: UniqId = self.account_ctx.id.clone().try_into().unwrap();
         let req = match ctx.props().repayment_id {
             Some(id) => {
                 let repayment = rmmt::Repayment {
@@ -279,7 +281,7 @@ impl BaseEditRepayment {
                 debug!("Update repayment: {:?}", repayment);
                 Request::put(&format!(
                     "/api/account/{}/repayments/{}",
-                    account_ctx.id, id
+                    self.account_ctx.id, id
                 ))
                 .json(&repayment)
                 .unwrap()
@@ -293,7 +295,7 @@ impl BaseEditRepayment {
                     date,
                 };
                 debug!("Create repayment: {:?}", repayment);
-                Request::post(&format!("/api/account/{}/repayments", account_ctx.id))
+                Request::post(&format!("/api/account/{}/repayments", self.account_ctx.id))
                     .json(&repayment)
                     .unwrap()
             }
@@ -346,8 +348,11 @@ impl Component for BaseEditRepayment {
     type Message = EditRepaymentMsg;
     type Properties = BaseEditRepaymentProps;
 
-    fn create(_ctx: &Context<Self>) -> Self {
+    fn create(ctx: &Context<Self>) -> Self {
+        let (account_ctx, ctx_listener) = ctx.link().context::<AccountCtx>(ctx.link().callback(EditRepaymentMsg::UpdateAccountCtx)).unwrap();
         Self {
+            account_ctx,
+            _ctx_listener: ctx_listener,
             select_payer: NodeRef::default(),
             input_amount: NodeRef::default(),
             select_beneficiary: NodeRef::default(),
@@ -358,7 +363,6 @@ impl Component for BaseEditRepayment {
     }
 
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
-        let (account_ctx, _) = ctx.link().context::<AccountCtx>(Callback::noop()).unwrap();
         match msg {
             EditRepaymentMsg::Submit => {
                 if self.creating {
@@ -374,7 +378,7 @@ impl Component for BaseEditRepayment {
 
                 let navigator = ctx.link().navigator().unwrap();
                 navigator.push(&Route::Account {
-                    account_id: account_ctx.id.clone(),
+                    account_id: self.account_ctx.id.clone(),
                 });
 
                 false
@@ -388,11 +392,14 @@ impl Component for BaseEditRepayment {
                 self.error = None;
                 true
             }
+            EditRepaymentMsg::UpdateAccountCtx(account_ctx) => {
+                self.account_ctx = account_ctx;
+                true
+            }
         }
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
-        let (account_ctx, _) = ctx.link().context::<AccountCtx>(Callback::noop()).unwrap();
         let default = match ctx.props().default.as_ref() {
             Some(default) => default.clone(),
             None => match ctx.link().location() {
@@ -426,7 +433,7 @@ impl Component for BaseEditRepayment {
             <div class="box">
                 if let Some(repayment_id) = ctx.props().repayment_id.clone() {
                     <h3 class="subtitle is-3">
-                        <Link<Route> to={Route::EditRepayment { account_id: account_ctx.id.clone(), repayment_id }}>
+                        <Link<Route> to={Route::EditRepayment { account_id: self.account_ctx.id.clone(), repayment_id }}>
                             <span class="icon-text">
                                 <span class="icon"><i class="fas fa-exchange"></i></span>
                                 <span>{ "Remboursement" }</span>
@@ -435,7 +442,7 @@ impl Component for BaseEditRepayment {
                     </h3>
                 } else {
                     <h3 class="subtitle is-3">
-                        <Link<Route> to={Route::CreateRepayment { account_id: account_ctx.id.clone() }}>
+                        <Link<Route> to={Route::CreateRepayment { account_id: self.account_ctx.id.clone() }}>
                             <span class="icon-text">
                                 <span class="icon"><i class="fas fa-exchange"></i></span>
                                 <span>{ "Nouveau remboursement" }</span>
@@ -457,7 +464,7 @@ impl Component for BaseEditRepayment {
                                     <div class="select is-fullwidth is-primary">
                                         <select ref={ self.select_payer.clone() } required=true>
                                         {
-                                            account_ctx.users.iter().map(|(_, user)| html! {
+                                            self.account_ctx.users.iter().map(|(_, user)| html! {
                                                 <option value={ user.id.to_string() } selected={ default.payer_id == Some(user.id) }>{ &user.name }</option>
                                             }).collect::<Html>()
                                         }
@@ -487,7 +494,7 @@ impl Component for BaseEditRepayment {
                                     <div class="select is-fullwidth is-primary">
                                         <select ref={ self.select_beneficiary.clone() } required=true>
                                         {
-                                            account_ctx.users.iter().map(|(_, user)| html! {
+                                            self.account_ctx.users.iter().map(|(_, user)| html! {
                                                 <option value={ user.id.to_string() } selected={ default.beneficiary_id == Some(user.id) }>{ &user.name }</option>
                                             }).collect::<Html>()
                                         }
