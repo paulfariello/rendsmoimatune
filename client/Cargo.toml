@@ -6,23 +6,26 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+anyhow = "1"
 chrono = { version = "*", features = ["wasmbind"] }
 gloo = "0.7"
-gloo-net = "0.2"
+gloo-net = "0.2.6"
 itertools = "*"
 log = "*"
 rmmt = { path = "../rmmt" }
 serde = { version = "1.0", features = ["derive"] }
-uuid = "0.8.2"
+uuid = "1"
 wasm-bindgen = "*"
 wasm-bindgen-futures = "0.4"
 wasm-logger = "*"
 web-sys = { version = "*", features = ["HtmlFormElement"] }
-yew = "0.19"
-yew-agent = "0.1"
-yew-router = "0.16"
-yewtil = "0.4"
+yew = { version = "0.20", features = ["csr"] }
+yew-agent = "0.2"
+yew-router = "0.17"
 wee_alloc = "*"
+bounce = { version = "0.7.0", features = ["query", "gloo"] }
+async-trait = "0.1.72"
+thiserror = "1.0.44"
 
 [profile.release]
 # less code to include into binary

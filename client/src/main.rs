@@ -1,5 +1,6 @@
 extern crate wee_alloc;
 
+use bounce::BounceRoot;
 use uuid::Uuid;
 use wasm_logger;
 use yew::prelude::*;
@@ -8,19 +9,20 @@ use yew_router::prelude::*;
 #[global_allocator]
 static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
 
-mod agent;
 mod components;
+mod utils;
 
 use components::{
     account::{Account, CreateAccount},
+    ctx::AccountProvider,
     expenditure::{EditExpenditure, Expenditures},
     repayment::{EditRepayment, Repayments},
     user::User,
-    utils::{Breadcrumb, NavBar},
+    utils::NavBar,
 };
 
 #[derive(Clone, Routable, PartialEq)]
-enum Route {
+pub enum Route {
     #[at("/")]
     Home,
     #[at("/account/:account_id")]
@@ -50,7 +52,7 @@ enum Route {
     NotFound,
 }
 
-fn switch(route: &Route) -> Html {
+fn switch(route: Route) -> Html {
     match route {
         Route::Home => html! {
             <>
@@ -61,46 +63,57 @@ fn switch(route: &Route) -> Html {
         Route::Account { account_id } => html! {
             <>
             <NavBar account_id={ account_id.clone() } />
-            <div class="container">
-                <Breadcrumb route={ route.clone() } />
-                <Account id={ account_id.clone() } />
-            </div>
+            <BounceRoot>
+                <AccountProvider id={ account_id.clone() }>
+                    <Suspense fallback={ utils::loading() }>
+                        <Account id={ account_id.clone() } />
+                    </Suspense>
+                </AccountProvider>
+            </BounceRoot>
             </>
         },
         Route::Expenditures { account_id } => html! {
             <>
             <NavBar account_id={ account_id.clone() } />
-            <div class="container">
-                <Breadcrumb route={ route.clone() } />
-                <Expenditures account_id={ account_id.clone() } />
-            </div>
+            <AccountProvider id={ account_id.clone() }>
+                //<Breadcrumb route={ route.clone() } />
+                <Suspense fallback={ utils::loading() }>
+                    <Expenditures />
+                </Suspense>
+            </AccountProvider>
             </>
         },
         Route::CreateExpenditure { account_id } => html! {
             <>
             <NavBar account_id={ account_id.clone() } />
-            <div class="container">
-                <Breadcrumb route={ route.clone() } />
-                <EditExpenditure account_id={ account_id.clone() } />
-            </div>
+            <AccountProvider id={ account_id.clone() }>
+                //<Breadcrumb route={ route.clone() } />
+                <Suspense fallback={ utils::loading() }>
+                    <EditExpenditure />
+                </Suspense>
+            </AccountProvider>
             </>
         },
         Route::Repayments { account_id } => html! {
             <>
             <NavBar account_id={ account_id.clone() } />
-            <div class="container">
-                <Breadcrumb route={ route.clone() } />
-                <Repayments account_id={ account_id.clone() } />
-            </div>
+            <AccountProvider id={ account_id.clone() }>
+                //<Breadcrumb route={ route.clone() } />
+                <Suspense fallback={ utils::loading() }>
+                    <Repayments />
+                </Suspense>
+            </AccountProvider>
             </>
         },
         Route::CreateRepayment { account_id } => html! {
             <>
             <NavBar account_id={ account_id.clone() } />
-            <div class="container">
-                <Breadcrumb route={ route.clone() } />
-                <EditRepayment account_id={ account_id.clone() } />
-            </div>
+            <AccountProvider id={ account_id.clone() }>
+                //<Breadcrumb route={ route.clone() } />
+                <Suspense fallback={ utils::loading() }>
+                    <EditRepayment />
+                </Suspense>
+            </AccountProvider>
             </>
         },
         Route::EditRepayment {
@@ -109,10 +122,12 @@ fn switch(route: &Route) -> Html {
         } => html! {
             <>
             <NavBar account_id={ account_id.clone() } />
-            <div class="container">
-                <Breadcrumb route={ route.clone() } />
-                <EditRepayment account_id={ account_id.clone() } repayment_id={ repayment_id.clone() } />
-            </div>
+            <AccountProvider id={ account_id.clone() }>
+                //<Breadcrumb route={ route.clone() } />
+                <Suspense fallback={ utils::loading() }>
+                    <EditRepayment repayment_id={ repayment_id.clone() } />
+                </Suspense>
+            </AccountProvider>
             </>
         },
         Route::EditExpenditure {
@@ -121,10 +136,12 @@ fn switch(route: &Route) -> Html {
         } => html! {
             <>
             <NavBar account_id={ account_id.clone() } />
-            <div class="container">
-                <Breadcrumb route={ route.clone() } />
-                <EditExpenditure account_id={ account_id.clone() } expenditure_id={ expenditure_id.clone() } />
-            </div>
+            <AccountProvider id={ account_id.clone() }>
+                //<Breadcrumb route={ route.clone() } />
+                <Suspense fallback={ utils::loading() }>
+                    <EditExpenditure expenditure_id={ expenditure_id.clone() } />
+                </Suspense>
+            </AccountProvider>
             </>
         },
         Route::User {
@@ -133,10 +150,12 @@ fn switch(route: &Route) -> Html {
         } => html! {
             <>
             <NavBar account_id={ account_id.clone() } />
-            <div class="container">
-                <Breadcrumb route={ route.clone() } />
-                <User account_id={ account_id.clone() } user_id={ user_id.clone() } />
-            </div>
+            <AccountProvider id={ account_id.clone() }>
+                //<Breadcrumb route={ route.clone() } />
+                <Suspense fallback={ utils::loading() }>
+                    <User user_id={ user_id.clone() } />
+                </Suspense>
+            </AccountProvider>
             </>
         },
         Route::NotFound => html! {
@@ -155,7 +174,7 @@ fn app() -> Html {
     html! {
         <>
             <BrowserRouter>
-                <Switch<Route> render={Switch::render(switch)} />
+                <Switch<Route> render={switch} />
             </BrowserRouter>
         </>
     }
@@ -163,5 +182,5 @@ fn app() -> Html {
 
 fn main() {
     wasm_logger::init(wasm_logger::Config::default());
-    yew::start_app::<App>();
+    yew::Renderer::<App>::new().render();
 }

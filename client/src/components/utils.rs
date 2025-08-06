@@ -1,6 +1,5 @@
 use yew::prelude::*;
 use yew_router::prelude::*;
-use yew_router::scope_ext::HistoryHandle;
 
 use crate::Route;
 
@@ -16,7 +15,7 @@ pub(crate) enum NavBarMsg {
 }
 
 pub(crate) struct NavBar {
-    _listener: HistoryHandle,
+    _listener: LocationHandle,
     menu_visible: bool,
 }
 
@@ -25,9 +24,10 @@ impl Component for NavBar {
     type Properties = NavBarProps;
 
     fn create(ctx: &Context<Self>) -> Self {
-        let listener = ctx.link().add_history_listener(ctx.link().callback(|_| {
-            NavBarMsg::Hide
-        })).unwrap();
+        let listener = ctx
+            .link()
+            .add_location_listener(ctx.link().callback(|_| NavBarMsg::Hide))
+            .unwrap();
 
         Self {
             _listener: listener,
@@ -333,4 +333,18 @@ pub(crate) fn breadcrumb(BreadcrumpProps { route }: &BreadcrumpProps) -> Html {
     } else {
         html! {}
     }
+}
+
+#[derive(Properties, PartialEq)]
+pub struct FetchErrorProps {
+    pub error: String,
+}
+
+#[function_component(FetchError)]
+pub fn fetch_error(props: &FetchErrorProps) -> HtmlResult {
+    Ok(html! {
+        <div class={ classes!("notification", "is-error", "is-light") }>
+            <pre>{ props.error.clone() }</pre>
+        </div>
+    })
 }

@@ -10,7 +10,8 @@ Installation
 ============
 
 ```sh
-echo DATABASE_URL=postgres://user:password@host/database > server/.env
+echo DATABASE_URL=postgres://rmmt:password@127.0.0.1/rmmt > rmmt/.env
+cd rmmt/
 diesel migration generate init
 diesel migration run
 ```
@@ -35,5 +36,5 @@ Dev
 
 ```sh
 docker pull postgres
-docker run --name rmmt-postgres -e POSTGRES_DB=rmmt -e POSTGRES_PASSWORD=password -p 127.0.0.1:5432:5432/tcp -d postgres
+docker run --name rmmt-postgres -e POSTGRES_USER=rmmt -e POSTGRES_PASSWORD=password -p 127.0.0.1:5432:5432/tcp -d postgres
 ```

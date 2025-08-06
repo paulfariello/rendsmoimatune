@@ -1,2 +1,2 @@
 [global.databases.main]
-url = "postgres://postgres:password@127.0.0.1/rmmt"
+url = "postgres://rmmt:password@127.0.0.1/rmmt"

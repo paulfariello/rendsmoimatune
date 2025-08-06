@@ -1,7 +1,6 @@
-use std::cell::RefCell;
 use std::collections::HashMap;
-use std::rc::Rc;
 
+use anyhow::Result;
 use chrono::naive::NaiveDate;
 use chrono::Local;
 use gloo_net::http::Request;
@@ -10,213 +9,174 @@ use log::{debug, error, info, warn};
 use rmmt::{self, prelude::*};
 use uuid::Uuid;
 use yew::prelude::*;
-use yew_agent::{Bridge, Bridged, Dispatched, Dispatcher};
+use yew::suspense::{use_future, use_future_with_deps, UseFutureHandle};
 use yew_router::prelude::*;
 
-use crate::agent::{AccountAgent, AccountMsg};
 use crate::components::{
     account::AccountTitle,
+    ctx::{AccountAction, AccountCtx},
     user::UserName,
-    utils::{Amount, Loading},
+    utils::{Amount, FetchError},
 };
+use crate::utils;
 use crate::Route;
 
-#[derive(Properties, PartialEq)]
-pub struct RepaymentsProps {
-    pub account_id: String,
-}
+#[function_component(Repayments)]
+pub fn repayments() -> HtmlResult {
+    let account_ctx = use_context::<AccountCtx>().unwrap();
 
-pub struct Repayments {
-    account: Option<Rc<RefCell<rmmt::Account>>>,
-    repayments: Option<Rc<RefCell<HashMap<Uuid, rmmt::Repayment>>>>,
-    users: Option<Rc<RefCell<HashMap<Uuid, rmmt::User>>>>,
-    _agent: Box<dyn Bridge<AccountAgent>>,
-}
+    let account_url = format!("/api/account/{}", account_ctx.id);
+    let account: UseFutureHandle<Result<rmmt::Account, _>> =
+        use_future(|| async move { utils::get(&account_url).await })?;
+    let account: &rmmt::Account = match *account {
+        Ok(ref res) => res,
+        Err(ref error) => return Ok(html! { <FetchError error={ format!("{:?}", error) } /> }),
+    };
+    account_ctx.dispatch(AccountAction::UpdateName(account.name.clone()));
 
-impl Component for Repayments {
-    type Message = AccountMsg;
-    type Properties = RepaymentsProps;
+    let users_url = format!("/api/account/{}/users", account_ctx.id);
+    let users: UseFutureHandle<Result<Vec<rmmt::User>, _>> =
+        use_future(|| async move { utils::get(&users_url).await })?;
+    let users: HashMap<Uuid, rmmt::User> = match *users {
+        Ok(ref res) => res.iter().cloned().map(|u| (u.id.clone(), u)).collect(),
+        Err(ref error) => return Ok(html! { <FetchError error={ format!("{:?}", error) } /> }),
+    };
+    account_ctx.dispatch(AccountAction::UpdateUsers(users));
 
-    fn create(ctx: &Context<Self>) -> Self {
-        let mut agent = AccountAgent::bridge(ctx.link().callback(|msg| msg));
-
-        agent.send(AccountMsg::LoadAccount(ctx.props().account_id.clone()));
-
-        Self {
-            account: None,
-            repayments: None,
-            users: None,
-            _agent: agent,
-        }
-    }
-
-    fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
-        match msg {
-            AccountMsg::UpdateAccount(account) => {
-                self.account = Some(account);
-                true
-            }
-            AccountMsg::UpdateUsers(users) => {
-                self.users = Some(users);
-                true
-            }
-            AccountMsg::UpdateRepayments(repayments) => {
-                self.repayments = Some(repayments);
-                true
-            }
-            _ => false,
-        }
-    }
-
-    fn view(&self, ctx: &Context<Self>) -> Html {
-        html! {
-            <>
-            <AccountTitle id={ ctx.props().account_id.clone() } account={ self.account.clone() } />
-            <div class="box">
-                <h3 class="subtitle is-3">
-                    <Link<Route> to={Route::Repayments { account_id: ctx.props().account_id.clone() }}>
-                        <span class="icon-text">
-                            <span class="icon"><i class="fas fa-exchange"></i></span>
-                            <span>{ "Remboursements" }</span>
-                        </span>
-                    </Link<Route>>
-                </h3>
-                if let (Some(users), Some(repayments)) = (self.users.clone(), self.repayments.clone()) {
-                    <RepaymentsList account_id={ ctx.props().account_id.clone() } { repayments } { users } />
-                } else {
-                    <Loading />
-                }
-            </div>
-            </>
-        }
-    }
+    Ok(html! {
+        <>
+        <AccountTitle />
+        <div class="box">
+            <h3 class="subtitle is-3">
+                <Link<Route> to={Route::Repayments { account_id: account_ctx.id.clone() }}>
+                    <span class="icon-text">
+                        <span class="icon"><i class="fas fa-exchange"></i></span>
+                        <span>{ "Remboursements" }</span>
+                    </span>
+                </Link<Route>>
+            </h3>
+            <Suspense fallback={utils::loading()}>
+                <RepaymentsList />
+            </Suspense>
+        </div>
+        </>
+    })
 }
 
 #[derive(Properties, PartialEq)]
 pub struct RepaymentsListProps {
-    pub account_id: String,
-    pub limit: Option<usize>,
-    pub users: Rc<RefCell<HashMap<Uuid, rmmt::User>>>,
-    pub repayments: Rc<RefCell<HashMap<Uuid, rmmt::Repayment>>>,
     #[prop_or_default]
-    pub loading: bool,
+    pub limit: Option<usize>,
+    #[prop_or_default]
+    pub user_id: Option<Uuid>,
     #[prop_or_default]
     pub buttons: bool,
 }
 
-pub struct RepaymentsList;
+#[function_component(RepaymentsList)]
+pub fn repayments_list(props: &RepaymentsListProps) -> HtmlResult {
+    let account_ctx = use_context::<AccountCtx>().unwrap();
+    log::debug!("Rendering repayments list version: {}", account_ctx.version);
 
-impl Component for RepaymentsList {
-    type Message = ();
-    type Properties = RepaymentsListProps;
+    let repayments_url = format!("/api/account/{}/repayments", account_ctx.id);
+    let query: Vec<(&str, String)> = props
+        .user_id
+        .iter()
+        .map(|id| ("user_id", id.hyphenated().to_string()))
+        .collect();
+    let repayments: UseFutureHandle<Result<Vec<rmmt::Repayment>, _>> =
+        use_future_with_deps(|_| async move { utils::get_with_query(&repayments_url, query).await }, account_ctx.version)?;
+    let mut repayments: Vec<rmmt::Repayment> = match *repayments {
+        Ok(ref res) => res.iter().cloned().collect(), // TODO avoid clone
+        Err(ref error) => return Ok(html! { <FetchError error={ format!("{:?}", error) } /> }),
+    };
 
-    fn create(_ctx: &Context<Self>) -> Self {
-        Self
-    }
+    repayments.sort_by(|a, b| b.date.cmp(&a.date));
+    let len = repayments.len();
 
-    fn view(&self, ctx: &Context<Self>) -> Html {
-        let repayments = ctx.props().repayments.borrow();
-        let mut sorted = repayments.keys().cloned().collect::<Vec<_>>();
-        sorted.sort_by(|a, b| {
-            repayments
-                .get(b)
-                .unwrap()
-                .date
-                .partial_cmp(&repayments.get(a).unwrap().date)
-                .unwrap()
-        });
-        let len = repayments.len();
-
-        html! {
-            <div class="is-relative block">
-                if ctx.props().loading {
-                    <div class="loading-overlay">
-                        <Loading />
-                    </div>
-                }
-                {
-                    if len > 0 {
-                        let map = |id: &Uuid| {
-                            let repayment = repayments.get(id).unwrap();
-                            html! {
+    Ok(html! {
+        <div class="is-relative block">
+            {
+                if len > 0 {
+                    let map = |repayment: &rmmt::Repayment| {
+                        html! {
+                            <tr>
+                                <td class="is-vcentered is-hidden-touch">{ &repayment.date }</td>
+                                <td class="is-vcentered"><UserName id={ repayment.payer_id } /></td>
+                                <td class="is-vcentered is-hidden-touch">{ "a remboursé" }</td>
+                                <td class="is-vcentered"><Amount amount={ repayment.amount as i64 } /></td>
+                                <td class="is-vcentered is-hidden-touch">{ "à" }</td>
+                                <td class="is-vcentered"><UserName id={ repayment.beneficiary_id } /></td>
+                                <td class="is-vcentered">
+                                    <Link<Route> to={Route::EditRepayment { account_id: account_ctx.id.clone(), repayment_id: { repayment.id } }}>
+                                        <a aria-label="Éditer" class="button is-primary" href="">
+                                            <i class="fas fa-pencil fa-fw"></i>
+                                        </a>
+                                    </Link<Route>>
+                                    <DeleteRepayment id={ repayment.id.clone() } />
+                                </td>
+                            </tr>
+                        }
+                    };
+                    html! {
+                        <table class="table is-fullwidth is-striped is-hoverable">
+                            <thead>
                                 <tr>
-                                    <td class="is-vcentered is-hidden-touch">{ &repayment.date }</td>
-                                    <td class="is-vcentered"><UserName account_id={ ctx.props().account_id.clone() } users={ ctx.props().users.clone() } id={ repayment.payer_id } /></td>
-                                    <td class="is-vcentered is-hidden-touch">{ "a remboursé" }</td>
-                                    <td class="is-vcentered"><Amount amount={ repayment.amount as i64 } /></td>
-                                    <td class="is-vcentered is-hidden-touch">{ "à" }</td>
-                                    <td class="is-vcentered"><UserName account_id={ ctx.props().account_id.clone() } users={ ctx.props().users.clone() } id={ repayment.beneficiary_id } /></td>
-                                    <td class="is-vcentered">
-                                        <Link<Route> to={Route::EditRepayment { account_id: ctx.props().account_id.clone(), repayment_id: { repayment.id } }}>
-                                            <a aria-label="Éditer" class="button is-primary" href="">
-                                                <i class="fas fa-pencil fa-fw"></i>
-                                            </a>
-                                        </Link<Route>>
-                                        <DeleteRepayment account_id={ repayment.account_id.clone() } id={ repayment.id.clone() } />
-                                    </td>
+                                    <th class="is-hidden-touch">{ "Date" }</th>
+                                    <th class="is-hidden-touch">{ "Payeur" }</th>
+                                    <th class="is-hidden-desktop">{ "De" }</th>
+                                    <th class="is-hidden-touch"></th>
+                                    <th class="is-hidden-touch">{ "Montant" }</th>
+                                    <th class="is-hidden-desktop"></th>
+                                    <th class="is-hidden-touch"></th>
+                                    <th class="is-hidden-touch">{ "Beneficiaire" }</th>
+                                    <th class="is-hidden-desktop">{ "À" }</th>
+                                    <th class="is-hidden-touch">{ "Actions" }</th>
+                                    <th class="is-hidden-desktop"></th>
                                 </tr>
+                            </thead>
+                        <tbody>
+                        {
+                            match props.limit {
+                                Some(limit) => repayments.iter().take(limit).map(map).collect::<Html>(),
+                                None => repayments.iter().map(map).collect::<Html>(),
                             }
-                        };
-                        html! {
-                            <table class="table is-fullwidth is-striped is-hoverable">
-                                <thead>
-                                    <tr>
-                                        <th class="is-hidden-touch">{ "Date" }</th>
-                                        <th class="is-hidden-touch">{ "Payeur" }</th>
-                                        <th class="is-hidden-desktop">{ "De" }</th>
-                                        <th class="is-hidden-touch"></th>
-                                        <th class="is-hidden-touch">{ "Montant" }</th>
-                                        <th class="is-hidden-desktop"></th>
-                                        <th class="is-hidden-touch"></th>
-                                        <th class="is-hidden-touch">{ "Beneficiaire" }</th>
-                                        <th class="is-hidden-desktop">{ "À" }</th>
-                                        <th class="is-hidden-touch">{ "Actions" }</th>
-                                        <th class="is-hidden-desktop"></th>
-                                    </tr>
-                                </thead>
-                            <tbody>
-                            {
-                                match ctx.props().limit {
-                                    Some(limit) => sorted.iter().take(limit).map(map).collect::<Html>(),
-                                    None => sorted.iter().map(map).collect::<Html>(),
-                                }
-                            }
-                            </tbody>
-                            </table>
                         }
-                    } else {
-                        html! {
-                            <div class="notification is-info is-light">
-                                { "Aucune remboursement" }
-                            </div>
-                        }
+                        </tbody>
+                        </table>
+                    }
+                } else {
+                    html! {
+                        <div class="notification is-info is-light">
+                            { "Aucun remboursement" }
+                        </div>
                     }
                 }
+            }
 
-                <div class="buttons">
-                    if let Some(limit) = ctx.props().limit {
-                        if len > limit {
-                            <Link<Route> to={Route::Repayments { account_id: ctx.props().account_id.clone() }} classes="button is-light">
-                                { format!("Voir les {} autres", len - limit) }
-                            </Link<Route>>
-                        }
-                    }
-                    if ctx.props().buttons {
-                        <Link<Route> to={Route::CreateRepayment { account_id: ctx.props().account_id.clone() }} classes="button is-primary">
-                            <span class="icon">
-                                <i class="fas fa-plus-circle" />
-                            </span>
-                            <span>{ "Nouveau remboursement" }</span>
+            <div class="buttons">
+                if let Some(limit) = props.limit {
+                    if len > limit {
+                        <Link<Route> to={Route::Repayments { account_id: account_ctx.id.clone() }} classes="button is-light">
+                            { format!("Voir les {} autres", len - limit) }
                         </Link<Route>>
                     }
-                </div>
+                }
+                if props.buttons {
+                    <Link<Route> to={Route::CreateRepayment { account_id: account_ctx.id.clone() }} classes="button is-primary">
+                        <span class="icon">
+                            <i class="fas fa-plus-circle" />
+                        </span>
+                        <span>{ "Nouveau remboursement" }</span>
+                    </Link<Route>>
+                }
             </div>
-        }
-    }
+        </div>
+    })
 }
 
-#[derive(Debug, Clone)]
-struct DefaultRepayment {
+#[derive(Debug, Clone, PartialEq)]
+pub struct DefaultRepayment {
     payer_id: Option<Uuid>,
     beneficiary_id: Option<Uuid>,
     amount: i32,
@@ -251,40 +211,39 @@ impl Default for DefaultRepayment {
             payer_id: None,
             beneficiary_id: None,
             amount: 0,
-            date: Local::today().naive_local(),
+            date: Local::now().naive_local().into(),
         }
     }
 }
 
 #[derive(Properties, PartialEq)]
-pub struct EditRepaymentProps {
-    pub account_id: String,
+pub struct BaseEditRepaymentProps {
     #[prop_or_default]
     pub repayment_id: Option<Uuid>,
+    pub repayment: Option<rmmt::Repayment>,
+    pub default: Option<DefaultRepayment>,
 }
 
 pub enum EditRepaymentMsg {
-    AccountMsg(AccountMsg),
     Submit,
     Edited { repayment: rmmt::Repayment },
     Error(String),
     ClearError,
+    UpdateAccountCtx(AccountCtx),
 }
 
-pub struct EditRepayment {
-    account: Option<Rc<RefCell<rmmt::Account>>>,
-    users: Option<Rc<RefCell<HashMap<Uuid, rmmt::User>>>>,
-    default: Option<DefaultRepayment>,
+pub struct BaseEditRepayment {
+    account_ctx: AccountCtx,
+    _ctx_listener: ContextHandle<AccountCtx>,
     select_payer: NodeRef,
     input_amount: NodeRef,
     select_beneficiary: NodeRef,
     input_date: NodeRef,
     creating: bool,
     error: Option<String>,
-    agent: Box<dyn Bridge<AccountAgent>>,
 }
 
-impl EditRepayment {
+impl BaseEditRepayment {
     fn save_repayment(&mut self, ctx: &Context<Self>) {
         self.creating = true;
 
@@ -310,7 +269,7 @@ impl EditRepayment {
         let input_date = self.input_date.cast::<web_sys::HtmlInputElement>().unwrap();
         let date = NaiveDate::parse_from_str(&input_date.value(), "%Y-%m-%d").unwrap();
 
-        let account_id: UniqId = ctx.props().account_id.clone().try_into().unwrap();
+        let account_id: UniqId = self.account_ctx.id.clone().try_into().unwrap();
         let req = match ctx.props().repayment_id {
             Some(id) => {
                 let repayment = rmmt::Repayment {
@@ -324,8 +283,7 @@ impl EditRepayment {
                 debug!("Update repayment: {:?}", repayment);
                 Request::put(&format!(
                     "/api/account/{}/repayments/{}",
-                    ctx.props().account_id,
-                    id
+                    self.account_ctx.id, id
                 ))
                 .json(&repayment)
                 .unwrap()
@@ -339,12 +297,9 @@ impl EditRepayment {
                     date,
                 };
                 debug!("Create repayment: {:?}", repayment);
-                Request::post(&format!(
-                    "/api/account/{}/repayments",
-                    ctx.props().account_id
-                ))
-                .json(&repayment)
-                .unwrap()
+                Request::post(&format!("/api/account/{}/repayments", self.account_ctx.id))
+                    .json(&repayment)
+                    .unwrap()
             }
         };
 
@@ -385,62 +340,32 @@ impl EditRepayment {
             .unwrap();
         input_amount.set_value("0");
 
-        let today = Local::today();
+        let today = Local::now();
         let input_date = self.input_date.cast::<web_sys::HtmlInputElement>().unwrap();
         input_date.set_value(&format!("{}", today.format("%Y-%m-%d")));
     }
 }
 
-impl Component for EditRepayment {
+impl Component for BaseEditRepayment {
     type Message = EditRepaymentMsg;
-    type Properties = EditRepaymentProps;
+    type Properties = BaseEditRepaymentProps;
 
     fn create(ctx: &Context<Self>) -> Self {
-        let mut agent = AccountAgent::bridge(ctx.link().callback(EditRepaymentMsg::AccountMsg));
-
-        agent.send(AccountMsg::LoadAccount(ctx.props().account_id.clone()));
-        if let Some(repayment_id) = ctx.props().repayment_id.clone() {
-            agent.send(AccountMsg::LoadRepayment {
-                account_id: ctx.props().account_id.clone(),
-                repayment_id,
-            });
-        }
-
+        let (account_ctx, ctx_listener) = ctx.link().context::<AccountCtx>(ctx.link().callback(EditRepaymentMsg::UpdateAccountCtx)).unwrap();
         Self {
-            account: None,
-            users: None,
-            default: None,
+            account_ctx,
+            _ctx_listener: ctx_listener,
             select_payer: NodeRef::default(),
             input_amount: NodeRef::default(),
             select_beneficiary: NodeRef::default(),
             input_date: NodeRef::default(),
             creating: false,
             error: None,
-            agent,
         }
     }
 
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
-            EditRepaymentMsg::AccountMsg(msg) => match msg {
-                AccountMsg::UpdateAccount(account) => {
-                    self.account = Some(account);
-                    true
-                }
-                AccountMsg::UpdateUsers(users) => {
-                    self.users = Some(users);
-                    true
-                }
-                AccountMsg::UpdateRepayment(repayment) => {
-                    if Some(repayment.id) == ctx.props().repayment_id {
-                        self.default = Some(repayment.into());
-                        true
-                    } else {
-                        false
-                    }
-                }
-                _ => false,
-            },
             EditRepaymentMsg::Submit => {
                 if self.creating {
                     false
@@ -451,12 +376,11 @@ impl Component for EditRepayment {
             }
             EditRepaymentMsg::Edited { repayment } => {
                 info!("Edited repayment: {:?}", repayment);
-                self.agent.send(AccountMsg::ChangedRepayments);
                 self.clear();
 
-                let history = ctx.link().history().unwrap();
-                history.push(Route::Account {
-                    account_id: ctx.props().account_id.clone(),
+                let navigator = ctx.link().navigator().unwrap();
+                navigator.push(&Route::Account {
+                    account_id: self.account_ctx.id.clone(),
                 });
 
                 false
@@ -470,44 +394,54 @@ impl Component for EditRepayment {
                 self.error = None;
                 true
             }
+            EditRepaymentMsg::UpdateAccountCtx(account_ctx) => {
+                self.account_ctx = account_ctx;
+                true
+            }
         }
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
-        let default = match self.default.as_ref() {
+        let default = match ctx.props().default.as_ref() {
             Some(default) => default.clone(),
             None => match ctx.link().location() {
-                Some(location) => match location.query::<rmmt::Balancing>() {
+                Some(location) if !location.query_str().is_empty() => match location.query::<rmmt::Balancing>() {
                     Err(err) => {
-                        error!("Invalid query: {}", err);
+                        error!("Invalid query: {} \"{}\"", err, location.query_str());
                         Default::default()
                     }
                     Ok(balancing) => balancing.into(),
                 },
-                None => Default::default(),
+                _ => {
+                    let mut default: DefaultRepayment = Default::default();
+                    let mut users = self.account_ctx.users.keys();
+                    default.payer_id = users.next().copied();
+                    default.beneficiary_id = users.next().copied();
+                    default
+                }
             },
         };
 
-        let onsubmit = ctx.link().callback(|event: FocusEvent| {
+        let onsubmit = ctx.link().callback(|event: SubmitEvent| {
             event.prevent_default();
             EditRepaymentMsg::Submit
         });
 
-        let history = ctx.link().history().unwrap();
-        let previous = Callback::once(move |event: MouseEvent| {
+        let navigator = ctx.link().navigator().unwrap();
+        let previous = Callback::from(move |event: MouseEvent| {
             event.prevent_default();
-            history.go(-1)
+            navigator.back()
         });
 
         let delete_error = ctx.link().callback(|_| EditRepaymentMsg::ClearError);
 
         html! {
             <>
-            <AccountTitle id={ ctx.props().account_id.clone() } account={ self.account.clone() } />
+            <AccountTitle />
             <div class="box">
                 if let Some(repayment_id) = ctx.props().repayment_id.clone() {
                     <h3 class="subtitle is-3">
-                        <Link<Route> to={Route::EditRepayment { account_id: ctx.props().account_id.clone(), repayment_id }}>
+                        <Link<Route> to={Route::EditRepayment { account_id: self.account_ctx.id.clone(), repayment_id }}>
                             <span class="icon-text">
                                 <span class="icon"><i class="fas fa-exchange"></i></span>
                                 <span>{ "Remboursement" }</span>
@@ -516,7 +450,7 @@ impl Component for EditRepayment {
                     </h3>
                 } else {
                     <h3 class="subtitle is-3">
-                        <Link<Route> to={Route::CreateRepayment { account_id: ctx.props().account_id.clone() }}>
+                        <Link<Route> to={Route::CreateRepayment { account_id: self.account_ctx.id.clone() }}>
                             <span class="icon-text">
                                 <span class="icon"><i class="fas fa-exchange"></i></span>
                                 <span>{ "Nouveau remboursement" }</span>
@@ -530,85 +464,81 @@ impl Component for EditRepayment {
                       { error }
                     </div>
                 }
-                if let Some(users) = self.users.clone() {
-                    <form {onsubmit}>
-                        <div class="field is-horizontal">
-                            <div class="field-body">
-                                <div class="field">
-                                    <p class="control is-expanded has-icons-left">
-                                        <div class="select is-fullwidth is-primary">
-                                            <select ref={ self.select_payer.clone() } required=true>
-                                            {
-                                                (&*users.borrow()).iter().map(|(_, user)| html! {
-                                                    <option value={ user.id.to_string() } selected={ default.payer_id == Some(user.id) }>{ &user.name }</option>
-                                                }).collect::<Html>()
-                                            }
-                                            </select>
-                                        </div>
-                                        <span class="icon is-small is-left">
-                                            <i class="fas fa-user"></i>
-                                        </span>
-                                    </p>
-                                </div>
-                                <div class="field">
-                                    <label class="label is-large">{ "rembourse" }</label>
-                                </div>
-                                <div class="field has-addons">
-                                    <div class="control is-expanded">
-                                    <input ref={ self.input_amount.clone() } type="number" min="0" step="0.01" class="input is-primary" required=true placeholder="montant" value={ (default.amount as f64 / 100f64).to_string() } />
+                <form {onsubmit}>
+                    <div class="field is-horizontal">
+                        <div class="field-body">
+                            <div class="field">
+                                <p class="control is-expanded has-icons-left">
+                                    <div class="select is-fullwidth is-primary">
+                                        <select ref={ self.select_payer.clone() } required=true>
+                                        {
+                                            self.account_ctx.users.iter().map(|(_, user)| html! {
+                                                <option value={ user.id.to_string() } selected={ default.payer_id == Some(user.id) }>{ &user.name }</option>
+                                            }).collect::<Html>()
+                                        }
+                                        </select>
                                     </div>
-                                    <div class="control">
-                                        <p class="button is-static">{ "€" }</p>
-                                    </div>
+                                    <span class="icon is-small is-left">
+                                        <i class="fas fa-user"></i>
+                                    </span>
+                                </p>
+                            </div>
+                            <div class="field">
+                                <label class="label is-large">{ "rembourse" }</label>
+                            </div>
+                            <div class="field has-addons">
+                                <div class="control is-expanded">
+                                <input ref={ self.input_amount.clone() } type="number" min="0" step="0.01" class="input is-primary" required=true placeholder="montant" value={ (default.amount as f64 / 100f64).to_string() } />
                                 </div>
-                                <div class="field">
-                                    <label class="label is-large">{ "à" }</label>
-                                </div>
-                                <div class="field">
-                                    <p class="control is-expanded has-icons-left">
-                                        <div class="select is-fullwidth is-primary">
-                                            <select ref={ self.select_beneficiary.clone() } required=true>
-                                            {
-                                                (&*users.borrow()).iter().map(|(_, user)| html! {
-                                                    <option value={ user.id.to_string() } selected={ default.beneficiary_id == Some(user.id) }>{ &user.name }</option>
-                                                }).collect::<Html>()
-                                            }
-                                            </select>
-                                        </div>
-                                        <span class="icon is-small is-left">
-                                            <i class="fas fa-user"></i>
-                                        </span>
-                                    </p>
+                                <div class="control">
+                                    <p class="button is-static">{ "€" }</p>
                                 </div>
                             </div>
-                        </div>
-                        <div class="field">
-                            <div class="control">
-                                <input ref={self.input_date.clone()} type="date" class="input is-primary" required=true value={ format!("{}", default.date.format("%Y-%m-%d")) } />
+                            <div class="field">
+                                <label class="label is-large">{ "à" }</label>
+                            </div>
+                            <div class="field">
+                                <p class="control is-expanded has-icons-left">
+                                    <div class="select is-fullwidth is-primary">
+                                        <select ref={ self.select_beneficiary.clone() } required=true>
+                                        {
+                                            self.account_ctx.users.iter().map(|(_, user)| html! {
+                                                <option value={ user.id.to_string() } selected={ default.beneficiary_id == Some(user.id) }>{ &user.name }</option>
+                                            }).collect::<Html>()
+                                        }
+                                        </select>
+                                    </div>
+                                    <span class="icon is-small is-left">
+                                        <i class="fas fa-user"></i>
+                                    </span>
+                                </p>
                             </div>
                         </div>
-                        <div class="control buttons">
-                            <button type="button" class="button is-light" onclick={ previous }>
-                                { "Annuler" }
-                            </button>
-                            <button type="submit" class={classes!("button", "is-primary", self.creating.then(|| "is-loading"))}>
-                                if ctx.props().repayment_id.is_some() {
-                                    <span class="icon">
-                                        <i class="fas fa-save" />
-                                    </span>
-                                    <span>{ "Enregistrer" }</span>
-                                } else {
-                                    <span class="icon">
-                                        <i class="fas fa-plus" />
-                                    </span>
-                                    <span>{ "Ajouter" }</span>
-                                }
-                            </button>
+                    </div>
+                    <div class="field">
+                        <div class="control">
+                            <input ref={self.input_date.clone()} type="date" class="input is-primary" required=true value={ format!("{}", default.date.format("%Y-%m-%d")) } />
                         </div>
-                    </form>
-                } else {
-                    <Loading />
-                }
+                    </div>
+                    <div class="control buttons">
+                        <button type="button" class="button is-light" onclick={ previous }>
+                            { "Annuler" }
+                        </button>
+                        <button type="submit" class={classes!("button", "is-primary", self.creating.then(|| "is-loading"))}>
+                            if ctx.props().repayment_id.is_some() {
+                                <span class="icon">
+                                    <i class="fas fa-save" />
+                                </span>
+                                <span>{ "Enregistrer" }</span>
+                            } else {
+                                <span class="icon">
+                                    <i class="fas fa-plus" />
+                                </span>
+                                <span>{ "Ajouter" }</span>
+                            }
+                        </button>
+                    </div>
+                </form>
             </div>
             </>
         }
@@ -616,8 +546,67 @@ impl Component for EditRepayment {
 }
 
 #[derive(Properties, PartialEq)]
+pub struct EditExistingRepaymentProps {
+    #[prop_or_default]
+    pub repayment_id: Uuid,
+}
+
+#[function_component(EditExistingRepayment)]
+pub fn edit_existing_repayment(props: &EditExistingRepaymentProps) -> HtmlResult {
+    let account_ctx = use_context::<AccountCtx>().unwrap();
+    let repayment_url = format!(
+        "/api/account/{}/repayments/{}",
+        account_ctx.id, props.repayment_id
+    );
+    let repayment: UseFutureHandle<Result<rmmt::Repayment, _>> =
+        use_future(|| async move { utils::get(&repayment_url).await })?;
+    let repayment: &rmmt::Repayment = match *repayment {
+        Ok(ref res) => res,
+        Err(ref error) => return Ok(html! { <FetchError error={ format!("{:?}", error) } /> }),
+    };
+
+    Ok(
+        html! {<BaseEditRepayment repayment_id={ props.repayment_id } repayment={ Some(repayment.clone()) } />},
+    )
+}
+
+#[derive(Properties, PartialEq)]
+pub struct EditRepaymentProps {
+    #[prop_or_default]
+    pub repayment_id: Option<Uuid>,
+}
+
+#[function_component(EditRepayment)]
+pub fn edit_repayment_with_account_and_users(props: &EditRepaymentProps) -> HtmlResult {
+    let account_ctx = use_context::<AccountCtx>().unwrap();
+
+    let account_url = format!("/api/account/{}", account_ctx.id);
+    let account: UseFutureHandle<Result<rmmt::Account, _>> =
+        use_future(|| async move { utils::get(&account_url).await })?;
+    let account: &rmmt::Account = match *account {
+        Ok(ref res) => res,
+        Err(ref error) => return Ok(html! { <FetchError error={ format!("{:?}", error) } /> }),
+    };
+    account_ctx.dispatch(AccountAction::UpdateName(account.name.clone()));
+
+    let users_url = format!("/api/account/{}/users", account_ctx.id);
+    let users: UseFutureHandle<Result<Vec<rmmt::User>, _>> =
+        use_future(|| async move { utils::get(&users_url).await })?;
+    let users: HashMap<Uuid, rmmt::User> = match *users {
+        Ok(ref res) => res.iter().cloned().map(|u| (u.id.clone(), u)).collect(),
+        Err(ref error) => return Ok(html! { <FetchError error={ format!("{:?}", error) } /> }),
+    };
+    account_ctx.dispatch(AccountAction::UpdateUsers(users));
+
+    if let Some(repayment_id) = props.repayment_id {
+        Ok(html! {<EditExistingRepayment repayment_id={ repayment_id } />})
+    } else {
+        Ok(html! {<BaseEditRepayment repayment_id={ props.repayment_id } />})
+    }
+}
+
+#[derive(Properties, PartialEq)]
 pub struct DeleteRepaymentProps {
-    pub account_id: Uuid,
     pub id: Uuid,
 }
 
@@ -629,17 +618,17 @@ pub enum DeleteRepaymentMsg {
 
 struct DeleteRepayment {
     deleting: bool,
-    agent: Dispatcher<AccountAgent>,
     error: Option<String>,
 }
 
 impl DeleteRepayment {
     fn delete_repayment(&mut self, ctx: &Context<Self>) {
+        let (account_ctx, _) = ctx.link().context::<AccountCtx>(Callback::noop()).unwrap();
         self.deleting = true;
 
         let url = format!(
             "/api/account/{}/repayments/{}",
-            UniqId::from(ctx.props().account_id),
+            account_ctx.id,
             ctx.props().id
         );
         ctx.link().send_future(async move {
@@ -671,7 +660,6 @@ impl Component for DeleteRepayment {
         Self {
             deleting: false,
             error: None,
-            agent: AccountAgent::dispatcher(),
         }
     }
 
@@ -687,8 +675,9 @@ impl Component for DeleteRepayment {
                 }
             }
             DeleteRepaymentMsg::Deleted => {
+                let (account_ctx, _) = ctx.link().context::<AccountCtx>(Callback::noop()).unwrap();
                 self.deleting = false;
-                self.agent.send(AccountMsg::ChangedRepayments);
+                account_ctx.dispatch(AccountAction::BumpVersion);
                 true
             }
             DeleteRepaymentMsg::Error(error) => {
