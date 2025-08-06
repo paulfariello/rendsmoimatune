@@ -1,8 +1,6 @@
 use std::collections::HashMap;
-use std::rc::Rc;
 
 use anyhow::{Context as _, Error, Result};
-use bounce::query::use_query;
 use log;
 use rmmt;
 use uuid::Uuid;
@@ -13,7 +11,6 @@ use yew_router::prelude::*;
 use crate::components::ctx::{AccountAction, AccountCtx};
 use crate::components::{
     balance::{BalanceList, BalancingList},
-    ctx::AccountQuery,
     expenditure::ExpendituresList,
     repayment::RepaymentsList,
     user::CreateUser,
@@ -32,12 +29,14 @@ pub fn account(props: &AccountProps) -> HtmlResult {
     let account_ctx = use_context::<AccountCtx>().unwrap();
     log::debug!("Rendering account version = {}", account_ctx.version);
 
-    let account = use_query::<AccountQuery>(Rc::new(props.id.clone()))?;
-    let account = match account.as_ref() {
-        Ok(account) => account,
-        // TODO check if we can pass utils::Error to FetchError
-        Err(error) => return Ok(html! { <FetchError error={ format!("{:?}", error) } /> }),
+    let account_url = format!("/api/account/{}", props.id);
+    let account: UseFutureHandle<Result<rmmt::Account, _>> =
+        use_future_with_deps(|_| async move { utils::get(&account_url).await }, account_ctx.version)?;
+    let account: &rmmt::Account = match *account {
+        Ok(ref res) => res,
+        Err(ref error) => return Ok(html! { <FetchError error={ format!("{:?}", error) } /> }),
     };
+    account_ctx.dispatch(AccountAction::UpdateName(account.name.clone()));
 
     let users_url = format!("/api/account/{}/users", props.id);
     let users: UseFutureHandle<Result<Vec<rmmt::User>, _>> =
@@ -88,7 +87,7 @@ pub fn account(props: &AccountProps) -> HtmlResult {
             <div class="tile is-parent">
                 <div class="tile is-child box">
                     <h3 class="subtitle is-3">
-                        <Link<Route> to={Route::Expenditures { account_id: account.id.as_ref().clone() }}>
+                        <Link<Route> to={Route::Expenditures { account_id: account_ctx.id.clone() }}>
                             <span class="icon"><i class="fas fa-credit-card"></i></span>
                             <span>{ "Dépenses" }</span>
                         </Link<Route>>
@@ -104,7 +103,7 @@ pub fn account(props: &AccountProps) -> HtmlResult {
             <div class="tile is-parent">
                 <div class="tile is-child box">
                     <h3 class="subtitle is-3">
-                        <Link<Route> to={Route::Repayments { account_id: account.id.as_ref().clone() }}>
+                        <Link<Route> to={Route::Repayments { account_id: account_ctx.id.clone() }}>
                             <span class="icon"><i class="fas fa-exchange"></i></span>
                             <span>{ "Remboursements" }</span>
                         </Link<Route>>
@@ -243,6 +242,7 @@ impl Component for CreateAccount {
 #[function_component(AccountTitle)]
 pub fn account_title() -> Html {
     let account_ctx = use_context::<AccountCtx>().unwrap();
+    log::debug!("Render account title: {}", account_ctx.name);
     html! {
         <h2 class="title is-1">
             <Link<Route> to={Route::Account { account_id: account_ctx.id.clone() }}>
